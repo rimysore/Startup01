@@ -1,0 +1,154 @@
+{"query": "what does the config file at /etc/app/settings.ini say", "expected": ["read_text_file", "read_file"], "style": "user", "note": "read_file and read_text_file are near-duplicates in this server"}
+{"query": "read the contents of a text file", "expected": ["read_text_file", "read_file"], "style": "agent"}
+{"query": "open the screenshot at ~/Desktop/error.png so you can look at it", "expected": ["read_media_file"], "style": "user"}
+{"query": "read an image file as base64", "expected": ["read_media_file"], "style": "agent"}
+{"query": "pull up package.json and tsconfig.json together", "expected": ["read_multiple_files"], "style": "user"}
+{"query": "read several files at once", "expected": ["read_multiple_files"], "style": "agent"}
+{"query": "save this text into notes.txt, replacing whatever is there", "expected": ["write_file"], "style": "user"}
+{"query": "write content to a file", "expected": ["write_file"], "style": "agent"}
+{"query": "change the port number on line 12 of server.py to 8080", "expected": ["edit_file"], "style": "user"}
+{"query": "make line-based edits to a file", "expected": ["edit_file"], "style": "agent"}
+{"query": "make a new folder called reports inside the project", "expected": ["create_directory"], "style": "user"}
+{"query": "create a directory", "expected": ["create_directory"], "style": "agent"}
+{"query": "what's in my Downloads folder", "expected": ["list_directory", "list_directory_with_sizes"], "style": "user", "note": "either listing answers this"}
+{"query": "list files in a directory", "expected": ["list_directory", "list_directory_with_sizes"], "style": "agent"}
+{"query": "which files in this folder are taking up the most space", "expected": ["list_directory_with_sizes"], "style": "user"}
+{"query": "list directory contents with file sizes", "expected": ["list_directory_with_sizes"], "style": "agent"}
+{"query": "give me an overview of how the whole project is organized, nested folders and all", "expected": ["directory_tree"], "style": "user"}
+{"query": "recursive tree view of a directory", "expected": ["directory_tree"], "style": "agent"}
+{"query": "rename draft.txt to final.txt", "expected": ["move_file"], "style": "user"}
+{"query": "move or rename a file", "expected": ["move_file"], "style": "agent"}
+{"query": "find every file ending in .test.js somewhere under src", "expected": ["search_files"], "style": "user"}
+{"query": "search for files by name pattern", "expected": ["search_files"], "style": "agent"}
+{"query": "when was this file last modified and how big is it", "expected": ["get_file_info"], "style": "user"}
+{"query": "get file metadata", "expected": ["get_file_info"], "style": "agent"}
+{"query": "which parts of the disk am I permitted to touch", "expected": ["list_allowed_directories"], "style": "user"}
+{"query": "list directories the server can access", "expected": ["list_allowed_directories"], "style": "agent"}
+{"query": "what have I changed in my working copy so far", "expected": ["git_status"], "style": "user"}
+{"query": "show repository status", "expected": ["git_status"], "style": "agent"}
+{"query": "show me the edits I haven't added yet", "expected": ["git_diff_unstaged"], "style": "user"}
+{"query": "diff of unstaged changes", "expected": ["git_diff_unstaged"], "style": "agent"}
+{"query": "what exactly is about to go into my next commit", "expected": ["git_diff_staged"], "style": "user"}
+{"query": "diff of staged changes", "expected": ["git_diff_staged"], "style": "agent"}
+{"query": "how does my feature branch differ from main", "expected": ["git_diff"], "style": "user"}
+{"query": "compare two branches or commits", "expected": ["git_diff"], "style": "agent"}
+{"query": "record my staged work with the message 'fix login redirect'", "expected": ["git_commit"], "style": "user"}
+{"query": "commit staged changes with a message", "expected": ["git_commit"], "style": "agent"}
+{"query": "stage the files I just edited so they're ready to commit", "expected": ["git_add"], "style": "user"}
+{"query": "stage files for commit", "expected": ["git_add"], "style": "agent"}
+{"query": "take everything back out of the staging area", "expected": ["git_reset"], "style": "user"}
+{"query": "unstage all changes", "expected": ["git_reset"], "style": "agent"}
+{"query": "who has been committing to this repo recently", "expected": ["git_log"], "style": "user"}
+{"query": "show commit history", "expected": ["git_log"], "style": "agent"}
+{"query": "start a new branch in my local clone for an experiment", "expected": ["git_create_branch"], "style": "user", "note": "'local clone' distinguishes it from GitHub's create_branch"}
+{"query": "create a local git branch", "expected": ["git_create_branch"], "style": "agent"}
+{"query": "go back to the main branch", "expected": ["git_checkout"], "style": "user"}
+{"query": "switch git branches", "expected": ["git_checkout"], "style": "agent"}
+{"query": "what changed in commit a1b2c3d", "expected": ["git_show"], "style": "user"}
+{"query": "show the contents of a commit", "expected": ["git_show"], "style": "agent"}
+{"query": "which branches exist in my local clone", "expected": ["git_branch"], "style": "user"}
+{"query": "list git branches", "expected": ["git_branch"], "style": "agent"}
+{"query": "put this updated README straight into the repo on GitHub with a commit message", "expected": ["create_or_update_file", "push_files"], "style": "user", "note": "one file; push_files also works"}
+{"query": "create or update a file in a github repository", "expected": ["create_or_update_file"], "style": "agent"}
+{"query": "are there any open source projects on GitHub for parsing PDFs", "expected": ["search_repositories"], "style": "user"}
+{"query": "search github repositories", "expected": ["search_repositories"], "style": "agent"}
+{"query": "set up a brand new private repo on my GitHub account called side-project", "expected": ["create_repository"], "style": "user"}
+{"query": "create a github repository", "expected": ["create_repository"], "style": "agent"}
+{"query": "show me what the Dockerfile looks like in the acme/api repo on GitHub", "expected": ["get_file_contents"], "style": "user"}
+{"query": "get file contents from a github repository", "expected": ["get_file_contents"], "style": "agent"}
+{"query": "upload these three source files to the repo in a single commit", "expected": ["push_files"], "style": "user"}
+{"query": "push multiple files to a repository in one commit", "expected": ["push_files"], "style": "agent"}
+{"query": "report a bug on the project's GitHub page saying the export button does nothing", "expected": ["create_issue"], "style": "user"}
+{"query": "create a github issue", "expected": ["create_issue"], "style": "agent"}
+{"query": "propose my branch for merging into main on GitHub", "expected": ["create_pull_request"], "style": "user"}
+{"query": "open a pull request", "expected": ["create_pull_request"], "style": "agent"}
+{"query": "make my own copy of the facebook/react project under my account", "expected": ["fork_repository"], "style": "user"}
+{"query": "fork a github repository", "expected": ["fork_repository"], "style": "agent"}
+{"query": "cut a new branch on the remote GitHub repo from main for the hotfix", "expected": ["create_branch"], "style": "user", "note": "remote branch; local is git_create_branch"}
+{"query": "create a branch in a github repository", "expected": ["create_branch"], "style": "agent"}
+{"query": "what has been pushed to the develop branch of acme/web lately", "expected": ["list_commits"], "style": "user"}
+{"query": "list commits of a github branch", "expected": ["list_commits"], "style": "agent"}
+{"query": "show the open bugs in the acme/web project", "expected": ["list_issues", "search_issues"], "style": "user", "note": "either can filter open bugs"}
+{"query": "list issues in a repository", "expected": ["list_issues"], "style": "agent"}
+{"query": "close issue 42 on GitHub and relabel it as wontfix", "expected": ["update_issue"], "style": "user"}
+{"query": "update a github issue", "expected": ["update_issue"], "style": "agent"}
+{"query": "reply on the GitHub issue saying we are looking into it", "expected": ["add_issue_comment"], "style": "user"}
+{"query": "comment on an issue", "expected": ["add_issue_comment"], "style": "agent"}
+{"query": "where on GitHub do people call this deprecated API", "expected": ["search_code"], "style": "user"}
+{"query": "search code across github", "expected": ["search_code"], "style": "agent"}
+{"query": "find GitHub issues and PRs that mention a memory leak, from any project", "expected": ["search_issues"], "style": "user"}
+{"query": "search issues and pull requests", "expected": ["search_issues"], "style": "agent"}
+{"query": "look up the GitHub account of the maintainer named Jane Smith", "expected": ["search_users"], "style": "user"}
+{"query": "search github users", "expected": ["search_users"], "style": "agent"}
+{"query": "give me the full details of issue 128 in acme/web", "expected": ["get_issue"], "style": "user"}
+{"query": "get details of a specific issue", "expected": ["get_issue"], "style": "agent"}
+{"query": "what is pull request 57 in acme/web about", "expected": ["get_pull_request"], "style": "user"}
+{"query": "get details of a pull request", "expected": ["get_pull_request"], "style": "agent"}
+{"query": "which pull requests are open against acme/web right now", "expected": ["list_pull_requests"], "style": "user"}
+{"query": "list pull requests in a repository", "expected": ["list_pull_requests"], "style": "agent"}
+{"query": "approve PR 57 with a comment saying looks good", "expected": ["create_pull_request_review"], "style": "user"}
+{"query": "create a review on a pull request", "expected": ["create_pull_request_review"], "style": "agent"}
+{"query": "land PR 57 into the main branch", "expected": ["merge_pull_request"], "style": "user"}
+{"query": "merge a pull request", "expected": ["merge_pull_request"], "style": "agent"}
+{"query": "which files does PR 57 touch", "expected": ["get_pull_request_files"], "style": "user"}
+{"query": "list files changed in a pull request", "expected": ["get_pull_request_files"], "style": "agent"}
+{"query": "are the CI checks passing on PR 57", "expected": ["get_pull_request_status"], "style": "user"}
+{"query": "get status checks for a pull request", "expected": ["get_pull_request_status"], "style": "agent"}
+{"query": "bring PR 57's branch up to date with the base", "expected": ["update_pull_request_branch"], "style": "user"}
+{"query": "update a pull request branch with base changes", "expected": ["update_pull_request_branch"], "style": "agent"}
+{"query": "what inline remarks have reviewers left on PR 57's code", "expected": ["get_pull_request_comments"], "style": "user"}
+{"query": "get review comments on a pull request", "expected": ["get_pull_request_comments"], "style": "agent"}
+{"query": "has anyone signed off on PR 57 yet", "expected": ["get_pull_request_reviews"], "style": "user"}
+{"query": "get reviews on a pull request", "expected": ["get_pull_request_reviews"], "style": "agent"}
+{"query": "start tracking a new person named Priya Rao in your memory", "expected": ["create_entities"], "style": "user"}
+{"query": "create entities in the knowledge graph", "expected": ["create_entities"], "style": "agent"}
+{"query": "note that Priya works for Acme Corp", "expected": ["create_relations"], "style": "user"}
+{"query": "create relations between entities", "expected": ["create_relations"], "style": "agent"}
+{"query": "remember that Priya prefers dark mode", "expected": ["add_observations", "create_entities"], "style": "user", "note": "a new fact about a person: add_observations if she exists, create_entities if not"}
+{"query": "add observations to an entity", "expected": ["add_observations"], "style": "agent"}
+{"query": "forget everything about the Acme project", "expected": ["delete_entities"], "style": "user"}
+{"query": "delete entities from the knowledge graph", "expected": ["delete_entities"], "style": "agent"}
+{"query": "that note about her phone number is outdated, remove it", "expected": ["delete_observations"], "style": "user"}
+{"query": "delete observations from an entity", "expected": ["delete_observations"], "style": "agent"}
+{"query": "Priya no longer works for Acme, drop that connection", "expected": ["delete_relations"], "style": "user"}
+{"query": "delete relations from the knowledge graph", "expected": ["delete_relations"], "style": "agent"}
+{"query": "dump everything you currently remember", "expected": ["read_graph"], "style": "user"}
+{"query": "read the entire knowledge graph", "expected": ["read_graph"], "style": "agent"}
+{"query": "do you remember anything about people who like hiking", "expected": ["search_nodes"], "style": "user"}
+{"query": "search nodes in the knowledge graph", "expected": ["search_nodes"], "style": "agent"}
+{"query": "pull up what you've stored about Priya Rao specifically", "expected": ["open_nodes", "search_nodes"], "style": "user", "note": "lookup by exact name; a search also works"}
+{"query": "open specific nodes by name", "expected": ["open_nodes"], "style": "agent"}
+{"query": "work through this tricky architecture decision step by step, revising earlier thoughts if needed", "expected": ["sequentialthinking"], "style": "user"}
+{"query": "step-by-step reasoning tool", "expected": ["sequentialthinking"], "style": "agent"}
+{"query": "grab the text of that blog post at https://example.com/post/42", "expected": ["fetch"], "style": "user"}
+{"query": "fetch a url and extract markdown", "expected": ["fetch"], "style": "agent"}
+{"query": "what time is it right now in Tokyo", "expected": ["get_current_time"], "style": "user"}
+{"query": "get the current time in a timezone", "expected": ["get_current_time"], "style": "agent"}
+{"query": "if it's 9am in London, what time is that for my colleague in Los Angeles", "expected": ["convert_time"], "style": "user"}
+{"query": "convert time between timezones", "expected": ["convert_time"], "style": "agent"}
+{"query": "repeat back exactly what I say so I can check the connection", "expected": ["echo"], "style": "user"}
+{"query": "echo a string back", "expected": ["echo"], "style": "agent"}
+{"query": "show me a message that carries priority and audience annotations", "expected": ["get-annotated-message"], "style": "user"}
+{"query": "get a message with annotations", "expected": ["get-annotated-message"], "style": "agent"}
+{"query": "what environment variables is the server running with", "expected": ["get-env"], "style": "user"}
+{"query": "list environment variables", "expected": ["get-env"], "style": "agent"}
+{"query": "give me several links to resources I can follow", "expected": ["get-resource-links"], "style": "user"}
+{"query": "return resource links", "expected": ["get-resource-links"], "style": "agent"}
+{"query": "hand me a reference to a resource that I can embed", "expected": ["get-resource-reference"], "style": "user"}
+{"query": "get a resource reference", "expected": ["get-resource-reference"], "style": "agent"}
+{"query": "return data together with an output schema so I can validate it", "expected": ["get-structured-content"], "style": "user"}
+{"query": "get structured content with output schema", "expected": ["get-structured-content"], "style": "agent"}
+{"query": "what is 17 plus 25", "expected": ["get-sum"], "style": "user"}
+{"query": "add two numbers", "expected": ["get-sum"], "style": "agent"}
+{"query": "show me a small sample picture", "expected": ["get-tiny-image"], "style": "user"}
+{"query": "get a tiny image", "expected": ["get-tiny-image"], "style": "agent"}
+{"query": "shrink this log file with compression and give it back as a resource", "expected": ["gzip-file-as-resource"], "style": "user"}
+{"query": "gzip compress a file", "expected": ["gzip-file-as-resource"], "style": "agent"}
+{"query": "turn the fake log messages on or off", "expected": ["toggle-simulated-logging"], "style": "user"}
+{"query": "toggle simulated logging", "expected": ["toggle-simulated-logging"], "style": "agent"}
+{"query": "start or stop the fake resource update notifications", "expected": ["toggle-subscriber-updates"], "style": "user"}
+{"query": "toggle subscriber updates", "expected": ["toggle-subscriber-updates"], "style": "agent"}
+{"query": "kick off a slow job that reports its progress along the way", "expected": ["trigger-long-running-operation"], "style": "user"}
+{"query": "run a long running operation with progress updates", "expected": ["trigger-long-running-operation"], "style": "agent"}
+{"query": "run a mock deep research task that gathers and summarizes information", "expected": ["simulate-research-query"], "style": "user"}
+{"query": "simulate a research query", "expected": ["simulate-research-query"], "style": "agent"}

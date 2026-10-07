@@ -14,7 +14,12 @@ from .index import ToolIndex
 from .slim import slim_tool
 from .tokens import Counter, estimate_tokens
 
-Queries = list[tuple[str, str]]
+# (query, expected): expected is one tool name, or several acceptable ones (any is a hit).
+Queries = list[tuple[str, "str | tuple[str, ...]"]]
+
+
+def _wanted(want: "str | tuple[str, ...]") -> tuple[str, ...]:
+    return (want,) if isinstance(want, str) else tuple(want)
 
 QUERY_SETS = {
     "dev": synthetic_queries,  # used for choosing the retrieval configuration
@@ -36,14 +41,15 @@ def evaluate(retriever: Retriever, queries: Queries, ks: tuple[int, ...] = (1, 3
     rr_sum = 0.0
     misses = []
     for query, want in queries:
+        accepted = _wanted(want)
         ranked = [t.name for t, _ in retriever.search(query, k=max(ks))]
-        if want in ranked:
-            rank = ranked.index(want) + 1
+        rank = next((i for i, name in enumerate(ranked, start=1) if name in accepted), None)
+        if rank is not None:
             rr_sum += 1 / rank
             for k in ks:
                 hits[k] += rank <= k
-        if want not in ranked[:5]:
-            misses.append((query, want, ranked[:3]))
+        if rank is None or rank > 5:
+            misses.append((query, " | ".join(accepted), ranked[:3]))
     n = len(queries) or 1
     return Metrics(len(queries), {k: v / n for k, v in hits.items()}, rr_sum / n, misses)
 
@@ -148,6 +154,6 @@ def run(
     # Context the lazy path adds once the model has found its tool: the search
     # result plus (worst case) describe_tool for the right one.
     first_queries = next(iter(query_sets.values()))
-    discovery = sum(counter(gateway.search(q)) + counter(gateway.describe(want)) for q, want in first_queries)
+    discovery = sum(counter(gateway.search(q)) + counter(gateway.describe(_wanted(want)[0])) for q, want in first_queries)
     report.lazy_after_discovery_tokens = report.lazy_fixed_tokens + discovery / (len(first_queries) or 1)
     return report

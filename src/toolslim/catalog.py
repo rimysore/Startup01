@@ -24,6 +24,26 @@ class Tool:
         }
 
 
+def load_catalogs(paths) -> list[Tool]:
+    """Merge several catalogs (files, or directories of *.json) into one.
+
+    This is what an agent connected to several MCP servers sees. Tool names
+    must be unique across servers.
+    """
+    files: list[Path] = []
+    for p in map(Path, paths):
+        files += sorted(p.glob("*.json")) if p.is_dir() else [p]
+    tools: list[Tool] = []
+    origin: dict[str, Path] = {}
+    for f in files:
+        for tool in load_catalog(f):
+            if tool.name in origin:
+                raise ValueError(f"duplicate tool name {tool.name!r} in {f} (already defined in {origin[tool.name]})")
+            origin[tool.name] = f
+            tools.append(tool)
+    return tools
+
+
 def load_catalog(path: str | Path) -> list[Tool]:
     """Load tools from a JSON file.
 

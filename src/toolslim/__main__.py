@@ -1,31 +1,40 @@
-"""CLI: python -m toolslim {bench,search,slim} [--catalog tools.json]"""
+"""CLI: python -m toolslim {bench,check,search,slim} [--catalog PATH ...] [--labels FILE]"""
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 
 from . import bench
-from .catalog import load_catalog
+from .catalog import load_catalogs
 from .fixtures import synthetic_catalog
 from .gateway import LazyToolGateway
+from .labels import LabelError, as_query_sets, check_labels, load_labels
 from .slim import slim_tool
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(prog="toolslim", description=__doc__)
-    parser.add_argument("--catalog", help="JSON file: an MCP tools/list result or a list of tool definitions")
+    parser.add_argument(
+        "--catalog",
+        action="append",
+        metavar="PATH",
+        help="catalog JSON (MCP tools/list result or list of tool definitions) or a directory of them; repeat to merge several servers",
+    )
+    parser.add_argument("--labels", metavar="FILE", help="labeled queries (JSONL, see toolslim/labels.py) for scoring retrieval on --catalog")
     sub = parser.add_subparsers(dest="cmd", required=True)
-    p_bench = sub.add_parser("bench", help="token and retrieval benchmark on the synthetic catalog")
+    p_bench = sub.add_parser("bench", help="token and retrieval benchmark (synthetic catalog by default)")
     p_bench.add_argument(
         "--sets",
         default="dev",
-        help="comma-separated query sets: " + ", ".join(bench.QUERY_SETS) + ", or 'all'. Default 'dev': choose "
+        help="synthetic catalog only; comma-separated query sets: " + ", ".join(bench.QUERY_SETS) + ", or 'all'. Default 'dev': choose "
         "retrieval configs on dev; score the held-out sets only once the config is fixed.",
     )
     p_bench.add_argument(
         "--primary", default="hybrid-rrf", help="retriever behind the lazy-gateway token rows (falls back to bm25 if dense deps are missing)"
     )
+    sub.add_parser("check", help="validate --labels against --catalog and report leakage/coverage")
     p_search = sub.add_parser("search", help="what the model would see for a search_tools call")
     p_search.add_argument("query")
     p_slim = sub.add_parser("slim", help="print a slimmed tool definition")
@@ -33,16 +42,43 @@ def main() -> None:
     p_slim.add_argument("--level", type=int, default=2, choices=(0, 1, 2, 3))
     args = parser.parse_args()
 
-    tools = load_catalog(args.catalog) if args.catalog else synthetic_catalog()
+    if args.labels and not args.catalog:
+        parser.error("--labels needs --catalog")
+    tools = load_catalogs(args.catalog) if args.catalog else synthetic_catalog()
 
-    if args.cmd == "bench":
-        if args.catalog:
-            parser.error("bench needs labeled queries; with --catalog use `search`/`slim`, or add a queries file (planned)")
-        names = list(bench.QUERY_SETS) if args.sets == "all" else args.sets.split(",")
-        unknown = [n for n in names if n not in bench.QUERY_SETS]
-        if unknown:
-            parser.error(f"unknown query set(s) {unknown}; choose from {list(bench.QUERY_SETS)}")
-        query_sets = {n: bench.QUERY_SETS[n]() for n in names}
+    labels = None
+    if args.labels:
+        try:
+            labels = load_labels(args.labels)
+        except (LabelError, OSError) as exc:
+            parser.exit(2, f"error: {exc}\n")
+
+    if args.cmd == "check":
+        if labels is None:
+            parser.error("check needs --labels and --catalog")
+        report = check_labels(labels, tools)
+        for key, value in report.stats.items():
+            print(f"{key + ':':<44}{value}")
+        for line in report.errors:
+            print(f"ERROR   {line}")
+        for line in report.warnings:
+            print(f"warning {line}")
+        print("\nOK" if report.ok else f"\n{len(report.errors)} error(s)")
+        sys.exit(0 if report.ok else 1)
+    elif args.cmd == "bench":
+        if labels is not None:
+            report = check_labels(labels, tools)
+            if not report.ok:
+                parser.exit(2, "error: labels do not match the catalog:\n  " + "\n  ".join(report.errors) + "\n")
+            query_sets = as_query_sets(labels)
+        elif args.catalog:
+            parser.error("bench on --catalog needs --labels (see toolslim/labels.py for the format)")
+        else:
+            names = list(bench.QUERY_SETS) if args.sets == "all" else args.sets.split(",")
+            unknown = [n for n in names if n not in bench.QUERY_SETS]
+            if unknown:
+                parser.error(f"unknown query set(s) {unknown}; choose from {list(bench.QUERY_SETS)}")
+            query_sets = {n: bench.QUERY_SETS[n]() for n in names}
         print(bench.run(tools, query_sets, primary=args.primary).render())
     elif args.cmd == "search":
         print(LazyToolGateway(tools).search(args.query))
