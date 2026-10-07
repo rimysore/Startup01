@@ -129,6 +129,47 @@ class WordLlamaRegressionTests(unittest.TestCase):
         self.assertIn("calendar_delete_event", gw.search("remove an event from my schedule"))
 
 
+class DefaultConfigTests(unittest.TestCase):
+    def test_default_matches_the_recorded_dev_selection(self):
+        import json
+        from pathlib import Path
+
+        from toolslim.config import DEFAULT_RETRIEVER
+
+        recorded = json.loads((Path(__file__).resolve().parent.parent / "results" / "dev-selection.json").read_text())
+        self.assertEqual(DEFAULT_RETRIEVER, recorded["chosen"])
+
+    def test_default_retriever_falls_back_to_bm25_with_a_note_when_dense_is_missing(self):
+        import sys
+
+        from toolslim.config import default_retriever
+        from toolslim.index import ToolIndex
+
+        # Hide only `wordllama`. (Snapshot/restoring all of sys.modules would also evict
+        # numpy if it were first imported inside the block, and numpy cannot be re-imported.)
+        missing = object()
+        saved = sys.modules.get("wordllama", missing)
+        sys.modules["wordllama"] = None
+        try:
+            retriever, note = default_retriever(synthetic_catalog())
+        finally:
+            if saved is missing:
+                del sys.modules["wordllama"]
+            else:
+                sys.modules["wordllama"] = saved
+        self.assertIsInstance(retriever, ToolIndex)
+        self.assertIn("falls back to BM25", note)
+
+    @unittest.skipUnless(HAS_WORDLLAMA, "wordllama not installed")
+    def test_default_retriever_is_dense_when_available(self):
+        from toolslim.config import default_retriever
+        from toolslim.dense import DenseIndex
+
+        retriever, note = default_retriever(synthetic_catalog())
+        self.assertIsInstance(retriever, DenseIndex)
+        self.assertIsNone(note)
+
+
 class GatewayCustomIndexTests(unittest.TestCase):
     def test_gateway_uses_injected_index(self):
         gw = LazyToolGateway(synthetic_catalog(), index=FakeRetriever([("stripe_get_balance", 1.0)]))

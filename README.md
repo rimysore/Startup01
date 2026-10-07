@@ -25,7 +25,7 @@ python -m unittest discover -s tests
 | slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) | 10,583 (-62.7%) |
 | slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) | 7,184 (-74.7%) |
 | lazy gateway, first request | 190 (-97%) | 190 (-98.5%) | 190 (-99.3%) |
-| lazy gateway, after search + describe | 492 (-93%) | 506 (-96%) | not scored yet (draft labels exist) |
+| lazy gateway, after search + describe | 494 (-93%) | 503 (-96%) | not scored yet (draft labels exist) |
 
 How much slimming saves depends heavily on how a server generates its schemas: level 1 saves 11.5% on the dev servers but 55.6% on the test servers, almost entirely because Notion's generator attaches ~14k tokens of unused definitions to its tools (see below). The synthetic set overstated level 1 relative to the dev servers (28% vs 11.5%). Lazy loading's cost does not depend on the catalog.
 
@@ -34,7 +34,7 @@ Slimming levels:
 - **1**: lossless for tool calling: `title`, `$schema`, `examples`, `additionalProperties: false`, and `$defs`/`definitions` entries that no `$ref` reaches (transitively; skipped when a schema uses `$anchor`/`$id`/`$dynamicRef`, which are not resolved).
 - **2** and **3**: lossy. Not yet validated against real model behavior.
 
-The lazy rows use the hybrid retriever below. They only hold if the model finds the right tool on the first search, so retrieval quality matters as much as the token numbers.
+The lazy rows use the default retriever (plain embedding search; see "Choosing the default" below). They only hold if the model finds the right tool on the first search, so retrieval quality matters as much as the token numbers.
 
 ## Retrieval
 
@@ -44,14 +44,14 @@ The first version used lexical BM25 only and found the right tool in the top 5 f
 |---|---:|---:|---:|
 | bm25 | 50% (0.34) | 42% (0.22) | 100% (0.98) |
 | dense (`wordllama` embeddings) | 70% (0.54) | 68% (0.45) | 100% (0.98) |
-| **hybrid-rrf** (BM25 + dense, reciprocal rank fusion, default) | 78% (0.49) | 68% (0.35) | 100% (1.00) |
+| hybrid-rrf (BM25 + dense, reciprocal rank fusion; the default when these numbers were first measured) | 78% (0.49) | 68% (0.35) | 100% (1.00) |
 
 Seven variants in total are in `python -m toolslim bench --sets all`.
 
 How to read this:
 
 - **Embeddings are the real gain.** BM25 -> dense is +20 points on dev and +26 on held-out user-style queries; the effect shows up in both sets.
-- **Fusion did not beat plain dense.** Hybrid won by 3 queries on dev but tied on held-out (and has a lower MRR). With 40 queries per set that gap is noise. Hybrid stays the default because it was chosen on dev before the held-out run, and it keeps exact-keyword matching for identifiers; plain dense is an equally good, simpler choice on this data.
+- **Fusion did not beat plain dense.** Hybrid won by 3 queries on dev but tied on held-out (and has a lower MRR). With 40 queries per set that gap is noise. Hybrid was the default when this was written; the default was later chosen by a pre-registered rule (see "Choosing the default"), which picked plain dense.
 - **Agent-style queries are easy.** Short intents like "refund a payment" hit 100% for every retriever, which supports the idea that model-written queries do better than user paraphrases. They were written by the same author who knows the tool names, so treat 100% as an upper bound, not a measurement.
 - **A ceiling around 80%.** Recall barely moves from k=5 (78%) to k=10 (82%) on dev. What's left needs inference ("hand PLAT-77 over to Dana" means *assign*; "how many users signed up" means *run a SQL query*) that static word vectors can't do. Next lever: an LLM-written or rewritten query, or a reranker.
 
@@ -85,17 +85,40 @@ Retrieval, recall@5 (MRR), 77 queries per set. The retrievers were fixed on the 
 |---|---:|---:|
 | bm25 | 51% (0.38) | 99% (0.94) |
 | dense | 73% (0.52) | 96% (0.93) |
-| hybrid-rrf (default) | 69% (0.45) | 99% (0.95) |
+| hybrid-rrf (the default at the time) | 69% (0.45) | 99% (0.95) |
 | hybrid-minmax 1:1 | 77% (0.50) | 99% (0.96) |
 | hybrid-minmax 1:2 | 78% (0.54) | 99% (0.96) |
 
 What this says:
 
 - **Embeddings help again** (BM25 51% -> dense 73%), matching the synthetic result (+20 to +26 points).
-- **The default did not win.** `hybrid-rrf` (69%) trailed plain dense and both min-max fusions (77-78%). I did not change the default, because switching on the strength of the test set would make it a tuning set. Min-max fusion now looks better on two independent sets; deciding that properly needs fresh queries (see next steps). With 77 queries and 8 variants, treat gaps under ~8 points as noise.
+- **The default at the time did not win.** `hybrid-rrf` (69%) trailed plain dense and both min-max fusions (77-78%). I did not change it on the strength of that one set; the choice was made later by a fixed rule on all dev data pooled (below). With 77 queries and 8 variants, treat gaps under ~8 points as noise.
 - **Agent-style queries are solved** (96-99%), as before. The author caveat still applies.
 - **Failures are mostly domain-level, not near-misses**: for 16 of the 24 user-style misses the top result was from a different server than the right tool. Eight of the misses are the memory server, whose tools talk about a "knowledge graph" of "entities" and "observations" while people say "remember" and "forget". Tool descriptions written in the server's own jargon are hard to find from everyday words, which suggests index-side enrichment (usage hints or aliases per tool) as the next lever.
 - **Asking for more results pays off on real catalogs**: recall@10 is 86% vs 69% at k=5 for the default (the synthetic set plateaued at ~80%). Each extra result costs roughly 40 tokens, so this is a cheap lever to evaluate properly.
+
+### Choosing the default
+
+The default retriever was chosen by `scripts/select_config.py`, whose rule was committed before it was run, using **dev data only** (the synthetic sets and `catalogs/` + `queries/mcp-reference.jsonl`; the fresh test set is never read, and a test checks that). Rule: among candidates whose agent-style recall@5 is within 2 points of the best, take those whose pooled user-style recall@5 is within one standard error of the best, and pick the simplest.
+
+Pooled dev, 157 user-style and 117 agent-style queries (full output in `results/dev-selection.json`):
+
+| retriever | user recall@5 | MRR | user recall@10 | agent recall@5 | eligible |
+|---|---:|---:|---:|---:|:--:|
+| bm25 | 48.4% | 0.34 | 60.5% | 99.1% | no |
+| **dense** | 70.7% | 0.53 | 82.8% | 97.4% | **chosen** |
+| dense+params | 72.0% | 0.55 | 82.2% | 99.1% | yes |
+| hybrid-rrf | 70.7% | 0.45 | 81.5% | 99.1% | yes |
+| hybrid-minmax 1:1 | 73.9% | 0.48 | 84.1% | 99.1% | yes |
+| hybrid-rrf+params | 67.5% | 0.45 | 79.0% | 99.1% | no |
+| hybrid-minmax+params 1:1 | 70.7% | 0.47 | 80.9% | 99.1% | yes |
+| hybrid-minmax 1:2 | 73.2% | 0.51 | 84.7% | 99.1% | yes |
+
+One standard error is 3.5 points here, so five candidates are statistically tied and the rule falls back to simplicity: no fusion. Things to know:
+
+- Dense has the lowest agent-style recall of the eligible candidates (97.4% vs 99.1%, two queries). That passed the pre-set guard, but if real traffic is mostly model-written queries, a hybrid is marginally safer on this data.
+- Nothing in the data tests identifier-style queries (exact names, IDs), where BM25 would matter; dense-only has no keyword path.
+- The result count of `search_tools` (default 5) was not tuned: the model passes `limit` per call, and the best value depends on what an extra search turn costs, which dev data cannot measure. Recall@10 is shown for reference.
 
 ### Fresh test set, and what its schemas showed
 
@@ -123,7 +146,7 @@ Caveats: the dev and synthetic catalogs contain no `$defs`, so their numbers did
 
 ## Next steps
 
-1. Fix the retriever configuration (RRF vs min-max, result count) on the dev data and record it; have someone other than me review or replace `queries/mcp-test.jsonl`; then score the test set once (protocol in `queries/README.md`).
+1. Score the test set once with the recorded configuration (protocol in `queries/README.md`); have someone other than me review or replace `queries/mcp-test.jsonl`.
 2. Index-side enrichment for jargon-heavy tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
 3. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
 4. Count tokens with the API's token counter instead of the estimate.

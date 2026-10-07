@@ -8,6 +8,7 @@ import sys
 
 from . import bench
 from .catalog import load_catalogs
+from .config import DEFAULT_RETRIEVER, default_retriever
 from .fixtures import synthetic_catalog
 from .gateway import LazyToolGateway
 from .labels import LabelError, as_query_sets, check_labels, load_labels
@@ -32,7 +33,7 @@ def main() -> None:
         "retrieval configs on dev; score the held-out sets only once the config is fixed.",
     )
     p_bench.add_argument(
-        "--primary", default="hybrid-rrf", help="retriever behind the lazy-gateway token rows (falls back to bm25 if dense deps are missing)"
+        "--primary", default=DEFAULT_RETRIEVER, help="retriever behind the lazy-gateway token rows (falls back to bm25 if dense deps are missing)"
     )
     sub.add_parser("check", help="validate --labels against --catalog and report leakage/coverage")
     p_search = sub.add_parser("search", help="what the model would see for a search_tools call")
@@ -81,7 +82,10 @@ def main() -> None:
             query_sets = {n: bench.QUERY_SETS[n]() for n in names}
         print(bench.run(tools, query_sets, primary=args.primary).render())
     elif args.cmd == "search":
-        print(LazyToolGateway(tools).search(args.query))
+        retriever, note = default_retriever(tools)
+        if note:
+            print(note, file=sys.stderr)
+        print(LazyToolGateway(tools, index=retriever).search(args.query))
     else:
         tool = next((t for t in tools if t.name == args.name), None)
         if tool is None:

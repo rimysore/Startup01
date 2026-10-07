@@ -1,0 +1,100 @@
+{
+  "chosen": "dense",
+  "rule": "pooled user-style recall@5, 1-SE rule, simplest eligible; agent-style guard 2 points",
+  "best_user_recall5": 0.7388535031847133,
+  "se": 0.03505673327443812,
+  "threshold": 0.7037967699102752,
+  "simplicity_order": [
+    "bm25",
+    "dense",
+    "dense+params",
+    "hybrid-rrf",
+    "hybrid-minmax 1:1",
+    "hybrid-rrf+params",
+    "hybrid-minmax+params 1:1",
+    "hybrid-minmax 1:2"
+  ],
+  "candidates": {
+    "bm25": {
+      "user_recall5": 0.4840764331210191,
+      "user_hits5": 76,
+      "user_n": 157,
+      "user_recall10": 0.6050955414012739,
+      "user_mrr": 0.3428849459104235,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    },
+    "dense": {
+      "user_recall5": 0.7070063694267515,
+      "user_hits5": 111,
+      "user_n": 157,
+      "user_recall10": 0.8280254777070064,
+      "user_mrr": 0.52510110201193,
+      "agent_recall5": 0.9743589743589743,
+      "agent_n": 117
+    },
+    "dense+params": {
+      "user_recall5": 0.7197452229299363,
+      "user_hits5": 113,
+      "user_n": 157,
+      "user_recall10": 0.821656050955414,
+      "user_mrr": 0.5474926701041352,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    },
+    "hybrid-rrf": {
+      "user_recall5": 0.7070063694267515,
+      "user_hits5": 111,
+      "user_n": 157,
+      "user_recall10": 0.8152866242038217,
+      "user_mrr": 0.4476316853705388,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    },
+    "hybrid-rrf+params": {
+      "user_recall5": 0.6751592356687898,
+      "user_hits5": 106,
+      "user_n": 157,
+      "user_recall10": 0.7898089171974523,
+      "user_mrr": 0.45487817207562425,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    },
+    "hybrid-minmax 1:1": {
+      "user_recall5": 0.7388535031847133,
+      "user_hits5": 116,
+      "user_n": 157,
+      "user_recall10": 0.8407643312101911,
+      "user_mrr": 0.4782327368314629,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    },
+    "hybrid-minmax 1:2": {
+      "user_recall5": 0.732484076433121,
+      "user_hits5": 115,
+      "user_n": 157,
+      "user_recall10": 0.8471337579617835,
+      "user_mrr": 0.5067359215448387,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    },
+    "hybrid-minmax+params 1:1": {
+      "user_recall5": 0.7070063694267515,
+      "user_hits5": 111,
+      "user_n": 157,
+      "user_recall10": 0.8089171974522293,
+      "user_mrr": 0.47480537862703465,
+      "agent_recall5": 0.9914529914529915,
+      "agent_n": 117
+    }
+  },
+  "environment": {
+    "python": "3.13.16",
+    "wordllama": "0.4.0.post1",
+    "numpy": "2.5.3"
+  },
+  "data": [
+    "synthetic: dev + heldout-user + heldout-agent",
+    "real-dev: catalogs/ + queries/mcp-reference.jsonl"
+  ]
+}
