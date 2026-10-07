@@ -253,9 +253,9 @@ What it says, and what it does not:
 
 `catalogs/test2/` has 105 more tools from 6 servers (Kubernetes, Heroku, MongoDB, DynamoDB, Pinecone, Tavily), chosen to overlap in vocabulary because cross-server confusion was the main failure on the first test set. 210 labeled queries (`queries/mcp-test2.jsonl`, written by me, so not independent) were scored once; the result is in "Second test result" below, so this batch is spent too. Token profile: 42,367 estimated tokens in total, but lossless slimming saves only 5.9% (level 3: 63%), since the weight is in long descriptions rather than schema scaffolding; the lazy gateway's fixed cost is still 190 tokens (99.6% less). Details and the rules for keeping it a clean test set are in `catalogs/README.md`. The first test set is spent and counts as dev data from now on.
 
-### Third batch (captured, unlabeled)
+### Third batch (captured, labels drafted)
 
-`catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). It has no labels and has not been scored. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
+`catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). A draft of 378 labeled queries (`queries/mcp-test3.jsonl`, written by me, so not independent) is committed; nearly all of its agent-style queries (97%) name their service, a regime favorable to the server-name idea. It has not been scored. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
 
 ## Design notes
 
@@ -266,7 +266,7 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Label `catalogs/test3` (189 tools; ideally someone other than me, naming the service or listing every acceptable tool; the two `add_table` tools need namespaced names), commit the labels, then score it once under the confirmation plan in "Choosing the default, round 2".
+1. Have someone other than me review or replace `queries/mcp-test3.jsonl` if possible, then score `catalogs/test3` once under the confirmation plan in "Choosing the default, round 2" (script committed before the run, as for the second batch).
 2. Find out how often real users and real model-written search queries name the service (it decides how much the server name is worth); this needs real traffic or an end-to-end eval.
 3. Fix the BM25 camel-case tokenizer and re-run the comparisons (BM25 and the BM25 half of the hybrids shift; dense does not).
 4. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.

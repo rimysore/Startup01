@@ -172,7 +172,7 @@ class CommittedDataTests(unittest.TestCase):
             if lb.expected[0] in dedicated:
                 self.assertIn("kubectl_generic", lb.expected, lb.query)
 
-    def test_third_batch_needs_namespacing_and_stays_unlabeled(self):
+    def test_third_batch_needs_namespacing(self):
         with self.assertRaisesRegex(ValueError, "duplicate tool name 'add_table'"):
             load_catalogs([ROOT / "catalogs" / "test3"])
         batch = load_catalogs([ROOT / "catalogs" / "test3"], on_duplicate="namespace")
@@ -183,12 +183,35 @@ class CommittedDataTests(unittest.TestCase):
         self.assertEqual({t.server for t in batch}, {"excel", "word", "powerpoint", "redis", "obsidian", "docker"})
         for d in ("catalogs", "catalogs/test2"):
             self.assertFalse(names & {t.name for t in load_catalogs([ROOT / d])}, d)
-        # Labels for this batch must be added deliberately (committed before scoring); update this test and
-        # catalogs/README.md when they are. Only names unique to this batch count: the spent SQLite label
-        # `create_table` legitimately shares a name with Excel's tool.
+
+    def test_third_batch_labels_are_clean_and_use_the_namespaced_names(self):
+        tools = load_catalogs([ROOT / "catalogs" / "test3"], on_duplicate="namespace")
+        names = {t.name for t in tools}
+        labels = load_labels(ROOT / "queries" / "mcp-test3.jsonl")
+        check = check_labels(labels, tools)
+        self.assertEqual(check.errors, [])
+        self.assertEqual(check.warnings, [])  # full coverage, no leaky user-style queries
+        self.assertEqual(len(labels), 378)
+        self.assertEqual({lb.style for lb in labels}, {"user", "agent"})
+        used = {e for lb in labels for e in lb.expected}
+        self.assertIn("word__add_table", used)
+        self.assertIn("powerpoint__add_table", used)
+        self.assertNotIn("add_table", used)
+        # no other label file may reference names unique to this batch (the spent SQLite label `create_table`
+        # legitimately shares a name with Excel's tool, so shared names are excluded)
         others = {t.name for d in ("catalogs", "catalogs/test", "catalogs/test2") for t in load_catalogs([ROOT / d])}
         for f in (ROOT / "queries").glob("*.jsonl"):
-            self.assertFalse({e for lb in load_labels(f) for e in lb.expected} & (names - others), f.name)
+            if f.name != "mcp-test3.jsonl":
+                self.assertFalse({e for lb in load_labels(f) for e in lb.expected} & (names - others), f.name)
+        # and these labels reference nothing outside the batch
+        self.assertFalse(used - names)
+
+    def test_footnote_rule_is_applied_uniformly(self):
+        # Documented rule: every tool that adds a footnote "by paragraph" is accepted wherever one of them is expected.
+        by_paragraph = {"add_footnote_to_document", "add_footnote_enhanced", "add_footnote_robust"}
+        for lb in load_labels(ROOT / "queries" / "mcp-test3.jsonl"):
+            if lb.expected[0] in {"add_footnote_to_document", "add_footnote_enhanced"}:
+                self.assertTrue(by_paragraph <= set(lb.expected), lb.query)
 
     def test_dev_labels_do_not_reference_test_tools(self):
         test_names = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}

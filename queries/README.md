@@ -8,6 +8,7 @@ Format: JSON Lines, documented in `src/toolslim/labels.py`. Validate with
 | `mcp-reference.jsonl` | `catalogs/` (8 servers, 78 tools) | **dev**: used while building and choosing retrievers | 154 |
 | `mcp-test.jsonl` | `catalogs/test/` (5 servers, 70 tools) | scored once on 2026-10-07, so **spent** (counts as dev data from now on) | 140 |
 | `mcp-test2.jsonl` | `catalogs/test2/` (6 servers, 105 tools) | scored once on 2026-10-07, so **spent** | 210 |
+| `mcp-test3.jsonl` | `catalogs/test3/` (6 servers, 189 tools) | **confirmation batch**: draft, not yet scored | 378 |
 
 ## How `mcp-test.jsonl` was produced
 
@@ -78,3 +79,27 @@ The last two rows (a crude, tokenizer-independent detector; a server called `tim
 ### Result (2026-10-07)
 
 Scored once with `scripts/score_test2.py`, protocol as above; raw output in `results/test2-score.txt`. Headline `dense`: user-style recall@5 = 66.7% (70/105, 95% interval 57-75%). Details, the declared `dense+server` comparison and caveats are in the top-level README. No labels or retrievers were changed afterwards, and no label was found to be objectively wrong.
+
+## `mcp-test3.jsonl` (draft, unscored; the confirmation batch)
+
+Written for `catalogs/test3/` by the same AI assistant that built the retrievers and chose the default, so it is a draft and not an independent test; a human reviewer or an independent author would strengthen it considerably. Written from tool names, descriptions and parameter names only, before any retrieval was run on this batch, and committed before scoring. One user-style and one agent-style query per tool (189 tools, 378 queries). Load it with `--catalog catalogs/test3 --on-duplicate namespace`.
+
+The overlap audit was done for all queries up front:
+
+- **Overlap groups:** the Office trio (tables: Excel `create_table`, Word `add_table`, PowerPoint `add_table`; charts; images; merging cells; creating, listing, reading and searching documents), Obsidian vs Word (appending, searching, reading), and the many look-alike Redis operations across data types (list/set/sorted set/hash/stream/JSON).
+- **Rule 1:** a query that another Office server could also answer names the product or its documents ("spreadsheet", "workbook", "Word document", "slide", "deck"); user-style Office queries do so in 114 of 117 cases.
+- **Rule 2:** tools that do equivalent jobs are all accepted: Word's five footnote-adding tools (by paragraph or by search text), its two footnote-deleting tools, rectangular vs single-row or single-column cell merges, one vs several column widths, Redis's two key scans, Obsidian's single and batch reads, PowerPoint's overlapping text and slide tools, and a few more (each marked with a note). 21 of the 189 rows (42 of 378 queries) accept several tools.
+- **Rule 3:** the two colliding `add_table` tools are labeled with their namespaced names, `word__add_table` and `powerpoint__add_table`.
+- **Rule 4:** where an action is unique within the batch (Docker, most of Redis), the user-style query does not force the service name in.
+
+Lint (`check`): 378 queries, 189/189 tools covered, no unknown tools, no duplicates, no user-style query containing every word of its tool's name (one that did, for `add_footnote_to_document`, was re-paraphrased before committing: a text fix, made without running retrieval).
+
+| | `mcp-reference` (dev) | `mcp-test` (spent) | `mcp-test2` (spent) | `mcp-test3` |
+|---|---:|---:|---:|---:|
+| user-style mean overlap with tool-name words | 0.14 | 0.13 | 0.20 | 0.25 |
+| agent-style mean overlap with tool-name words | 0.83 | 0.57 | 0.68 | 0.74 |
+| queries accepting several tools | 8 / 154 | 14 / 140 | 34 / 210 | 42 / 378 |
+| user-style queries that name their server | 19% | 1% | 73% | 32% |
+| agent-style queries that name their server | 22% | 16% | 89% | **97%** |
+
+Caveat for the confirmation: nearly every agent-style query here names its service (I put the product word in almost all of them), the same favorable regime as the second batch. So this batch tests the BM25/dense fusion well and tests the value of the server name in the index text under conditions that favor it; it says little about how often real model-written queries name their service. Scoring protocol and the declared comparisons are in the top-level README ("Choosing the default, round 2").

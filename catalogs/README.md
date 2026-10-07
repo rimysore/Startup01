@@ -7,7 +7,7 @@ Four generations of catalogs, in order of capture:
 | `catalogs/*.json` | **dev**: used while building and choosing retrievers |
 | `catalogs/test/` | scored once on 2026-10-07, so **spent**: treat it as dev data from now on |
 | `catalogs/test2/` | scored once on 2026-10-07 (second time), so also **spent**: dev data from now on |
-| `catalogs/test3/` | **fresh batch**: captured after the second result; unlabeled and unscored |
+| `catalogs/test3/` | **confirmation batch**: captured after the second result; labels drafted in `queries/mcp-test3.jsonl`, unscored |
 
 Verbatim `tools/list` results captured from real MCP servers with
 `scripts/capture_catalog.py` (the `source` block in each file records the exact
@@ -94,7 +94,7 @@ Rules for keeping it a clean test set:
 - Labels should be written by someone other than whoever built the retrievers, and committed before scoring. The lessons from the last set are in `queries/README.md`: name the service in each query or list every server's acceptable tool, and audit that up front for all queries.
 - Score once.
 
-## `test3/`: third batch (unlabeled, unscored)
+## `test3/`: third batch (labels drafted, unscored)
 
 Captured after the second batch was spent. It is the largest so far (189 tools) and was chosen with the results of the first two in mind:
 
