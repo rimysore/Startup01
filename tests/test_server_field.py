@@ -124,6 +124,26 @@ class RecordedResultsTests(unittest.TestCase):
         self.assertEqual(result["declared_comparison"]["variant"], "dense+server")
 
 
+class Test3ScoringScriptTests(unittest.TestCase):
+    def test_score_test3_defaults_to_the_confirmation_batch_and_declares_its_protocol(self):
+        code = (ROOT / "scripts" / "score_test3.py").read_text()
+        self.assertIn('"catalogs" / "test3"', code)
+        self.assertIn('"mcp-test3.jsonl"', code)
+        self.assertIn('default="namespace"', code)  # add_table collides between Word and PowerPoint
+        for phrase in ("Headline", "Declared comparisons", "Context only", "Reading of the result", "CONFIRMED", "Not allowed"):
+            self.assertIn(phrase, code)
+
+    def test_the_headline_is_the_current_default(self):
+        from toolslim.config import DEFAULT_RETRIEVER
+
+        code = (ROOT / "scripts" / "score_test3.py").read_text()
+        self.assertIn(f'HEADLINE = "{DEFAULT_RETRIEVER}"', code)
+
+    def test_no_test3_results_exist_before_the_confirmation_run(self):
+        # Delete this test when results/test3-score.* is committed after the single run.
+        self.assertFalse(list((ROOT / "results").glob("test3-score*")))
+
+
 class KnownTokenizerLimitationTests(unittest.TestCase):
     @unittest.expectedFailure
     def test_camel_case_brand_names_should_match_their_lowercase_form(self):
