@@ -25,7 +25,7 @@ python -m unittest discover -s tests
 | slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) | 10,583 (-62.7%) |
 | slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) | 7,184 (-74.7%) |
 | lazy gateway, first request | 190 (-97%) | 190 (-98.5%) | 190 (-99.3%) |
-| lazy gateway, after search + describe | 494 (-93%) | 503 (-96%) | not scored yet (draft labels exist) |
+| lazy gateway, after search + describe | 494 (-93%) | 503 (-96%) | 537 (-98.1%), optimistic: 40% of user-style queries missed at k=5 |
 
 How much slimming saves depends heavily on how a server generates its schemas: level 1 saves 11.5% on the dev servers but 55.6% on the test servers, almost entirely because Notion's generator attaches ~14k tokens of unused definitions to its tools (see below). The synthetic set overstated level 1 relative to the dev servers (28% vs 11.5%). Lazy loading's cost does not depend on the catalog.
 
@@ -122,7 +122,7 @@ One standard error is 3.5 points here, so five candidates are statistically tied
 
 ### Fresh test set, and what its schemas showed
 
-`catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results. A draft of 140 labeled queries (`queries/mcp-test.jsonl`) is committed but **has not been scored**. It exists so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
+`catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results. 140 labeled queries (`queries/mcp-test.jsonl`) were scored once (result below), so this set is now spent as a test. It existed so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
 
 | | tools | all schemas | slim L1 | slim L2 | slim L3 |
 |---|---:|---:|---:|---:|---:|
@@ -137,6 +137,32 @@ How it is verified: unit tests for cycles, transitive references, escaped names,
 
 Caveats: the dev and synthetic catalogs contain no `$defs`, so their numbers did not change and the gain is demonstrated only on the test catalogs. The transform has no tuned parameters, but it was found by looking at the test catalogs' token counts. `describe_tool` on the largest Notion tools drops from 1,096-1,656 tokens to 406-991; the lazy gateway's fixed cost (190 tokens) is unchanged.
 
+### Test-set result (scored once)
+
+Protocol (`queries/README.md`): configuration fixed on dev data and committed first (`dense`, see above), then one run: `python -m toolslim --catalog catalogs/test --labels queries/mcp-test.jsonl bench` (raw output in `results/test-score.txt`). No labels or retrievers were changed afterwards.
+
+**Pre-registered headline: `dense`, user-style recall@5 = 60% (42/70), MRR 0.44; agent-style 100%.** Other retrievers, for reference only (none of this selects anything):
+
+| retriever | user-style recall@5 (MRR) | agent-style |
+|---|---:|---:|
+| bm25 | 50% (0.36) | 100% |
+| **dense (default)** | **60% (0.44)** | 100% |
+| dense+params | 67% (0.49) | 100% |
+| hybrid-rrf | 66% (0.44) | 100% |
+| hybrid-rrf+params | 67% (0.45) | 100% |
+| hybrid-minmax 1:1 | 64% (0.40) | 100% |
+| hybrid-minmax 1:2 | 66% (0.46) | 100% |
+| hybrid-minmax+params 1:1 | 69% (0.44) | 100% |
+
+What it says, and what it does not:
+
+- **The dense default scored lower than on pooled dev data (60% vs 70.7%) and below most alternatives (64-69%).** With 70 queries the 95% interval on 60% is about +/-11 points, so neither gap is established. But the direction is worth noting: six of the seven alternatives beat dense here, and on dev five of those six were equal or slightly ahead (up to +3 points; `hybrid-rrf+params` was 3 behind). The one-standard-error rule chose the simplest option; this result suggests that was conservative and fusion may add a few points. Switching would be a new decision that needs fresh data, since this test set is now spent.
+- **Embeddings still help, less than on dev.** BM25 stayed put (50% vs 48.4% on dev); dense's lead shrank from ~22 to 10 points.
+- **Notion is where it fails**: 15 of 24 Notion queries missed (Playwright 8/25, Slack 2/8, SQLite 2/6, Maps 1/7). Its descriptions are terse ("Notion | Retrieve a page Error Responses: ...") and its tools are named `API-...`.
+- **Cross-server confusion is the main failure mode**: in 20 of the 28 misses the top result came from a different server, e.g. Notion "table" queries returned SQLite's `create_table`/`describe_table`. In a lazy gateway fronting many servers, that is the realistic problem. A candidate fix is a free signal the gateway already knows: the server name (and a short server description) in each tool's index text. Not tried; it needs fresh data to evaluate.
+- **Part of the miss rate is my labeling flaw.** Several Notion queries say "table" or "workspace" without naming Notion, so a SQLite or Slack tool was a plausible correct answer that the labels did not accept (for example `create_table` for "set up a brand new table for tracking customer feedback", `describe_table` for "what columns does the bug tracker table have", `read_query` for "show me every row in the tasks table where..."). Recall is therefore somewhat higher than 60%. I did not re-label: I noticed this while reading the misses, so any adjusted number would be biased upward.
+- Recall@10 for dense is 69% (vs 60% at 5); recall@1 is 34%.
+
 ## Design notes
 
 - **Cache-friendly.** The three meta-tool definitions never change, so the prompt-cache prefix (`tools` renders first) stays stable. Dynamically adding tools after a search would invalidate the cache each time.
@@ -146,10 +172,11 @@ Caveats: the dev and synthetic catalogs contain no `$defs`, so their numbers did
 
 ## Next steps
 
-1. Score the test set once with the recorded configuration (protocol in `queries/README.md`); have someone other than me review or replace `queries/mcp-test.jsonl`.
-2. Index-side enrichment for jargon-heavy tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
-3. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
-4. Count tokens with the API's token counter instead of the estimate.
-5. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses).
-6. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
-7. A proxy MCP server so any client can use the gateway unchanged.
+1. Fresh data again: the test set is spent. Capture and label another batch of servers, with labels written by someone else (guidelines in `queries/README.md`), before deciding anything further about fusion.
+2. Add the server name (and a short server description) to each tool's index text, to attack cross-server confusion; evaluate on the fresh batch, and on the dev sets as a no-regression check.
+3. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
+4. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
+5. Count tokens with the API's token counter instead of the estimate.
+6. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses and the right default `limit`).
+7. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
+8. A proxy MCP server so any client can use the gateway unchanged.
