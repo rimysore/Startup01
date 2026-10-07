@@ -123,8 +123,22 @@ class CommittedDataTests(unittest.TestCase):
         self.assertGreaterEqual(len(tools), 70)
         self.assertEqual(len({t.name for t in tools}), len(tools))
 
+    def test_fresh_test_catalogs_are_separate_and_collision_free(self):
+        dev = load_catalogs([ROOT / "catalogs"])
+        test = load_catalogs([ROOT / "catalogs" / "test"])
+        self.assertGreaterEqual(len(test), 60)
+        self.assertFalse({t.name for t in dev} & {t.name for t in test})
+        # --catalog catalogs must not silently pull in the test set
+        self.assertFalse({t.name for t in test} & {t.name for t in load_catalogs([ROOT / "catalogs"])})
+
+    def test_no_labels_exist_for_the_fresh_test_set_yet(self):
+        # Labels must be written deliberately (and committed before scoring). If this fails, update the docs too.
+        test_names = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}
+        dev_labels = load_labels(ROOT / "queries" / "mcp-reference.jsonl")
+        self.assertFalse({e for lb in dev_labels for e in lb.expected} & test_names)
+
     def test_catalogs_carry_provenance(self):
-        for f in sorted((ROOT / "catalogs").glob("*.json")):
+        for f in sorted((ROOT / "catalogs").glob("*.json")) + sorted((ROOT / "catalogs" / "test").glob("*.json")):
             src = json.loads(f.read_text())["source"]
             for key in ("name", "package", "license", "server", "captured_at"):
                 self.assertTrue(src.get(key), f"{f.name}: missing source.{key}")
