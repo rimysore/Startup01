@@ -66,6 +66,18 @@ evidence of copying, but it does mean agent-style queries are a weak discriminat
 - Any scoring should fix its protocol first (headline, comparisons, reading) and be committed before it is
   run, as with the earlier batches.
 
+## Fifth batch (`fifth-test.jsonl`)
+
+| file | catalog | tools | queries |
+|---|---|---:|---:|
+| `fifth-test.jsonl` | `catalogs/test4/` (GitLab, Mapbox, Firecrawl, Desktop Commander, Puppeteer, Todoist) | 213 | 434 |
+
+Produced the same way as the others (one fresh subagent instance, started with an empty context, given only the guide, the validator and this batch's `tools.json` in a directory containing nothing else), with one difference: the prompt also told the author to write each query itself, using scripts only to assemble and check the file, not to generate queries from templates. It reports it opened nothing outside that directory (I cannot verify that) and that one oversized command output was saved by the harness to a path it never opened. The file is committed exactly as written (checksum in `MANIFEST.sha256`) **before** the retrievers were run on it, and passes the repo's own `check`.
+
+- 217 user-style and 217 agent-style queries: the minimum would be 213 each, and the author added four of each for tools with near-duplicates. 18 queries (4%) accept several tools.
+- Compared with the earlier independent sets, the user-style queries share more words with tool names (mean overlap 0.44 against 0.28-0.39), which favors lexical search, and only 17% (user) and 10% (agent) name their service. The 17 lint warnings (user-style queries containing every word of the tool's name) were left in place, as before.
+- 7 of the 434 queries are word-for-word identical to a query in an earlier file (mine or an earlier independent set): 6 short agent-style queries ("list files in a directory") and one user-style query ("what files are in my Downloads folder?"), all about Desktop Commander's file tools (which mirror the Filesystem server of an earlier batch) or Puppeteer's browser tools (which mirror Playwright), none about GitLab, Firecrawl or Mapbox. Convergence on obvious phrasing, not evidence of copying; not edited.
+
 ## Scored
 
 The retrievers were scored on these labels once, under the protocol in `scripts/score_independent.py` (committed before the run). Results and caveats: top-level README, "Independent labels (scored once)"; raw output in `results/independent-score.{txt,json}`. These labels were not edited after scoring.

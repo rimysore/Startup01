@@ -1,0 +1,434 @@
+{"query": "show me what Desktop Commander is currently configured with, like which folders it's allowed to touch", "expected": ["get_config"], "style": "user"}
+{"query": "get desktop commander server configuration", "expected": ["get_config"], "style": "agent"}
+{"query": "change the default shell Desktop Commander uses to zsh", "expected": ["set_config_value"], "style": "user"}
+{"query": "set a configuration value by key", "expected": ["set_config_value"], "style": "agent"}
+{"query": "open ~/Documents/budget_2026.txt and tell me what's in it", "expected": ["read_file", "read_multiple_files"], "style": "user"}
+{"query": "read contents of a file at a path", "expected": ["read_file"], "style": "agent"}
+{"query": "can you pull the text out of this PDF at /Users/maria/Downloads/lease_agreement.pdf", "expected": ["read_file"], "style": "user"}
+{"query": "extract text from a local PDF", "expected": ["read_file", "firecrawl_parse"], "style": "agent"}
+{"query": "read package.json, tsconfig.json and README.md from my project folder and show them all together", "expected": ["read_multiple_files"], "style": "user"}
+{"query": "read several files at once", "expected": ["read_multiple_files", "read_file"], "style": "agent"}
+{"query": "save these meeting notes into a new file called notes_oct7.txt in my home folder", "expected": ["write_file"], "style": "user"}
+{"query": "write text to a file", "expected": ["write_file"], "style": "agent"}
+{"query": "append this line to the end of my log file at ~/logs/backup.log", "expected": ["write_file"], "style": "user"}
+{"query": "append content to existing file", "expected": ["write_file"], "style": "agent"}
+{"query": "make me a PDF of this report called quarterly_summary.pdf", "expected": ["write_pdf"], "style": "user"}
+{"query": "create a new PDF document from text", "expected": ["write_pdf"], "style": "agent"}
+{"query": "add a page to the existing invoice PDF with the updated totals", "expected": ["write_pdf"], "style": "user"}
+{"query": "modify existing PDF file", "expected": ["write_pdf"], "style": "agent"}
+{"query": "create a folder called projects/2026/q4 in my home directory, including any missing parent folders", "expected": ["create_directory"], "style": "user"}
+{"query": "make a new directory", "expected": ["create_directory"], "style": "agent"}
+{"query": "what files are in my Downloads folder?", "expected": ["list_directory"], "style": "user"}
+{"query": "list files in a directory", "expected": ["list_directory"], "style": "agent"}
+{"query": "rename report_final.docx to report_v2.docx and move it into the Archive folder", "expected": ["move_file"], "style": "user"}
+{"query": "move or rename a file", "expected": ["move_file"], "style": "agent"}
+{"query": "search my code folder for every file that mentions the word 'deprecated'", "expected": ["start_search"], "style": "user"}
+{"query": "start a search for files or text in a directory", "expected": ["start_search"], "style": "agent"}
+{"query": "the search for TODO comments is still running, show me the next batch of results", "expected": ["get_more_search_results"], "style": "user"}
+{"query": "get more results from active search", "expected": ["get_more_search_results"], "style": "agent"}
+{"query": "stop that file search, it's taking forever and I already found what I needed", "expected": ["stop_search"], "style": "user"}
+{"query": "stop an active search", "expected": ["stop_search"], "style": "agent"}
+{"query": "are there any searches still running in the background?", "expected": ["list_searches"], "style": "user"}
+{"query": "list active searches", "expected": ["list_searches"], "style": "agent"}
+{"query": "how big is movie_backup.zip and when was it last modified?", "expected": ["get_file_info"], "style": "user"}
+{"query": "get file metadata size and modification time", "expected": ["get_file_info"], "style": "agent"}
+{"query": "in config.yaml change the port from 8080 to 9090", "expected": ["edit_block"], "style": "user"}
+{"query": "replace text in a file with exact string match", "expected": ["edit_block"], "style": "agent"}
+{"query": "start a python REPL so I can try out some pandas stuff", "expected": ["start_process"], "style": "user"}
+{"query": "run a shell command in a terminal process", "expected": ["start_process"], "style": "agent"}
+{"query": "check the output of the build that's running in process 4821", "expected": ["read_process_output"], "style": "user"}
+{"query": "read output from a running process by pid", "expected": ["read_process_output"], "style": "agent"}
+{"query": "type 'yes' into the installer that's waiting for input in my terminal session", "expected": ["interact_with_process"], "style": "user"}
+{"query": "send input to a running interactive process", "expected": ["interact_with_process"], "style": "agent"}
+{"query": "that terminal session is frozen, force it to close", "expected": ["force_terminate"], "style": "user"}
+{"query": "force terminate a terminal session", "expected": ["force_terminate", "kill_process"], "style": "agent"}
+{"query": "which terminal sessions do I have open right now and are any of them waiting on input?", "expected": ["list_sessions"], "style": "user"}
+{"query": "list active terminal sessions", "expected": ["list_sessions"], "style": "agent"}
+{"query": "show me everything running on my machine sorted by memory use", "expected": ["list_processes"], "style": "user"}
+{"query": "list all running processes with cpu and memory", "expected": ["list_processes"], "style": "agent"}
+{"query": "kill process 3377, it's hogging the CPU", "expected": ["kill_process", "force_terminate"], "style": "user"}
+{"query": "terminate a process by PID", "expected": ["kill_process", "force_terminate"], "style": "agent"}
+{"query": "how often have the Desktop Commander tools been succeeding or failing for me?", "expected": ["get_usage_stats"], "style": "user"}
+{"query": "get tool usage statistics", "expected": ["get_usage_stats"], "style": "agent"}
+{"query": "what were the last 10 tool calls Desktop Commander made on my machine?", "expected": ["get_recent_tool_calls"], "style": "user"}
+{"query": "show recent tool call history", "expected": ["get_recent_tool_calls"], "style": "agent"}
+{"query": "I want to send feedback to the Desktop Commander team about a bug", "expected": ["give_feedback_to_desktop_commander"], "style": "user"}
+{"query": "open feedback form", "expected": ["give_feedback_to_desktop_commander"], "style": "agent"}
+{"query": "run the Desktop Commander getting-started onboarding prompt for me", "expected": ["get_prompts"], "style": "user"}
+{"query": "get onboarding prompt by id", "expected": ["get_prompts"], "style": "agent"}
+{"query": "grab the content of https://stripe.com/docs/webhooks as markdown so I can read it", "expected": ["firecrawl_scrape"], "style": "user"}
+{"query": "scrape a web page to markdown", "expected": ["firecrawl_scrape"], "style": "agent"}
+{"query": "take a screenshot of the pricing page at linear.app/pricing using Firecrawl", "expected": ["firecrawl_scrape"], "style": "user"}
+{"query": "fetch URL content as html or screenshot", "expected": ["firecrawl_scrape"], "style": "agent"}
+{"query": "list every URL on docs.example.com without downloading the pages", "expected": ["firecrawl_map"], "style": "user"}
+{"query": "enumerate all URLs of a website", "expected": ["firecrawl_map"], "style": "agent"}
+{"query": "search the web for recent news about the EU AI Act enforcement and give me the top results", "expected": ["firecrawl_search"], "style": "user"}
+{"query": "web search with ranked results", "expected": ["firecrawl_search"], "style": "agent"}
+{"query": "what data providers does Firecrawl have for company and people info?", "expected": ["firecrawl_find_tools"], "style": "user"}
+{"query": "browse available data providers and workflows", "expected": ["firecrawl_find_tools"], "style": "agent"}
+{"query": "that search I just ran gave me great sources, log a good rating for it with search id 7f3a21c4", "expected": ["firecrawl_search_feedback"], "style": "user"}
+{"query": "rate quality of a previous firecrawl search", "expected": ["firecrawl_search_feedback"], "style": "agent"}
+{"query": "the scrape job for my last run came back with missing content, submit feedback to Firecrawl about it", "expected": ["firecrawl_feedback"], "style": "user"}
+{"query": "submit feedback on a scrape or crawl job", "expected": ["firecrawl_feedback"], "style": "agent"}
+{"query": "crawl the whole blog at https://blog.acme.io and collect all the posts, limit it to 50 pages", "expected": ["firecrawl_crawl"], "style": "user"}
+{"query": "crawl a website multiple pages", "expected": ["firecrawl_crawl"], "style": "agent"}
+{"query": "is that crawl I started earlier done yet? the id is 9c2e-44b1", "expected": ["firecrawl_check_crawl_status"], "style": "user"}
+{"query": "check crawl job status by id", "expected": ["firecrawl_check_crawl_status"], "style": "agent"}
+{"query": "find me a list of the top 10 project management SaaS tools with their pricing tiers, I don't have any URLs", "expected": ["firecrawl_agent"], "style": "user"}
+{"query": "autonomous web research returning structured data", "expected": ["firecrawl_agent"], "style": "agent"}
+{"query": "has my Firecrawl research agent finished? job id is a81f-0033", "expected": ["firecrawl_agent_status"], "style": "user"}
+{"query": "get agent job progress or results", "expected": ["firecrawl_agent_status"], "style": "agent"}
+{"query": "open the login page of our staging site in a browser, fill in the username and click sign in", "expected": ["firecrawl_interact", "puppeteer_navigate"], "style": "user"}
+{"query": "interactive browser session click and fill fields", "expected": ["firecrawl_interact"], "style": "agent"}
+{"query": "I'm done with that live browser session, close it down (scrape id sc_5512)", "expected": ["firecrawl_interact_stop"], "style": "user"}
+{"query": "stop interact browser session", "expected": ["firecrawl_interact_stop"], "style": "agent"}
+{"query": "turn this PDF of the 10-K filing into markdown and pull out the revenue numbers", "expected": ["firecrawl_parse", "read_file"], "style": "user"}
+{"query": "parse a document into markdown or structured json", "expected": ["firecrawl_parse"], "style": "agent"}
+{"query": "set up a monitor so I get alerted whenever the pricing page of competitor.com changes, check it daily", "expected": ["firecrawl_monitor_create"], "style": "user"}
+{"query": "create a recurring page change monitor", "expected": ["firecrawl_monitor_create"], "style": "agent"}
+{"query": "which Firecrawl monitors do I have set up?", "expected": ["firecrawl_monitor_list"], "style": "user"}
+{"query": "list monitors", "expected": ["firecrawl_monitor_list"], "style": "agent"}
+{"query": "show me the settings of monitor mon_4412 and whether it's active", "expected": ["firecrawl_monitor_get"], "style": "user"}
+{"query": "get monitor by id", "expected": ["firecrawl_monitor_get"], "style": "agent"}
+{"query": "pause my competitor pricing monitor and change its schedule to weekly", "expected": ["firecrawl_monitor_update"], "style": "user"}
+{"query": "update monitor schedule or status", "expected": ["firecrawl_monitor_update"], "style": "agent"}
+{"query": "delete the old careers-page monitor, I don't need it anymore", "expected": ["firecrawl_monitor_delete"], "style": "user"}
+{"query": "delete a monitor permanently", "expected": ["firecrawl_monitor_delete"], "style": "agent"}
+{"query": "run the pricing monitor right now instead of waiting for tomorrow", "expected": ["firecrawl_monitor_run"], "style": "user"}
+{"query": "trigger an immediate monitor check", "expected": ["firecrawl_monitor_run"], "style": "agent"}
+{"query": "show me the history of past checks for monitor mon_4412, only the failed ones", "expected": ["firecrawl_monitor_checks"], "style": "user"}
+{"query": "list historical checks for a monitor", "expected": ["firecrawl_monitor_checks"], "style": "agent"}
+{"query": "for that last monitor check, which pages were new or changed?", "expected": ["firecrawl_monitor_check"], "style": "user"}
+{"query": "get monitor check page-level results", "expected": ["firecrawl_monitor_check"], "style": "agent"}
+{"query": "find research papers on CRISPR off-target effects published since 2023", "expected": ["firecrawl_research_search_papers"], "style": "user"}
+{"query": "search academic papers by topic", "expected": ["firecrawl_research_search_papers"], "style": "agent"}
+{"query": "give me the abstract and authors for arXiv paper 2401.04088", "expected": ["firecrawl_research_inspect_paper"], "style": "user"}
+{"query": "get paper metadata by arxiv or DOI id", "expected": ["firecrawl_research_inspect_paper"], "style": "agent"}
+{"query": "what other papers are similar to or cite 'Attention Is All You Need'?", "expected": ["firecrawl_research_related_papers"], "style": "user"}
+{"query": "find related papers from citation graph", "expected": ["firecrawl_research_related_papers"], "style": "agent"}
+{"query": "what does the paper PMC8812345 say about the control group sample size?", "expected": ["firecrawl_research_read_paper"], "style": "user"}
+{"query": "retrieve passages from a paper for a question", "expected": ["firecrawl_research_read_paper"], "style": "agent"}
+{"query": "how do people usually handle pagination with cursor tokens in a Rust GraphQL client? look at real repos and issues", "expected": ["firecrawl_developer_search"], "style": "user"}
+{"query": "search public repos and docs for programming question", "expected": ["firecrawl_developer_search"], "style": "agent"}
+{"query": "what does California law say about security deposit limits for renters?", "expected": ["firecrawl_gov_search"], "style": "user"}
+{"query": "search statutes and regulations", "expected": ["firecrawl_gov_search"], "style": "agent"}
+{"query": "how many Firecrawl credits do I have left this month?", "expected": ["firecrawl_credit_usage"], "style": "user"}
+{"query": "check firecrawl credit balance", "expected": ["firecrawl_credit_usage"], "style": "agent"}
+{"query": "merge merge request !142 in the payments-api project on GitLab, the pipeline is green", "expected": ["merge_merge_request"], "style": "user"}
+{"query": "merge a gitlab merge request", "expected": ["merge_merge_request"], "style": "agent"}
+{"query": "approve MR 87 in the web-frontend project, the changes look good to me", "expected": ["approve_merge_request"], "style": "user"}
+{"query": "approve a merge request", "expected": ["approve_merge_request"], "style": "agent"}
+{"query": "I approved merge request 87 by mistake, take my approval back", "expected": ["unapprove_merge_request"], "style": "user"}
+{"query": "remove my approval from a merge request", "expected": ["unapprove_merge_request"], "style": "agent"}
+{"query": "who still needs to approve merge request 213 in infra/terraform and are the approval rules met?", "expected": ["get_merge_request_approval_state"], "style": "user"}
+{"query": "get merge request approval rules and approvers", "expected": ["get_merge_request_approval_state"], "style": "agent"}
+{"query": "does merge request 56 in data-pipeline have merge conflicts?", "expected": ["get_merge_request_conflicts"], "style": "user"}
+{"query": "check merge request for conflicts", "expected": ["get_merge_request_conflicts"], "style": "agent"}
+{"query": "show me the pipelines that ran for merge request 301 in the mobile-app project", "expected": ["list_merge_request_pipelines"], "style": "user"}
+{"query": "list pipelines of a merge request", "expected": ["list_merge_request_pipelines"], "style": "agent"}
+{"query": "commit a fix to docs/install.md on the main branch of project 4521 with the message 'fix typo in install steps'", "expected": ["create_or_update_file", "push_files"], "style": "user"}
+{"query": "create or update a single file in a gitlab project", "expected": ["create_or_update_file"], "style": "agent"}
+{"query": "find GitLab projects with 'billing' in the name", "expected": ["search_repositories", "list_projects"], "style": "user"}
+{"query": "search gitlab projects", "expected": ["search_repositories"], "style": "agent"}
+{"query": "create a new private GitLab project called internal-tools with a README", "expected": ["create_repository"], "style": "user"}
+{"query": "create new gitlab project", "expected": ["create_repository"], "style": "agent"}
+{"query": "set up a new GitLab group called platform-team under the engineering group", "expected": ["create_group"], "style": "user"}
+{"query": "create a group or subgroup", "expected": ["create_group"], "style": "agent"}
+{"query": "show me the contents of src/main.py on the develop branch of project 1893", "expected": ["get_file_contents"], "style": "user"}
+{"query": "get file contents from a gitlab repo", "expected": ["get_file_contents"], "style": "agent"}
+{"query": "commit these three changed files (app.js, app.css, index.html) to the feature/redesign branch in one commit", "expected": ["push_files"], "style": "user"}
+{"query": "push multiple files in a single commit", "expected": ["push_files"], "style": "agent"}
+{"query": "open an issue in the checkout-service project titled 'Cart total wrong with discount codes' and label it bug", "expected": ["create_issue"], "style": "user"}
+{"query": "create a new issue", "expected": ["create_issue"], "style": "agent"}
+{"query": "open a merge request from feature/login-fix into main in project 2210 titled 'Fix login redirect loop'", "expected": ["create_merge_request"], "style": "user"}
+{"query": "create a merge request from a source branch", "expected": ["create_merge_request"], "style": "agent"}
+{"query": "fork the open-source gitlab project 7788 into my own namespace", "expected": ["fork_repository"], "style": "user"}
+{"query": "fork a project", "expected": ["fork_repository"], "style": "agent"}
+{"query": "make a new branch release/2.4 off of main in the billing project", "expected": ["create_branch"], "style": "user"}
+{"query": "create a branch from a ref", "expected": ["create_branch"], "style": "agent"}
+{"query": "is the hotfix/auth-timeout branch protected, and what's its latest commit?", "expected": ["get_branch"], "style": "user"}
+{"query": "get branch details", "expected": ["get_branch"], "style": "agent"}
+{"query": "what branches exist in project 3301 that have 'feature' in their name?", "expected": ["list_branches"], "style": "user"}
+{"query": "list branches in a project", "expected": ["list_branches"], "style": "agent"}
+{"query": "delete the stale branch feature/old-onboarding from the web-frontend repo", "expected": ["delete_branch"], "style": "user"}
+{"query": "delete a branch", "expected": ["delete_branch"], "style": "agent"}
+{"query": "which branches are protected in the payments-api repository?", "expected": ["list_protected_branches"], "style": "user"}
+{"query": "list protected branches", "expected": ["list_protected_branches"], "style": "agent"}
+{"query": "show me the push and force-push rules for the protected branch main in project 912", "expected": ["get_protected_branch"], "style": "user"}
+{"query": "get protected branch access levels", "expected": ["get_protected_branch"], "style": "agent"}
+{"query": "protect the release/* branches so only maintainers can push and merge", "expected": ["protect_branch"], "style": "user"}
+{"query": "protect a branch with access levels", "expected": ["protect_branch"], "style": "agent"}
+{"query": "remove the protection from branch staging in project 912 so we can force push", "expected": ["unprotect_branch"], "style": "user"}
+{"query": "unprotect a branch", "expected": ["unprotect_branch"], "style": "agent"}
+{"query": "change the default branch of the docs project from master to main", "expected": ["update_default_branch"], "style": "user"}
+{"query": "set project default branch", "expected": ["update_default_branch"], "style": "agent"}
+{"query": "give me the details of merge request 142 in payments-api, including who's reviewing it", "expected": ["get_merge_request"], "style": "user"}
+{"query": "get merge request details", "expected": ["get_merge_request"], "style": "agent"}
+{"query": "show the code changes in merge request 77 in the search-service project", "expected": ["get_merge_request_diffs", "list_merge_request_diffs"], "style": "user"}
+{"query": "get merge request diffs", "expected": ["get_merge_request_diffs"], "style": "agent"}
+{"query": "which files were touched by merge request 410, just the names, I don't need the diff", "expected": ["list_merge_request_changed_files"], "style": "user"}
+{"query": "list changed file paths in a merge request", "expected": ["list_merge_request_changed_files"], "style": "agent"}
+{"query": "page through the diffs of the huge merge request 998, 20 files at a time", "expected": ["list_merge_request_diffs"], "style": "user"}
+{"query": "list merge request diffs with pagination", "expected": ["list_merge_request_diffs"], "style": "agent"}
+{"query": "show me only the diff for src/auth/session.ts in merge request 156", "expected": ["get_merge_request_file_diff"], "style": "user"}
+{"query": "get diff for specific files in a merge request", "expected": ["get_merge_request_file_diff"], "style": "agent"}
+{"query": "how many times has merge request 204 been updated with new pushes? list its versions", "expected": ["list_merge_request_versions"], "style": "user"}
+{"query": "list all versions of a merge request", "expected": ["list_merge_request_versions"], "style": "agent"}
+{"query": "show me version 3 of merge request 204 so I can see what changed since my last review", "expected": ["get_merge_request_version"], "style": "user"}
+{"query": "get a specific merge request version", "expected": ["get_merge_request_version"], "style": "agent"}
+{"query": "what's different between the release-1.2 and main branches in the api project?", "expected": ["get_branch_diffs"], "style": "user"}
+{"query": "compare diffs between two branches or commits", "expected": ["get_branch_diffs"], "style": "agent"}
+{"query": "retitle merge request 142 to 'Add retry logic to payment webhook' and add the reviewer jordan.lee", "expected": ["update_merge_request"], "style": "user"}
+{"query": "update merge request title or description", "expected": ["update_merge_request"], "style": "agent"}
+{"query": "leave a comment on issue 57 in the checkout-service project saying we can reproduce this on staging", "expected": ["create_note", "create_issue_note"], "style": "user"}
+{"query": "add a comment to an issue or merge request", "expected": ["create_note"], "style": "agent"}
+{"query": "start a review thread on line 42 of merge request 88 asking why we dropped the null check", "expected": ["create_merge_request_thread"], "style": "user"}
+{"query": "start a review thread on a merge request", "expected": ["create_merge_request_thread"], "style": "agent"}
+{"query": "mark the discussion thread abc123 on merge request 88 as resolved", "expected": ["resolve_merge_request_thread"], "style": "user"}
+{"query": "resolve a merge request thread", "expected": ["resolve_merge_request_thread"], "style": "agent"}
+{"query": "show me all the discussion threads on merge request 301 and which ones are still unresolved", "expected": ["mr_discussions"], "style": "user"}
+{"query": "list merge request discussions", "expected": ["mr_discussions"], "style": "agent"}
+{"query": "open that one discussion on merge request 301, id 5e9f2c, I want to read the whole conversation", "expected": ["get_merge_request_discussion"], "style": "user"}
+{"query": "get a single merge request discussion", "expected": ["get_merge_request_discussion"], "style": "agent"}
+{"query": "delete my comment (note 9912) in the thread under merge request 301, it was a mistake", "expected": ["delete_merge_request_discussion_note"], "style": "user"}
+{"query": "delete a discussion note on a merge request", "expected": ["delete_merge_request_discussion_note"], "style": "agent"}
+{"query": "edit my reply in the merge request 301 discussion to fix the typo in note 9913", "expected": ["update_merge_request_discussion_note"], "style": "user"}
+{"query": "update a merge request discussion note", "expected": ["update_merge_request_discussion_note"], "style": "agent"}
+{"query": "reply inside the existing thread on merge request 88 and say 'done, pushed a fix'", "expected": ["create_merge_request_discussion_note"], "style": "user"}
+{"query": "reply to an existing merge request thread", "expected": ["create_merge_request_discussion_note"], "style": "agent"}
+{"query": "post a general comment on merge request 142 saying LGTM pending the CI run", "expected": ["create_merge_request_note", "create_note"], "style": "user"}
+{"query": "add a note to a merge request", "expected": ["create_merge_request_note", "create_note"], "style": "agent"}
+{"query": "remove the comment note 4410 from merge request 142", "expected": ["delete_merge_request_note"], "style": "user"}
+{"query": "delete a merge request note", "expected": ["delete_merge_request_note"], "style": "agent"}
+{"query": "show me comment number 4410 on merge request 142", "expected": ["get_merge_request_note"], "style": "user"}
+{"query": "get one merge request note by id", "expected": ["get_merge_request_note"], "style": "agent"}
+{"query": "list all the comments on merge request 142, newest first", "expected": ["get_merge_request_notes"], "style": "user"}
+{"query": "list notes on a merge request", "expected": ["get_merge_request_notes"], "style": "agent"}
+{"query": "change my comment 4410 on merge request 142 to say 'approved after rebase'", "expected": ["update_merge_request_note"], "style": "user"}
+{"query": "modify a merge request note", "expected": ["update_merge_request_note"], "style": "agent"}
+{"query": "show me my pending draft review comment 31 on merge request 66", "expected": ["get_draft_note"], "style": "user"}
+{"query": "get a draft note on a merge request", "expected": ["get_draft_note"], "style": "agent"}
+{"query": "what draft comments have I queued up on merge request 66 but not posted yet?", "expected": ["list_draft_notes"], "style": "user"}
+{"query": "list draft notes for a merge request", "expected": ["list_draft_notes"], "style": "agent"}
+{"query": "save a draft review comment on merge request 66 saying 'consider extracting this into a helper', I'll submit it later", "expected": ["create_draft_note"], "style": "user"}
+{"query": "create a draft review comment", "expected": ["create_draft_note"], "style": "agent"}
+{"query": "reword my draft comment 31 on merge request 66", "expected": ["update_draft_note"], "style": "user"}
+{"query": "update a draft note", "expected": ["update_draft_note"], "style": "agent"}
+{"query": "throw away my unpublished draft comment 31 on merge request 66", "expected": ["delete_draft_note"], "style": "user"}
+{"query": "delete a draft note", "expected": ["delete_draft_note"], "style": "agent"}
+{"query": "publish just draft comment 31 on merge request 66", "expected": ["publish_draft_note"], "style": "user"}
+{"query": "publish a single draft note", "expected": ["publish_draft_note"], "style": "agent"}
+{"query": "I'm done reviewing merge request 66, publish all my draft comments and mark it as requested changes", "expected": ["bulk_publish_draft_notes"], "style": "user"}
+{"query": "publish all draft notes and submit review", "expected": ["bulk_publish_draft_notes"], "style": "agent"}
+{"query": "what emoji reactions has merge request 142 gotten?", "expected": ["list_merge_request_emoji_reactions"], "style": "user"}
+{"query": "list emoji reactions on a merge request", "expected": ["list_merge_request_emoji_reactions"], "style": "agent"}
+{"query": "what reactions are on comment 4410 of merge request 142?", "expected": ["list_merge_request_note_emoji_reactions"], "style": "user"}
+{"query": "list emoji reactions on a merge request note", "expected": ["list_merge_request_note_emoji_reactions"], "style": "agent"}
+{"query": "put a rocket emoji on merge request 142", "expected": ["create_merge_request_emoji_reaction"], "style": "user"}
+{"query": "add emoji reaction to a merge request", "expected": ["create_merge_request_emoji_reaction"], "style": "agent"}
+{"query": "take my thumbsup off merge request 142", "expected": ["delete_merge_request_emoji_reaction"], "style": "user"}
+{"query": "remove emoji reaction from merge request", "expected": ["delete_merge_request_emoji_reaction"], "style": "agent"}
+{"query": "react with eyes to comment 4410 on merge request 142", "expected": ["create_merge_request_note_emoji_reaction"], "style": "user"}
+{"query": "add emoji reaction to a merge request note", "expected": ["create_merge_request_note_emoji_reaction"], "style": "agent"}
+{"query": "remove my heart reaction from comment 4410 on merge request 142", "expected": ["delete_merge_request_note_emoji_reaction"], "style": "user"}
+{"query": "remove emoji from merge request note", "expected": ["delete_merge_request_note_emoji_reaction"], "style": "agent"}
+{"query": "edit my reply in the discussion on issue 57 of checkout-service, note 2210, to correct the version number", "expected": ["update_issue_note"], "style": "user"}
+{"query": "modify an issue thread note", "expected": ["update_issue_note"], "style": "agent"}
+{"query": "reply in the discussion thread on issue 57 telling them the fix ships in v3.2", "expected": ["create_issue_note"], "style": "user"}
+{"query": "add a note to an issue replying to a discussion", "expected": ["create_issue_note", "create_note"], "style": "agent"}
+{"query": "what emoji reactions are on issue 57 in checkout-service?", "expected": ["list_issue_emoji_reactions"], "style": "user"}
+{"query": "list emoji reactions on an issue", "expected": ["list_issue_emoji_reactions"], "style": "agent"}
+{"query": "what reactions did people leave on comment 2210 under issue 57?", "expected": ["list_issue_note_emoji_reactions"], "style": "user"}
+{"query": "list emoji reactions on an issue note", "expected": ["list_issue_note_emoji_reactions"], "style": "agent"}
+{"query": "add a thumbs up to issue 57", "expected": ["create_issue_emoji_reaction"], "style": "user"}
+{"query": "add emoji reaction to an issue", "expected": ["create_issue_emoji_reaction"], "style": "agent"}
+{"query": "remove my rocket reaction from issue 57", "expected": ["delete_issue_emoji_reaction"], "style": "user"}
+{"query": "remove emoji reaction from an issue", "expected": ["delete_issue_emoji_reaction"], "style": "agent"}
+{"query": "react with a tada on comment 2210 in issue 57", "expected": ["create_issue_note_emoji_reaction"], "style": "user"}
+{"query": "add emoji reaction to an issue comment", "expected": ["create_issue_note_emoji_reaction"], "style": "agent"}
+{"query": "take off my eyes reaction from comment 2210 on issue 57", "expected": ["delete_issue_note_emoji_reaction"], "style": "user"}
+{"query": "remove emoji from issue note", "expected": ["delete_issue_note_emoji_reaction"], "style": "agent"}
+{"query": "list the open issues in the checkout-service project labelled 'bug'", "expected": ["list_issues"], "style": "user"}
+{"query": "list issues in a gitlab project with filters", "expected": ["list_issues"], "style": "agent"}
+{"query": "what GitLab issues are assigned to me?", "expected": ["my_issues", "list_issues"], "style": "user"}
+{"query": "list issues assigned to current user", "expected": ["my_issues"], "style": "agent"}
+{"query": "give me the details of issue 57 in checkout-service", "expected": ["get_issue"], "style": "user"}
+{"query": "get issue details", "expected": ["get_issue"], "style": "agent"}
+{"query": "close issue 57 and assign it to sam.patel", "expected": ["update_issue"], "style": "user"}
+{"query": "update issue fields like title assignee or state", "expected": ["update_issue"], "style": "agent"}
+{"query": "in issue 112 replace the line 'Node 16' with 'Node 20' in the description without rewriting the whole thing", "expected": ["update_issue_description_patch"], "style": "user"}
+{"query": "patch an issue description with search and replace", "expected": ["update_issue_description_patch"], "style": "agent"}
+{"query": "permanently delete issue 301 from the sandbox project, it was created by accident", "expected": ["delete_issue"], "style": "user"}
+{"query": "delete an issue", "expected": ["delete_issue"], "style": "agent"}
+{"query": "what's on my GitLab to-do list?", "expected": ["list_todos"], "style": "user"}
+{"query": "list gitlab to-do items", "expected": ["list_todos"], "style": "agent"}
+{"query": "mark my to-do number 5530 as done", "expected": ["mark_todo_done"], "style": "user"}
+{"query": "mark a to-do as done", "expected": ["mark_todo_done"], "style": "agent"}
+{"query": "clear out my whole GitLab to-do list, mark everything done", "expected": ["mark_all_todos_done"], "style": "user"}
+{"query": "mark all pending todos done", "expected": ["mark_all_todos_done"], "style": "agent"}
+{"query": "which issues are linked to issue 57 (blocks, relates to, etc.)?", "expected": ["list_issue_links"], "style": "user"}
+{"query": "list links of an issue", "expected": ["list_issue_links"], "style": "agent"}
+{"query": "show me all the discussion threads on issue 57", "expected": ["list_issue_discussions"], "style": "user"}
+{"query": "list discussions for an issue", "expected": ["list_issue_discussions"], "style": "agent"}
+{"query": "show me the details of issue link 18 on issue 57", "expected": ["get_issue_link"], "style": "user"}
+{"query": "get a specific issue link", "expected": ["get_issue_link"], "style": "agent"}
+{"query": "link issue 57 in checkout-service as blocking issue 12 in the payments project", "expected": ["create_issue_link"], "style": "user"}
+{"query": "create a link between two issues", "expected": ["create_issue_link"], "style": "agent"}
+{"query": "remove the link between issue 57 and issue 12, link id 18", "expected": ["delete_issue_link"], "style": "user"}
+{"query": "delete an issue link", "expected": ["delete_issue_link"], "style": "agent"}
+{"query": "what namespaces and groups can I create projects in?", "expected": ["list_namespaces"], "style": "user"}
+{"query": "list namespaces for the current user", "expected": ["list_namespaces"], "style": "agent"}
+{"query": "show me details of the 'platform-team' namespace", "expected": ["get_namespace"], "style": "user"}
+{"query": "get a namespace by id or path", "expected": ["get_namespace"], "style": "agent"}
+{"query": "does the path 'engineering/mobile' already exist as a namespace before I create it?", "expected": ["verify_namespace"], "style": "user"}
+{"query": "check if a namespace path exists", "expected": ["verify_namespace"], "style": "agent"}
+{"query": "give me the info on gitlab project 4521, like its visibility and default branch", "expected": ["get_project"], "style": "user"}
+{"query": "get project details", "expected": ["get_project"], "style": "agent"}
+{"query": "show me all the projects I have access to on GitLab", "expected": ["list_projects"], "style": "user"}
+{"query": "list accessible gitlab projects", "expected": ["list_projects"], "style": "agent"}
+{"query": "change the description of the billing project and make it internal visibility", "expected": ["update_project"], "style": "user"}
+{"query": "update project settings", "expected": ["update_project"], "style": "agent"}
+{"query": "who are the members of the payments-api project?", "expected": ["list_project_members"], "style": "user"}
+{"query": "list project members", "expected": ["list_project_members"], "style": "agent"}
+{"query": "list everyone in the engineering group, including inherited members", "expected": ["list_group_members"], "style": "user"}
+{"query": "list group members", "expected": ["list_group_members"], "style": "agent"}
+{"query": "what labels does the checkout-service project have?", "expected": ["list_labels"], "style": "user"}
+{"query": "list project labels", "expected": ["list_labels"], "style": "agent"}
+{"query": "show me the 'priority::high' label in project 4521", "expected": ["get_label"], "style": "user"}
+{"query": "get a single label", "expected": ["get_label"], "style": "agent"}
+{"query": "add a red label called 'security' to the web-frontend project", "expected": ["create_label"], "style": "user"}
+{"query": "create a new project label", "expected": ["create_label"], "style": "agent"}
+{"query": "rename the label 'wip' to 'in-progress' and make it blue", "expected": ["update_label"], "style": "user"}
+{"query": "update an existing label", "expected": ["update_label"], "style": "agent"}
+{"query": "delete the unused label 'legacy' from project 4521", "expected": ["delete_label"], "style": "user"}
+{"query": "delete a project label", "expected": ["delete_label"], "style": "agent"}
+{"query": "what projects are in the engineering group, including subgroups?", "expected": ["list_group_projects"], "style": "user"}
+{"query": "list projects in a group", "expected": ["list_group_projects"], "style": "agent"}
+{"query": "show me the folder structure of the repo for project 4521 on main, recursively", "expected": ["get_repository_tree"], "style": "user"}
+{"query": "list files and directories in a repository", "expected": ["get_repository_tree"], "style": "agent"}
+{"query": "check this CI config for errors before I commit it: stages: [build, test] ... for project 4521", "expected": ["validate_ci_lint"], "style": "user"}
+{"query": "validate gitlab ci yaml content", "expected": ["validate_ci_lint"], "style": "agent"}
+{"query": "is the .gitlab-ci.yml that's currently in the payments-api repo valid?", "expected": ["validate_project_ci_lint"], "style": "user"}
+{"query": "lint existing project gitlab-ci configuration", "expected": ["validate_project_ci_lint"], "style": "agent"}
+{"query": "what reusable CI/CD components are in the GitLab catalog for Docker builds?", "expected": ["list_ci_catalog_resources"], "style": "user"}
+{"query": "list ci/cd catalog resources", "expected": ["list_ci_catalog_resources"], "style": "agent"}
+{"query": "show me the versions and components of the 'deploy-to-k8s' CI catalog entry", "expected": ["get_ci_catalog_resource"], "style": "user"}
+{"query": "get ci catalog resource details", "expected": ["get_ci_catalog_resource"], "style": "agent"}
+{"query": "list the open merge requests in the payments-api project", "expected": ["list_merge_requests"], "style": "user"}
+{"query": "list merge requests", "expected": ["list_merge_requests"], "style": "agent"}
+{"query": "which merge requests are open anywhere in the engineering group?", "expected": ["list_group_merge_requests"], "style": "user"}
+{"query": "list merge requests across a group", "expected": ["list_group_merge_requests"], "style": "agent"}
+{"query": "look up the GitLab users alice.wong and bob.nguyen", "expected": ["get_users", "get_user"], "style": "user"}
+{"query": "get gitlab users by usernames", "expected": ["get_users"], "style": "agent"}
+{"query": "who is GitLab user number 10234?", "expected": ["get_user"], "style": "user"}
+{"query": "get user details by id", "expected": ["get_user"], "style": "agent"}
+{"query": "which GitLab account am I logged in as?", "expected": ["whoami"], "style": "user"}
+{"query": "get current authenticated user", "expected": ["whoami"], "style": "agent"}
+{"query": "show me the recent commits on main in the payments-api project from last week", "expected": ["list_commits"], "style": "user"}
+{"query": "list repository commits", "expected": ["list_commits"], "style": "agent"}
+{"query": "what did commit 9fceb02 change and who made it?", "expected": ["get_commit"], "style": "user"}
+{"query": "get commit details by sha", "expected": ["get_commit"], "style": "agent"}
+{"query": "show me the actual code diff for commit 9fceb02", "expected": ["get_commit_diff"], "style": "user"}
+{"query": "get diff of a specific commit", "expected": ["get_commit_diff"], "style": "agent"}
+{"query": "who last changed lines 40 to 60 of src/billing/invoice.rb? show me the blame", "expected": ["get_file_blame"], "style": "user"}
+{"query": "git blame for a file", "expected": ["get_file_blame"], "style": "agent"}
+{"query": "what CI statuses were reported for commit 9fceb02?", "expected": ["list_commit_statuses"], "style": "user"}
+{"query": "list commit statuses", "expected": ["list_commit_statuses"], "style": "agent"}
+{"query": "mark commit 9fceb02 as passed for the 'security-scan' check from our external scanner", "expected": ["create_commit_status"], "style": "user"}
+{"query": "create or update commit status", "expected": ["create_commit_status"], "style": "agent"}
+{"query": "what iterations does the engineering group have that are currently open?", "expected": ["list_group_iterations"], "style": "user"}
+{"query": "list group iterations", "expected": ["list_group_iterations"], "style": "agent"}
+{"query": "upload the screenshot at ~/Desktop/bug.png to the checkout-service project so I can embed it in an issue", "expected": ["upload_markdown"], "style": "user"}
+{"query": "upload a file for use in markdown", "expected": ["upload_markdown"], "style": "agent"}
+{"query": "download the attachment image with secret abc123 named error.png from project 4521", "expected": ["download_attachment"], "style": "user"}
+{"query": "download an uploaded attachment", "expected": ["download_attachment"], "style": "agent"}
+{"query": "is the GitLab connection working and what version of the server am I talking to?", "expected": ["health_check"], "style": "user"}
+{"query": "verify gitlab server status and authentication", "expected": ["health_check"], "style": "agent"}
+{"query": "what have I been doing on GitLab recently? show my activity events from the last month", "expected": ["list_events"], "style": "user"}
+{"query": "list events for the authenticated user", "expected": ["list_events"], "style": "agent"}
+{"query": "show me recent activity on the payments-api project, like pushes and comments since October 1", "expected": ["get_project_events"], "style": "user"}
+{"query": "list project activity events", "expected": ["get_project_events"], "style": "agent"}
+{"query": "I need to do something with GitLab pipelines but I don't see the tool, can you turn on more tool categories?", "expected": ["discover_tools"], "style": "user"}
+{"query": "discover and activate additional tool categories", "expected": ["discover_tools"], "style": "agent"}
+{"query": "what's around the coordinates 40.7484, -73.9857? I want to know the neighborhood and what's within a 10 minute walk", "expected": ["ground_location_tool"], "style": "user"}
+{"query": "what is near a coordinate or neighborhood lookup", "expected": ["ground_location_tool"], "style": "agent"}
+{"query": "I have these delivery addresses as coordinates, which of them fall inside my service area polygon?", "expected": ["points_within_polygon_tool"], "style": "user"}
+{"query": "test whether points are inside a polygon", "expected": ["points_within_polygon_tool"], "style": "agent"}
+{"query": "combine my three delivery zone polygons into one single coverage area", "expected": ["union_tool"], "style": "user"}
+{"query": "merge polygons into one geometry", "expected": ["union_tool"], "style": "agent"}
+{"query": "which of these 5 warehouses is closest to the customer at 47.61, -122.33?", "expected": ["nearest_point_tool"], "style": "user"}
+{"query": "find nearest point in a collection to a target", "expected": ["nearest_point_tool"], "style": "agent"}
+{"query": "what area do my two service zones have in common?", "expected": ["intersect_tool"], "style": "user"}
+{"query": "intersection of two polygons", "expected": ["intersect_tool"], "style": "agent"}
+{"query": "take my delivery zone and cut out the part that overlaps with the restricted airport zone", "expected": ["difference_tool"], "style": "user"}
+{"query": "subtract one polygon from another", "expected": ["difference_tool"], "style": "agent"}
+{"query": "if I start at 51.5074, -0.1278 and go 25 km northeast, what are the coordinates where I end up?", "expected": ["destination_tool"], "style": "user"}
+{"query": "calculate destination point from bearing and distance", "expected": ["destination_tool"], "style": "agent"}
+{"query": "how long is this hiking trail if I trace it with these GPS points?", "expected": ["length_tool"], "style": "user"}
+{"query": "measure length of a line from coordinates", "expected": ["length_tool"], "style": "agent"}
+{"query": "my bike path is a line, where's the closest point on it to the cafe at 37.77, -122.42?", "expected": ["nearest_point_on_line_tool"], "style": "user"}
+{"query": "snap a point to the nearest position on a line", "expected": ["nearest_point_on_line_tool"], "style": "agent"}
+{"query": "draw the smallest convex shape that wraps around all these store locations", "expected": ["convex_tool"], "style": "user"}
+{"query": "compute convex hull of points", "expected": ["convex_tool"], "style": "agent"}
+{"query": "get me the opening hours and phone number for the place with Mapbox id dXJuOm1ieHBvaTo0NTg5", "expected": ["place_details_tool"], "style": "user"}
+{"query": "retrieve place details by mapbox id", "expected": ["place_details_tool"], "style": "agent"}
+{"query": "this coastline polygon has way too many vertices, simplify it so it's lighter to render", "expected": ["simplify_tool"], "style": "user"}
+{"query": "simplify a linestring or polygon vertices", "expected": ["simplify_tool"], "style": "agent"}
+{"query": "what's the bounding box of this GeoJSON shape?", "expected": ["bbox_tool"], "style": "user"}
+{"query": "calculate bounding box of geometry", "expected": ["bbox_tool"], "style": "agent"}
+{"query": "find the center point of this parcel polygon", "expected": ["centroid_tool"], "style": "user"}
+{"query": "compute polygon centroid", "expected": ["centroid_tool"], "style": "agent"}
+{"query": "what's the halfway point between Chicago and Detroit?", "expected": ["midpoint_tool"], "style": "user"}
+{"query": "geographic midpoint between two coordinates", "expected": ["midpoint_tool"], "style": "agent"}
+{"query": "which compass direction do I head to get from Denver to Salt Lake City?", "expected": ["bearing_tool"], "style": "user"}
+{"query": "calculate bearing between two points", "expected": ["bearing_tool"], "style": "agent"}
+{"query": "how many acres is this farm plot polygon?", "expected": ["area_tool"], "style": "user"}
+{"query": "calculate area of a polygon", "expected": ["area_tool"], "style": "agent"}
+{"query": "draw a 2 km radius circle around my shop at 34.05, -118.25", "expected": ["buffer_tool"], "style": "user"}
+{"query": "create buffer zone around a geometry", "expected": ["buffer_tool"], "style": "agent"}
+{"query": "how far is it in miles in a straight line from Boston to Philadelphia?", "expected": ["distance_tool"], "style": "user"}
+{"query": "distance between two coordinates", "expected": ["distance_tool"], "style": "agent"}
+{"query": "show me all the pharmacies near downtown Portland that are within 3 km", "expected": ["category_search_tool"], "style": "user"}
+{"query": "find all places of a category like coffee shops", "expected": ["category_search_tool"], "style": "agent"}
+{"query": "how do I drive from Austin to San Antonio, give me turn by turn directions", "expected": ["directions_tool"], "style": "user"}
+{"query": "get driving directions between coordinates", "expected": ["directions_tool"], "style": "agent"}
+{"query": "show me everywhere I can get to within 15 minutes by bike from the office at 45.52, -122.68", "expected": ["isochrone_tool"], "style": "user"}
+{"query": "compute reachable area within travel time", "expected": ["isochrone_tool"], "style": "agent"}
+{"query": "my GPS recording is jittery, snap it onto the actual roads", "expected": ["map_matching_tool"], "style": "user"}
+{"query": "snap gps trace to roads", "expected": ["map_matching_tool"], "style": "agent"}
+{"query": "I need travel times between each of these 6 depots and 10 customers, give me the whole table", "expected": ["matrix_tool"], "style": "user"}
+{"query": "travel time and distance matrix between multiple points", "expected": ["matrix_tool"], "style": "agent"}
+{"query": "I have 8 stops to make tomorrow, what's the fastest order to visit them all and come back?", "expected": ["optimization_tool"], "style": "user"}
+{"query": "optimize route through several stops traveling salesman", "expected": ["optimization_tool"], "style": "agent"}
+{"query": "show me a map with pins for these four restaurant locations", "expected": ["render_map_tool"], "style": "user"}
+{"query": "render an interactive map with markers", "expected": ["render_map_tool"], "style": "agent"}
+{"query": "what's the street address at latitude 48.8584, longitude 2.2945?", "expected": ["reverse_geocode_tool"], "style": "user"}
+{"query": "convert coordinates to an address", "expected": ["reverse_geocode_tool"], "style": "agent"}
+{"query": "make me a static PNG map image centered on Lisbon at zoom 12, 800 by 600", "expected": ["static_map_image_tool"], "style": "user"}
+{"query": "generate static map image", "expected": ["static_map_image_tool"], "style": "agent"}
+{"query": "where is 1600 Pennsylvania Avenue? give me the coordinates", "expected": ["search_and_geocode_tool"], "style": "user"}
+{"query": "geocode an address or find a specific business", "expected": ["search_and_geocode_tool"], "style": "agent"}
+{"query": "open https://example.com/checkout in a headless browser", "expected": ["puppeteer_navigate", "firecrawl_interact"], "style": "user"}
+{"query": "navigate browser to a URL", "expected": ["puppeteer_navigate"], "style": "agent"}
+{"query": "take a screenshot of the page that's open right now, call it homepage", "expected": ["puppeteer_screenshot"], "style": "user"}
+{"query": "screenshot current page or element", "expected": ["puppeteer_screenshot"], "style": "agent"}
+{"query": "click the 'Add to cart' button on the page with the selector #add-to-cart", "expected": ["puppeteer_click"], "style": "user"}
+{"query": "click an element by css selector", "expected": ["puppeteer_click"], "style": "agent"}
+{"query": "type my email address into the #email input on the signup form", "expected": ["puppeteer_fill"], "style": "user"}
+{"query": "fill out an input field", "expected": ["puppeteer_fill"], "style": "agent"}
+{"query": "pick 'Canada' from the country dropdown on the form", "expected": ["puppeteer_select"], "style": "user"}
+{"query": "select option in a dropdown", "expected": ["puppeteer_select"], "style": "agent"}
+{"query": "hover over the menu item with class .nav-products to open the submenu", "expected": ["puppeteer_hover"], "style": "user"}
+{"query": "hover over an element", "expected": ["puppeteer_hover"], "style": "agent"}
+{"query": "run document.title in the browser console and tell me what it returns", "expected": ["puppeteer_evaluate"], "style": "user"}
+{"query": "execute javascript in the page", "expected": ["puppeteer_evaluate"], "style": "agent"}
+{"query": "add a task to Todoist to call the dentist tomorrow at 9am, high priority", "expected": ["todoist_create_task"], "style": "user"}
+{"query": "create a todoist task", "expected": ["todoist_create_task"], "style": "agent"}
+{"query": "what's on my Todoist list for today?", "expected": ["todoist_get_tasks"], "style": "user"}
+{"query": "get todoist tasks with filters", "expected": ["todoist_get_tasks"], "style": "agent"}
+{"query": "move my 'file taxes' task in Todoist to next Friday and make it priority 1", "expected": ["todoist_update_task"], "style": "user"}
+{"query": "update a todoist task by name", "expected": ["todoist_update_task"], "style": "agent"}
+{"query": "delete the 'buy birthday balloons' task from Todoist", "expected": ["todoist_delete_task"], "style": "user"}
+{"query": "delete todoist task", "expected": ["todoist_delete_task"], "style": "agent"}
+{"query": "mark 'send invoice to Acme' as done in Todoist", "expected": ["todoist_complete_task"], "style": "user"}
+{"query": "complete a todoist task", "expected": ["todoist_complete_task"], "style": "agent"}
