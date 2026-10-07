@@ -1,0 +1,476 @@
+{
+  "headline": {
+    "retriever": "hybrid-rrf+server",
+    "user": {
+      "n": 442,
+      "recall5": 0.8597285067873304,
+      "recall10": 0.9298642533936652,
+      "mrr": 0.6905668677727501
+    },
+    "agent": {
+      "n": 442,
+      "recall5": 0.9819004524886877,
+      "recall10": 0.995475113122172,
+      "mrr": 0.9236721611721611
+    },
+    "user_ci95": [
+      0.8242449638056064,
+      0.8890128389656022
+    ],
+    "all_recall5": 0.920814479638009
+  },
+  "table": {
+    "bm25": {
+      "user": {
+        "n": 442,
+        "recall5": 0.8076923076923077,
+        "recall10": 0.8642533936651584,
+        "mrr": 0.6516034618975796
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9864253393665159,
+        "recall10": 0.9886877828054299,
+        "mrr": 0.9306435394670689
+      },
+      "user_ci95": [
+        0.7683614767606222,
+        0.8417206690059462
+      ],
+      "all_recall5": 0.8970588235294118
+    },
+    "dense": {
+      "user": {
+        "n": 442,
+        "recall5": 0.7963800904977375,
+        "recall10": 0.8800904977375565,
+        "mrr": 0.6347877612583495
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9389140271493213,
+        "recall10": 0.9796380090497737,
+        "mrr": 0.8558024491848022
+      },
+      "user_ci95": [
+        0.7563594689225064,
+        0.831293186190879
+      ],
+      "all_recall5": 0.8676470588235294
+    },
+    "bm25+server": {
+      "user": {
+        "n": 442,
+        "recall5": 0.8190045248868778,
+        "recall10": 0.8755656108597285,
+        "mrr": 0.6576716584069525
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9864253393665159,
+        "recall10": 0.9886877828054299,
+        "mrr": 0.9295123177476119
+      },
+      "user_ci95": [
+        0.7804112397749529,
+        0.8521003966447981
+      ],
+      "all_recall5": 0.9027149321266968
+    },
+    "dense+server": {
+      "user": {
+        "n": 442,
+        "recall5": 0.7986425339366516,
+        "recall10": 0.8981900452488688,
+        "mrr": 0.6571293902176254
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9615384615384616,
+        "recall10": 0.9864253393665159,
+        "mrr": 0.8704625439919558
+      },
+      "user_ci95": [
+        0.758756197807422,
+        0.8333823554366002
+      ],
+      "all_recall5": 0.8800904977375565
+    },
+    "hybrid-rrf": {
+      "user": {
+        "n": 442,
+        "recall5": 0.8484162895927602,
+        "recall10": 0.9117647058823529,
+        "mrr": 0.6865384615384615
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9796380090497737,
+        "recall10": 0.9909502262443439,
+        "mrr": 0.906456043956044
+      },
+      "user_ci95": [
+        0.8119903791719543,
+        0.8788379329460716
+      ],
+      "all_recall5": 0.9140271493212669
+    },
+    "hybrid-rrf+server": {
+      "user": {
+        "n": 442,
+        "recall5": 0.8597285067873304,
+        "recall10": 0.9298642533936652,
+        "mrr": 0.6905668677727501
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9819004524886877,
+        "recall10": 0.995475113122172,
+        "mrr": 0.9236721611721611
+      },
+      "user_ci95": [
+        0.8242449638056064,
+        0.8890128389656022
+      ],
+      "all_recall5": 0.920814479638009
+    },
+    "hybrid-minmax 1:1": {
+      "user": {
+        "n": 442,
+        "recall5": 0.8506787330316742,
+        "recall10": 0.9095022624434389,
+        "mrr": 0.6891312935430584
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9886877828054299,
+        "recall10": 0.997737556561086,
+        "mrr": 0.9330370609782375
+      },
+      "user_ci95": [
+        0.8144360595161344,
+        0.8808781507325278
+      ],
+      "all_recall5": 0.919683257918552
+    },
+    "hybrid-minmax 1:1+server": {
+      "user": {
+        "n": 442,
+        "recall5": 0.8619909502262444,
+        "recall10": 0.9230769230769231,
+        "mrr": 0.698805932629462
+      },
+      "agent": {
+        "n": 442,
+        "recall5": 0.9909502262443439,
+        "recall10": 0.997737556561086,
+        "mrr": 0.942219708396179
+      },
+      "user_ci95": [
+        0.8267039911155417,
+        0.8910397097863033
+      ],
+      "all_recall5": 0.9264705882352942
+    }
+  },
+  "per_batch_all_recall5": {
+    "dev": {
+      "bm25": 0.8717948717948718,
+      "dense": 0.9038461538461539,
+      "bm25+server": 0.8717948717948718,
+      "dense+server": 0.9038461538461539,
+      "hybrid-rrf": 0.9038461538461539,
+      "hybrid-rrf+server": 0.9102564102564102,
+      "hybrid-minmax 1:1": 0.9038461538461539,
+      "hybrid-minmax 1:1+server": 0.9230769230769231
+    },
+    "first-test": {
+      "bm25": 0.9142857142857143,
+      "dense": 0.9142857142857143,
+      "bm25+server": 0.9142857142857143,
+      "dense+server": 0.8928571428571429,
+      "hybrid-rrf": 0.9357142857142857,
+      "hybrid-rrf+server": 0.9428571428571428,
+      "hybrid-minmax 1:1": 0.9357142857142857,
+      "hybrid-minmax 1:1+server": 0.9357142857142857
+    },
+    "second-test": {
+      "bm25": 0.9285714285714286,
+      "dense": 0.8428571428571429,
+      "bm25+server": 0.9333333333333333,
+      "dense+server": 0.8904761904761904,
+      "hybrid-rrf": 0.9238095238095239,
+      "hybrid-rrf+server": 0.9285714285714286,
+      "hybrid-minmax 1:1": 0.9333333333333333,
+      "hybrid-minmax 1:1+server": 0.9428571428571428
+    },
+    "third-test": {
+      "bm25": 0.8835978835978836,
+      "dense": 0.8492063492063492,
+      "bm25+server": 0.8941798941798942,
+      "dense+server": 0.8597883597883598,
+      "hybrid-rrf": 0.9047619047619048,
+      "hybrid-rrf+server": 0.9126984126984127,
+      "hybrid-minmax 1:1": 0.9126984126984127,
+      "hybrid-minmax 1:1+server": 0.9153439153439153
+    }
+  },
+  "comparisons": {
+    "C1": {
+      "a": "hybrid-rrf+server",
+      "b": "dense",
+      "user": {
+        "gained": 39,
+        "lost": 11,
+        "clears_2se": true
+      },
+      "agent": {
+        "gained": 19,
+        "lost": 0,
+        "clears_2se": true
+      },
+      "all": {
+        "gained": 58,
+        "lost": 11,
+        "clears_2se": true
+      }
+    },
+    "C2": {
+      "a": "hybrid-rrf+server",
+      "b": "bm25",
+      "user": {
+        "gained": 31,
+        "lost": 8,
+        "clears_2se": true
+      },
+      "agent": {
+        "gained": 3,
+        "lost": 5,
+        "clears_2se": false
+      },
+      "all": {
+        "gained": 34,
+        "lost": 13,
+        "clears_2se": true
+      }
+    },
+    "C3": {
+      "a": "hybrid-rrf+server",
+      "b": "hybrid-rrf",
+      "user": {
+        "gained": 9,
+        "lost": 4,
+        "clears_2se": false
+      },
+      "agent": {
+        "gained": 2,
+        "lost": 1,
+        "clears_2se": false
+      },
+      "all": {
+        "gained": 11,
+        "lost": 5,
+        "clears_2se": false
+      }
+    },
+    "C4": {
+      "a": "bm25",
+      "b": "dense",
+      "user": {
+        "gained": 41,
+        "lost": 36,
+        "clears_2se": false
+      },
+      "agent": {
+        "gained": 24,
+        "lost": 3,
+        "clears_2se": true
+      },
+      "all": {
+        "gained": 65,
+        "lost": 39,
+        "clears_2se": true
+      }
+    },
+    "C5": {
+      "a": "dense+server",
+      "b": "dense",
+      "user": {
+        "gained": 12,
+        "lost": 11,
+        "clears_2se": false
+      },
+      "agent": {
+        "gained": 14,
+        "lost": 4,
+        "clears_2se": true
+      },
+      "all": {
+        "gained": 26,
+        "lost": 15,
+        "clears_2se": false
+      }
+    }
+  },
+  "mine_vs_independent": {
+    "mine": {
+      "bm25": 0.8197278911564626,
+      "dense": 0.8140589569160998,
+      "bm25+server": 0.8231292517006803,
+      "dense+server": 0.8469387755102041,
+      "hybrid-rrf": 0.8480725623582767,
+      "hybrid-rrf+server": 0.8560090702947846,
+      "hybrid-minmax 1:1": 0.8684807256235828,
+      "hybrid-minmax 1:1+server": 0.8741496598639455
+    },
+    "independent": {
+      "bm25": 0.8970588235294118,
+      "dense": 0.8676470588235294,
+      "bm25+server": 0.9027149321266968,
+      "dense+server": 0.8800904977375565,
+      "hybrid-rrf": 0.9140271493212669,
+      "hybrid-rrf+server": 0.920814479638009,
+      "hybrid-minmax 1:1": 0.919683257918552,
+      "hybrid-minmax 1:1+server": 0.9264705882352942
+    },
+    "readings": {
+      "rho": 0.9047619047619048,
+      "R1_conclusions_independent_of_label_author": true,
+      "R2_a_c1_clears": true,
+      "R2_b_agent_within_1pt": true,
+      "R2_supported": true
+    }
+  },
+  "overlap_strata_user": {
+    "none": {
+      "n": 165,
+      "bm25": 0.6242424242424243,
+      "dense": 0.6909090909090909,
+      "hybrid-rrf+server": 0.7212121212121212
+    },
+    "some": {
+      "n": 80,
+      "bm25": 0.8125,
+      "dense": 0.7125,
+      "hybrid-rrf+server": 0.875
+    },
+    "half or more": {
+      "n": 197,
+      "bm25": 0.9593908629441624,
+      "dense": 0.9187817258883249,
+      "hybrid-rrf+server": 0.9695431472081218
+    }
+  },
+  "misses_by_server_user": {
+    "everything": [
+      0,
+      13
+    ],
+    "fetch": [
+      0,
+      1
+    ],
+    "filesystem": [
+      4,
+      14
+    ],
+    "git": [
+      3,
+      12
+    ],
+    "github": [
+      3,
+      26
+    ],
+    "memory": [
+      4,
+      9
+    ],
+    "sequential-thinking": [
+      0,
+      1
+    ],
+    "time": [
+      0,
+      2
+    ],
+    "google-maps": [
+      1,
+      7
+    ],
+    "notion": [
+      4,
+      24
+    ],
+    "playwright": [
+      3,
+      25
+    ],
+    "slack": [
+      0,
+      8
+    ],
+    "sqlite": [
+      0,
+      6
+    ],
+    "dynamodb": [
+      0,
+      8
+    ],
+    "heroku": [
+      4,
+      33
+    ],
+    "kubernetes": [
+      4,
+      23
+    ],
+    "mongodb": [
+      3,
+      27
+    ],
+    "pinecone": [
+      0,
+      9
+    ],
+    "tavily": [
+      0,
+      5
+    ],
+    "docker": [
+      0,
+      4
+    ],
+    "excel": [
+      8,
+      26
+    ],
+    "obsidian": [
+      6,
+      15
+    ],
+    "powerpoint": [
+      6,
+      37
+    ],
+    "redis": [
+      4,
+      53
+    ],
+    "word": [
+      5,
+      54
+    ]
+  },
+  "sizes": {
+    "user": 442,
+    "agent": 442
+  },
+  "environment": {
+    "python": "3.13.16",
+    "wordllama": "0.4.0.post1",
+    "numpy": "2.5.3"
+  },
+  "caveat": "independent labels on spent dev tools; not a fresh confirmation set; no default is changed by this run"
+}

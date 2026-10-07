@@ -268,13 +268,48 @@ What this says:
 - **The "few hub tools cause the misses" picture is not borne out as a main cause.** Counting wrong top-5 slots, each source's 8 most frequent wrong tools hold only 13-31% of them, and the top ones differ by source (dev: `get_issue`, `get_pull_request`, `create_branch`; first test: `browser_find`, `API-retrieve-page-markdown`; second: `maintenance_on`, `list_apps`, `count`, `find`; third: `get_paragraph_text_from_document`, `add_slide`, `get_document_text`). Many are legitimate neighbors of the right tool, not generic noise, which a global penalty cannot tell apart. The correction helped where a server's tools share generic verbs (the second batch) and hurt where tools have close, natural neighbors (the GitHub pull-request family, Notion); that explanation is plausible but not tested here.
 - **The remaining misses look like wording gaps, not scoring artifacts**: "draw a rounded rectangle" versus a tool described as "add an auto shape", "queue list" versus "Redis list". That points at the tool text and the query (enrichment, rewriting by a model), not at the ranking formula.
 
-### Independent labels (written, not yet scored)
+### Independent labels (scored once)
 
-Every query set above was written by the same author who built and tuned the retrievers. `queries/independent/` now holds labels for all four real-server batches written by four fresh subagent instances that saw only the tool lists and the labeling guidelines (`scripts/make_label_kit.py` builds that blind kit; a test checks it contains no retrieval code, earlier queries or results): 884 queries, one user-style and one agent-style per tool. I did not edit any of them (checksums in `queries/independent/MANIFEST.sha256`), and they pass the repo's own validator. Details, the differences from my labels, and the limits are in `queries/independent/README.md`:
+Every query set above was written by the same author who built and tuned the retrievers. `queries/independent/` holds labels for all four real-server batches written by four fresh subagent instances that saw only the tool lists and the labeling guidelines (`scripts/make_label_kit.py` builds that blind kit; a test checks it contains no retrieval code, earlier queries or results): 884 queries, one user-style and one agent-style per tool. I did not edit any of them (checksums in `queries/independent/MANIFEST.sha256`), and they pass the repo's own validator. Details, the differences from my labels, and the limits are in `queries/independent/README.md`:
 
 - Their user-style queries share more words with tool names (0.28-0.39 against 0.13-0.25 for mine), accept fewer alternative tools, and name the service in different proportions (third batch, agent-style: 20% against my 97%).
 - They are another instance of the same model family, not human users, and the tools are the ones already used to design the retrievers. These are independent labels on dev data, not a fresh confirmation set.
-- They have not been scored. The scoring protocol will be fixed and committed first.
+
+**Protocol** (`scripts/score_independent.py`, committed in `ff7a225` before it was run on these labels; only dry-run on my own labels): headline `hybrid-rrf+server`, the configured default; five declared paired comparisons (C1 vs `dense`, C2 vs `bm25`, C3 vs `hybrid-rrf`, C4 `bm25` vs `dense`, C5 `dense+server` vs `dense`); two declared readings. **R1**: the label author does not change the conclusions iff the Spearman correlation, over the eight candidates, between pooled recall@5 on my labels and on the independent ones is at least 0.8. **R2**: the round-2 adoption is *supported* iff C1 on all queries clears the 2-SE bar and the default's agent-style recall is within 1 point of the best. One run, no edits afterwards; nothing here changes the default. Raw output: `results/independent-score.txt` / `.json`.
+
+442 user-style and 442 agent-style queries over the four batches (each scored on its own catalog), recall@5 with 95% intervals:
+
+| retriever | user-style | MRR | recall@10 | agent-style | all |
+|---|---:|---:|---:|---:|---:|
+| bm25 | 80.8% [77, 84] | 0.65 | 86.4% | 98.6% | 89.7% |
+| dense | 79.6% [76, 83] | 0.63 | 88.0% | 93.9% | 86.8% |
+| bm25+server | 81.9% [78, 85] | 0.66 | 87.6% | 98.6% | 90.3% |
+| dense+server | 79.9% [76, 83] | 0.66 | 89.8% | 96.2% | 88.0% |
+| hybrid-rrf | 84.8% [81, 88] | 0.69 | 91.2% | 98.0% | 91.4% |
+| **hybrid-rrf+server (headline)** | **86.0% [82, 89]** | 0.69 | 93.0% | **98.2%** | 92.1% |
+| hybrid-minmax 1:1 | 85.1% [81, 88] | 0.69 | 91.0% | 98.9% | 92.0% |
+| hybrid-minmax 1:1+server | 86.2% [83, 89] | 0.70 | 92.3% | 99.1% | 92.6% |
+
+Declared comparisons (paired, gained / lost; "clears" = g > l and g - l >= 2*sqrt(g + l)):
+
+| | user-style | agent-style | all |
+|---|---|---|---|
+| C1 headline vs `dense` | 39 / 11, clears | 19 / 0, clears | **58 / 11, clears** |
+| C2 headline vs `bm25` | 31 / 8, clears | 3 / 5, no | **34 / 13, clears** |
+| C3 headline vs `hybrid-rrf` | 9 / 4, no | 2 / 1, no | 11 / 5, no |
+| C4 `bm25` vs `dense` | 41 / 36, no | 24 / 3, clears | 65 / 39, clears |
+| C5 `dense+server` vs `dense` | 12 / 11, no | 14 / 4, clears | 26 / 15, no |
+
+**Declared readings.** R1: rho = 0.90, so the conclusions did not depend on who wrote the labels (by this rule). R2: C1 on all queries clears (58 / 11), and the headline's agent-style recall is 98.2% against 99.1% for the best (within 1 point): the round-2 adoption is **supported**. The default is not changed.
+
+How to read it:
+
+- **Everything scores higher on the independent labels** (+3 to +8 points on all queries, e.g. 82.0% to 89.7% for BM25). The independent user-style queries share more words with tool names, which is the easier setting, so absolute numbers are not comparable between the two label sets. The ordering of the candidates is mostly the same (rho = 0.90), but there are swaps: `dense+server` fell from above both BM25 variants to below them, and `hybrid-rrf+server` moved ahead of plain `hybrid-minmax 1:1` (92.1% against 92.0%: a tie in practice).
+- **Fusion is the part that holds up.** The hybrid beats `dense` and also beats `bm25` on user-style queries (31 / 8), so it is not just BM25 with extras. With these labels neither single retriever has a clear user-style advantage over the other (C4: 41 / 36), while BM25 is clearly ahead on agent-style queries (24 / 3).
+- **The server name is a small extra that does not clear, again.** On top of fusion it is 11 / 5 (C3), as in round 2 and on the third batch. On plain `dense` the user-style effect that motivated the idea in the dev experiment all but disappears (12 / 11, C5); only the agent-style gain remains (14 / 4). Why is untested. One possible reason is that in two batches the independent user-style queries name the service far more often than mine (first batch 54% against 1%, third 58% against 32%), which would leave less for the index text to add; in the second batch they name it less (34% against 73%), so this cannot be the whole story, and I did not test it. So the evidence for putting the server name in the index text is weaker than the round-2 adoption suggested, although including it does no harm here.
+- **Where the headline's misses are (descriptive, after the fact):** 62 user-style misses and 8 agent-style. By server: Excel 8/26, Obsidian 6/15, PowerPoint 6/37, Word 5/54; 4 each for Filesystem, Heroku, Kubernetes, Memory, Notion and Redis; 3 each for Git, GitHub, MongoDB and Playwright; 1 for Google Maps; none for Docker, DynamoDB, Everything, Pinecone, Slack, SQLite, Tavily and the smaller servers.
+- **Overlap with the tool name matters a lot (descriptive):** user-style recall for BM25 / dense / headline is 62% / 69% / 72% when the query shares no word with the tool's name (165 queries), 81% / 71% / 88% with some overlap (80), and 96% / 92% / 97% with half or more (197). Dense is better than BM25 only when there is no overlap, which fits the earlier suspicion that the embedding advantage depends on how paraphrased the queries are. It does not prove it.
+- **Limits.** Same-model-family authors, not people; the catalogs are the four batches used to tune the retrievers; the scored "all" mixes user- and agent-style queries equally; and with 442 queries per style a 95% interval is about +/-3 points, so differences among the top four candidates are within noise. A fifth batch with independent labels (Next steps) remains the real test.
 
 ### Fresh test set, and what its schemas showed
 
@@ -336,7 +371,7 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Score the retrievers on the independent labels under a protocol fixed and committed first (headline: the current default; comparisons against `dense`, `bm25` and `hybrid-rrf`; and a check of how much the results differ from the author-written labels). Human-written labels or real traffic would still be better.
+1. Human-written labels or real traffic. The independent labels came from another instance of the same model family, and the catalogs they were scored on are the ones used to design the retrievers.
 2. End-to-end eval with a real model (needs an API key): task success and total cost for full vs. slim vs. lazy, how often real queries name their service, the cost of a retrieval miss, and the right default `limit`. This is also the only way to learn whether the ~86% recall@5 matters in practice, because a model can search again.
 3. Attack the wording gap rather than the ranking formula: index-side enrichment for terse or jargon-heavy tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field), and query rewriting or reranking by a model. Server-level routing (pick the server first, then rank inside it) is an untested alternative to a global penalty.
 4. A fifth batch of servers with independently written queries, so the next decision is not made on spent data.

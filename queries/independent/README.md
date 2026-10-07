@@ -65,3 +65,7 @@ evidence of copying, but it does mean agent-style queries are a weak discriminat
   differ.
 - Any scoring should fix its protocol first (headline, comparisons, reading) and be committed before it is
   run, as with the earlier batches.
+
+## Scored
+
+The retrievers were scored on these labels once, under the protocol in `scripts/score_independent.py` (committed before the run). Results and caveats: top-level README, "Independent labels (scored once)"; raw output in `results/independent-score.{txt,json}`. These labels were not edited after scoring.

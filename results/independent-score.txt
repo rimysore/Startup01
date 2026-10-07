@@ -1,0 +1,56 @@
+Independent labels: 442 user-style + 442 agent-style queries over 4 batches (each on its own catalog)
+
+retriever                   user r@5          95% CI   MRR   r@10  agent r@5     all
+bm25                           80.8%      [77%, 84%]  0.65  86.4%      98.6%   89.7%
+dense                          79.6%      [76%, 83%]  0.63  88.0%      93.9%   86.8%
+bm25+server                    81.9%      [78%, 85%]  0.66  87.6%      98.6%   90.3%
+dense+server                   79.9%      [76%, 83%]  0.66  89.8%      96.2%   88.0%
+hybrid-rrf                     84.8%      [81%, 88%]  0.69  91.2%      98.0%   91.4%
+hybrid-rrf+server              86.0%      [82%, 89%]  0.69  93.0%      98.2%   92.1%  <- HEADLINE
+hybrid-minmax 1:1              85.1%      [81%, 88%]  0.69  91.0%      98.9%   92.0%
+hybrid-minmax 1:1+server       86.2%      [83%, 89%]  0.70  92.3%      99.1%   92.6%
+
+Per batch, headline vs the others (all-query recall@5, independent labels):
+batch                      bm25            dense      bm25+server     dense+server       hybrid-rrf  hybrid-rrf+serv  hybrid-minmax 1  hybrid-minmax 1
+dev                       87.2%            90.4%            87.2%            90.4%            90.4%            91.0%            90.4%            92.3%
+first-test                91.4%            91.4%            91.4%            89.3%            93.6%            94.3%            93.6%            93.6%
+second-test               92.9%            84.3%            93.3%            89.0%            92.4%            92.9%            93.3%            94.3%
+third-test                88.4%            84.9%            89.4%            86.0%            90.5%            91.3%            91.3%            91.5%
+
+Declared paired comparisons (A vs B; gained = A hits and B misses):
+  C1 hybrid-rrf+server vs dense      user  : gained  39, lost  11, net  +28 (2-SE bar 14.1; clears)
+  C1 hybrid-rrf+server vs dense      agent : gained  19, lost   0, net  +19 (2-SE bar  8.7; clears)
+  C1 hybrid-rrf+server vs dense      all   : gained  58, lost  11, net  +47 (2-SE bar 16.6; clears)
+  C2 hybrid-rrf+server vs bm25       user  : gained  31, lost   8, net  +23 (2-SE bar 12.5; clears)
+  C2 hybrid-rrf+server vs bm25       agent : gained   3, lost   5, net   -2 (2-SE bar  5.7; does not clear)
+  C2 hybrid-rrf+server vs bm25       all   : gained  34, lost  13, net  +21 (2-SE bar 13.7; clears)
+  C3 hybrid-rrf+server vs hybrid-rrf user  : gained   9, lost   4, net   +5 (2-SE bar  7.2; does not clear)
+  C3 hybrid-rrf+server vs hybrid-rrf agent : gained   2, lost   1, net   +1 (2-SE bar  3.5; does not clear)
+  C3 hybrid-rrf+server vs hybrid-rrf all   : gained  11, lost   5, net   +6 (2-SE bar  8.0; does not clear)
+  C4 bm25 vs dense      user  : gained  41, lost  36, net   +5 (2-SE bar 17.5; does not clear)
+  C4 bm25 vs dense      agent : gained  24, lost   3, net  +21 (2-SE bar 10.4; clears)
+  C4 bm25 vs dense      all   : gained  65, lost  39, net  +26 (2-SE bar 20.4; clears)
+  C5 dense+server vs dense      user  : gained  12, lost  11, net   +1 (2-SE bar  9.6; does not clear)
+  C5 dense+server vs dense      agent : gained  14, lost   4, net  +10 (2-SE bar  8.5; clears)
+  C5 dense+server vs dense      all   : gained  26, lost  15, net  +11 (2-SE bar 12.8; does not clear)
+
+Label-source check: pooled all-query recall@5 on MY labels vs the INDEPENDENT labels
+retriever                     mine  independent    diff
+bm25                         82.0%        89.7%   +7.7%
+dense                        81.4%        86.8%   +5.4%
+bm25+server                  82.3%        90.3%   +8.0%
+dense+server                 84.7%        88.0%   +3.3%
+hybrid-rrf                   84.8%        91.4%   +6.6%
+hybrid-rrf+server            85.6%        92.1%   +6.5%
+hybrid-minmax 1:1            86.8%        92.0%   +5.1%
+hybrid-minmax 1:1+server     87.4%        92.6%   +5.2%
+Spearman rho across the eight candidates = 0.90 (R1 needs >= 0.8)  ->  conclusions did not depend on who wrote the labels
+R2: (a) C1 on all queries clears the 2-SE bar: yes; (b) headline agent-style recall 98.2% vs best 99.1% (within 1 point): yes  ->  round-2 adoption SUPPORTED on independent labels (no default is changed by this run)
+
+Descriptive: user-style recall@5 by how many words the query shares with its tool's name (independent labels)
+overlap           n     bm25    dense   hybrid-rrf+server
+none            165    62.4%    69.1%               72.1%
+some             80    81.2%    71.2%               87.5%
+half or more    197    95.9%    91.9%               97.0%
+
+hybrid-rrf+server user-style misses by server: docker 0/4, dynamodb 0/8, everything 0/13, excel 8/26, fetch 0/1, filesystem 4/14, git 3/12, github 3/26, google-maps 1/7, heroku 4/33, kubernetes 4/23, memory 4/9, mongodb 3/27, notion 4/24, obsidian 6/15, pinecone 0/9, playwright 3/25, powerpoint 6/37, redis 4/53, sequential-thinking 0/1, slack 0/8, sqlite 0/6, tavily 0/5, time 0/2, word 5/54
