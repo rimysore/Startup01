@@ -1,0 +1,49 @@
+Fifth batch, independent labels: 217 user-style + 217 agent-style queries over 213 tools / 6 servers
+
+retriever                   user r@5          95% CI   MRR   r@10  agent r@5     all
+bm25                           75.6%      [69%, 81%]  0.59  85.3%      99.1%   87.3%
+dense                          67.3%      [61%, 73%]  0.50  79.7%      90.3%   78.8%
+bm25+server                    75.6%      [69%, 81%]  0.58  85.7%      99.1%   87.3%
+dense+server                   66.4%      [60%, 72%]  0.50  78.3%      89.4%   77.9%
+hybrid-rrf                     77.9%      [72%, 83%]  0.61  86.6%      98.6%   88.2%
+hybrid-rrf+server              78.3%      [72%, 83%]  0.60  85.7%      98.6%   88.5%  <- HEADLINE
+hybrid-minmax 1:1              77.4%      [71%, 82%]  0.62  87.6%      99.1%   88.2%
+hybrid-minmax 1:1+server       77.9%      [72%, 83%]  0.63  87.1%      99.1%   88.5%
+
+Declared paired comparisons (A vs B; gained = A hits and B misses):
+  C1 hybrid-rrf+server vs dense      user  : gained  31, lost   7, net  +24 (2-SE bar 12.3; clears)
+  C1 hybrid-rrf+server vs dense      agent : gained  18, lost   0, net  +18 (2-SE bar  8.5; clears)
+  C1 hybrid-rrf+server vs dense      all   : gained  49, lost   7, net  +42 (2-SE bar 15.0; clears)
+  C2 hybrid-rrf+server vs bm25       user  : gained  16, lost  10, net   +6 (2-SE bar 10.2; does not clear)
+  C2 hybrid-rrf+server vs bm25       agent : gained   1, lost   2, net   -1 (2-SE bar  3.5; does not clear)
+  C2 hybrid-rrf+server vs bm25       all   : gained  17, lost  12, net   +5 (2-SE bar 10.8; does not clear)
+  C3 hybrid-rrf+server vs hybrid-rrf user  : gained   3, lost   2, net   +1 (2-SE bar  4.5; does not clear)
+  C3 hybrid-rrf+server vs hybrid-rrf agent : gained   0, lost   0, net   +0 (2-SE bar  0.0; does not clear)
+  C3 hybrid-rrf+server vs hybrid-rrf all   : gained   3, lost   2, net   +1 (2-SE bar  4.5; does not clear)
+  C4 bm25 vs dense      user  : gained  34, lost  16, net  +18 (2-SE bar 14.1; clears)
+  C4 bm25 vs dense      agent : gained  20, lost   1, net  +19 (2-SE bar  9.2; clears)
+  C4 bm25 vs dense      all   : gained  54, lost  17, net  +37 (2-SE bar 16.9; clears)
+  C5 dense+server vs dense      user  : gained   1, lost   3, net   -2 (2-SE bar  4.0; does not clear)
+  C5 dense+server vs dense      agent : gained   0, lost   2, net   -2 (2-SE bar  2.8; does not clear)
+  C5 dense+server vs dense      all   : gained   1, lost   5, net   -4 (2-SE bar  4.9; does not clear)
+
+R2: (a) C1 on all queries clears the 2-SE bar: yes; (b) no candidate beats the default on agent-style queries by the 2-SE bar: yes  ->  round-2 adoption CONFIRMED (no default is changed by this run)
+    for information, the old fixed guard (within 1 point of the best, 99.1%): would pass (default 98.6%)
+R3: user-style recall 78.3% [72.4%, 83.3%] vs 86.0% on the earlier batches: DIFFERENT
+
+Reported, not decided: recall@5 by server (user-style / agent-style) for the default, bm25 and dense
+server               tools   n(u/a)   hybrid-rrf+server                bm25               dense
+desktop-commander       26    29/29         76% / 97%         76% / 100%         69% / 90%
+firecrawl               28    29/29         93% / 100%         86% / 100%         83% / 93%
+gitlab                 118  118/118         72% / 98%         69% / 98%         57% / 86%
+mapbox                  29    29/29         90% / 100%         86% / 100%         86% / 100%
+puppeteer                7      7/7         71% / 100%         71% / 100%         86% / 100%
+todoist                  5      5/5        100% / 100%        100% / 100%         80% / 100%
+macro-average over servers (user / agent): hybrid-rrf+server 83.7% / 99.1%; bm25 81.5% / 99.7%; dense 76.7% / 94.9%
+pooled WITHOUT gitlab (user / agent): hybrid-rrf+server 85.9% / 99.0%; bm25 82.8% / 100.0%; dense 79.8% / 94.9% (n = 99/99)
+
+Reported, not decided: user-style recall@5 by how many words the query shares with its tool's name
+overlap           n     bm25    dense   hybrid-rrf+server
+none             49    67.3%    71.4%               73.5%
+some             35    62.9%    57.1%               68.6%
+half or more    133    82.0%    68.4%               82.7%

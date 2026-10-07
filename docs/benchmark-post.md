@@ -1,4 +1,4 @@
-# Lazy tool loading for MCP: what 25 real servers say
+# Lazy tool loading for MCP: what 31 real servers say
 
 *Draft. Numbers below are copied from `results/` and `README.md` in this repository; the checklist at the end lists what must be settled before publishing.*
 
@@ -24,8 +24,8 @@ The question for the second idea is not the token count, which is easy to comput
 
 | | |
 |---|---|
-| Servers | 25 real MCP servers captured with their own `tools/list`, unmodified (provenance and licenses in `catalogs/README.md`) |
-| Tools | 442 in four batches (78, 70, 105, 189), each scored on its own catalog; a fifth batch (213 tools) is captured and held back |
+| Servers | 31 real MCP servers captured with their own `tools/list`, unmodified (provenance and licenses in `catalogs/README.md`) |
+| Tools | 655 in five batches (78, 70, 105, 189, 213), each scored on its own catalog. The fifth was captured after everything was tuned and scored once, on its own |
 | Queries | per tool, one **user-style** request in everyday words ("save these notes to a new file called todo.txt") and one **agent-style** query as a model would send to a search function ("write text to a file") |
 | Metric | recall@5: any acceptable tool in the top 5 results |
 
@@ -64,6 +64,19 @@ What held up, and what did not:
 - **The embedding advantage shrank across batches.** On author-written labels, embeddings beat BM25 by 22 points on everyday-language queries on the first batch (the reference servers: 73% vs 51%); on the fourth batch they were 4 points behind (69% vs 73%). The share of words queries had in common with their tool's name rose over the same batches (0.14 to 0.25), so a good part of this is the labels getting less paraphrased, not retrieval changing. Do not expect a fixed gap.
 - **Word overlap with the tool name dominates.** With no shared word, BM25 / embeddings / the fused default score 62% / 69% / 72%. With half the name's words present: 96% / 92% / 97%.
 
+### The fresh batch said less than the four it followed
+
+The fifth batch (213 tools, 6 servers, GitLab alone 118) was captured after everything was tuned and scored once, on independent labels, under a protocol committed before the labels existed:
+
+| retriever | everyday-language | agent-style | both |
+|---|---:|---:|---:|
+| BM25 | 75.6% [69, 81] | 99.1% | 87.3% |
+| embeddings | 67.3% [61, 73] | 90.3% | 78.8% |
+| BM25 + embeddings fused | 77.9% [72, 83] | 98.6% | 88.2% |
+| **same, with server name** | **78.3% [72, 83]** | **98.6%** | **88.5%** |
+
+By the rule we had fixed, the choice of default was confirmed: fusion beats embeddings alone by a wide margin (49 queries gained, 7 lost). But it is the *only* thing that held. The fused default is statistically indistinguishable from plain BM25 here (17 gained, 12 lost), the server name did nothing, and everyday-language recall (78%) was lower than the 86% on the earlier batches. About half of the difference is one server: GitLab's 118 near-duplicate tools score 72% on everyday-language queries, while the other five servers pooled score 86%. In 38 of the 47 misses the right server was found and the wrong tool in it was ranked first, so the remaining failures are not cross-server confusion. If we had stopped at the four spent batches, we would have reported a cleaner story.
+
 ## How we tried not to fool ourselves
 
 This part is as much of the result as the table, because the early numbers were wrong in instructive ways.
@@ -98,7 +111,7 @@ python -m unittest discover -s tests
 
 ## What is next
 
-1. Label the held-back fifth batch with independent authors, fix the protocol, score once.
+1. A sixth batch with human-written queries.
 2. An end-to-end run with a real model: task success and total cost for full vs slim vs lazy, including retrieval misses.
 3. Ship the gateway as a drop-in MCP proxy: one config listing your upstream servers, three meta-tools out.
 4. Compare against built-in tool search.
@@ -112,5 +125,5 @@ python -m unittest discover -s tests
 - [ ] **End-to-end result.** Strongest single addition; if it contradicts the token story, the TL;DR changes.
 - [ ] **Human check of a sample of the independent labels**, since "independent" currently means "another model instance".
 - [ ] **Re-run every number** from a clean checkout and diff against `results/` (they are produced by committed scripts).
-- [ ] Decide whether to publish the fifth batch's result before or after the post; it is the only untouched data.
+- [ ] All five batches are now spent. Any new claim needs a sixth, ideally with human-written queries.
 - [ ] Remove or soften any claim you cannot reproduce. The 12-gained-0-lost fusion figure, the 22-point and 4-point embedding-vs-BM25 gaps, and the word-overlap trend come from `README.md` tables and per-batch results, not from the single final results file.

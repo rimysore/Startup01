@@ -311,6 +311,42 @@ How to read it:
 - **Overlap with the tool name matters a lot (descriptive):** user-style recall for BM25 / dense / headline is 62% / 69% / 72% when the query shares no word with the tool's name (165 queries), 81% / 71% / 88% with some overlap (80), and 96% / 92% / 97% with half or more (197). Dense is better than BM25 only when there is no overlap, which fits the earlier suspicion that the embedding advantage depends on how paraphrased the queries are. It does not prove it.
 - **Limits.** Same-model-family authors, not people; the catalogs are the four batches used to tune the retrievers; the scored "all" mixes user- and agent-style queries equally; and with 442 queries per style a 95% interval is about +/-3 points, so differences among the top four candidates are within noise. A fifth batch with independent labels (Next steps) remains the real test.
 
+### Fifth batch result (independent labels, scored once)
+
+The first scoring on tools that no retriever setting was ever tuned against: `catalogs/test4/`, 213 tools from 6 servers, with 434 queries (217 per style) written by a fresh subagent instance from the blind kit (`queries/independent/README.md`, checksum pinned, committed before the run). Protocol: `scripts/score_fifth.py`, committed before the labels existed (`0c9892a`); headline `hybrid-rrf+server`; the same five paired comparisons as the previous independent-label run; the adoption reading uses a **paired** agent-style guard in place of the fixed one-point rule that decided two earlier runs by two queries (the old rule is printed for information). One run, no edits afterwards; no default changed. Raw output: `results/fifth-score.txt` / `.json`.
+
+| retriever | user-style | MRR | recall@10 | agent-style | all |
+|---|---:|---:|---:|---:|---:|
+| bm25 | 75.6% [69, 81] | 0.59 | 85.3% | 99.1% | 87.3% |
+| dense | 67.3% [61, 73] | 0.50 | 79.7% | 90.3% | 78.8% |
+| bm25+server | 75.6% [69, 81] | 0.58 | 85.7% | 99.1% | 87.3% |
+| dense+server | 66.4% [60, 72] | 0.50 | 78.3% | 89.4% | 77.9% |
+| hybrid-rrf | 77.9% [72, 83] | 0.61 | 86.6% | 98.6% | 88.2% |
+| **hybrid-rrf+server (headline)** | **78.3% [72, 83]** | 0.60 | 85.7% | **98.6%** | 88.5% |
+| hybrid-minmax 1:1 | 77.4% [71, 82] | 0.62 | 87.6% | 99.1% | 88.2% |
+| hybrid-minmax 1:1+server | 77.9% [72, 83] | 0.63 | 87.1% | 99.1% | 88.5% |
+
+Declared comparisons (paired, gained / lost; "clears" = g > l and g - l >= 2*sqrt(g + l)):
+
+| | user-style | agent-style | all |
+|---|---|---|---|
+| C1 headline vs `dense` | 31 / 7, clears | 18 / 0, clears | **49 / 7, clears** |
+| C2 headline vs `bm25` | 16 / 10, no | 1 / 2, no | 17 / 12, no |
+| C3 headline vs `hybrid-rrf` | 3 / 2, no | 0 / 0, no | 3 / 2, no |
+| C4 `bm25` vs `dense` | 34 / 16, clears | 20 / 1, clears | 54 / 17, clears |
+| C5 `dense+server` vs `dense` | 1 / 3, no | 0 / 2, no | 1 / 5, no |
+
+**Declared readings.** R2: **CONFIRMED**: C1 on all queries clears (49 / 7) and no candidate beats the default on agent-style queries by the bar (its recall, 98.6%, is also within 1 point of the best, 99.1%, so the old rule would have passed too). R3: user-style recall of 78.3% [72.4, 83.3] does **not** contain the 86.0% from the four earlier batches, so the result is **DIFFERENT**.
+
+How to read it:
+
+- **What is confirmed is "much better than `dense`", and not more.** The default is not distinguishable from plain BM25 (17 / 12 on all queries, 16 / 10 on user-style) or from plain `hybrid-rrf` (3 / 2). The fusion gain over BM25 that cleared on the earlier independent labels (31 / 8 on user-style) did not repeat here. Across the five independent-label sets, BM25 alone is 0 to 4 points behind the default on all queries (1.2 here); embeddings alone are below BM25 on three of the five sets (second, third and fifth), tied on one and above it on the first, and the weakest of the four basic options pooled over the earlier four batches (86.8% against 89.7% for BM25).
+- **The server name did nothing here.** On `dense` it is 1 / 5 on all queries (not significant, the wrong sign), on top of fusion 3 / 2. This batch's queries rarely name the service (17% of user-style, 10% of agent-style), and the earlier gains came mostly from sets that did. Taken together with the previous runs the server name is a harmless, unproven extra; the default is unchanged because the pre-declared rule does not change it, not because the evidence for it got stronger.
+- **Lower user-style recall is mostly GitLab.** GitLab is 118 of the 213 tools and 54% of the queries, and the default gets 72% of its user-style queries; the other five servers pooled score 85.9% [n = 99], about the earlier level. The by-server table is pre-declared as reported-not-decided: Firecrawl 93%, Mapbox 90%, Todoist 100%, Desktop Commander 76%, Puppeteer 71% (7 queries), GitLab 72%. I cannot separate catalog size from near-duplicate density (GitLab has `list_` / `get_` / `update_` variants for merge requests, issues, notes, discussions and emoji reactions), nor from this author's phrasing.
+- **Misses (post hoc): 47 user-style, 3 agent-style.** In 38 of the 47 user-style misses the top result is from the right server, so cross-server confusion is no longer the main failure; 33 of the 47 are GitLab tools, and in 14 of those the top result is a sibling tool sharing at least two name words. Several others look like wording gaps rather than ranking errors (hypothesis, untested): "open ~/Documents/budget_2026.txt and tell me what's in it" does not return `read_file` in the top 5 (the top results are `ground_location_tool`, `list_merge_requests`, `give_feedback_to_desktop_commander`), and "the search for TODO comments is still running, show me the next batch" returns `stop_search` and `start_search` instead of `get_more_search_results`.
+- **Limits.** One batch, one author (another instance of the same model family, no human check), 55% of the tools from a single server, and this author's queries share more words with tool names than any earlier set (mean overlap 0.44), which flatters lexical search. With 217 queries a 95% interval is about +/-6 points.
+- **What it suggests next:** the ranking formula is not where the remaining misses are. Tool-text enrichment or query rewriting (Next steps) and the cost of a miss in a real agent loop matter more than another retriever variant.
+
 ### Fresh test set, and what its schemas showed
 
 `catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results. 140 labeled queries (`queries/mcp-test.jsonl`) were scored once (result below), so this set is now spent as a test. It existed so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
@@ -362,9 +398,9 @@ What it says, and what it does not:
 
 `catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). 378 labeled queries (`queries/mcp-test3.jsonl`, written by me, so not independent; 97% of the agent-style ones name their service) were scored once as the confirmation batch; the result is in "Third test result" above, so this batch is spent too. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
 
-### Fifth batch (captured, unlabeled, untouched)
+### Fifth batch (captured, labeled, scored once)
 
-`catalogs/test4/` has 213 tools from 6 servers (GitLab with 118 tools, Mapbox, Firecrawl, Desktop Commander, Puppeteer, Todoist), captured after the independent-label run so the next decision is not made on spent data. No labels exist yet and nothing has been tuned against it. It is the largest catalog so far (96,454 estimated tokens; lossless slimming saves 2.2%, level 3 66.3%, the lazy gateway's fixed cost is 190 tokens). Two servers I tried first could not be captured (the official GitLab server emits tool schemas without a `type`; Supabase needs a blocked host), and Neon and Linear were dropped (blocked dependency; too large). Details, selection criteria and the rules for keeping it clean are in `catalogs/README.md`.
+`catalogs/test4/` has 213 tools from 6 servers (GitLab with 118 tools, Mapbox, Firecrawl, Desktop Commander, Puppeteer, Todoist), captured after the independent-label run so the decision was not made on spent data. It is the largest catalog so far (96,454 estimated tokens; lossless slimming saves 2.2%, level 3 66.3%, the lazy gateway's fixed cost is 190 tokens). It was labeled by an independent author and scored once; the result is in "Fifth batch result" above, so this batch is spent too. Two servers I tried first could not be captured (the official GitLab server emits tool schemas without a `type`; Supabase needs a blocked host), and Neon and Linear were dropped (blocked dependency; too large). Details and selection criteria are in `catalogs/README.md`.
 
 ## Design notes
 
@@ -378,7 +414,7 @@ What it says, and what it does not:
 1. Human-written labels or real traffic. The independent labels came from another instance of the same model family, and the catalogs they were scored on are the ones used to design the retrievers.
 2. End-to-end eval with a real model (needs an API key): task success and total cost for full vs. slim vs. lazy, how often real queries name their service, the cost of a retrieval miss, and the right default `limit`. This is also the only way to learn whether the ~86% recall@5 matters in practice, because a model can search again.
 3. Attack the wording gap rather than the ranking formula: index-side enrichment for terse or jargon-heavy tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field), and query rewriting or reranking by a model. Server-level routing (pick the server first, then rank inside it) is an untested alternative to a global penalty.
-4. Label the fifth batch (`catalogs/test4/`, captured) with independent authors, fix a scoring protocol, and score it once.
+4. A sixth batch with human-written queries, so the next decision is neither on spent data nor on labels from the same model family.
 5. A "no match" threshold for dense search.
 6. Count tokens with the API's token counter instead of the estimate.
 7. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.

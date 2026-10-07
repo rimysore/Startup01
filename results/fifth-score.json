@@ -1,0 +1,447 @@
+{
+  "headline": {
+    "retriever": "hybrid-rrf+server",
+    "user": {
+      "n": 217,
+      "recall5": 0.783410138248848,
+      "recall10": 0.8571428571428571,
+      "mrr": 0.5952289517957721
+    },
+    "agent": {
+      "n": 217,
+      "recall5": 0.9861751152073732,
+      "recall10": 0.9907834101382489,
+      "mrr": 0.8833772218564846
+    },
+    "user_ci95": [
+      0.7239282200522906,
+      0.8330320627929705
+    ],
+    "all_recall5": 0.8847926267281107
+  },
+  "table": {
+    "bm25": {
+      "user": {
+        "n": 217,
+        "recall5": 0.7557603686635944,
+        "recall10": 0.8525345622119815,
+        "mrr": 0.5854710701484894
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9907834101382489,
+        "recall10": 0.9953917050691244,
+        "mrr": 0.9371479774705581
+      },
+      "user_ci95": [
+        0.6944718472680711,
+        0.8081508470069205
+      ],
+      "all_recall5": 0.8732718894009217
+    },
+    "dense": {
+      "user": {
+        "n": 217,
+        "recall5": 0.6728110599078341,
+        "recall10": 0.7972350230414746,
+        "mrr": 0.5023882671348109
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9032258064516129,
+        "recall10": 0.9308755760368663,
+        "mrr": 0.7652256601565358
+      },
+      "user_ci95": [
+        0.6078503972331957,
+        0.7317595313309879
+      ],
+      "all_recall5": 0.7880184331797235
+    },
+    "bm25+server": {
+      "user": {
+        "n": 217,
+        "recall5": 0.7557603686635944,
+        "recall10": 0.8571428571428571,
+        "mrr": 0.5817478604344963
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9907834101382489,
+        "recall10": 0.9953917050691244,
+        "mrr": 0.9381720430107527
+      },
+      "user_ci95": [
+        0.6944718472680711,
+        0.8081508470069205
+      ],
+      "all_recall5": 0.8732718894009217
+    },
+    "dense+server": {
+      "user": {
+        "n": 217,
+        "recall5": 0.663594470046083,
+        "recall10": 0.783410138248848,
+        "mrr": 0.4992209787140663
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.8940092165898618,
+        "recall10": 0.9262672811059908,
+        "mrr": 0.752168824519055
+      },
+      "user_ci95": [
+        0.5983678977666856,
+        0.7231295012740749
+      ],
+      "all_recall5": 0.7788018433179723
+    },
+    "hybrid-rrf": {
+      "user": {
+        "n": 217,
+        "recall5": 0.7788018433179723,
+        "recall10": 0.8663594470046083,
+        "mrr": 0.6062687440567625
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9861751152073732,
+        "recall10": 0.9907834101382489,
+        "mrr": 0.8906298003072197
+      },
+      "user_ci95": [
+        0.7189956946175896,
+        0.8289083234659599
+      ],
+      "all_recall5": 0.8824884792626728
+    },
+    "hybrid-rrf+server": {
+      "user": {
+        "n": 217,
+        "recall5": 0.783410138248848,
+        "recall10": 0.8571428571428571,
+        "mrr": 0.5952289517957721
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9861751152073732,
+        "recall10": 0.9907834101382489,
+        "mrr": 0.8833772218564846
+      },
+      "user_ci95": [
+        0.7239282200522906,
+        0.8330320627929705
+      ],
+      "all_recall5": 0.8847926267281107
+    },
+    "hybrid-minmax 1:1": {
+      "user": {
+        "n": 217,
+        "recall5": 0.7741935483870968,
+        "recall10": 0.8755760368663594,
+        "mrr": 0.6215126910979446
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9907834101382489,
+        "recall10": 0.9953917050691244,
+        "mrr": 0.9116743471582182
+      },
+      "user_ci95": [
+        0.714072680723459,
+        0.8247750725983789
+      ],
+      "all_recall5": 0.8824884792626728
+    },
+    "hybrid-minmax 1:1+server": {
+      "user": {
+        "n": 217,
+        "recall5": 0.7788018433179723,
+        "recall10": 0.8709677419354839,
+        "mrr": 0.6277796064662424
+      },
+      "agent": {
+        "n": 217,
+        "recall5": 0.9907834101382489,
+        "recall10": 0.9953917050691244,
+        "mrr": 0.9143625192012288
+      },
+      "user_ci95": [
+        0.7189956946175896,
+        0.8289083234659599
+      ],
+      "all_recall5": 0.8847926267281107
+    }
+  },
+  "comparisons": {
+    "C1": {
+      "a": "hybrid-rrf+server",
+      "b": "dense",
+      "user": {
+        "gained": 31,
+        "lost": 7,
+        "clears_2se": true
+      },
+      "agent": {
+        "gained": 18,
+        "lost": 0,
+        "clears_2se": true
+      },
+      "all": {
+        "gained": 49,
+        "lost": 7,
+        "clears_2se": true
+      }
+    },
+    "C2": {
+      "a": "hybrid-rrf+server",
+      "b": "bm25",
+      "user": {
+        "gained": 16,
+        "lost": 10,
+        "clears_2se": false
+      },
+      "agent": {
+        "gained": 1,
+        "lost": 2,
+        "clears_2se": false
+      },
+      "all": {
+        "gained": 17,
+        "lost": 12,
+        "clears_2se": false
+      }
+    },
+    "C3": {
+      "a": "hybrid-rrf+server",
+      "b": "hybrid-rrf",
+      "user": {
+        "gained": 3,
+        "lost": 2,
+        "clears_2se": false
+      },
+      "agent": {
+        "gained": 0,
+        "lost": 0,
+        "clears_2se": false
+      },
+      "all": {
+        "gained": 3,
+        "lost": 2,
+        "clears_2se": false
+      }
+    },
+    "C4": {
+      "a": "bm25",
+      "b": "dense",
+      "user": {
+        "gained": 34,
+        "lost": 16,
+        "clears_2se": true
+      },
+      "agent": {
+        "gained": 20,
+        "lost": 1,
+        "clears_2se": true
+      },
+      "all": {
+        "gained": 54,
+        "lost": 17,
+        "clears_2se": true
+      }
+    },
+    "C5": {
+      "a": "dense+server",
+      "b": "dense",
+      "user": {
+        "gained": 1,
+        "lost": 3,
+        "clears_2se": false
+      },
+      "agent": {
+        "gained": 0,
+        "lost": 2,
+        "clears_2se": false
+      },
+      "all": {
+        "gained": 1,
+        "lost": 5,
+        "clears_2se": false
+      }
+    }
+  },
+  "readings": {
+    "R2_a_c1_clears": true,
+    "R2_b_no_significantly_better_on_agent": true,
+    "R2_beaten_on_agent_by": [],
+    "R2_confirmed": true,
+    "old_guard_within_1pt_info_only": true,
+    "R3_user_recall_consistent_with_earlier": false
+  },
+  "per_server": {
+    "desktop-commander": {
+      "n_user": 29,
+      "n_agent": 29,
+      "hybrid-rrf+server": {
+        "user": 0.7586206896551724,
+        "agent": 0.9655172413793104
+      },
+      "bm25": {
+        "user": 0.7586206896551724,
+        "agent": 1.0
+      },
+      "dense": {
+        "user": 0.6896551724137931,
+        "agent": 0.896551724137931
+      }
+    },
+    "firecrawl": {
+      "n_user": 29,
+      "n_agent": 29,
+      "hybrid-rrf+server": {
+        "user": 0.9310344827586207,
+        "agent": 1.0
+      },
+      "bm25": {
+        "user": 0.8620689655172413,
+        "agent": 1.0
+      },
+      "dense": {
+        "user": 0.8275862068965517,
+        "agent": 0.9310344827586207
+      }
+    },
+    "gitlab": {
+      "n_user": 118,
+      "n_agent": 118,
+      "hybrid-rrf+server": {
+        "user": 0.7203389830508474,
+        "agent": 0.9830508474576272
+      },
+      "bm25": {
+        "user": 0.6949152542372882,
+        "agent": 0.9830508474576272
+      },
+      "dense": {
+        "user": 0.5677966101694916,
+        "agent": 0.864406779661017
+      }
+    },
+    "mapbox": {
+      "n_user": 29,
+      "n_agent": 29,
+      "hybrid-rrf+server": {
+        "user": 0.896551724137931,
+        "agent": 1.0
+      },
+      "bm25": {
+        "user": 0.8620689655172413,
+        "agent": 1.0
+      },
+      "dense": {
+        "user": 0.8620689655172413,
+        "agent": 1.0
+      }
+    },
+    "puppeteer": {
+      "n_user": 7,
+      "n_agent": 7,
+      "hybrid-rrf+server": {
+        "user": 0.7142857142857143,
+        "agent": 1.0
+      },
+      "bm25": {
+        "user": 0.7142857142857143,
+        "agent": 1.0
+      },
+      "dense": {
+        "user": 0.8571428571428571,
+        "agent": 1.0
+      }
+    },
+    "todoist": {
+      "n_user": 5,
+      "n_agent": 5,
+      "hybrid-rrf+server": {
+        "user": 1.0,
+        "agent": 1.0
+      },
+      "bm25": {
+        "user": 1.0,
+        "agent": 1.0
+      },
+      "dense": {
+        "user": 0.8,
+        "agent": 1.0
+      }
+    }
+  },
+  "macro_average_over_servers": {
+    "hybrid-rrf+server": {
+      "user": 0.8368052656480476,
+      "agent": 0.9914280148061563
+    },
+    "bm25": {
+      "user": 0.8153265982021095,
+      "agent": 0.9971751412429378
+    },
+    "dense": {
+      "user": 0.7673749686899892,
+      "agent": 0.9486654977595949
+    }
+  },
+  "pooled_without_big_server": {
+    "server": "gitlab",
+    "hybrid-rrf+server": {
+      "user": 0.8585858585858586,
+      "agent": 0.98989898989899,
+      "n_user": 99,
+      "n_agent": 99
+    },
+    "bm25": {
+      "user": 0.8282828282828283,
+      "agent": 1.0,
+      "n_user": 99,
+      "n_agent": 99
+    },
+    "dense": {
+      "user": 0.797979797979798,
+      "agent": 0.9494949494949495,
+      "n_user": 99,
+      "n_agent": 99
+    }
+  },
+  "overlap_strata_user": {
+    "none": {
+      "n": 49,
+      "bm25": 0.673469387755102,
+      "dense": 0.7142857142857143,
+      "hybrid-rrf+server": 0.7346938775510204
+    },
+    "some": {
+      "n": 35,
+      "bm25": 0.6285714285714286,
+      "dense": 0.5714285714285714,
+      "hybrid-rrf+server": 0.6857142857142857
+    },
+    "half or more": {
+      "n": 133,
+      "bm25": 0.8195488721804511,
+      "dense": 0.6842105263157895,
+      "hybrid-rrf+server": 0.8270676691729323
+    }
+  },
+  "sizes": {
+    "queries": {
+      "user": 217,
+      "agent": 217
+    },
+    "tools": 213
+  },
+  "environment": {
+    "python": "3.13.16",
+    "wordllama": "0.4.0.post1",
+    "numpy": "2.5.3"
+  },
+  "caveat": "independent labels (another model instance) on tools not used for tuning; no default is changed by this run"
+}

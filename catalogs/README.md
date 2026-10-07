@@ -1,6 +1,6 @@
 # Real MCP tool catalogs
 
-Four generations of catalogs, in order of capture:
+Five generations of catalogs, in order of capture:
 
 | directory | status |
 |---|---|
@@ -8,6 +8,7 @@ Four generations of catalogs, in order of capture:
 | `catalogs/test/` | scored once on 2026-10-07, so **spent**: treat it as dev data from now on |
 | `catalogs/test2/` | scored once on 2026-10-07 (second time), so also **spent**: dev data from now on |
 | `catalogs/test3/` | scored once as the confirmation batch (2026-10-07), so also **spent** |
+| `catalogs/test4/` | scored once on independent labels (2026-10-07), so also **spent** |
 
 Verbatim `tools/list` results captured from real MCP servers with
 `scripts/capture_catalog.py` (the `source` block in each file records the exact
@@ -124,9 +125,9 @@ Token profile (estimates): 35,694 tokens for all 189 schemas; lossless slimming 
 
 Rules for keeping it a clean test set: decisions about retrievers, the server-name idea and the default are made on **dev data only, which now includes `catalogs/test/` and `catalogs/test2/`**, with a rule fixed beforehand; labels should be written by someone other than whoever built the retrievers (or flagged as a draft) and committed before scoring, naming the service or listing every acceptable tool; score once.
 
-## `test4/`: fifth batch (captured 2026-10-07, unlabeled, unscored)
+## `test4/`: fifth batch (captured 2026-10-07, scored once, spent)
 
-Captured after the independent-label run, so the next decision can be made on tools nobody tuned against. **Nothing in the repository has seen it**: no labels exist, no retriever setting was chosen with it, and no script reads it yet. `--catalog catalogs/test4` loads it. `MANIFEST.sha256` pins the files.
+Captured after the independent-label run, so the next decision can be made on tools nobody tuned against. Nothing was tuned against it. It was captured before any labels existed, labeled by an independent author, and scored once (`results/fifth-score.txt`); it is now spent. `--catalog catalogs/test4` loads it. `MANIFEST.sha256` pins the files.
 
 Selection criteria, fixed before capturing: a stdio MCP server installable from npm or PyPI through this environment's proxy, whose `tools/list` works with fake credentials, in a domain that either shares vocabulary with servers in the earlier batches (cross-server confusion was the main failure so far) or is new.
 
@@ -141,7 +142,7 @@ Selection criteria, fixed before capturing: a stdio MCP server installable from 
 
 213 tools, 6 servers, no name collisions inside the batch (19 names also exist in earlier batches, mostly GitLab imitating GitHub's names; batches are scored on their own catalogs, so that does not matter). Estimated tokens: 96,454 in total, of which GitLab is 48,074. Level-1 slimming saves only 2.2% (level 2: 46.0%, level 3: 66.3%); the lazy gateway's fixed cost is 190 tokens (99.8% less). GitLab is 55% of the tools, so any scoring protocol must also report per server and not only pooled.
 
-Rules for keeping it a test set: independent labels first (the blind kit in `scripts/make_label_kit.py`, which does not list this batch yet), a scoring protocol fixed and committed before the run, retrievers chosen on the earlier four batches only, score once.
+Rules it was held to: independent labels first (the blind kit in `scripts/make_label_kit.py`), a scoring protocol fixed and committed before the labels existed (`scripts/score_fifth.py`), retrievers chosen on the earlier four batches only, score once. All were followed.
 
 Capture notes (what did not make it in, and why):
 

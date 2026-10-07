@@ -1,6 +1,6 @@
 # Independent labels
 
-Labeled queries for the four real-server batches, written by authors who did not build or tune the
+Labeled queries for the five real-server batches, written by authors who did not build or tune the
 retrievers and never saw the retrieval code, any earlier query, or any result. Same file format as the
 other label files (`src/toolslim/labels.py`). They are stored in a subdirectory on purpose: the
 integrity tests that scan `queries/*.jsonl` do not touch them.
@@ -80,4 +80,4 @@ Produced the same way as the others (one fresh subagent instance, started with a
 
 ## Scored
 
-The retrievers were scored on these labels once, under the protocol in `scripts/score_independent.py` (committed before the run). Results and caveats: top-level README, "Independent labels (scored once)"; raw output in `results/independent-score.{txt,json}`. These labels were not edited after scoring.
+The first four files were scored once under `scripts/score_independent.py` (committed before that run); results and caveats: top-level README, "Independent labels (scored once)", raw output in `results/independent-score.{txt,json}`. `fifth-test.jsonl` was scored once under `scripts/score_fifth.py` (committed before the labels existed): top-level README, "Fifth batch result", raw output in `results/fifth-score.{txt,json}`. None of these labels was edited after scoring.
