@@ -7,7 +7,7 @@ Format: JSON Lines, documented in `src/toolslim/labels.py`. Validate with
 |---|---|---|---:|
 | `mcp-reference.jsonl` | `catalogs/` (8 servers, 78 tools) | **dev**: used while building and choosing retrievers | 154 |
 | `mcp-test.jsonl` | `catalogs/test/` (5 servers, 70 tools) | scored once on 2026-10-07, so **spent** (counts as dev data from now on) | 140 |
-| `mcp-test2.jsonl` | `catalogs/test2/` (6 servers, 105 tools) | **next test**: draft, not yet scored | 210 |
+| `mcp-test2.jsonl` | `catalogs/test2/` (6 servers, 105 tools) | scored once on 2026-10-07, so **spent** | 210 |
 
 ## How `mcp-test.jsonl` was produced
 
@@ -43,7 +43,7 @@ Lessons for whoever writes the next set (this one has a flaw you can avoid):
 - **Name the service, or accept cross-server answers.** In a merged catalog, "add a new column to the tasks table" is answerable by a Notion tool *and* by SQLite's `write_query`. Several of my Notion queries said "table" or "workspace" without saying Notion, so correct answers from other servers were scored as misses. Either mention the service in the query (as the dev set does for GitHub vs local git) or list every server's acceptable tool in `expected`. Audit this for all queries up front, not only for the ones that fail: auditing only after seeing misses biases the score upward.
 - **Score once means score once.** The temptation after a surprising result is to fix labels; any fix made after seeing misses should be disclosed as such and reported next to the original number.
 
-## `mcp-test2.jsonl` (draft, unscored)
+## `mcp-test2.jsonl` (scored once; written by the retriever's author)
 
 Written for `catalogs/test2/` by the same AI assistant that built the retrievers, so it is a draft and not an independent test; an independent author or a human reviewer would strengthen it. It was written from tool names, descriptions and parameter names only, before any retrieval was run on this batch, and committed before scoring.
 
@@ -74,3 +74,7 @@ The last two rows (a crude, tokenizer-independent detector; a server called `tim
 ### Scoring protocol for `mcp-test2.jsonl` (fixed before the run)
 
 `scripts/score_test2.py`, committed before it was run on this batch. Headline: `dense` (the recorded default), user-style recall@5 over 105 queries, with a 95% interval. Declared second comparison: `dense+server` vs `dense`, paired (queries gained / lost), reported with counts and no decision attached. Everything else (BM25 and hybrids, with and without the server name, recall@10, MRR) is context. One run; labels and retrievers are not edited afterwards (an objectively wrong label may be fixed in a separate, disclosed commit with both scores reported). Results go to `results/test2-score.txt` and `.json`.
+
+### Result (2026-10-07)
+
+Scored once with `scripts/score_test2.py`, protocol as above; raw output in `results/test2-score.txt`. Headline `dense`: user-style recall@5 = 66.7% (70/105, 95% interval 57-75%). Details, the declared `dense+server` comparison and caveats are in the top-level README. No labels or retrievers were changed afterwards, and no label was found to be objectively wrong.

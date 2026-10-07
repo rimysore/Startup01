@@ -1,0 +1,88 @@
+Catalog: 105 tools, 6 servers | queries: user-style 105, agent-style 105
+Tokens (estimates): all schemas 42,367; slim L1 39,875; slim L3 15,498; lazy gateway first request 190
+
+retriever             user r@5          95% CI   MRR   r@10  agent r@5
+bm25                     68.6%      [59%, 77%]  0.55  81.0%     100.0%
+bm25+server              71.4%      [62%, 79%]  0.54  81.0%     100.0%
+dense                    66.7%      [57%, 75%]  0.50  79.0%      90.5%  <- HEADLINE
+dense+server             76.2%      [67%, 83%]  0.58  84.8%      97.1%  (declared second)
+hybrid-rrf               73.3%      [64%, 81%]  0.56  80.0%      98.1%
+hybrid-rrf+server        75.2%      [66%, 83%]  0.62  88.6%      98.1%
+
+Declared comparison, user-style: dense+server vs dense: gained 10, lost 0, net +10 (2-SE bar 6.3; clears it; for information, nothing is decided from this)
+Declared comparison, agent-style: dense+server vs dense: gained 7, lost 0, net +7 (2-SE bar 5.3; clears it; for information, nothing is decided from this)
+
+dense user-style misses by server: dynamodb 2/8, heroku 15/33, kubernetes 4/23, mongodb 13/27, pinecone 1/9, tavily 0/5
+35 misses; 5 had a top result from a different server than any accepted tool
+
+Misses of dense (user-style):
+- 'check that my DynamoDB schema.json file is well-formed and consistent with the usage data'
+    want dynamodb_data_model_schema_validator; got ['dynamodb_data_model_schema_converter', 'generate_data_access_layer', 'source_db_analyzer']
+- 'how much would my DynamoDB tables cost per month given these read and write patterns'
+    want compute_performances_and_costs; got ['source_db_analyzer', 'dynamodb_data_modeling', 'generate_resources']
+- 'set up a brand new Heroku app in the EU region'
+    want create_app; got ['deploy_to_heroku', 'ps_scale', 'maintenance_on']
+- 'my Heroku app should be called storefront instead of shop-api'
+    want rename_app; got ['deploy_to_heroku', 'list_apps', 'maintenance_on']
+- 'restore normal traffic to my Heroku app now that the migration is done'
+    want maintenance_off; got ['maintenance_on', 'deploy_to_heroku', 'ps_restart']
+- 'what extra services are attached to my Heroku apps'
+    want list_addons; got ['list_apps', 'deploy_to_heroku', 'maintenance_on']
+- 'what plan is the database add-on on my Heroku app and how is it billed'
+    want get_addon_info; got ['deploy_to_heroku', 'ps_scale', 'list_apps']
+- 'attach a Redis instance to my Heroku app'
+    want create_addon; got ['deploy_to_heroku', 'maintenance_on', 'list_apps']
+- 'what kinds of add-on services can I buy on Heroku'
+    want list_addon_services; got ['deploy_to_heroku', 'list_apps', 'maintenance_on']
+- 'what pricing tiers does the Postgres add-on offer on Heroku'
+    want list_addon_plans; got ['ps_scale', 'maintenance_on', 'deploy_to_heroku']
+- 'find the most resource-hungry queries on my Heroku Postgres database'
+    want pg_outliers; got ['source_db_analyzer', 'find', 'pg_info']
+- 'who can connect to my Heroku Postgres database and with which login details'
+    want pg_credentials; got ['ps_scale', 'ps_restart', 'source_db_analyzer']
+- 'when is the next scheduled downtime window for my Heroku Postgres database'
+    want pg_maintenance; got ['maintenance_on', 'source_db_analyzer', 'deploy_to_heroku']
+- "can I restore my Heroku Postgres database to last night's snapshot"
+    want pg_backups; got ['source_db_analyzer', 'ps_restart', 'maintenance_on']
+- "push what's running in staging up to production on Heroku"
+    want pipelines_promote; got ['maintenance_on', 'ps_scale', 'deploy_to_heroku']
+- 'show the stages and connected apps of our Heroku release flow'
+    want pipelines_info; got ['pipelines_create', 'list_apps', 'deploy_to_heroku']
+- 'run a one-time script on Heroku with its own temporary machine'
+    want deploy_one_off_dyno; got ['maintenance_on', 'deploy_to_heroku', 'list_apps']
+- 'tear down everything this Kubernetes tool created in my cluster'
+    want cleanup; got ['kubectl_create', 'kubectl_scale', 'kubectl_logs']
+- 'give me the detailed state and recent events of the checkout pod'
+    want kubectl_describe | kubectl_generic; got ['exec_in_pod', 'mongodb-logs', 'kubectl_logs']
+- 'change just the image tag on a running deployment without resending the whole manifest'
+    want kubectl_patch | kubectl_generic; got ['pipelines_create', 'rename_app', 'kubectl_logs']
+- 'undo the last deployment of the web service in my cluster and go back to the previous version'
+    want kubectl_rollout | kubectl_generic; got ['kubectl_reconnect', 'kubectl_logs', 'kubectl_scale']
+- 'which fields of the users documents in Mongo are already set up for fast lookups'
+    want collection-indexes; got ['source_db_analyzer', 'count', 'aggregate-db']
+- 'what fields and types do the documents in the orders collection of my MongoDB have'
+    want collection-schema; got ['find', 'aggregate', 'count']
+- 'how much disk space does the events collection use in MongoDB'
+    want collection-storage-size; got ['aggregate', 'find', 'delete-many']
+- 'add a new empty collection called audit_log to my MongoDB database'
+    want create-collection; got ['aggregate-db', 'list-databases', 'aggregate']
+- 'speed up lookups by email on the users collection in MongoDB'
+    want create-index; got ['find', 'aggregate', 'aggregate-db']
+- 'get rid of the temp_results collection from my MongoDB database entirely'
+    want drop-collection; got ['aggregate-db', 'aggregate', 'find']
+- 'wipe the whole staging database in MongoDB'
+    want drop-database; got ['aggregate-db', 'list-databases', 'find']
+- 'remove the unused email index from the users collection in MongoDB'
+    want drop-index; got ['delete-many', 'find', 'aggregate']
+- 'show me how MongoDB would execute this find query, and whether it uses an index'
+    want explain; got ['find', 'aggregate-db', 'list-databases']
+- 'add these three new product records to the products collection in MongoDB'
+    want insert-many; got ['list-databases', 'aggregate', 'find']
+- 'what collections does the shop database in MongoDB contain'
+    want list-collections; got ['list-databases', 'aggregate-db', 'find']
+- 'which MongoDB connections do I currently have open'
+    want list-connections; got ['connect', 'list-databases', 'disconnect']
+- 'set status to shipped on all pending orders in the MongoDB orders collection'
+    want update-many; got ['aggregate', 'find', 'aggregate-db']
+- 'reorder this list of passages by how relevant they are to my question'
+    want rerank-documents; got ['list-collections', 'list-indexes', 'tavily_research']

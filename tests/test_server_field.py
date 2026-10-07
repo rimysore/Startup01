@@ -113,6 +113,16 @@ class ScoringScriptTests(unittest.TestCase):
             self.assertIn(phrase, code)
 
 
+class RecordedResultsTests(unittest.TestCase):
+    def test_test2_headline_is_the_recorded_default_and_protocol_was_followed(self):
+        from toolslim.config import DEFAULT_RETRIEVER
+
+        result = json.loads((ROOT / "results" / "test2-score.json").read_text())
+        self.assertEqual(result["headline"]["retriever"], DEFAULT_RETRIEVER)
+        self.assertEqual(result["sizes"], {"tools": 105, "user": 105, "agent": 105})
+        self.assertEqual(result["declared_comparison"]["variant"], "dense+server")
+
+
 class KnownTokenizerLimitationTests(unittest.TestCase):
     @unittest.expectedFailure
     def test_camel_case_brand_names_should_match_their_lowercase_form(self):

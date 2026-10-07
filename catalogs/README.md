@@ -6,7 +6,7 @@ Three generations of catalogs, in order of capture:
 |---|---|
 | `catalogs/*.json` | **dev**: used while building and choosing retrievers |
 | `catalogs/test/` | scored once on 2026-10-07, so **spent**: treat it as dev data from now on |
-| `catalogs/test2/` | **fresh batch**: captured after that result; labels drafted in `queries/mcp-test2.jsonl`, unscored |
+| `catalogs/test2/` | scored once on 2026-10-07 (second time), so also **spent**: dev data from now on |
 
 Verbatim `tools/list` results captured from real MCP servers with
 `scripts/capture_catalog.py` (the `source` block in each file records the exact
@@ -62,7 +62,7 @@ Capture notes:
 - **`mcp-server-sqlite` needs the 1.x `mcp` SDK.** It uses decorators removed in `mcp` 2.x and declares only `mcp>=1.6.0`. It was run against an isolated `mcp<2` install while the capture client stayed on 2.x (`--env PYTHONPATH=<dir with mcp 1.x>`). Its tool list does not depend on the SDK version.
 - Vendor servers that insist on a credential were started with obviously fake ones; `tools/list` needs no real account, and the committed files contain no credentials or local paths.
 
-## `test2/`: next batch (labels drafted, unscored)
+## `test2/`: second batch (scored once, spent)
 
 Captured after the first test set was spent, for the next round of evaluation. The previous failure analysis (see the top-level README) found cross-server confusion to be the main problem, so this batch was chosen to **overlap in vocabulary**: two infrastructure servers that both talk about apps, logs, scaling and deploys; three data stores that all talk about collections/tables, indexes and queries; and a web-search server next to the dev set's `fetch`. `--catalog catalogs/test2` loads it.
 
