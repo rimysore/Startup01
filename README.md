@@ -163,6 +163,10 @@ What it says, and what it does not:
 - **Part of the miss rate is my labeling flaw.** Several Notion queries say "table" or "workspace" without naming Notion, so a SQLite or Slack tool was a plausible correct answer that the labels did not accept (for example `create_table` for "set up a brand new table for tracking customer feedback", `describe_table` for "what columns does the bug tracker table have", `read_query` for "show me every row in the tasks table where..."). Recall is therefore somewhat higher than 60%. I did not re-label: I noticed this while reading the misses, so any adjusted number would be biased upward.
 - Recall@10 for dense is 69% (vs 60% at 5); recall@1 is 34%.
 
+### Next batch (captured, unlabeled)
+
+`catalogs/test2/` has 105 more tools from 6 servers (Kubernetes, Heroku, MongoDB, DynamoDB, Pinecone, Tavily), chosen to overlap in vocabulary because cross-server confusion was the main failure on the first test set. It has no labels and has not been scored. Token profile: 42,367 estimated tokens in total, but lossless slimming saves only 5.9% (level 3: 63%), since the weight is in long descriptions rather than schema scaffolding; the lazy gateway's fixed cost is still 190 tokens (99.6% less). Details and the rules for keeping it a clean test set are in `catalogs/README.md`. The first test set is spent and counts as dev data from now on.
+
 ## Design notes
 
 - **Cache-friendly.** The three meta-tool definitions never change, so the prompt-cache prefix (`tools` renders first) stays stable. Dynamically adding tools after a search would invalidate the cache each time.
@@ -172,7 +176,7 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Fresh data again: the test set is spent. Capture and label another batch of servers, with labels written by someone else (guidelines in `queries/README.md`), before deciding anything further about fusion.
+1. Label `catalogs/test2/` (captured; ideally by someone other than me, guidelines in `queries/README.md`), then score it once. Decisions about fusion or new index features are made on dev data first, which now includes the spent first test set.
 2. Add the server name (and a short server description) to each tool's index text, to attack cross-server confusion; evaluate on the fresh batch, and on the dev sets as a no-regression check.
 3. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
 4. Query rewriting or reranking with a real model, to push past the retrieval ceiling.

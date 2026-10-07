@@ -131,6 +131,20 @@ class CommittedDataTests(unittest.TestCase):
         # --catalog catalogs must not silently pull in the test set
         self.assertFalse({t.name for t in test} & {t.name for t in load_catalogs([ROOT / "catalogs"])})
 
+    def test_next_batch_is_separate_collision_free_and_unlabeled(self):
+        dev = {t.name for t in load_catalogs([ROOT / "catalogs"])}
+        spent = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}
+        batch = load_catalogs([ROOT / "catalogs" / "test2"])
+        names = {t.name for t in batch}
+        self.assertGreaterEqual(len(batch), 100)
+        self.assertEqual(len(names), len(batch))
+        self.assertFalse(names & dev)
+        self.assertFalse(names & spent)
+        # Labels for this batch must be added deliberately (committed before scoring); update this test and
+        # catalogs/README.md when they are.
+        for f in (ROOT / "queries").glob("*.jsonl"):
+            self.assertFalse({e for lb in load_labels(f) for e in lb.expected} & names, f.name)
+
     def test_dev_labels_do_not_reference_test_tools(self):
         test_names = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}
         dev_labels = load_labels(ROOT / "queries" / "mcp-reference.jsonl")
@@ -155,7 +169,7 @@ class CommittedDataTests(unittest.TestCase):
         self.assertFalse({e for lb in labels for e in lb.expected} & dev_names)
 
     def test_catalogs_carry_provenance(self):
-        for f in sorted((ROOT / "catalogs").glob("*.json")) + sorted((ROOT / "catalogs" / "test").glob("*.json")):
+        for f in sorted((ROOT / "catalogs").glob("*.json")) + sorted((ROOT / "catalogs" / "test").glob("*.json")) + sorted((ROOT / "catalogs" / "test2").glob("*.json")):
             src = json.loads(f.read_text())["source"]
             for key in ("name", "package", "license", "server", "captured_at"):
                 self.assertTrue(src.get(key), f"{f.name}: missing source.{key}")

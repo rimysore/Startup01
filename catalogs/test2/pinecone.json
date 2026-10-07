@@ -1,0 +1,488 @@
+{
+  "source": {
+    "name": "pinecone",
+    "package": "npm:@pinecone-database/mcp@0.3.0",
+    "license": "Apache-2.0",
+    "server": {
+      "name": "pinecone-mcp",
+      "version": "0.3.0"
+    },
+    "captured_at": "2026-10-07"
+  },
+  "tools": [
+    {
+      "name": "search-docs",
+      "title": "Search Pinecone Documentation",
+      "description": "Search the official Pinecone documentation for relevant\ninformation. Use this before writing Pinecone code or explaining Pinecone\nbehavior, rather than relying on assumptions.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list-indexes",
+      "title": "List Indexes",
+      "description": "List all Pinecone indexes in the project, including each\nindex's configuration and readiness status. Use this to discover valid index\nnames before calling other tools.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        }
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "describe-index",
+      "title": "Describe Index",
+      "description": "Describe the configuration of a Pinecone index, including\nits embedding model and the \"fieldMap\" that names the record field holding the\ntext to embed. Call this before upsert-records to learn the required field\nname. Check \"status.ready\" in the response to confirm the index can accept\nupserts and queries.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "describe-index-stats",
+      "title": "Describe Index Stats",
+      "description": "Describe the statistics of a Pinecone index, including\nrecord counts per namespace. Use this to discover which namespaces exist in an\nindex. Newly upserted records can take a few seconds\nto be indexed and become visible to search results and index stats; if recent\ndata is missing, wait briefly and retry.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "create-index-for-model",
+      "title": "Create Index",
+      "description": "Create a Pinecone index with integrated inference, which\nautomatically embeds the text field named in \"fieldMap\". Supports AWS, GCP, and\nAzure cloud providers. This call blocks until the index is ready to accept\nupserts and queries, so no readiness polling is needed afterwards. If an index\nwith the same name already exists, it is returned unchanged instead of\nerroring.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "cloud": {
+            "default": "aws",
+            "type": "string",
+            "enum": [
+              "aws",
+              "gcp",
+              "azure"
+            ]
+          },
+          "region": {
+            "default": "us-east-1",
+            "type": "string"
+          },
+          "embed": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "enum": [
+                  "multilingual-e5-large",
+                  "llama-text-embed-v2",
+                  "pinecone-sparse-english-v0"
+                ]
+              },
+              "fieldMap": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ]
+              }
+            },
+            "required": [
+              "model",
+              "fieldMap"
+            ]
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "embed"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true
+      }
+    },
+    {
+      "name": "upsert-records",
+      "title": "Upsert Records",
+      "description": "Insert or update records in an integrated Pinecone index.\nText in the field named by the index's \"fieldMap\" is embedded automatically —\ncall describe-index first to confirm that field name. Records with an existing\n\"id\" are overwritten. Newly upserted records can take a few seconds\nto be indexed and become visible to search results and index stats; if recent\ndata is missing, wait briefly and retry.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "records": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "propertyNames": {
+                "type": "string"
+              },
+              "additionalProperties": {}
+            }
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "records"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true
+      }
+    },
+    {
+      "name": "search-records",
+      "title": "Search Records",
+      "description": "Search an index for records that are semantically similar\nto the query text. Only works with integrated-inference indexes (e.g. created\nwith create-index-for-model), which embed the query automatically; it fails on\nstandard indexes — use describe-index to check the index type. Returns hits\nwith \"_id\", \"_score\", and the record's stored \"fields\". Newly upserted records can take a few seconds\nto be indexed and become visible to search results and index stats; if recent\ndata is missing, wait briefly and retry.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "namespace": {
+            "type": "string"
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "topK": {
+                "type": "number"
+              },
+              "inputs": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ]
+              },
+              "filter": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "topK",
+              "inputs"
+            ]
+          },
+          "rerank": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "enum": [
+                  "cohere-rerank-3.5",
+                  "bge-reranker-v2-m3",
+                  "pinecone-rerank-v0"
+                ]
+              },
+              "topN": {
+                "type": "number"
+              },
+              "rankFields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "rankFields"
+            ]
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "query"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "rerank-documents",
+      "title": "Rerank Documents",
+      "description": "Rerank a set of provided documents by relevance to a\nquery. Use this for documents that did not come from a Pinecone search (e.g.\nexternally sourced text). To rerank the results of a single-index search,\nprefer the \"rerank\" parameter of search-records instead of calling this tool\nseparately.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "enum": [
+              "cohere-rerank-3.5",
+              "bge-reranker-v2-m3",
+              "pinecone-rerank-v0"
+            ]
+          },
+          "query": {
+            "type": "string"
+          },
+          "documents": {},
+          "options": {
+            "type": "object",
+            "properties": {
+              "topN": {
+                "type": "number"
+              },
+              "rankFields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "topN"
+            ]
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "query",
+          "documents"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "cascading-search",
+      "title": "Cascading Search",
+      "description": "Search across multiple indexes for records that are\nsimilar to the query text, then deduplicate and rerank the combined results.\nReranking is required for this tool. Only works with integrated-inference\nindexes. To search a single index, use search-records instead.",
+      "inputSchema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "indexes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "namespace": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "namespace"
+              ]
+            }
+          },
+          "query": {
+            "type": "object",
+            "properties": {
+              "topK": {
+                "type": "number"
+              },
+              "inputs": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ]
+              },
+              "filter": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": {}
+              }
+            },
+            "required": [
+              "topK",
+              "inputs"
+            ]
+          },
+          "rerank": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "enum": [
+                  "cohere-rerank-3.5",
+                  "bge-reranker-v2-m3",
+                  "pinecone-rerank-v0"
+                ]
+              },
+              "topN": {
+                "type": "number"
+              },
+              "rankFields": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "model",
+              "rankFields"
+            ]
+          },
+          "llm_provider": {
+            "type": "string"
+          },
+          "llm_model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "indexes",
+          "query",
+          "rerank"
+        ]
+      },
+      "execution": {
+        "taskSupport": "forbidden"
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ]
+}
