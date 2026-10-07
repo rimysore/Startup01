@@ -123,3 +123,30 @@ Capture notes:
 Token profile (estimates): 35,694 tokens for all 189 schemas; lossless slimming (level 1) saves 12.0%, level 3 saves 43.8%; the lazy gateway's 190-token fixed cost is 99.5% less. The weight is spread across all six servers (Excel 9,090, Redis 8,762, PowerPoint 8,610, Word 6,356, Obsidian 2,618, Docker 258).
 
 Rules for keeping it a clean test set: decisions about retrievers, the server-name idea and the default are made on **dev data only, which now includes `catalogs/test/` and `catalogs/test2/`**, with a rule fixed beforehand; labels should be written by someone other than whoever built the retrievers (or flagged as a draft) and committed before scoring, naming the service or listing every acceptable tool; score once.
+
+## `test4/`: fifth batch (captured 2026-10-07, unlabeled, unscored)
+
+Captured after the independent-label run, so the next decision can be made on tools nobody tuned against. **Nothing in the repository has seen it**: no labels exist, no retriever setting was chosen with it, and no script reads it yet. `--catalog catalogs/test4` loads it. `MANIFEST.sha256` pins the files.
+
+Selection criteria, fixed before capturing: a stdio MCP server installable from npm or PyPI through this environment's proxy, whose `tools/list` works with fake credentials, in a domain that either shares vocabulary with servers in the earlier batches (cross-server confusion was the main failure so far) or is new.
+
+| file | package | license | tools | why |
+|---|---|---|---:|---|
+| `test4/gitlab.json` | npm `@zereight/mcp-gitlab@2.1.69` (community server) | MIT | 118 | repositories, issues, merge requests; same vocabulary as GitHub/git in earlier batches, and by far the largest catalog so far |
+| `test4/mapbox.json` | npm `@mapbox/mcp-server@0.14.0` | MIT | 29 | geocoding, routing, isochrones: a new domain |
+| `test4/firecrawl.json` | npm `firecrawl-mcp@3.28.2` | MIT | 28 | scraping, crawling, search: overlaps Fetch/Tavily vocabulary and Puppeteer |
+| `test4/desktop-commander.json` | npm `@wonderwhy-er/desktop-commander@0.2.52` | MIT | 26 | files, processes, search: overlaps Filesystem vocabulary |
+| `test4/puppeteer.json` | npm `@modelcontextprotocol/server-puppeteer@2025.5.12` | MIT | 7 | browser automation: overlaps Playwright, Firecrawl |
+| `test4/todoist.json` | npm `@abhiz123/todoist-mcp-server@0.1.0` | MIT | 5 | tasks and projects: new domain |
+
+213 tools, 6 servers, no name collisions inside the batch (19 names also exist in earlier batches, mostly GitLab imitating GitHub's names; batches are scored on their own catalogs, so that does not matter). Estimated tokens: 96,454 in total, of which GitLab is 48,074. Level-1 slimming saves only 2.2% (level 2: 46.0%, level 3: 66.3%); the lazy gateway's fixed cost is 190 tokens (99.8% less). GitLab is 55% of the tools, so any scoring protocol must also report per server and not only pooled.
+
+Rules for keeping it a test set: independent labels first (the blind kit in `scripts/make_label_kit.py`, which does not list this batch yet), a scoring protocol fixed and committed before the run, retrievers chosen on the earlier four batches only, score once.
+
+Capture notes (what did not make it in, and why):
+
+- **`@modelcontextprotocol/server-gitlab@2025.4.25` (the official, deprecated server) was not captured.** Its 9 tools declare `inputSchema` as `{"$schema": ...}` with no `type` and no properties, so the MCP Python client rejects the response (a validation error) and clients that follow the spec could not use it either. Read over raw JSON-RPC it does list 9 tools; I did not patch around it, because catalogs here are meant to be verbatim and usable. The community server above replaced it.
+- **Supabase (`@supabase/mcp-server-supabase@0.13.0`) was not captured**: it fetches its docs GraphQL schema from supabase.com at startup and that request is blocked here (HTTP 403).
+- **Neon (`@neondatabase/mcp-server-neon@0.6.5`) could not be installed**: one dependency is fetched from `codeload.github.com`, which is blocked here.
+- **Linear (`@tacticlaunch/mcp-linear@1.4.4`) was captured and then left out**: 198 tools would have made two issue trackers more than 80% of the batch. Its capture was not kept.
+- Servers that want a credential were started with obviously fake ones; the committed files contain no credentials, hostnames or local paths (checked by search).

@@ -362,6 +362,10 @@ What it says, and what it does not:
 
 `catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). 378 labeled queries (`queries/mcp-test3.jsonl`, written by me, so not independent; 97% of the agent-style ones name their service) were scored once as the confirmation batch; the result is in "Third test result" above, so this batch is spent too. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
 
+### Fifth batch (captured, unlabeled, untouched)
+
+`catalogs/test4/` has 213 tools from 6 servers (GitLab with 118 tools, Mapbox, Firecrawl, Desktop Commander, Puppeteer, Todoist), captured after the independent-label run so the next decision is not made on spent data. No labels exist yet and nothing has been tuned against it. It is the largest catalog so far (96,454 estimated tokens; lossless slimming saves 2.2%, level 3 66.3%, the lazy gateway's fixed cost is 190 tokens). Two servers I tried first could not be captured (the official GitLab server emits tool schemas without a `type`; Supabase needs a blocked host), and Neon and Linear were dropped (blocked dependency; too large). Details, selection criteria and the rules for keeping it clean are in `catalogs/README.md`.
+
 ## Design notes
 
 - **Cache-friendly.** The three meta-tool definitions never change, so the prompt-cache prefix (`tools` renders first) stays stable. Dynamically adding tools after a search would invalidate the cache each time.
@@ -374,7 +378,7 @@ What it says, and what it does not:
 1. Human-written labels or real traffic. The independent labels came from another instance of the same model family, and the catalogs they were scored on are the ones used to design the retrievers.
 2. End-to-end eval with a real model (needs an API key): task success and total cost for full vs. slim vs. lazy, how often real queries name their service, the cost of a retrieval miss, and the right default `limit`. This is also the only way to learn whether the ~86% recall@5 matters in practice, because a model can search again.
 3. Attack the wording gap rather than the ranking formula: index-side enrichment for terse or jargon-heavy tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field), and query rewriting or reranking by a model. Server-level routing (pick the server first, then rank inside it) is an untested alternative to a global penalty.
-4. A fifth batch of servers with independently written queries, so the next decision is not made on spent data.
+4. Label the fifth batch (`catalogs/test4/`, captured) with independent authors, fix a scoring protocol, and score it once.
 5. A "no match" threshold for dense search.
 6. Count tokens with the API's token counter instead of the estimate.
 7. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
