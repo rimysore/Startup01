@@ -167,6 +167,15 @@ class CommittedDataTests(unittest.TestCase):
         self.assertFalse([w for w in check.warnings if "every word" in w or "no labeled query" in w], check.warnings)
 
 
+class SelectionScriptIsolationTests(unittest.TestCase):
+    def test_select_config_never_names_the_test_set(self):
+        """The dev-only selection script must not be able to read the held-back test data."""
+        code = (ROOT / "scripts" / "select_config.py").read_text()
+        code_without_docstring = code.split('"""', 2)[2]
+        for forbidden in ("catalogs/test", '"test"', "mcp-test", "catalogs\" / \"test"):
+            self.assertNotIn(forbidden, code_without_docstring)
+
+
 class DuplicateToolNamesTests(unittest.TestCase):
     def test_load_catalogs_rejects_duplicates_across_files(self):
         d = Path(tempfile.mkdtemp())
