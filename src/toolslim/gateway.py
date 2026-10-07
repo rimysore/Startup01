@@ -17,6 +17,7 @@ import json
 from typing import Any, Callable, Mapping
 
 from .catalog import Tool
+from .hybrid import Retriever
 from .index import ToolIndex
 from .slim import first_sentence, slim_tool
 
@@ -86,9 +87,10 @@ class LazyToolGateway:
         handlers: Mapping[str, Handler] | None = None,
         slim_level: int = 1,
         pinned: tuple[str, ...] = (),
+        index: Retriever | None = None,
     ):
         self._tools = {t.name: t for t in tools}
-        self._index = ToolIndex(tools)
+        self._index = index or ToolIndex(tools)
         self._handlers = dict(handlers or {})
         self._slim_level = slim_level
         self._pinned = [self._tools[n] for n in pinned]

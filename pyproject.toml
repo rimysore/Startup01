@@ -10,5 +10,9 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = []
 
+[project.optional-dependencies]
+# Embedding retrieval. wordllama bundles its weights in the wheel (no model download).
+dense = ["numpy", "wordllama>=0.4"]
+
 [tool.setuptools.packages.find]
 where = ["src"]
