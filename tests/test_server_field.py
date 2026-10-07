@@ -47,17 +47,17 @@ class ServerFieldTests(unittest.TestCase):
 
 class ServerInBm25Tests(unittest.TestCase):
     def setUp(self):
-        self.tools = [tool("do_it", server="zeta"), tool("do_it_too", server="omega")]
+        self.tools = [tool("alpha_one", server="zeta"), tool("alpha_two", server="omega")]  # equal-length names: no length-normalization difference
 
     def test_query_naming_the_server_surfaces_its_tool_only_when_enabled(self):
         with_server = ToolIndex(self.tools, use_server=True).search("zeta thing", k=2)
-        self.assertEqual([t.name for t, _ in with_server], ["do_it", "do_it_too"])
+        self.assertEqual([t.name for t, _ in with_server], ["alpha_one", "alpha_two"])
         self.assertGreater(with_server[0][1], with_server[1][1])
         plain = ToolIndex(self.tools).search("zeta thing", k=2)
         self.assertEqual(plain[0][1], plain[1][1])  # server name ignored: a tie
 
     def test_tools_without_a_server_are_unaffected(self):
-        bare = [tool("do_it"), tool("do_it_too")]
+        bare = [tool("alpha_one"), tool("alpha_two")]
         self.assertEqual(
             [(t.name, round(s, 6)) for t, s in ToolIndex(bare, use_server=True).search("thing")],
             [(t.name, round(s, 6)) for t, s in ToolIndex(bare).search("thing")],
