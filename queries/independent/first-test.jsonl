@@ -1,0 +1,140 @@
+{"query": "what are the lat/long coordinates for 1600 Amphitheatre Parkway, Mountain View", "expected": ["maps_geocode"], "style": "user"}
+{"query": "convert street address to latitude and longitude", "expected": ["maps_geocode"], "style": "agent"}
+{"query": "I have GPS coordinates 48.8584, 2.2945 from a photo, what address is that?", "expected": ["maps_reverse_geocode"], "style": "user"}
+{"query": "reverse geocode coordinates to street address", "expected": ["maps_reverse_geocode"], "style": "agent"}
+{"query": "find vegan restaurants within 2 km of downtown Austin", "expected": ["maps_search_places"], "style": "user"}
+{"query": "search for nearby places by keyword", "expected": ["maps_search_places"], "style": "agent"}
+{"query": "I have the Google place ID ChIJN1t_tDeuEmsRUsoyG83frY4, can you pull up its opening hours, phone number and reviews?", "expected": ["maps_place_details"], "style": "user"}
+{"query": "get opening hours and reviews for a place by place id", "expected": ["maps_place_details"], "style": "agent"}
+{"query": "how long would it take to get from each of our three warehouses to each of the five customer addresses by truck?", "expected": ["maps_distance_matrix"], "style": "user"}
+{"query": "compute travel time between several origins and destinations", "expected": ["maps_distance_matrix"], "style": "agent"}
+{"query": "how high above sea level is the summit of Mount Rainier and the trailhead parking lot?", "expected": ["maps_elevation"], "style": "user"}
+{"query": "get altitude for latitude longitude points", "expected": ["maps_elevation"], "style": "agent"}
+{"query": "give me turn by turn directions to bike from Union Square to the Golden Gate Bridge", "expected": ["maps_directions"], "style": "user"}
+{"query": "get route directions from origin to destination by walking or transit", "expected": ["maps_directions"], "style": "agent"}
+{"query": "look up the Notion user with ID 8f2c1d3e-5a4b-4c7d-9e10-2b3a4c5d6e7f and tell me their name", "expected": ["API-get-user"], "style": "user"}
+{"query": "retrieve a single notion user by id", "expected": ["API-get-user"], "style": "agent"}
+{"query": "show me everyone who has access to our Notion workspace", "expected": ["API-get-users"], "style": "user"}
+{"query": "list all notion workspace users with pagination", "expected": ["API-get-users"], "style": "agent"}
+{"query": "which bot user is my Notion integration token connected as?", "expected": ["API-get-self"], "style": "user"}
+{"query": "get current notion bot user for the token", "expected": ["API-get-self"], "style": "agent"}
+{"query": "find the Notion page called 'Q3 Roadmap Planning'", "expected": ["API-post-search"], "style": "user"}
+{"query": "search notion pages and databases by title", "expected": ["API-post-search"], "style": "agent"}
+{"query": "show me what's inside block 1a2b3c4d in Notion, the nested items under it", "expected": ["API-get-block-children"], "style": "user"}
+{"query": "list child blocks of a notion block or page", "expected": ["API-get-block-children"], "style": "agent"}
+{"query": "add a new to-do checkbox and a paragraph at the bottom of my Notion meeting notes page", "expected": ["API-patch-block-children", "API-update-page-markdown"], "style": "user", "note": "appending content to a page; markdown update can also insert content"}
+{"query": "append blocks to notion page", "expected": ["API-patch-block-children"], "style": "agent"}
+{"query": "get the details of one specific Notion block by its id", "expected": ["API-retrieve-a-block"], "style": "user"}
+{"query": "retrieve notion block by id", "expected": ["API-retrieve-a-block"], "style": "agent"}
+{"query": "change the text of that heading block in Notion to 'Final Budget'", "expected": ["API-update-a-block"], "style": "user"}
+{"query": "update content of an existing notion block", "expected": ["API-update-a-block"], "style": "agent"}
+{"query": "remove that paragraph block from my Notion page, I don't need it anymore", "expected": ["API-delete-a-block", "API-update-a-block"], "style": "user", "note": "update-a-block with archived=true also deletes a block"}
+{"query": "delete a notion block", "expected": ["API-delete-a-block", "API-update-a-block"], "style": "agent", "note": "archiving through update-a-block is equivalent"}
+{"query": "pull up the properties like status and due date for this Notion page", "expected": ["API-retrieve-a-page"], "style": "user"}
+{"query": "retrieve notion page properties by page id", "expected": ["API-retrieve-a-page"], "style": "agent"}
+{"query": "set the status property on my Notion task page to Done and give it a rocket emoji icon", "expected": ["API-patch-page"], "style": "user"}
+{"query": "update notion page properties or icon", "expected": ["API-patch-page"], "style": "agent"}
+{"query": "create a new page in my Notion projects database titled 'Website Redesign'", "expected": ["API-post-page"], "style": "user"}
+{"query": "create a new notion page under a parent", "expected": ["API-post-page"], "style": "agent"}
+{"query": "I need the full list of people assigned on a Notion page, the people property has too many entries to show", "expected": ["API-retrieve-a-page-property"], "style": "user"}
+{"query": "get a single property item from a notion page", "expected": ["API-retrieve-a-page-property"], "style": "agent"}
+{"query": "what comments did my teammates leave on this Notion page?", "expected": ["API-retrieve-a-comment"], "style": "user"}
+{"query": "list comments on notion block or page", "expected": ["API-retrieve-a-comment"], "style": "agent"}
+{"query": "leave a comment on the Notion spec page saying I approve the changes", "expected": ["API-create-a-comment"], "style": "user"}
+{"query": "post a comment to a notion page", "expected": ["API-create-a-comment"], "style": "agent"}
+{"query": "show me all rows in my Notion tasks database where Status is 'In Progress', sorted by due date", "expected": ["API-query-data-source"], "style": "user"}
+{"query": "query notion database with filter and sort", "expected": ["API-query-data-source"], "style": "agent"}
+{"query": "what columns and property types does my Notion CRM data source have?", "expected": ["API-retrieve-a-data-source", "API-retrieve-a-database"], "style": "user", "note": "schema of a database can come from either the data source or database lookup"}
+{"query": "retrieve notion data source schema", "expected": ["API-retrieve-a-data-source", "API-retrieve-a-database"], "style": "agent"}
+{"query": "rename my Notion data source to 'Customers 2026' and add a Priority select property", "expected": ["API-update-a-data-source"], "style": "user"}
+{"query": "update notion data source title and properties", "expected": ["API-update-a-data-source"], "style": "agent"}
+{"query": "set up a new Notion database for tracking bugs with columns for severity, owner and status", "expected": ["API-create-a-data-source"], "style": "user"}
+{"query": "create a new notion data source with properties", "expected": ["API-create-a-data-source"], "style": "agent"}
+{"query": "are there any page templates set up for my Notion meeting notes database?", "expected": ["API-list-data-source-templates"], "style": "user"}
+{"query": "list templates of a notion data source", "expected": ["API-list-data-source-templates"], "style": "agent"}
+{"query": "fetch the metadata of Notion database abc123 so I can see its data sources", "expected": ["API-retrieve-a-database"], "style": "user"}
+{"query": "retrieve notion database by id", "expected": ["API-retrieve-a-database"], "style": "agent"}
+{"query": "move my 'Meeting Notes' page in Notion under the Team Wiki page instead", "expected": ["API-move-page"], "style": "user"}
+{"query": "move notion page to a new parent", "expected": ["API-move-page"], "style": "agent"}
+{"query": "give me the text of this Notion page as markdown so I can paste it into a README", "expected": ["API-retrieve-page-markdown"], "style": "user"}
+{"query": "read notion page content as markdown", "expected": ["API-retrieve-page-markdown"], "style": "agent"}
+{"query": "rewrite the whole body of my Notion onboarding page with this new markdown text", "expected": ["API-update-page-markdown"], "style": "user"}
+{"query": "replace or edit notion page content using markdown", "expected": ["API-update-page-markdown"], "style": "agent"}
+{"query": "okay I'm done testing, close the browser page", "expected": ["browser_close"], "style": "user"}
+{"query": "close the current browser page", "expected": ["browser_close"], "style": "agent"}
+{"query": "make the browser window 375 by 812 so I can see how the site looks on a phone", "expected": ["browser_resize"], "style": "user"}
+{"query": "resize browser window to width and height", "expected": ["browser_resize"], "style": "agent"}
+{"query": "were there any JavaScript errors in the browser console on that page?", "expected": ["browser_console_messages"], "style": "user"}
+{"query": "get browser console log messages", "expected": ["browser_console_messages"], "style": "agent"}
+{"query": "a confirm popup showed up on the page, click OK on it", "expected": ["browser_handle_dialog"], "style": "user"}
+{"query": "accept or dismiss alert dialog", "expected": ["browser_handle_dialog"], "style": "agent"}
+{"query": "switch the page to dark mode so I can check how my CSS looks with prefers-color-scheme", "expected": ["browser_emulate_media"], "style": "user"}
+{"query": "emulate dark color scheme or reduced motion", "expected": ["browser_emulate_media"], "style": "agent"}
+{"query": "run a bit of JavaScript on the page to get the document title and the number of links", "expected": ["browser_evaluate", "browser_run_code_unsafe"], "style": "user", "note": "page-level JS; run_code_unsafe can also do it but evaluate is the direct fit"}
+{"query": "evaluate javascript expression in page", "expected": ["browser_evaluate", "browser_run_code_unsafe"], "style": "agent"}
+{"query": "attach my resume at /home/me/resume.pdf to the file upload field on the application form", "expected": ["browser_file_upload"], "style": "user"}
+{"query": "upload files to a file chooser on the page", "expected": ["browser_file_upload"], "style": "agent"}
+{"query": "simulate dragging an image file from my desktop and dropping it onto the upload area of the web page", "expected": ["browser_drop"], "style": "user"}
+{"query": "drop files or data onto page element", "expected": ["browser_drop"], "style": "agent"}
+{"query": "where is the 'Add to cart' button on this page? I just need to locate it", "expected": ["browser_find"], "style": "user"}
+{"query": "search page snapshot for text", "expected": ["browser_find"], "style": "agent"}
+{"query": "fill in the signup form: name Jane Smith, email jane@example.com and password", "expected": ["browser_fill_form", "browser_type"], "style": "user", "note": "several fields at once is fill_form; type works field by field"}
+{"query": "fill multiple form fields at once", "expected": ["browser_fill_form"], "style": "agent"}
+{"query": "hit the Escape key in the browser", "expected": ["browser_press_key"], "style": "user"}
+{"query": "press a keyboard key such as Enter or ArrowDown", "expected": ["browser_press_key"], "style": "agent"}
+{"query": "type 'wireless headphones' into the search box on the page and press enter", "expected": ["browser_type"], "style": "user"}
+{"query": "type text into input element", "expected": ["browser_type"], "style": "agent"}
+{"query": "open https://news.ycombinator.com in the browser", "expected": ["browser_navigate"], "style": "user"}
+{"query": "navigate browser to a url", "expected": ["browser_navigate"], "style": "agent"}
+{"query": "go back to the previous page in the browser", "expected": ["browser_navigate_back"], "style": "user"}
+{"query": "browser back button history", "expected": ["browser_navigate_back"], "style": "agent"}
+{"query": "show me all the API calls the page made while loading, only the ones hitting /api/", "expected": ["browser_network_requests"], "style": "user"}
+{"query": "list network requests made by page", "expected": ["browser_network_requests"], "style": "agent"}
+{"query": "I want to see the headers and response body of request number 12 from the network log", "expected": ["browser_network_request"], "style": "user"}
+{"query": "get details of a single network request by index", "expected": ["browser_network_request"], "style": "agent"}
+{"query": "run this Playwright script that logs in, waits for the dashboard and grabs all the cookies", "expected": ["browser_run_code_unsafe"], "style": "user"}
+{"query": "execute playwright code snippet", "expected": ["browser_run_code_unsafe"], "style": "agent"}
+{"query": "take a full-page screenshot of the site and save it as homepage.png", "expected": ["browser_take_screenshot"], "style": "user"}
+{"query": "capture screenshot of current page", "expected": ["browser_take_screenshot"], "style": "agent"}
+{"query": "show me what's on the page right now, I need the element structure so I can pick what to click", "expected": ["browser_snapshot"], "style": "user"}
+{"query": "capture accessibility snapshot of the page", "expected": ["browser_snapshot"], "style": "agent"}
+{"query": "click the blue Submit button at the bottom of the form", "expected": ["browser_click"], "style": "user"}
+{"query": "click an element on the web page", "expected": ["browser_click"], "style": "agent"}
+{"query": "drag the card from the To Do column and drop it into the Done column on the board", "expected": ["browser_drag"], "style": "user"}
+{"query": "drag and drop one element onto another", "expected": ["browser_drag"], "style": "agent"}
+{"query": "move the mouse over the Products menu so the dropdown shows up", "expected": ["browser_hover"], "style": "user"}
+{"query": "hover over page element", "expected": ["browser_hover"], "style": "agent"}
+{"query": "choose 'Canada' from the country dropdown on the checkout page", "expected": ["browser_select_option"], "style": "user"}
+{"query": "select option in dropdown", "expected": ["browser_select_option"], "style": "agent"}
+{"query": "open a new browser tab with google.com and then switch back to the first tab", "expected": ["browser_tabs"], "style": "user"}
+{"query": "list, open, close or switch browser tabs", "expected": ["browser_tabs"], "style": "agent"}
+{"query": "wait until the text 'Order confirmed' shows up on the page before continuing", "expected": ["browser_wait_for"], "style": "user"}
+{"query": "wait for text to appear or pause a few seconds", "expected": ["browser_wait_for"], "style": "agent"}
+{"query": "what channels do we have in our Slack workspace?", "expected": ["slack_list_channels"], "style": "user"}
+{"query": "list slack channels", "expected": ["slack_list_channels"], "style": "agent"}
+{"query": "send a message to the #engineering Slack channel saying the deploy is finished", "expected": ["slack_post_message"], "style": "user"}
+{"query": "post message to slack channel", "expected": ["slack_post_message"], "style": "agent"}
+{"query": "reply in the Slack thread under Maria's question about the release date, tell her it's Friday", "expected": ["slack_reply_to_thread"], "style": "user"}
+{"query": "reply to a slack message thread", "expected": ["slack_reply_to_thread"], "style": "agent"}
+{"query": "put a thumbs up reaction on that Slack message from the standup", "expected": ["slack_add_reaction"], "style": "user"}
+{"query": "add emoji reaction to slack message", "expected": ["slack_add_reaction"], "style": "agent"}
+{"query": "catch me up on the last 20 messages in the #general Slack channel", "expected": ["slack_get_channel_history"], "style": "user"}
+{"query": "get recent messages from slack channel", "expected": ["slack_get_channel_history"], "style": "agent"}
+{"query": "show me everything people replied in that Slack thread", "expected": ["slack_get_thread_replies"], "style": "user"}
+{"query": "get all replies in slack thread", "expected": ["slack_get_thread_replies"], "style": "agent"}
+{"query": "who is in our Slack workspace? give me everyone's names", "expected": ["slack_get_users"], "style": "user"}
+{"query": "list all slack workspace users", "expected": ["slack_get_users"], "style": "agent"}
+{"query": "what's the title and email of the Slack user U024BE7LH?", "expected": ["slack_get_user_profile"], "style": "user"}
+{"query": "get slack user profile details", "expected": ["slack_get_user_profile"], "style": "agent"}
+{"query": "how many orders were placed in March? run a select on the orders table in my SQLite database", "expected": ["read_query"], "style": "user"}
+{"query": "run a SELECT query on sqlite", "expected": ["read_query"], "style": "agent"}
+{"query": "update the customers table in my sqlite database and set status to 'inactive' for everyone who hasn't ordered since 2023", "expected": ["write_query"], "style": "user"}
+{"query": "execute insert update or delete sql in sqlite", "expected": ["write_query"], "style": "agent"}
+{"query": "make a new table in the SQLite database for employees with id, name and hire_date columns", "expected": ["create_table"], "style": "user"}
+{"query": "create sqlite table with CREATE TABLE statement", "expected": ["create_table"], "style": "agent"}
+{"query": "what tables are in my sqlite database?", "expected": ["list_tables"], "style": "user"}
+{"query": "list all sqlite tables", "expected": ["list_tables"], "style": "agent"}
+{"query": "what columns does the invoices table have in the sqlite db?", "expected": ["describe_table"], "style": "user"}
+{"query": "get schema of a database table", "expected": ["describe_table"], "style": "agent"}
+{"query": "note down in the memo that customers in the northeast churn twice as fast as everywhere else", "expected": ["append_insight"], "style": "user"}
+{"query": "add business insight to memo", "expected": ["append_insight"], "style": "agent"}

@@ -1,6 +1,6 @@
 # Labeled queries
 
-Format: JSON Lines, documented in `src/toolslim/labels.py`. Validate with
+Format: JSON Lines, documented in `src/toolslim/labels.py`. `independent/` holds labels written by authors who never saw the retrievers (see its README). Validate with
 `python -m toolslim --catalog <catalogs> --labels <file> check`.
 
 | file | catalog | role | queries |

@@ -1,0 +1,378 @@
+{"query": "spin up an nginx container called web-proxy and map port 8080 on my machine to port 80", "expected": ["create-container"], "style": "user"}
+{"query": "create a docker container from an image", "expected": ["create-container"], "style": "agent"}
+{"query": "I have a docker-compose file for my wordpress and mysql setup, can you bring the whole stack up as project 'blog'", "expected": ["deploy-compose"], "style": "user"}
+{"query": "deploy compose stack from yaml", "expected": ["deploy-compose"], "style": "agent"}
+{"query": "my postgres container keeps crashing, show me what it has been logging lately", "expected": ["get-logs"], "style": "user"}
+{"query": "fetch recent logs of a docker container", "expected": ["get-logs"], "style": "agent"}
+{"query": "what docker containers do I have on this machine right now?", "expected": ["list-containers"], "style": "user"}
+{"query": "list all docker containers", "expected": ["list-containers"], "style": "agent"}
+{"query": "make me a brand new Excel file at reports/q3_budget.xlsx with sheets called Income and Expenses", "expected": ["create_workbook"], "style": "user"}
+{"query": "create empty xlsx workbook with named sheets", "expected": ["create_workbook"], "style": "agent"}
+{"query": "before I touch sales_2026.xlsx, tell me what sheets it has and how big the data is in each", "expected": ["describe_workbook"], "style": "user"}
+{"query": "get workbook structure: sheets, used ranges, defined names", "expected": ["describe_workbook"], "style": "agent"}
+{"query": "which spreadsheets are in my Documents/finance folder, including subfolders?", "expected": ["list_workbooks"], "style": "user"}
+{"query": "list excel files in a directory", "expected": ["list_workbooks"], "style": "agent"}
+{"query": "I need to download the inventory.xlsx the server has, send me the actual file", "expected": ["export_workbook"], "style": "user"}
+{"query": "return workbook file as base64 to hand to user", "expected": ["export_workbook"], "style": "agent"}
+{"query": "I'm attaching my budget spreadsheet, put it on the server so you can edit it for me there", "expected": ["import_workbook"], "style": "user"}
+{"query": "upload base64 xlsx file to server workspace", "expected": ["import_workbook"], "style": "agent"}
+{"query": "what's on the Summary sheet of my forecast workbook - any frozen panes, merged cells, charts, dropdowns?", "expected": ["describe_sheet"], "style": "user"}
+{"query": "inspect worksheet merged ranges, tables, charts and conditional formats", "expected": ["describe_sheet"], "style": "agent"}
+{"query": "add a new tab named 'March' to the expenses workbook, right after January", "expected": ["create_sheet"], "style": "user"}
+{"query": "add an empty worksheet at position 2", "expected": ["create_sheet"], "style": "agent"}
+{"query": "rename the tab 'Sheet1' to 'Raw Data' in my customers.xlsx", "expected": ["rename_sheet"], "style": "user"}
+{"query": "rename a worksheet in an excel file", "expected": ["rename_sheet"], "style": "agent"}
+{"query": "duplicate the Template sheet so I can use it for the new client, call the copy 'Acme'", "expected": ["copy_sheet"], "style": "user"}
+{"query": "clone worksheet within workbook under new name", "expected": ["copy_sheet"], "style": "agent"}
+{"query": "get rid of the 'Old Notes' tab in my workbook entirely", "expected": ["delete_sheet"], "style": "user"}
+{"query": "remove a worksheet from an xlsx workbook", "expected": ["delete_sheet"], "style": "agent"}
+{"query": "I need three blank rows inserted above row 5 on the Budget sheet", "expected": ["insert_rows_or_columns"], "style": "user"}
+{"query": "insert empty columns before column C in a sheet", "expected": ["insert_rows_or_columns"], "style": "agent"}
+{"query": "drop rows 10 through 14 from the Orders sheet, they're test entries", "expected": ["delete_rows_or_columns"], "style": "user"}
+{"query": "delete columns from a worksheet and shift left", "expected": ["delete_rows_or_columns"], "style": "agent"}
+{"query": "show me the values in cells A1 to D20 of the Sales tab in sales.xlsx", "expected": ["read_range"], "style": "user"}
+{"query": "read cell values from a spreadsheet range", "expected": ["read_range"], "style": "agent"}
+{"query": "put these totals into the Summary sheet in my workbook starting at B2, and add a SUM formula under them", "expected": ["write_range"], "style": "user"}
+{"query": "write values and formulas into excel cells", "expected": ["write_range"], "style": "agent"}
+{"query": "wipe out whatever is in F2:F50 on the Log sheet but keep the rest as is", "expected": ["clear_range"], "style": "user"}
+{"query": "clear cell contents or formatting in a range", "expected": ["clear_range"], "style": "agent"}
+{"query": "copy the block A1:C10 from Sheet1 over to the Archive sheet starting at A1", "expected": ["copy_range"], "style": "user"}
+{"query": "copy range with formatting to another sheet", "expected": ["copy_range"], "style": "agent"}
+{"query": "where in this workbook does the name 'Henderson' show up?", "expected": ["find_cells"], "style": "user"}
+{"query": "search for text in all sheets of an excel file", "expected": ["find_cells"], "style": "agent"}
+{"query": "make the header row bold with a dark blue fill and white text, and show column D as currency", "expected": ["format_range"], "style": "user"}
+{"query": "set font, fill, borders and number format on cells", "expected": ["format_range"], "style": "agent"}
+{"query": "merge A1 through F1 on the Report sheet for a title banner", "expected": ["merge_cells"], "style": "user"}
+{"query": "merge or unmerge a cell range", "expected": ["merge_cells"], "style": "agent"}
+{"query": "freeze the top row, add filter buttons to my data and widen the columns to fit the text", "expected": ["set_sheet_layout"], "style": "user"}
+{"query": "set column widths and freeze panes in worksheet", "expected": ["set_sheet_layout"], "style": "agent"}
+{"query": "highlight every number over 100 in column C in red on the Stats sheet", "expected": ["add_conditional_format"], "style": "user"}
+{"query": "add conditional formatting color scale to range", "expected": ["add_conditional_format"], "style": "agent"}
+{"query": "I want column E to only accept Yes, No or Maybe from a dropdown", "expected": ["add_data_validation"], "style": "user"}
+{"query": "add dropdown list validation to cells", "expected": ["add_data_validation"], "style": "agent"}
+{"query": "turn my data in A1:F200 into a proper Excel table named Customers with striped rows", "expected": ["create_table"], "style": "user"}
+{"query": "convert range with header row into excel table", "expected": ["create_table"], "style": "agent"}
+{"query": "draw a column chart of monthly revenue from the data in A1:C13 and put it at E2 in my Excel sheet", "expected": ["create_chart"], "style": "user"}
+{"query": "add chart to excel worksheet from data range", "expected": ["create_chart"], "style": "agent"}
+{"query": "total up sales per region and product from my Orders sheet like a pivot table, on a new sheet", "expected": ["create_summary_table"], "style": "user"}
+{"query": "group rows and aggregate columns into summary table", "expected": ["create_summary_table"], "style": "agent"}
+{"query": "this .xlsm file has macros, I'd like to see what the VBA code in Module1 does", "expected": ["read_vba"], "style": "user"}
+{"query": "show VBA macro source from an excel workbook", "expected": ["read_vba"], "style": "agent"}
+{"query": "what's inside my Obsidian Projects/Website folder?", "expected": ["obsidian_list_files_in_dir"], "style": "user"}
+{"query": "list files in a vault subdirectory", "expected": ["obsidian_list_files_in_dir"], "style": "agent"}
+{"query": "show me the top-level folders and notes in my Obsidian vault", "expected": ["obsidian_list_files_in_vault"], "style": "user"}
+{"query": "list vault root directory contents", "expected": ["obsidian_list_files_in_vault"], "style": "agent"}
+{"query": "open my note Meetings/2026-09-30 standup.md in Obsidian and tell me what I wrote", "expected": ["obsidian_get_file_contents"], "style": "user"}
+{"query": "read the content of a note in the vault", "expected": ["obsidian_get_file_contents"], "style": "agent"}
+{"query": "find any of my Obsidian notes that mention 'quarterly OKRs'", "expected": ["obsidian_simple_search"], "style": "user"}
+{"query": "plain text search across vault notes", "expected": ["obsidian_simple_search"], "style": "agent"}
+{"query": "under the 'Action Items' heading in my project-plan note, add a line saying 'email vendor by Friday'", "expected": ["obsidian_patch_content"], "style": "user"}
+{"query": "insert text under a heading in an existing note", "expected": ["obsidian_patch_content"], "style": "agent"}
+{"query": "tack this idea onto the end of my Inbox.md note in Obsidian without changing anything else", "expected": ["obsidian_append_content"], "style": "user"}
+{"query": "append text to end of a vault file", "expected": ["obsidian_append_content"], "style": "agent"}
+{"query": "create a new Obsidian note called Reading List.md with this list of books", "expected": ["obsidian_put_content"], "style": "user"}
+{"query": "create or overwrite a note with full content", "expected": ["obsidian_put_content"], "style": "agent"}
+{"query": "delete the old Drafts/scratch.md note from my vault", "expected": ["obsidian_delete_file"], "style": "user"}
+{"query": "remove a file or folder from the vault", "expected": ["obsidian_delete_file"], "style": "agent"}
+{"query": "find all markdown notes in my Work folder whose content matches a regex for invoice numbers like INV-2026", "expected": ["obsidian_complex_search"], "style": "user"}
+{"query": "jsonlogic query to filter notes by path glob and content regex", "expected": ["obsidian_complex_search"], "style": "agent"}
+{"query": "pull up every note I tagged #recipe", "expected": ["obsidian_search_by_tag"], "style": "user"}
+{"query": "find notes by tag", "expected": ["obsidian_search_by_tag"], "style": "agent"}
+{"query": "what are the tags and status fields in the properties of my 'Book Notes/Dune' note? I don't need the body", "expected": ["obsidian_get_frontmatter"], "style": "user"}
+{"query": "get yaml frontmatter metadata of a note", "expected": ["obsidian_get_frontmatter"], "style": "agent"}
+{"query": "read these three notes at once: Ideas/a.md, Ideas/b.md and Ideas/c.md", "expected": ["obsidian_batch_get_file_contents"], "style": "user"}
+{"query": "read multiple vault files in one call", "expected": ["obsidian_batch_get_file_contents"], "style": "agent"}
+{"query": "show me today's daily note from Obsidian", "expected": ["obsidian_get_periodic_note"], "style": "user"}
+{"query": "get current weekly or monthly periodic note", "expected": ["obsidian_get_periodic_note"], "style": "agent"}
+{"query": "give me my last 7 daily notes with their text so I can write a weekly review", "expected": ["obsidian_get_recent_periodic_notes"], "style": "user"}
+{"query": "recent daily notes list with content", "expected": ["obsidian_get_recent_periodic_notes"], "style": "agent"}
+{"query": "which notes have I edited in the past few days?", "expected": ["obsidian_get_recent_changes"], "style": "user"}
+{"query": "get recently modified files in vault", "expected": ["obsidian_get_recent_changes"], "style": "agent"}
+{"query": "start a fresh PowerPoint deck for me", "expected": ["create_presentation"], "style": "user"}
+{"query": "create new empty presentation", "expected": ["create_presentation"], "style": "agent"}
+{"query": "make a new deck based on our company template at templates/brand.potx", "expected": ["create_presentation_from_template"], "style": "user"}
+{"query": "create presentation from a template file", "expected": ["create_presentation_from_template"], "style": "agent"}
+{"query": "open the file Q3_review.pptx so I can edit it", "expected": ["open_presentation"], "style": "user"}
+{"query": "load existing pptx from path", "expected": ["open_presentation"], "style": "agent"}
+{"query": "save my slides as pitch_final.pptx on the desktop", "expected": ["save_presentation"], "style": "user"}
+{"query": "save presentation to file", "expected": ["save_presentation"], "style": "agent"}
+{"query": "how many slides does my current deck have and what's its title?", "expected": ["get_presentation_info"], "style": "user"}
+{"query": "get presentation details like slide count and properties", "expected": ["get_presentation_info"], "style": "agent"}
+{"query": "what layouts does this .potx template contain?", "expected": ["get_template_file_info"], "style": "user"}
+{"query": "inspect template file layouts and properties", "expected": ["get_template_file_info"], "style": "agent"}
+{"query": "set the author of my presentation to Dana Whitfield and the title to 'Annual Planning'", "expected": ["set_core_properties"], "style": "user"}
+{"query": "set presentation metadata: title, author, keywords", "expected": ["set_core_properties"], "style": "agent"}
+{"query": "add a new slide called 'Roadmap' with a blue gradient background", "expected": ["add_slide"], "style": "user"}
+{"query": "append slide with layout and background color", "expected": ["add_slide"], "style": "agent"}
+{"query": "tell me what's on slide 4 of the deck - shapes, placeholders and so on", "expected": ["get_slide_info"], "style": "user"}
+{"query": "get details of a specific slide by index", "expected": ["get_slide_info"], "style": "agent"}
+{"query": "pull out the text from slide 2 only", "expected": ["extract_slide_text"], "style": "user"}
+{"query": "extract text from one slide", "expected": ["extract_slide_text"], "style": "agent"}
+{"query": "I need a plain-text dump of everything written across the whole presentation", "expected": ["extract_presentation_text"], "style": "user"}
+{"query": "extract all text from every slide", "expected": ["extract_presentation_text"], "style": "agent"}
+{"query": "put 'Quarterly Results' into the title placeholder on slide 1", "expected": ["populate_placeholder"], "style": "user"}
+{"query": "fill placeholder with text on slide", "expected": ["populate_placeholder"], "style": "agent"}
+{"query": "add three bullet points about our launch plan to the content box on slide 3", "expected": ["add_bullet_points"], "style": "user"}
+{"query": "add bullet list to slide placeholder", "expected": ["add_bullet_points"], "style": "agent"}
+{"query": "drop a text box on slide 2 with 'Confidential' in bold red 18pt Arial", "expected": ["manage_text"], "style": "user"}
+{"query": "add and format text box on slide", "expected": ["manage_text"], "style": "agent"}
+{"query": "insert the company logo image on slide 1 at the top right and sharpen it a bit", "expected": ["manage_image"], "style": "user"}
+{"query": "add or enhance image on a slide", "expected": ["manage_image"], "style": "agent"}
+{"query": "put a 4 by 3 table on slide 5 with our pricing tiers and a colored header row", "expected": ["powerpoint__add_table"], "style": "user"}
+{"query": "add table to a powerpoint slide", "expected": ["powerpoint__add_table"], "style": "agent"}
+{"query": "in the table on slide 5, make the cell in row 2 column 3 bold with a yellow background", "expected": ["format_table_cell"], "style": "user"}
+{"query": "format individual table cell on slide", "expected": ["format_table_cell"], "style": "agent"}
+{"query": "draw a blue rounded rectangle with the words 'Phase 1' on slide 6", "expected": ["add_shape"], "style": "user"}
+{"query": "add auto shape to slide with fill color", "expected": ["add_shape"], "style": "agent"}
+{"query": "add a bar chart of sales by quarter to slide 4 of my PowerPoint with a legend", "expected": ["add_chart"], "style": "user"}
+{"query": "insert chart into slide with categories and series", "expected": ["add_chart"], "style": "agent"}
+{"query": "make the whole deck look more polished and professional with a nice theme", "expected": ["apply_professional_design"], "style": "user"}
+{"query": "apply professional theme and styling to presentation", "expected": ["apply_professional_design"], "style": "agent"}
+{"query": "give the photo on slide 3 a soft shadow and rounded corners", "expected": ["apply_picture_effects"], "style": "user"}
+{"query": "apply combined picture effects to image shape", "expected": ["apply_picture_effects"], "style": "agent"}
+{"query": "which fonts would work best for a creative pitch deck? I have a font file at fonts/Lato.ttf to analyze", "expected": ["manage_fonts"], "style": "user"}
+{"query": "analyze and recommend fonts for presentation", "expected": ["manage_fonts"], "style": "agent"}
+{"query": "what slide layout templates can I pick from?", "expected": ["list_slide_templates"], "style": "user"}
+{"query": "list available slide layout templates", "expected": ["list_slide_templates"], "style": "agent"}
+{"query": "restyle slide 3 using the text_with_image template in the corporate gray scheme", "expected": ["apply_slide_template"], "style": "user"}
+{"query": "apply layout template to existing slide", "expected": ["apply_slide_template"], "style": "agent"}
+{"query": "add a new title slide using a template, with the title 'Welcome' and subtitle 'Team Offsite'", "expected": ["create_slide_from_template"], "style": "user"}
+{"query": "create new slide from layout template with content mapping", "expected": ["create_slide_from_template"], "style": "agent"}
+{"query": "build my whole deck in one go from a sequence of templates: title slide, then text with image, then a closing slide", "expected": ["create_presentation_from_templates"], "style": "user"}
+{"query": "create full presentation from template sequence", "expected": ["create_presentation_from_templates"], "style": "agent"}
+{"query": "what does the 'text_with_image' slide template look like and which fields does it take?", "expected": ["get_template_info"], "style": "user"}
+{"query": "get details for a slide template id", "expected": ["get_template_info"], "style": "agent"}
+{"query": "generate a 10 slide business presentation about renewable energy with charts, automatically", "expected": ["auto_generate_presentation"], "style": "user"}
+{"query": "auto generate presentation from topic", "expected": ["auto_generate_presentation"], "style": "agent"}
+{"query": "the text on slide 7 overflows its box, shrink and wrap it so it reads well", "expected": ["optimize_slide_text"], "style": "user"}
+{"query": "auto-resize fonts and fix text fit on slide", "expected": ["optimize_slide_text"], "style": "agent"}
+{"query": "make the words 'our website' on slide 2 link to https://example.com", "expected": ["manage_hyperlinks"], "style": "user"}
+{"query": "add, list or remove hyperlinks in slide text", "expected": ["manage_hyperlinks"], "style": "agent"}
+{"query": "the revenue chart on slide 4 has old numbers, replace them with new quarterly figures", "expected": ["update_chart_data"], "style": "user"}
+{"query": "replace categories and series in existing chart", "expected": ["update_chart_data"], "style": "agent"}
+{"query": "draw an arrow from the first box to the second on slide 5", "expected": ["add_connector"], "style": "user"}
+{"query": "add connector line between two points on slide", "expected": ["add_connector"], "style": "agent"}
+{"query": "show me the slide masters and their layouts in this presentation", "expected": ["manage_slide_masters"], "style": "user"}
+{"query": "list slide master layouts", "expected": ["manage_slide_masters"], "style": "agent"}
+{"query": "add a fade transition lasting 1.5 seconds to slide 2", "expected": ["manage_slide_transitions"], "style": "user"}
+{"query": "set slide transition type and duration", "expected": ["manage_slide_transitions"], "style": "agent"}
+{"query": "which presentations do I currently have open?", "expected": ["list_presentations"], "style": "user"}
+{"query": "list loaded presentations", "expected": ["list_presentations"], "style": "agent"}
+{"query": "go back to the other deck I had open earlier", "expected": ["switch_presentation"], "style": "user"}
+{"query": "switch active presentation by id", "expected": ["switch_presentation"], "style": "agent"}
+{"query": "what version of the PowerPoint server am I running and what can it do?", "expected": ["get_server_info"], "style": "user"}
+{"query": "get MCP server information", "expected": ["get_server_info"], "style": "agent"}
+{"query": "in Redis, set the 'email' field of the hash user:1042 to dana@example.com and have it expire in an hour", "expected": ["hset"], "style": "user"}
+{"query": "set field in redis hash with optional ttl", "expected": ["hset"], "style": "agent"}
+{"query": "what's the 'plan' field stored in the Redis hash user:1042?", "expected": ["hget"], "style": "user"}
+{"query": "get one field value from a redis hash", "expected": ["hget"], "style": "agent"}
+{"query": "remove the 'phone' field from the hash session:abc123 in Redis", "expected": ["hdel"], "style": "user"}
+{"query": "delete a field from a hash", "expected": ["hdel"], "style": "agent"}
+{"query": "dump every field and value of the Redis hash product:77", "expected": ["hgetall"], "style": "user"}
+{"query": "get all fields and values of a hash", "expected": ["hgetall"], "style": "agent"}
+{"query": "does the Redis hash cart:88 have a field called 'coupon'?", "expected": ["hexists"], "style": "user"}
+{"query": "check if hash field exists", "expected": ["hexists"], "style": "agent"}
+{"query": "store this embedding [0.12, 0.98, 0.33] on the Redis hash doc:5", "expected": ["set_vector_in_hash"], "style": "user"}
+{"query": "save vector embedding in hash field", "expected": ["set_vector_in_hash"], "style": "agent"}
+{"query": "load back the embedding I saved for doc:5 in Redis as a list of floats", "expected": ["get_vector_from_hash"], "style": "user"}
+{"query": "retrieve stored vector from hash", "expected": ["get_vector_from_hash"], "style": "agent"}
+{"query": "save this JSON profile document under the Redis key profile:9 at the root path", "expected": ["json_set"], "style": "user"}
+{"query": "set json value at path in redis", "expected": ["json_set"], "style": "agent"}
+{"query": "read the address part of the JSON document stored at Redis key profile:9", "expected": ["json_get"], "style": "user"}
+{"query": "get json value from redis key by path", "expected": ["json_get"], "style": "agent"}
+{"query": "remove the $.preferences section from the Redis JSON doc profile:9", "expected": ["json_del"], "style": "user"}
+{"query": "delete json path from a redis document", "expected": ["json_del"], "style": "agent"}
+{"query": "push 'send invoice' onto the front of my Redis list todo:today", "expected": ["lpush"], "style": "user"}
+{"query": "prepend value to redis list", "expected": ["lpush"], "style": "agent"}
+{"query": "add 'job-4471' to the back of the Redis queue named jobs", "expected": ["rpush"], "style": "user"}
+{"query": "append item to end of redis list", "expected": ["rpush"], "style": "agent"}
+{"query": "take the first item off the Redis list jobs and give it to me", "expected": ["lpop"], "style": "user"}
+{"query": "pop head element of a list", "expected": ["lpop"], "style": "agent"}
+{"query": "remove and return the last entry in the Redis list recent_searches", "expected": ["rpop"], "style": "user"}
+{"query": "pop tail element from list", "expected": ["rpop"], "style": "agent"}
+{"query": "show items 0 to 9 in the Redis list recent_searches", "expected": ["lrange"], "style": "user"}
+{"query": "get slice of a redis list by index range", "expected": ["lrange"], "style": "agent"}
+{"query": "how many entries are in my Redis queue called jobs?", "expected": ["llen"], "style": "user"}
+{"query": "get length of redis list", "expected": ["llen"], "style": "agent"}
+{"query": "take every occurrence of 'spam@x.com' out of the Redis list blocked_senders", "expected": ["lrem"], "style": "user"}
+{"query": "remove matching elements from a list", "expected": ["lrem"], "style": "agent"}
+{"query": "delete the Redis key cache:homepage", "expected": ["delete"], "style": "user"}
+{"query": "delete a redis key", "expected": ["delete"], "style": "agent"}
+{"query": "is the Redis key session:abc123 a string, hash or list?", "expected": ["type"], "style": "user"}
+{"query": "check data type of a key", "expected": ["type"], "style": "agent"}
+{"query": "make the Redis key otp:5521 disappear after 300 seconds", "expected": ["expire"], "style": "user"}
+{"query": "set time to live on an existing key", "expected": ["expire"], "style": "agent"}
+{"query": "rename the Redis key user:old to user:new", "expected": ["rename"], "style": "user"}
+{"query": "rename a key", "expected": ["rename"], "style": "agent"}
+{"query": "step through Redis keys starting with 'cache:' a batch at a time using a cursor", "expected": ["scan_keys"], "style": "user"}
+{"query": "scan keys by pattern with cursor iteration", "expected": ["scan_keys"], "style": "agent"}
+{"query": "give me a complete list of all keys in Redis that match user:*", "expected": ["scan_all_keys", "scan_keys"], "style": "user", "note": "scan_all_keys returns everything; scan_keys with cursor loop also works"}
+{"query": "get all keys matching a pattern", "expected": ["scan_all_keys", "scan_keys"], "style": "agent", "note": "either scan tool can list keys by pattern"}
+{"query": "how do I use Redis for rate limiting an API? I'd like to read the docs", "expected": ["search_redis_documents"], "style": "user"}
+{"query": "search redis documentation for use cases", "expected": ["search_redis_documents"], "style": "agent"}
+{"query": "send the message 'deploy finished' to the Redis channel alerts", "expected": ["publish"], "style": "user"}
+{"query": "publish message to pubsub channel", "expected": ["publish"], "style": "agent"}
+{"query": "listen to the Redis channel 'orders' for new messages", "expected": ["subscribe"], "style": "user"}
+{"query": "subscribe to a channel", "expected": ["subscribe"], "style": "agent"}
+{"query": "subscribe in Redis to every channel starting with events.* ", "expected": ["psubscribe"], "style": "user"}
+{"query": "pattern subscribe to pubsub channels", "expected": ["psubscribe"], "style": "agent"}
+{"query": "check whether any new messages arrived on my Redis subscription, wait up to 2 seconds", "expected": ["read_messages"], "style": "user"}
+{"query": "read pending pubsub messages for subscription id", "expected": ["read_messages"], "style": "agent"}
+{"query": "I'm done listening, close my Redis subscription", "expected": ["unsubscribe"], "style": "user"}
+{"query": "close pubsub subscription", "expected": ["unsubscribe"], "style": "agent"}
+{"query": "what search indexes exist in my Redis database?", "expected": ["get_indexes"], "style": "user"}
+{"query": "list redis search indexes", "expected": ["get_indexes"], "style": "agent"}
+{"query": "show me the schema of the Redis index idx:products", "expected": ["get_index_info"], "style": "user"}
+{"query": "get index schema with FT.INFO", "expected": ["get_index_info"], "style": "agent"}
+{"query": "how many documents has the Redis index idx:products indexed so far?", "expected": ["get_indexed_keys_number"], "style": "user"}
+{"query": "count keys indexed by a search index", "expected": ["get_indexed_keys_number"], "style": "agent"}
+{"query": "set up a Redis index for 768-dimensional embeddings with cosine distance so I can do similarity search on my docs", "expected": ["create_vector_index_hash"], "style": "user"}
+{"query": "create HNSW vector index on hash", "expected": ["create_vector_index_hash"], "style": "agent"}
+{"query": "find the 5 documents in Redis closest to this embedding vector", "expected": ["vector_search_hash", "hybrid_search"], "style": "user", "note": "hybrid_search with filter '*' is a pure vector search"}
+{"query": "KNN vector similarity search on redis hashes", "expected": ["vector_search_hash", "hybrid_search"], "style": "agent", "note": "hybrid_search with no filter equals vector search"}
+{"query": "search my Redis documents by embedding but only those tagged news and published after 2022", "expected": ["hybrid_search"], "style": "user"}
+{"query": "vector search combined with metadata filter expression", "expected": ["hybrid_search"], "style": "agent"}
+{"query": "how many keys are in my Redis database in total?", "expected": ["dbsize"], "style": "user"}
+{"query": "get number of keys in database", "expected": ["dbsize"], "style": "agent"}
+{"query": "how much memory is my Redis server using?", "expected": ["info"], "style": "user"}
+{"query": "get redis server stats and info", "expected": ["info"], "style": "agent"}
+{"query": "who is connected to my Redis server right now?", "expected": ["client_list"], "style": "user"}
+{"query": "list connected redis clients", "expected": ["client_list"], "style": "agent"}
+{"query": "add 'blue' to the Redis set called favorite_colors", "expected": ["sadd"], "style": "user"}
+{"query": "add member to a set", "expected": ["sadd"], "style": "agent"}
+{"query": "take 'blue' out of the Redis set favorite_colors", "expected": ["srem"], "style": "user"}
+{"query": "remove member from set", "expected": ["srem"], "style": "agent"}
+{"query": "list everything in the Redis set online_users", "expected": ["smembers"], "style": "user"}
+{"query": "get all members of a set", "expected": ["smembers"], "style": "agent"}
+{"query": "put player 'maria' on the Redis leaderboard with a score of 2450", "expected": ["zadd"], "style": "user"}
+{"query": "add member with score to sorted set", "expected": ["zadd"], "style": "agent"}
+{"query": "show the top 10 players on the Redis leaderboard with their scores", "expected": ["zrange"], "style": "user"}
+{"query": "get range of sorted set members with scores", "expected": ["zrange"], "style": "agent"}
+{"query": "kick 'maria' off the Redis leaderboard sorted set", "expected": ["zrem"], "style": "user"}
+{"query": "remove member from sorted set", "expected": ["zrem"], "style": "agent"}
+{"query": "append a new sensor reading with temp=21.5 to the Redis stream sensors:1", "expected": ["xadd"], "style": "user"}
+{"query": "add entry to redis stream", "expected": ["xadd"], "style": "agent"}
+{"query": "show the first 20 entries of the Redis stream sensors:1", "expected": ["xrange"], "style": "user"}
+{"query": "read entries from a stream", "expected": ["xrange"], "style": "agent"}
+{"query": "delete the stream entry 1700000000000-0 from sensors:1", "expected": ["xdel"], "style": "user"}
+{"query": "remove entry from redis stream by id", "expected": ["xdel"], "style": "agent"}
+{"query": "create a consumer group called workers on my Redis stream orders, starting from the beginning", "expected": ["xgroup_create"], "style": "user"}
+{"query": "create stream consumer group", "expected": ["xgroup_create"], "style": "agent"}
+{"query": "get rid of the consumer group 'workers' on stream orders", "expected": ["xgroup_destroy"], "style": "user"}
+{"query": "destroy consumer group of a stream", "expected": ["xgroup_destroy"], "style": "agent"}
+{"query": "as consumer c1 in group workers, pull the next 10 new messages from the orders stream", "expected": ["xreadgroup"], "style": "user"}
+{"query": "read stream entries as consumer group member", "expected": ["xreadgroup"], "style": "agent"}
+{"query": "mark these stream messages as processed for group workers on orders", "expected": ["xack"], "style": "user"}
+{"query": "acknowledge processed stream entries", "expected": ["xack"], "style": "agent"}
+{"query": "store the string 'hello' in Redis under the key greeting, expiring in 60 seconds", "expected": ["set"], "style": "user"}
+{"query": "set a string key value", "expected": ["set"], "style": "agent"}
+{"query": "what value is stored in Redis under the key greeting?", "expected": ["get"], "style": "user"}
+{"query": "get string value by key", "expected": ["get"], "style": "agent"}
+{"query": "make a new Word document called meeting_minutes.docx with the title 'Board Meeting' and me as the author", "expected": ["create_document"], "style": "user"}
+{"query": "create new docx file with title and author metadata", "expected": ["create_document"], "style": "agent"}
+{"query": "make a duplicate of contract_v1.docx so I can edit a fresh copy", "expected": ["copy_document"], "style": "user"}
+{"query": "copy a word document to a new filename", "expected": ["copy_document"], "style": "agent"}
+{"query": "how long is report.docx and who wrote it - give me its properties", "expected": ["get_document_info"], "style": "user"}
+{"query": "get word document metadata and info", "expected": ["get_document_info"], "style": "agent"}
+{"query": "read me everything that's written in the Word file proposal.docx", "expected": ["get_document_text"], "style": "user"}
+{"query": "extract full text of docx", "expected": ["get_document_text"], "style": "agent"}
+{"query": "show me the heading structure of my thesis document", "expected": ["get_document_outline"], "style": "user"}
+{"query": "get outline of word document structure", "expected": ["get_document_outline"], "style": "agent"}
+{"query": "which .docx files do I have in my Documents/contracts folder?", "expected": ["list_available_documents"], "style": "user"}
+{"query": "list docx files in directory", "expected": ["list_available_documents"], "style": "agent"}
+{"query": "I need to look at the raw underlying XML of my Word file to debug a formatting glitch", "expected": ["get_document_xml"], "style": "user"}
+{"query": "dump raw xml of docx", "expected": ["get_document_xml"], "style": "agent"}
+{"query": "add a 'Conclusion' heading right before the paragraph that begins 'In summary'", "expected": ["insert_header_near_text"], "style": "user"}
+{"query": "insert heading before or after a target paragraph", "expected": ["insert_header_near_text"], "style": "agent"}
+{"query": "slip a new sentence in right after the paragraph mentioning 'payment terms' in my Word contract", "expected": ["insert_line_or_paragraph_near_text"], "style": "user"}
+{"query": "insert paragraph near existing text in document", "expected": ["insert_line_or_paragraph_near_text"], "style": "agent"}
+{"query": "add a numbered list of the four steps right below the paragraph 'Setup instructions' in my doc", "expected": ["insert_numbered_list_near_text"], "style": "user"}
+{"query": "insert bulleted or numbered list near paragraph", "expected": ["insert_numbered_list_near_text"], "style": "agent"}
+{"query": "add a paragraph at the end of my Word document saying thanks for reading, in 12pt Times New Roman", "expected": ["add_paragraph"], "style": "user"}
+{"query": "append formatted paragraph to word document", "expected": ["add_paragraph"], "style": "agent"}
+{"query": "put a level 2 heading 'Budget Overview' into my report.docx", "expected": ["add_heading"], "style": "user"}
+{"query": "add heading to docx", "expected": ["add_heading"], "style": "agent"}
+{"query": "insert the chart image charts/sales.png into my Word report, about 5 inches wide", "expected": ["add_picture"], "style": "user"}
+{"query": "add image to word document", "expected": ["add_picture"], "style": "agent"}
+{"query": "add a 3 column, 5 row table to my Word document filled with this data", "expected": ["word__add_table"], "style": "user"}
+{"query": "add table to docx file", "expected": ["word__add_table"], "style": "agent"}
+{"query": "start a new page after the introduction in my Word doc", "expected": ["add_page_break"], "style": "user"}
+{"query": "insert page break into document", "expected": ["add_page_break"], "style": "agent"}
+{"query": "delete paragraph number 7 from my Word document, it's outdated", "expected": ["delete_paragraph"], "style": "user"}
+{"query": "remove a paragraph by index from docx", "expected": ["delete_paragraph"], "style": "agent"}
+{"query": "in my Word contract, change every 'Acme Corp' to 'Acme Holdings'", "expected": ["search_and_replace"], "style": "user"}
+{"query": "find and replace all occurrences of text in document", "expected": ["search_and_replace"], "style": "agent"}
+{"query": "define a new paragraph style named 'Callout' in my docx, italic blue 11pt", "expected": ["create_custom_style"], "style": "user"}
+{"query": "create custom style in word document", "expected": ["create_custom_style"], "style": "agent"}
+{"query": "make characters 10 to 25 of paragraph 3 bold and red in my Word doc", "expected": ["format_text"], "style": "user"}
+{"query": "format a character range within a paragraph", "expected": ["format_text"], "style": "agent"}
+{"query": "give the first table in my Word report borders and a header row", "expected": ["format_table"], "style": "user"}
+{"query": "format word table borders and shading", "expected": ["format_table"], "style": "agent"}
+{"query": "color the cell at row 2, column 1 of the first table light yellow in my Word file", "expected": ["set_table_cell_shading"], "style": "user"}
+{"query": "shade a specific table cell", "expected": ["set_table_cell_shading"], "style": "agent"}
+{"query": "make the rows of my Word table alternate between white and light gray so it's easier to read", "expected": ["apply_table_alternating_rows"], "style": "user"}
+{"query": "zebra stripe table rows in docx", "expected": ["apply_table_alternating_rows"], "style": "agent"}
+{"query": "make the top row of the table in my Word doc dark blue with white text", "expected": ["highlight_table_header"], "style": "user"}
+{"query": "highlight header row of table", "expected": ["highlight_table_header"], "style": "agent"}
+{"query": "merge the block from row 1 col 1 to row 2 col 3 in the first table of my Word document", "expected": ["merge_table_cells"], "style": "user"}
+{"query": "merge rectangular area of table cells", "expected": ["merge_table_cells"], "style": "agent"}
+{"query": "combine columns 1 through 3 of the first row in my Word table into one wide cell", "expected": ["merge_table_cells_horizontal", "merge_table_cells"], "style": "user", "note": "general rectangular merge also works"}
+{"query": "merge table cells horizontally in a row", "expected": ["merge_table_cells_horizontal", "merge_table_cells"], "style": "agent", "note": "general merge covers the horizontal case"}
+{"query": "in my Word table, join rows 2 to 4 of the first column into a single tall cell", "expected": ["merge_table_cells_vertical", "merge_table_cells"], "style": "user", "note": "general rectangular merge also works"}
+{"query": "merge cells vertically down a column", "expected": ["merge_table_cells_vertical", "merge_table_cells"], "style": "agent", "note": "general merge covers the vertical case"}
+{"query": "center the text in one particular cell of the second table in my Word doc", "expected": ["set_table_cell_alignment"], "style": "user"}
+{"query": "set horizontal and vertical alignment for a table cell", "expected": ["set_table_cell_alignment"], "style": "agent"}
+{"query": "right-align the text in every cell of the first table in my Word report", "expected": ["set_table_alignment_all"], "style": "user"}
+{"query": "set alignment for all cells in a table", "expected": ["set_table_alignment_all"], "style": "agent"}
+{"query": "lock my Word document with the password 'S3cret!' so others can't edit it", "expected": ["protect_document"], "style": "user"}
+{"query": "add password protection to docx", "expected": ["protect_document"], "style": "agent"}
+{"query": "I know the password, take the protection off my Word file", "expected": ["unprotect_document"], "style": "user"}
+{"query": "remove password protection from document", "expected": ["unprotect_document"], "style": "agent"}
+{"query": "add a footnote to paragraph 4 of my Word document citing Smith 2019", "expected": ["add_footnote_to_document", "add_footnote_enhanced", "add_footnote_robust"], "style": "user", "note": "several footnote-by-paragraph tools do the same job"}
+{"query": "add footnote to a paragraph by index", "expected": ["add_footnote_to_document", "add_footnote_enhanced", "add_footnote_robust"], "style": "agent", "note": "near-duplicate footnote tools"}
+{"query": "put a footnote right after the phrase 'market share' in my Word doc saying 'Source: IDC 2025'", "expected": ["add_footnote_after_text", "add_footnote_robust"], "style": "user", "note": "robust version also accepts search text"}
+{"query": "add footnote after specific text", "expected": ["add_footnote_after_text", "add_footnote_robust"], "style": "agent", "note": "robust version also accepts search text"}
+{"query": "attach a footnote just before the words 'Figure 3' in my Word document", "expected": ["add_footnote_before_text", "add_footnote_robust"], "style": "user", "note": "robust version also accepts search text"}
+{"query": "add footnote before a given text with superscript", "expected": ["add_footnote_before_text", "add_footnote_robust"], "style": "agent", "note": "robust version also accepts search text"}
+{"query": "my footnote marker isn't showing as superscript, add the footnote to paragraph 6 again so it formats properly", "expected": ["add_footnote_enhanced", "add_footnote_to_document", "add_footnote_robust"], "style": "user", "note": "near-duplicate footnote tools"}
+{"query": "enhanced footnote at end of paragraph with guaranteed superscript", "expected": ["add_footnote_enhanced", "add_footnote_to_document", "add_footnote_robust"], "style": "agent", "note": "near-duplicate footnote tools"}
+{"query": "add an endnote to paragraph 9 of my Word document", "expected": ["add_endnote_to_document"], "style": "user"}
+{"query": "add endnote to paragraph", "expected": ["add_endnote_to_document"], "style": "agent"}
+{"query": "change my Word footnotes to use roman numerals starting at i, in 9pt font", "expected": ["customize_footnote_style"], "style": "user"}
+{"query": "customize footnote numbering format and font", "expected": ["customize_footnote_style"], "style": "agent"}
+{"query": "delete footnote number 2 from my Word document", "expected": ["delete_footnote_from_document", "delete_footnote_robust"], "style": "user", "note": "robust delete does the same job with extra cleanup"}
+{"query": "delete footnote by id or nearby text", "expected": ["delete_footnote_from_document", "delete_footnote_robust"], "style": "agent", "note": "near-duplicate delete tools"}
+{"query": "add a footnote to my Word document and make sure it validates and auto-repairs so Word doesn't complain", "expected": ["add_footnote_robust", "add_footnote_to_document", "add_footnote_enhanced"], "style": "user", "note": "near-duplicate footnote tools"}
+{"query": "production-ready footnote addition with validation and auto repair", "expected": ["add_footnote_robust", "add_footnote_enhanced", "add_footnote_to_document"], "style": "agent", "note": "near-duplicate footnote tools"}
+{"query": "Word says my document has a problem; check whether the footnotes have any broken IDs or orphaned content", "expected": ["validate_document_footnotes"], "style": "user"}
+{"query": "validate footnotes in document for compliance", "expected": ["validate_document_footnotes"], "style": "agent"}
+{"query": "completely remove footnote 3 from my Word file including leftover orphans in footnotes.xml", "expected": ["delete_footnote_robust", "delete_footnote_from_document"], "style": "user", "note": "near-duplicate delete tools"}
+{"query": "delete footnote with orphan cleanup", "expected": ["delete_footnote_robust", "delete_footnote_from_document"], "style": "agent", "note": "near-duplicate delete tools"}
+{"query": "what does paragraph 12 of my Word document say?", "expected": ["get_paragraph_text_from_document"], "style": "user"}
+{"query": "get text of a specific paragraph by index", "expected": ["get_paragraph_text_from_document"], "style": "agent"}
+{"query": "where does the word 'indemnification' appear in my Word contract? match case please", "expected": ["find_text_in_document"], "style": "user"}
+{"query": "find occurrences of text in docx", "expected": ["find_text_in_document"], "style": "agent"}
+{"query": "turn my Word report into a PDF I can email", "expected": ["convert_to_pdf"], "style": "user"}
+{"query": "convert docx to pdf", "expected": ["convert_to_pdf"], "style": "agent"}
+{"query": "rewrite everything under the heading 'Resumen' in my Word document with these new paragraphs but leave the table of contents alone", "expected": ["replace_paragraph_block_below_header"], "style": "user"}
+{"query": "replace paragraphs under a header without touching TOC", "expected": ["replace_paragraph_block_below_header"], "style": "agent"}
+{"query": "swap out all the text between the line 'BEGIN TERMS' and the line 'END TERMS' in my Word file with updated clauses", "expected": ["replace_block_between_manual_anchors"], "style": "user"}
+{"query": "replace content between start and end anchor text", "expected": ["replace_block_between_manual_anchors"], "style": "agent"}
+{"query": "show me all the comments reviewers left in my Word document", "expected": ["get_all_comments"], "style": "user"}
+{"query": "extract all comments from docx", "expected": ["get_all_comments"], "style": "agent"}
+{"query": "what feedback did Priya leave in comments on my Word draft?", "expected": ["get_comments_by_author"], "style": "user"}
+{"query": "get docx comments filtered by author", "expected": ["get_comments_by_author"], "style": "agent"}
+{"query": "are there any comments attached to paragraph 5 in my Word document?", "expected": ["get_comments_for_paragraph"], "style": "user"}
+{"query": "get comments on a specific paragraph", "expected": ["get_comments_for_paragraph"], "style": "agent"}
+{"query": "make the second column of the first table in my Word doc 2 inches wide", "expected": ["set_table_column_width"], "style": "user"}
+{"query": "set width of one table column", "expected": ["set_table_column_width"], "style": "agent"}
+{"query": "set the three columns of my Word table to 1.5, 3 and 1 inches wide all at once", "expected": ["set_table_column_widths"], "style": "user"}
+{"query": "set widths for multiple table columns", "expected": ["set_table_column_widths"], "style": "agent"}
+{"query": "make the whole table in my Word document 6 inches wide", "expected": ["set_table_width"], "style": "user"}
+{"query": "set overall table width", "expected": ["set_table_width"], "style": "agent"}
+{"query": "the columns in my Word table are too wide or narrow, fit them to the content automatically", "expected": ["auto_fit_table_columns"], "style": "user"}
+{"query": "autofit table columns to content", "expected": ["auto_fit_table_columns"], "style": "agent"}
+{"query": "make the text in row 1 column 2 of the first Word table bold and italic, 14pt Calibri", "expected": ["format_table_cell_text"], "style": "user"}
+{"query": "format text inside a table cell", "expected": ["format_table_cell_text"], "style": "agent"}
+{"query": "add a little breathing room: 0.1 inch padding inside one cell of my Word table", "expected": ["set_table_cell_padding"], "style": "user"}
+{"query": "set cell margins and padding in table cell", "expected": ["set_table_cell_padding"], "style": "agent"}

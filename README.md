@@ -268,6 +268,14 @@ What this says:
 - **The "few hub tools cause the misses" picture is not borne out as a main cause.** Counting wrong top-5 slots, each source's 8 most frequent wrong tools hold only 13-31% of them, and the top ones differ by source (dev: `get_issue`, `get_pull_request`, `create_branch`; first test: `browser_find`, `API-retrieve-page-markdown`; second: `maintenance_on`, `list_apps`, `count`, `find`; third: `get_paragraph_text_from_document`, `add_slide`, `get_document_text`). Many are legitimate neighbors of the right tool, not generic noise, which a global penalty cannot tell apart. The correction helped where a server's tools share generic verbs (the second batch) and hurt where tools have close, natural neighbors (the GitHub pull-request family, Notion); that explanation is plausible but not tested here.
 - **The remaining misses look like wording gaps, not scoring artifacts**: "draw a rounded rectangle" versus a tool described as "add an auto shape", "queue list" versus "Redis list". That points at the tool text and the query (enrichment, rewriting by a model), not at the ranking formula.
 
+### Independent labels (written, not yet scored)
+
+Every query set above was written by the same author who built and tuned the retrievers. `queries/independent/` now holds labels for all four real-server batches written by four fresh subagent instances that saw only the tool lists and the labeling guidelines (`scripts/make_label_kit.py` builds that blind kit; a test checks it contains no retrieval code, earlier queries or results): 884 queries, one user-style and one agent-style per tool. I did not edit any of them (checksums in `queries/independent/MANIFEST.sha256`), and they pass the repo's own validator. Details, the differences from my labels, and the limits are in `queries/independent/README.md`:
+
+- Their user-style queries share more words with tool names (0.28-0.39 against 0.13-0.25 for mine), accept fewer alternative tools, and name the service in different proportions (third batch, agent-style: 20% against my 97%).
+- They are another instance of the same model family, not human users, and the tools are the ones already used to design the retrievers. These are independent labels on dev data, not a fresh confirmation set.
+- They have not been scored. The scoring protocol will be fixed and committed first.
+
 ### Fresh test set, and what its schemas showed
 
 `catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results. 140 labeled queries (`queries/mcp-test.jsonl`) were scored once (result below), so this set is now spent as a test. It existed so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
@@ -328,7 +336,7 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Independent labels: the strongest missing piece. Every query set was written by the same author who built and tuned the retrievers; a human reviewer, or a model that did not build them, would give an honest estimate. Real traffic would be better still.
+1. Score the retrievers on the independent labels under a protocol fixed and committed first (headline: the current default; comparisons against `dense`, `bm25` and `hybrid-rrf`; and a check of how much the results differ from the author-written labels). Human-written labels or real traffic would still be better.
 2. End-to-end eval with a real model (needs an API key): task success and total cost for full vs. slim vs. lazy, how often real queries name their service, the cost of a retrieval miss, and the right default `limit`. This is also the only way to learn whether the ~86% recall@5 matters in practice, because a model can search again.
 3. Attack the wording gap rather than the ranking formula: index-side enrichment for terse or jargon-heavy tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field), and query rewriting or reranking by a model. Server-level routing (pick the server first, then rank inside it) is an untested alternative to a global penalty.
 4. A fifth batch of servers with independently written queries, so the next decision is not made on spent data.
