@@ -154,7 +154,7 @@ class KnownTokenizerLimitationTests(unittest.TestCase):
     def test_camel_case_brand_names_should_match_their_lowercase_form(self):
         """Known limitation: the BM25 tokenizer splits "GitHub" into git+hub, so it never matches the
         lowercase token "github" in tool or server names (same for MongoDB, DynamoDB, PostgreSQL).
-        This test is expected to fail until that is fixed; it will then report an unexpected success."""
+        A fix exists as an option (camel_join=True) but was not adopted by default (see results/hub-tokenizer.json); this test is expected to fail until the default changes, and will then report an unexpected success."""
         from toolslim.index import tokenize
 
         self.assertEqual(tokenize("GitHub"), tokenize("github"))

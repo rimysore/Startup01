@@ -65,7 +65,7 @@ Known limitations:
 
 - Dense and hybrid search always return `k` results, even for nonsense queries (BM25 returns nothing when no words match). There is no "no match" signal yet.
 - `wordllama` 0.4.0 looks for its tokenizer in the wrong directory (`tokenizer/` vs the shipped `tokenizers/`); `dense.wordllama_embedder` works around it through the public `cache_dir` argument.
-- The BM25 tokenizer splits camel-case brand names ("GitHub" -> `git hub`), so they never match the lowercase form in tool or server names (details under "Server names in the index"). It weakens the BM25 half of the default hybrid; the dense half is unaffected.
+- The BM25 tokenizer splits camel-case brand names ("GitHub" -> `git hub`), so they never match the lowercase form in tool or server names (details under "Server names in the index"). A fix exists as an option (`camel_join=True`) but was not adopted: it changed the outcome of 3 of 1,002 queries for BM25 and 1 for the default hybrid (see "Tokenizer and hub experiment"). It weakens the BM25 half of the default hybrid; the dense half is unaffected.
 - Token counts are a chars/3.5 estimate, not the API's counter.
 
 ## Real MCP catalogs
@@ -237,6 +237,37 @@ How to read it:
 - **Misses (48 user-style, 3 agent-style)**: PowerPoint 13/37, Word 10/54, Redis 9/53, Excel 8/26, Obsidian 8/15, Docker 0/4; only 13 of the 48 have a top result from another server. Looking at them (descriptive, after the fact), the failures look like hub words rather than missing vocabulary: queries containing "slide" return `add_slide`, `get_slide_info`, `extract_slide_text`; "workbook"/"spreadsheet" return `describe_workbook`, `export_workbook`, `import_workbook`; Redis "queue list" queries drift to `list-containers` and `list_presentations`; Obsidian "note" queries return the periodic-note tools. Redis queries that never say "Redis" (lpush, rpush, lrange, llen, sadd, srem) are hard for both halves of the hybrid.
 - **Caveats unchanged**: the labels were drafted by the retriever's author, and 97% of the agent-style queries (32% of user-style) name their service, which favors the server name in the index text. With 189 queries a 95% interval is about +/-6 points, so most differences between the top candidates are not established.
 
+### Tokenizer and hub experiment (dev data, leave-one-batch-out)
+
+Two problems the third batch's misses suggested: the BM25 tokenizer splits camel-case brand names ("GitHub" -> `git hub`, which never matches the lowercase `github` in tool and server names), and a few generic tools ("hubs") that win queries they should not. `scripts/hub_tokenizer_experiment.py` fixed both decision rules in advance (committed before the run, thresholds mutation-checked) and `results/hub-tokenizer.json` holds the output. All four batches are dev data and no untouched batch exists, so the design is not blind and adoption would have rested on a leave-one-batch-out estimate; each source is scored against its own catalog (1,002 queries in all).
+
+**Part 1, tokenizer fix** (camel-case words also yield their joined form; judged on "no harm", since it is a bug fix). Legacy -> fixed, queries gained / lost over all sources:
+
+| retriever | gained / lost | worst source |
+|---|---|---|
+| `bm25+server` | 3 / 0 | +0.0 |
+| `hybrid-rrf+server` (the default) | 0 / 1 | -0.5 points (test2) |
+
+Rule: adopt only if neither retriever loses. The hybrid lost one query, so **the legacy tokenizer stays the default**; the fix is available as `ToolIndex(camel_join=True)` / `tokenize(join_camel=True)`. The bug is real but its effect on these query sets is a handful of queries out of 1,002, so it was never a major source of misses.
+
+**Part 2, hubs.** Two knobs on the default hybrid: a hubness correction on the dense half (`DenseIndex(hub_lambda=...)`, which lowers the score of tools that sit close to many other tools, in the spirit of CSLS) and BM25's length normalization `b` (short generic tools gain from it). Pooled recall@5 over all 1,002 queries; the baseline is today's default (lambda 0, b 0.75):
+
+| lambda | b | all | synthetic | dev | spent test | test2 | test3 |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 0.75 | 85.0% | 80.8% | 85.1% | 82.1% | 86.7% | 86.5% |
+| 0 | 0.1 | 85.3% | 80.8% | 84.4% | 82.1% | 86.7% | 87.6% |
+| 0.25 | 0.1 | 85.3% | 81.7% | 82.5% | 80.7% | 88.6% | 87.6% |
+| 0.5 | 0.75 | 84.4% | 81.7% | 78.6% | 78.6% | 90.0% | 86.8% |
+| 1.0 | 0.75 | 83.1% | 77.5% | 77.3% | 75.7% | 89.5% | 86.5% |
+
+(All 12 configurations are in the JSON.) The hubness correction helps the second batch (86.7% -> 90.0% at lambda 0.5) and hurts the dev and first test batches (85.1% -> 78.6% and 82.1% -> 78.6%): it moves different sources in opposite directions. Leave-one-batch-out, choosing the configuration without the held-out source and scoring it there, gave pooled **6 queries gained and 12 lost** against the baseline (needs gained - lost >= 8.5, and no source worse by more than 2 points); the dev fold was 2.6 points worse, the first test fold 1.4 worse. **Decision: keep the baseline.** Length normalization alone moves nothing (best 85.3% vs 85.0%).
+
+What this says:
+
+- **Neither fix earns a place.** The tokenizer bug is real and tiny; the hubness correction does not generalize across batches.
+- **The "few hub tools cause the misses" picture is not borne out as a main cause.** Counting wrong top-5 slots, each source's 8 most frequent wrong tools hold only 13-31% of them, and the top ones differ by source (dev: `get_issue`, `get_pull_request`, `create_branch`; first test: `browser_find`, `API-retrieve-page-markdown`; second: `maintenance_on`, `list_apps`, `count`, `find`; third: `get_paragraph_text_from_document`, `add_slide`, `get_document_text`). Many are legitimate neighbors of the right tool, not generic noise, which a global penalty cannot tell apart. The correction helped where a server's tools share generic verbs (the second batch) and hurt where tools have close, natural neighbors (the GitHub pull-request family, Notion); that explanation is plausible but not tested here.
+- **The remaining misses look like wording gaps, not scoring artifacts**: "draw a rounded rectangle" versus a tool described as "add an auto shape", "queue list" versus "Redis list". That points at the tool text and the query (enrichment, rewriting by a model), not at the ranking formula.
+
 ### Fresh test set, and what its schemas showed
 
 `catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results. 140 labeled queries (`queries/mcp-test.jsonl`) were scored once (result below), so this set is now spent as a test. It existed so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
@@ -297,13 +328,11 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Decide what to do with a **not confirmed** verdict that is narrow on the guard and clear on the fusion gain: keep `hybrid-rrf+server`, or look again at BM25-leaning candidates (BM25 alone matched the headline on all queries and led on agent-style recall in every batch). That is a new round, and all four batches are now dev data, so it needs either a fifth batch, independently written queries, or a different kind of evidence.
-2. Independent labels: the strongest missing piece. Every query set was written by the same author who built and tuned the retrievers; a human reviewer, or a model that did not build them, would give an honest estimate. Real traffic would be better still.
-3. Fix the BM25 camel-case tokenizer and add a hub-word fix (the failures above look like shared words such as "slide", "workbook", "list" pulling toward a few generic tools); re-run the comparisons.
-4. Find out how often real users and real model-written search queries name the service (it decides how much the server name is worth); this needs real traffic or an end-to-end eval.
-5. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.
-6. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
-7. Count tokens with the API's token counter instead of the estimate.
-8. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses and the right default `limit`).
-9. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
-10. A proxy MCP server so any client can use the gateway unchanged.
+1. Independent labels: the strongest missing piece. Every query set was written by the same author who built and tuned the retrievers; a human reviewer, or a model that did not build them, would give an honest estimate. Real traffic would be better still.
+2. End-to-end eval with a real model (needs an API key): task success and total cost for full vs. slim vs. lazy, how often real queries name their service, the cost of a retrieval miss, and the right default `limit`. This is also the only way to learn whether the ~86% recall@5 matters in practice, because a model can search again.
+3. Attack the wording gap rather than the ranking formula: index-side enrichment for terse or jargon-heavy tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field), and query rewriting or reranking by a model. Server-level routing (pick the server first, then rank inside it) is an untested alternative to a global penalty.
+4. A fifth batch of servers with independently written queries, so the next decision is not made on spent data.
+5. A "no match" threshold for dense search.
+6. Count tokens with the API's token counter instead of the estimate.
+7. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
+8. A proxy MCP server so any client can use the gateway unchanged.

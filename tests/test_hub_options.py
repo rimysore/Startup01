@@ -96,5 +96,22 @@ class HubnessCorrectionTests(unittest.TestCase):
         self.assertEqual(len(big_k.search("hub", k=4)), 4)
 
 
+class RecordedDecisionTests(unittest.TestCase):
+    def test_library_defaults_match_the_recorded_experiment_decisions(self):
+        import inspect
+        import json
+        from pathlib import Path
+
+        result = json.loads((Path(__file__).resolve().parent.parent / "results" / "hub-tokenizer.json").read_text())
+        index_defaults = inspect.signature(ToolIndex.__init__).parameters
+        self.assertEqual(index_defaults["camel_join"].default, result["camel_join_adopted"])
+        lam, b = result["hub"]["lobo"]["final_config"]
+        self.assertEqual(index_defaults["b"].default, b)
+        if HAS_NUMPY:
+            from toolslim.dense import DenseIndex
+
+            self.assertEqual(inspect.signature(DenseIndex.__init__).parameters["hub_lambda"].default, lam)
+
+
 if __name__ == "__main__":
     unittest.main()
