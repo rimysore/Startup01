@@ -131,7 +131,7 @@ class CommittedDataTests(unittest.TestCase):
         # --catalog catalogs must not silently pull in the test set
         self.assertFalse({t.name for t in test} & {t.name for t in load_catalogs([ROOT / "catalogs"])})
 
-    def test_next_batch_is_separate_collision_free_and_unlabeled(self):
+    def test_next_batch_is_separate_and_collision_free(self):
         dev = {t.name for t in load_catalogs([ROOT / "catalogs"])}
         spent = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}
         batch = load_catalogs([ROOT / "catalogs" / "test2"])
@@ -140,10 +140,37 @@ class CommittedDataTests(unittest.TestCase):
         self.assertEqual(len(names), len(batch))
         self.assertFalse(names & dev)
         self.assertFalse(names & spent)
-        # Labels for this batch must be added deliberately (committed before scoring); update this test and
-        # catalogs/README.md when they are.
+
+    def test_next_batch_labels_are_clean_and_confined_to_their_catalog(self):
+        tools = load_catalogs([ROOT / "catalogs" / "test2"])
+        names = {t.name for t in tools}
+        labels = load_labels(ROOT / "queries" / "mcp-test2.jsonl")
+        check = check_labels(labels, tools)
+        self.assertEqual(check.errors, [])
+        self.assertEqual(check.warnings, [])  # full coverage, no leaky user-style queries
+        self.assertEqual({lb.style for lb in labels}, {"user", "agent"})
+        # no other label file may reference this batch, and these labels reference nothing else
         for f in (ROOT / "queries").glob("*.jsonl"):
-            self.assertFalse({e for lb in load_labels(f) for e in lb.expected} & names, f.name)
+            if f.name != "mcp-test2.jsonl":
+                self.assertFalse({e for lb in load_labels(f) for e in lb.expected} & names, f.name)
+        other = {t.name for d in ("catalogs", "catalogs/test") for t in load_catalogs([ROOT / d])}
+        self.assertFalse({e for lb in labels for e in lb.expected} & other)
+
+    def test_all_label_files_share_no_query_text(self):
+        seen: dict[str, str] = {}
+        for f in sorted((ROOT / "queries").glob("*.jsonl")):
+            for lb in load_labels(f):
+                key = lb.query.lower()
+                self.assertNotIn(key, seen, f"{f.name} repeats a query from {seen.get(key)}: {lb.query!r}")
+                seen[key] = f.name
+
+    def test_kubectl_generic_rule_is_applied_uniformly(self):
+        # Documented rule: kubectl_generic is accepted wherever a dedicated kubectl tool is the expected answer.
+        labels = load_labels(ROOT / "queries" / "mcp-test2.jsonl")
+        dedicated = {"kubectl_get", "kubectl_describe", "kubectl_delete", "kubectl_logs", "kubectl_scale", "kubectl_patch", "kubectl_rollout", "kubectl_context"}
+        for lb in labels:
+            if lb.expected[0] in dedicated:
+                self.assertIn("kubectl_generic", lb.expected, lb.query)
 
     def test_dev_labels_do_not_reference_test_tools(self):
         test_names = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}

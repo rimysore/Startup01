@@ -165,7 +165,7 @@ What it says, and what it does not:
 
 ### Next batch (captured, unlabeled)
 
-`catalogs/test2/` has 105 more tools from 6 servers (Kubernetes, Heroku, MongoDB, DynamoDB, Pinecone, Tavily), chosen to overlap in vocabulary because cross-server confusion was the main failure on the first test set. It has no labels and has not been scored. Token profile: 42,367 estimated tokens in total, but lossless slimming saves only 5.9% (level 3: 63%), since the weight is in long descriptions rather than schema scaffolding; the lazy gateway's fixed cost is still 190 tokens (99.6% less). Details and the rules for keeping it a clean test set are in `catalogs/README.md`. The first test set is spent and counts as dev data from now on.
+`catalogs/test2/` has 105 more tools from 6 servers (Kubernetes, Heroku, MongoDB, DynamoDB, Pinecone, Tavily), chosen to overlap in vocabulary because cross-server confusion was the main failure on the first test set. A draft of 210 labeled queries (`queries/mcp-test2.jsonl`, written by me, so not independent) is committed; it has not been scored. Token profile: 42,367 estimated tokens in total, but lossless slimming saves only 5.9% (level 3: 63%), since the weight is in long descriptions rather than schema scaffolding; the lazy gateway's fixed cost is still 190 tokens (99.6% less). Details and the rules for keeping it a clean test set are in `catalogs/README.md`. The first test set is spent and counts as dev data from now on.
 
 ## Design notes
 
@@ -176,7 +176,7 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Label `catalogs/test2/` (captured; ideally by someone other than me, guidelines in `queries/README.md`), then score it once. Decisions about fusion or new index features are made on dev data first, which now includes the spent first test set.
+1. Have someone other than me review or replace `queries/mcp-test2.jsonl`, make any retriever or index decision (fusion, server names in the index) on dev data first, record it, then score `catalogs/test2` once.
 2. Add the server name (and a short server description) to each tool's index text, to attack cross-server confusion; evaluate on the fresh batch, and on the dev sets as a no-regression check.
 3. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
 4. Query rewriting or reranking with a real model, to push past the retrieval ceiling.

@@ -1,0 +1,210 @@
+{"query": "I'm designing a new DynamoDB table layout and want expert guidance on modeling my access patterns", "expected": ["dynamodb_data_modeling"], "style": "user"}
+{"query": "get the DynamoDB data modeling expert prompt", "expected": ["dynamodb_data_modeling"], "style": "agent"}
+{"query": "turn my finished data model write-up into a schema JSON file for DynamoDB", "expected": ["dynamodb_data_model_schema_converter"], "style": "user"}
+{"query": "convert a DynamoDB data model into a schema json", "expected": ["dynamodb_data_model_schema_converter"], "style": "agent"}
+{"query": "check that my DynamoDB schema.json file is well-formed and consistent with the usage data", "expected": ["dynamodb_data_model_schema_validator"], "style": "user"}
+{"query": "validate a dynamodb schema.json file", "expected": ["dynamodb_data_model_schema_validator"], "style": "agent"}
+{"query": "look at my existing MySQL database and work out its tables and access patterns so I can migrate to DynamoDB", "expected": ["source_db_analyzer"], "style": "user"}
+{"query": "analyze a source database to prepare a DynamoDB migration", "expected": ["source_db_analyzer"], "style": "agent"}
+{"query": "run my DynamoDB model against a local DynamoDB to make sure the access patterns actually work", "expected": ["dynamodb_data_model_validation"], "style": "user"}
+{"query": "test a data model against DynamoDB Local", "expected": ["dynamodb_data_model_validation"], "style": "agent"}
+{"query": "how much would my DynamoDB tables cost per month given these read and write patterns", "expected": ["compute_performances_and_costs"], "style": "user"}
+{"query": "calculate DynamoDB capacity units and monthly cost", "expected": ["compute_performances_and_costs"], "style": "agent"}
+{"query": "produce the deployment templates and sample items from my DynamoDB model file", "expected": ["generate_resources"], "style": "user"}
+{"query": "generate resources from a DynamoDB data model json file", "expected": ["generate_resources"], "style": "agent"}
+{"query": "write Python code my application can use to read and write those DynamoDB tables", "expected": ["generate_data_access_layer"], "style": "user"}
+{"query": "generate a data access layer for DynamoDB tables", "expected": ["generate_data_access_layer"], "style": "agent"}
+{"query": "which of my Heroku applications do I have access to", "expected": ["list_apps"], "style": "user"}
+{"query": "list heroku apps", "expected": ["list_apps"], "style": "agent"}
+{"query": "show me the config, dynos and domains for my Heroku app called shop-api", "expected": ["get_app_info"], "style": "user"}
+{"query": "get heroku app details", "expected": ["get_app_info"], "style": "agent"}
+{"query": "set up a brand new Heroku app in the EU region", "expected": ["create_app"], "style": "user"}
+{"query": "create a heroku app", "expected": ["create_app"], "style": "agent"}
+{"query": "my Heroku app should be called storefront instead of shop-api", "expected": ["rename_app"], "style": "user"}
+{"query": "rename a heroku app", "expected": ["rename_app"], "style": "agent"}
+{"query": "take my Heroku app offline for visitors with a holding page while we migrate", "expected": ["maintenance_on"], "style": "user"}
+{"query": "enable heroku maintenance mode", "expected": ["maintenance_on"], "style": "agent"}
+{"query": "restore normal traffic to my Heroku app now that the migration is done", "expected": ["maintenance_off"], "style": "user"}
+{"query": "disable heroku maintenance mode", "expected": ["maintenance_off"], "style": "agent"}
+{"query": "show me what my Heroku app has been printing to its logs recently", "expected": ["get_app_logs"], "style": "user"}
+{"query": "get heroku app logs", "expected": ["get_app_logs"], "style": "agent"}
+{"query": "which isolated network environments does our Heroku account have, and what are their address ranges", "expected": ["list_private_spaces"], "style": "user"}
+{"query": "list heroku private spaces", "expected": ["list_private_spaces"], "style": "agent"}
+{"query": "which Heroku teams am I a member of", "expected": ["list_teams"], "style": "user"}
+{"query": "list heroku teams", "expected": ["list_teams"], "style": "agent"}
+{"query": "what extra services are attached to my Heroku apps", "expected": ["list_addons"], "style": "user"}
+{"query": "list heroku add-ons", "expected": ["list_addons"], "style": "agent"}
+{"query": "what plan is the database add-on on my Heroku app and how is it billed", "expected": ["get_addon_info"], "style": "user"}
+{"query": "get heroku add-on details", "expected": ["get_addon_info"], "style": "agent"}
+{"query": "attach a Redis instance to my Heroku app", "expected": ["create_addon"], "style": "user"}
+{"query": "create a heroku add-on", "expected": ["create_addon"], "style": "agent"}
+{"query": "what kinds of add-on services can I buy on Heroku", "expected": ["list_addon_services"], "style": "user"}
+{"query": "list available heroku add-on services", "expected": ["list_addon_services"], "style": "agent"}
+{"query": "what pricing tiers does the Postgres add-on offer on Heroku", "expected": ["list_addon_plans"], "style": "user"}
+{"query": "list plans for a heroku add-on service", "expected": ["list_addon_plans"], "style": "agent"}
+{"query": "run a SQL statement against the Postgres database of my Heroku app", "expected": ["pg_psql"], "style": "user"}
+{"query": "execute sql on heroku postgres", "expected": ["pg_psql"], "style": "agent"}
+{"query": "is my Heroku Postgres database healthy and how much of its resources is it using", "expected": ["pg_info"], "style": "user"}
+{"query": "view heroku postgres database status", "expected": ["pg_info"], "style": "agent"}
+{"query": "which queries are running right now on my Heroku Postgres database", "expected": ["pg_ps"], "style": "user"}
+{"query": "monitor active heroku postgres queries", "expected": ["pg_ps"], "style": "agent"}
+{"query": "are any queries on my Heroku Postgres database stuck waiting on locks", "expected": ["pg_locks"], "style": "user"}
+{"query": "analyze heroku postgres locks", "expected": ["pg_locks"], "style": "agent"}
+{"query": "find the most resource-hungry queries on my Heroku Postgres database", "expected": ["pg_outliers"], "style": "user"}
+{"query": "find heroku postgres outlier queries", "expected": ["pg_outliers"], "style": "agent"}
+{"query": "who can connect to my Heroku Postgres database and with which login details", "expected": ["pg_credentials"], "style": "user"}
+{"query": "manage heroku postgres credentials", "expected": ["pg_credentials"], "style": "agent"}
+{"query": "stop the runaway query that is hogging my Heroku Postgres database", "expected": ["pg_kill"], "style": "user"}
+{"query": "kill a heroku postgres process", "expected": ["pg_kill"], "style": "agent"}
+{"query": "when is the next scheduled downtime window for my Heroku Postgres database", "expected": ["pg_maintenance"], "style": "user"}
+{"query": "check heroku postgres maintenance windows", "expected": ["pg_maintenance"], "style": "agent"}
+{"query": "can I restore my Heroku Postgres database to last night's snapshot", "expected": ["pg_backups"], "style": "user"}
+{"query": "manage heroku postgres backups", "expected": ["pg_backups"], "style": "agent"}
+{"query": "move my Heroku Postgres database to a newer major version", "expected": ["pg_upgrade"], "style": "user"}
+{"query": "upgrade heroku postgres version", "expected": ["pg_upgrade"], "style": "agent"}
+{"query": "which processes is my Heroku app running right now", "expected": ["ps_list", "get_app_info"], "style": "user", "note": "get_app_info also reports an app's dynos"}
+{"query": "list heroku dynos", "expected": ["ps_list", "get_app_info"], "style": "agent"}
+{"query": "run five copies of the web process for my Heroku app", "expected": ["ps_scale"], "style": "user"}
+{"query": "scale heroku dynos", "expected": ["ps_scale"], "style": "agent"}
+{"query": "bounce my Heroku app's processes, it seems to be stuck", "expected": ["ps_restart"], "style": "user"}
+{"query": "restart heroku dynos", "expected": ["ps_restart"], "style": "agent"}
+{"query": "set up a staging to production release flow on Heroku", "expected": ["pipelines_create"], "style": "user"}
+{"query": "create a heroku pipeline", "expected": ["pipelines_create"], "style": "agent"}
+{"query": "push what's running in staging up to production on Heroku", "expected": ["pipelines_promote"], "style": "user"}
+{"query": "promote heroku pipeline apps to the next stage", "expected": ["pipelines_promote"], "style": "agent"}
+{"query": "which release flows do I have on Heroku", "expected": ["pipelines_list"], "style": "user"}
+{"query": "list heroku pipelines", "expected": ["pipelines_list"], "style": "agent"}
+{"query": "show the stages and connected apps of our Heroku release flow", "expected": ["pipelines_info"], "style": "user"}
+{"query": "get heroku pipeline details", "expected": ["pipelines_info"], "style": "agent"}
+{"query": "ship this codebase to a new Heroku app", "expected": ["deploy_to_heroku"], "style": "user"}
+{"query": "deploy an application to heroku", "expected": ["deploy_to_heroku"], "style": "agent"}
+{"query": "run a one-time script on Heroku with its own temporary machine", "expected": ["deploy_one_off_dyno"], "style": "user"}
+{"query": "run a command in a heroku one-off dyno", "expected": ["deploy_one_off_dyno"], "style": "agent"}
+{"query": "tear down everything this Kubernetes tool created in my cluster", "expected": ["cleanup"], "style": "user"}
+{"query": "cleanup all managed kubernetes resources", "expected": ["cleanup"], "style": "agent"}
+{"query": "list the pods running in the production namespace of my cluster", "expected": ["kubectl_get", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "get kubernetes resources by type", "expected": ["kubectl_get", "kubectl_generic"], "style": "agent"}
+{"query": "give me the detailed state and recent events of the checkout pod", "expected": ["kubectl_describe", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "describe a kubernetes resource", "expected": ["kubectl_describe", "kubectl_generic"], "style": "agent"}
+{"query": "make my cluster match this YAML file", "expected": ["kubectl_apply", "kubectl_create", "kubectl_generic"], "style": "user", "note": "create-from-manifest and generic kubectl also work"}
+{"query": "apply a kubernetes yaml manifest", "expected": ["kubectl_apply", "kubectl_create", "kubectl_generic"], "style": "agent"}
+{"query": "remove the old staging deployment from my cluster", "expected": ["kubectl_delete", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "delete kubernetes resources", "expected": ["kubectl_delete", "kubectl_generic"], "style": "agent"}
+{"query": "create a namespace called payments in my cluster", "expected": ["kubectl_create", "kubectl_apply", "kubectl_generic"], "style": "user", "note": "apply and generic kubectl also work"}
+{"query": "create a kubernetes resource", "expected": ["kubectl_create", "kubectl_apply", "kubectl_generic"], "style": "agent"}
+{"query": "what has the api pod printed to its logs in the last ten minutes", "expected": ["kubectl_logs", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "get kubernetes pod logs", "expected": ["kubectl_logs", "kubectl_generic"], "style": "agent"}
+{"query": "run six replicas of the web deployment in my cluster", "expected": ["kubectl_scale", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "scale a kubernetes deployment", "expected": ["kubectl_scale", "kubectl_generic"], "style": "agent"}
+{"query": "change just the image tag on a running deployment without resending the whole manifest", "expected": ["kubectl_patch", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "patch a kubernetes resource", "expected": ["kubectl_patch", "kubectl_generic"], "style": "agent"}
+{"query": "undo the last deployment of the web service in my cluster and go back to the previous version", "expected": ["kubectl_rollout", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "manage a kubernetes rollout", "expected": ["kubectl_rollout", "kubectl_generic"], "style": "agent"}
+{"query": "switch my kubectl to the staging cluster", "expected": ["kubectl_context", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "list or set the current kubernetes context", "expected": ["kubectl_context", "kubectl_generic"], "style": "agent"}
+{"query": "the Kubernetes API connection seems stale, set up fresh clients", "expected": ["kubectl_reconnect"], "style": "user"}
+{"query": "reconnect to the kubernetes api server", "expected": ["kubectl_reconnect"], "style": "agent"}
+{"query": "what fields does a Kubernetes Deployment spec accept and what do they mean", "expected": ["explain_resource", "kubectl_generic"], "style": "user", "note": "kubectl explain; generic kubectl also works"}
+{"query": "get documentation for a kubernetes resource field", "expected": ["explain_resource", "kubectl_generic"], "style": "agent"}
+{"query": "install the nginx ingress package from a Helm repo into my cluster", "expected": ["install_helm_chart"], "style": "user"}
+{"query": "install a helm chart", "expected": ["install_helm_chart"], "style": "agent"}
+{"query": "move my Helm release to the newest chart version", "expected": ["upgrade_helm_chart"], "style": "user"}
+{"query": "upgrade a helm release", "expected": ["upgrade_helm_chart"], "style": "agent"}
+{"query": "get rid of the Helm release called monitoring from my cluster", "expected": ["uninstall_helm_chart"], "style": "user"}
+{"query": "uninstall a helm chart", "expected": ["uninstall_helm_chart"], "style": "agent"}
+{"query": "empty out a worker node so I can reboot it, without scheduling new pods there", "expected": ["node_management"], "style": "user"}
+{"query": "cordon, drain or uncordon a kubernetes node", "expected": ["node_management"], "style": "agent"}
+{"query": "make the database pod reachable on my laptop's port 5433", "expected": ["port_forward"], "style": "user"}
+{"query": "forward a local port to a kubernetes pod", "expected": ["port_forward"], "style": "agent"}
+{"query": "close the tunnel I opened to the pod earlier", "expected": ["stop_port_forward"], "style": "user"}
+{"query": "stop a kubernetes port forward", "expected": ["stop_port_forward"], "style": "agent"}
+{"query": "run ls inside the running api container and show me the output", "expected": ["exec_in_pod"], "style": "user"}
+{"query": "execute a command in a kubernetes pod", "expected": ["exec_in_pod"], "style": "agent"}
+{"query": "what kinds of objects does my cluster's API support", "expected": ["list_api_resources", "kubectl_generic"], "style": "user", "note": "kubectl_generic runs any kubectl command"}
+{"query": "list kubernetes api resources", "expected": ["list_api_resources", "kubectl_generic"], "style": "agent"}
+{"query": "run an arbitrary kubectl command with my own flags", "expected": ["kubectl_generic"], "style": "user"}
+{"query": "execute any kubectl command", "expected": ["kubectl_generic"], "style": "agent"}
+{"query": "check that the server connection is still responding", "expected": ["ping"], "style": "user"}
+{"query": "ping to verify the connection is alive", "expected": ["ping"], "style": "agent"}
+{"query": "run a database-wide aggregation pipeline in MongoDB, not tied to one collection", "expected": ["aggregate-db"], "style": "user"}
+{"query": "run an aggregation against a mongodb database", "expected": ["aggregate-db"], "style": "agent"}
+{"query": "in MongoDB, group the orders collection by customer and total the amounts", "expected": ["aggregate"], "style": "user"}
+{"query": "run an aggregation pipeline on a mongodb collection", "expected": ["aggregate"], "style": "agent"}
+{"query": "which fields of the users documents in Mongo are already set up for fast lookups", "expected": ["collection-indexes"], "style": "user"}
+{"query": "describe the indexes for a mongodb collection", "expected": ["collection-indexes"], "style": "agent"}
+{"query": "what fields and types do the documents in the orders collection of my MongoDB have", "expected": ["collection-schema"], "style": "user"}
+{"query": "describe the schema of a mongodb collection", "expected": ["collection-schema"], "style": "agent"}
+{"query": "how much disk space does the events collection use in MongoDB", "expected": ["collection-storage-size"], "style": "user"}
+{"query": "get the size of a mongodb collection", "expected": ["collection-storage-size"], "style": "agent"}
+{"query": "open a connection to my MongoDB at mongodb://localhost:27017", "expected": ["connect"], "style": "user"}
+{"query": "connect to a mongodb instance", "expected": ["connect"], "style": "agent"}
+{"query": "how many documents in the customers collection are from Canada, in MongoDB", "expected": ["count", "aggregate"], "style": "user", "note": "an aggregation can count too"}
+{"query": "count documents in a mongodb collection", "expected": ["count", "aggregate"], "style": "agent"}
+{"query": "add a new empty collection called audit_log to my MongoDB database", "expected": ["create-collection"], "style": "user"}
+{"query": "create a mongodb collection", "expected": ["create-collection"], "style": "agent"}
+{"query": "speed up lookups by email on the users collection in MongoDB", "expected": ["create-index"], "style": "user"}
+{"query": "create an index on a mongodb collection", "expected": ["create-index"], "style": "agent"}
+{"query": "show usage statistics for my MongoDB database as a whole", "expected": ["db-stats"], "style": "user"}
+{"query": "get mongodb database statistics", "expected": ["db-stats"], "style": "agent"}
+{"query": "remove every document in the sessions collection older than 30 days, in MongoDB", "expected": ["delete-many"], "style": "user"}
+{"query": "delete documents matching a filter from a mongodb collection", "expected": ["delete-many"], "style": "agent"}
+{"query": "I'm done, close my MongoDB connection", "expected": ["disconnect"], "style": "user"}
+{"query": "close a mongodb connection", "expected": ["disconnect"], "style": "agent"}
+{"query": "get rid of the temp_results collection from my MongoDB database entirely", "expected": ["drop-collection"], "style": "user"}
+{"query": "drop a mongodb collection", "expected": ["drop-collection"], "style": "agent"}
+{"query": "wipe the whole staging database in MongoDB", "expected": ["drop-database"], "style": "user"}
+{"query": "drop a mongodb database", "expected": ["drop-database"], "style": "agent"}
+{"query": "remove the unused email index from the users collection in MongoDB", "expected": ["drop-index"], "style": "user"}
+{"query": "drop an index from a mongodb collection", "expected": ["drop-index"], "style": "agent"}
+{"query": "show me how MongoDB would execute this find query, and whether it uses an index", "expected": ["explain"], "style": "user"}
+{"query": "explain a mongodb query execution plan", "expected": ["explain"], "style": "agent"}
+{"query": "save the results of my MongoDB query to a file in EJSON format", "expected": ["export"], "style": "user"}
+{"query": "export mongodb query results", "expected": ["export"], "style": "agent"}
+{"query": "get the first ten customers from Canada out of the MongoDB customers collection", "expected": ["find"], "style": "user"}
+{"query": "find documents in a mongodb collection", "expected": ["find"], "style": "agent"}
+{"query": "add these three new product records to the products collection in MongoDB", "expected": ["insert-many"], "style": "user"}
+{"query": "insert documents into a mongodb collection", "expected": ["insert-many"], "style": "agent"}
+{"query": "what collections does the shop database in MongoDB contain", "expected": ["list-collections"], "style": "user"}
+{"query": "list collections in a mongodb database", "expected": ["list-collections"], "style": "agent"}
+{"query": "which MongoDB connections do I currently have open", "expected": ["list-connections"], "style": "user"}
+{"query": "list active mongodb connections", "expected": ["list-connections"], "style": "agent"}
+{"query": "what databases live on my MongoDB server", "expected": ["list-databases"], "style": "user"}
+{"query": "list mongodb databases", "expected": ["list-databases"], "style": "agent"}
+{"query": "what recent events has my mongod server logged, any errors", "expected": ["mongodb-logs"], "style": "user"}
+{"query": "get recent mongod log events", "expected": ["mongodb-logs"], "style": "agent"}
+{"query": "change the name of the orders_old collection in MongoDB to orders_archive", "expected": ["rename-collection"], "style": "user"}
+{"query": "rename a mongodb collection", "expected": ["rename-collection"], "style": "agent"}
+{"query": "set status to shipped on all pending orders in the MongoDB orders collection", "expected": ["update-many"], "style": "user"}
+{"query": "update documents matching a filter in a mongodb collection", "expected": ["update-many"], "style": "agent"}
+{"query": "look up in the MongoDB documentation how to model a many-to-many relationship", "expected": ["search-knowledge", "tavily_search"], "style": "user", "note": "documentation lookups also work as a web search"}
+{"query": "search the mongodb assistant knowledge base", "expected": ["search-knowledge", "tavily_search"], "style": "agent"}
+{"query": "which sources can the MongoDB assistant search for answers", "expected": ["list-knowledge-sources"], "style": "user"}
+{"query": "list mongodb knowledge base data sources", "expected": ["list-knowledge-sources"], "style": "agent"}
+{"query": "find the Pinecone documentation page about namespaces", "expected": ["search-docs", "tavily_search"], "style": "user", "note": "documentation lookups also work as a web search"}
+{"query": "search the pinecone documentation", "expected": ["search-docs", "tavily_search"], "style": "agent"}
+{"query": "which vector indexes do I have in my Pinecone project and are they ready", "expected": ["list-indexes"], "style": "user"}
+{"query": "list pinecone indexes", "expected": ["list-indexes"], "style": "agent"}
+{"query": "what embedding model and field mapping does my Pinecone index use", "expected": ["describe-index"], "style": "user"}
+{"query": "describe the configuration of a pinecone index", "expected": ["describe-index"], "style": "agent"}
+{"query": "how many records are in each namespace of my Pinecone index", "expected": ["describe-index-stats"], "style": "user"}
+{"query": "get pinecone index statistics", "expected": ["describe-index-stats"], "style": "agent"}
+{"query": "set up a new Pinecone index that embeds my text automatically", "expected": ["create-index-for-model"], "style": "user"}
+{"query": "create a pinecone index with integrated inference", "expected": ["create-index-for-model"], "style": "agent"}
+{"query": "add these documents to my Pinecone index so they can be searched", "expected": ["upsert-records"], "style": "user"}
+{"query": "upsert records into a pinecone index", "expected": ["upsert-records"], "style": "agent"}
+{"query": "find the stored passages most similar in meaning to this question in my Pinecone index", "expected": ["search-records", "cascading-search"], "style": "user", "note": "a cascading search over one index also works"}
+{"query": "search a pinecone index for semantically similar records", "expected": ["search-records", "cascading-search"], "style": "agent"}
+{"query": "reorder this list of passages by how relevant they are to my question", "expected": ["rerank-documents"], "style": "user"}
+{"query": "rerank documents by relevance to a query", "expected": ["rerank-documents"], "style": "agent"}
+{"query": "search all of my Pinecone indexes at once and merge the results", "expected": ["cascading-search"], "style": "user"}
+{"query": "search across multiple pinecone indexes and rerank", "expected": ["cascading-search"], "style": "agent"}
+{"query": "what is the latest news on the new EU AI regulation", "expected": ["tavily_search"], "style": "user"}
+{"query": "search the web for current information", "expected": ["tavily_search"], "style": "agent"}
+{"query": "pull the main text out of these three article links", "expected": ["tavily_extract"], "style": "user"}
+{"query": "extract content from urls", "expected": ["tavily_extract"], "style": "agent"}
+{"query": "follow the links on our docs site and gather the content of the pages", "expected": ["tavily_crawl"], "style": "user"}
+{"query": "crawl a website starting from a url", "expected": ["tavily_crawl"], "style": "agent"}
+{"query": "show me how a website's pages are organized without downloading all of them", "expected": ["tavily_map"], "style": "user"}
+{"query": "map a website's structure", "expected": ["tavily_map"], "style": "agent"}
+{"query": "write me a thorough researched briefing on the state of solid-state batteries", "expected": ["tavily_research"], "style": "user"}
+{"query": "perform comprehensive research on a topic", "expected": ["tavily_research"], "style": "agent"}
