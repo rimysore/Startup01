@@ -18,20 +18,20 @@ python -m unittest discover -s tests
 
 ## Results so far (estimated tokens)
 
-| strategy | synthetic, 40 tools | real MCP servers, 78 tools |
-|---|---:|---:|
-| all schemas, as published | 6,780 | 12,514 |
-| slimmed, level 1 (structural noise only) | 4,879 (-28%) | 11,076 (-11.5%) |
-| slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) |
-| slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) |
-| lazy gateway, first request | 190 (-97%) | 190 (-98.5%) |
-| lazy gateway, after search + describe | 492 (-93%) | 506 (-96%) |
+| strategy | synthetic, 40 tools | dev: real servers, 78 tools | fresh test: real servers, 70 tools |
+|---|---:|---:|---:|
+| all schemas, as published | 6,780 | 12,514 | 28,389 |
+| slimmed, level 1 (lossless) | 4,879 (-28%) | 11,076 (-11.5%) | 12,600 (-55.6%) |
+| slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) | 10,583 (-62.7%) |
+| slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) | 7,184 (-74.7%) |
+| lazy gateway, first request | 190 (-97%) | 190 (-98.5%) | 190 (-99.3%) |
+| lazy gateway, after search + describe | 492 (-93%) | 506 (-96%) | needs labeled queries |
 
-My synthetic schemas were noisier than real ones, so they overstated level-1 slimming (28% vs 11.5% on real servers). Trust the right-hand column.
+How much slimming saves depends heavily on how a server generates its schemas: level 1 saves 11.5% on the dev servers but 55.6% on the test servers, almost entirely because Notion's generator attaches ~14k tokens of unused definitions to its tools (see below). The synthetic set overstated level 1 relative to the dev servers (28% vs 11.5%). Lazy loading's cost does not depend on the catalog.
 
 Slimming levels:
 
-- **1**: lossless for tool calling (`title`, `$schema`, `examples`, `additionalProperties: false`).
+- **1**: lossless for tool calling: `title`, `$schema`, `examples`, `additionalProperties: false`, and `$defs`/`definitions` entries that no `$ref` reaches (transitively; skipped when a schema uses `$anchor`/`$id`/`$dynamicRef`, which are not resolved).
 - **2** and **3**: lossy. Not yet validated against real model behavior.
 
 The lazy rows use the hybrid retriever below. They only hold if the model finds the right tool on the first search, so retrieval quality matters as much as the token numbers.
@@ -97,18 +97,22 @@ What this says:
 - **Failures are mostly domain-level, not near-misses**: for 16 of the 24 user-style misses the top result was from a different server than the right tool. Eight of the misses are the memory server, whose tools talk about a "knowledge graph" of "entities" and "observations" while people say "remember" and "forget". Tool descriptions written in the server's own jargon are hard to find from everyday words, which suggests index-side enrichment (usage hints or aliases per tool) as the next lever.
 - **Asking for more results pays off on real catalogs**: recall@10 is 86% vs 69% at k=5 for the default (the synthetic set plateaued at ~80%). Each extra result costs roughly 40 tokens, so this is a cheap lever to evaluate properly.
 
-### Fresh test set, and what its schemas show
+### Fresh test set, and what its schemas showed
 
-`catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results and not yet labeled. It exists so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). One thing is already visible from token counts alone (no queries involved):
+`catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results and not yet labeled. It exists so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
 
 | | tools | all schemas | slim L1 | slim L2 | slim L3 |
 |---|---:|---:|---:|---:|---:|
-| notion | 24 | 21,340 | -5.7% | -10.6% | -16.8% |
+| notion | 24 | 21,340 | -71.1% | -75.9% | -82.2% |
 | playwright | 25 | 5,034 | -12.4% | -30.5% | -60.5% |
 | other three | 21 | 2,018 | 0% | -2% | -29% |
-| **all test tools** | 70 | 28,389 | -6.5% | -13.6% | -25.6% |
+| **all test tools** | 70 | 28,389 | -55.6% | -62.7% | -74.7% |
 
-Notion's OpenAPI-derived tools average ~890 tokens each (the dev set averages ~160), and the slimmer barely touches them. The reason: **74% of Notion's tokens are `$defs`, and 94% of those definitions are not referenced by the tool that carries them** (only 6 of its 24 tools use any). The same 9-definition block is copied into every tool. Pruning unreferenced `$defs` would be lossless and is the obvious next slimming lever; the lazy gateway is unaffected (190 tokens either way), though `describe_tool` on such a tool is expensive.
+Notion's OpenAPI-derived tools average ~890 tokens each (the dev set averages ~160). **74% of their tokens were `$defs`, and 94% of those definitions were not referenced by the tool carrying them** (only 6 of its 24 tools use any): the same 9-definition block is copied into every tool. Before pruning, the slimmer saved only 5.7% on Notion at level 1; `prune_unused_defs` now makes that 71.1%, with no loss of meaning.
+
+How it is verified: unit tests for cycles, transitive references, escaped names, both `$defs`/`definitions`, and the cases where it must back off; a test that inlines every `$ref` in the original and pruned schema of all 148 committed tools and requires identical results; and mutation checks showing that a pruner that drops everything, or ignores transitive references, fails those tests.
+
+Caveats: the dev and synthetic catalogs contain no `$defs`, so their numbers did not change and the gain is demonstrated only on the test catalogs. The transform has no tuned parameters, but it was found by looking at the test catalogs' token counts. `describe_tool` on the largest Notion tools drops from 1,096-1,656 tokens to 406-991; the lazy gateway's fixed cost (190 tokens) is unchanged.
 
 ## Design notes
 
@@ -120,10 +124,9 @@ Notion's OpenAPI-derived tools average ~890 tokens each (the dev set averages ~1
 ## Next steps
 
 1. Label `catalogs/test/` (ideally someone other than the person who tuned the retrievers), decide fusion (RRF vs min-max) and result count on the dev data, then score the test set once.
-2. Slimming level 0.5: prune `$defs` that no `$ref` reaches (lossless; ~64% of Notion's tokens).
-3. Index-side enrichment for jargon-heavy tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
-4. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
-5. Count tokens with the API's token counter instead of the estimate.
-6. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses).
-7. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
-8. A proxy MCP server so any client can use the gateway unchanged.
+2. Index-side enrichment for jargon-heavy tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
+3. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
+4. Count tokens with the API's token counter instead of the estimate.
+5. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses).
+6. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
+7. A proxy MCP server so any client can use the gateway unchanged.
