@@ -215,6 +215,10 @@ What it says, and what it does not:
 
 `catalogs/test2/` has 105 more tools from 6 servers (Kubernetes, Heroku, MongoDB, DynamoDB, Pinecone, Tavily), chosen to overlap in vocabulary because cross-server confusion was the main failure on the first test set. 210 labeled queries (`queries/mcp-test2.jsonl`, written by me, so not independent) were scored once; the result is in "Second test result" below, so this batch is spent too. Token profile: 42,367 estimated tokens in total, but lossless slimming saves only 5.9% (level 3: 63%), since the weight is in long descriptions rather than schema scaffolding; the lazy gateway's fixed cost is still 190 tokens (99.6% less). Details and the rules for keeping it a clean test set are in `catalogs/README.md`. The first test set is spent and counts as dev data from now on.
 
+### Third batch (captured, unlabeled)
+
+`catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). It has no labels and has not been scored. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
+
 ## Design notes
 
 - **Cache-friendly.** The three meta-tool definitions never change, so the prompt-cache prefix (`tools` renders first) stays stable. Dynamically adding tools after a search would invalidate the cache each time.
@@ -224,7 +228,7 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Decide whether to put the server name in the index text and whether to move the default off plain `dense` (to `dense+server` or a hybrid). The evidence is consistent but both test batches are spent and the strong result comes from queries that name their service. Needs fresh servers and, ideally, queries written by someone else, and a rule fixed beforehand.
+1. Decide whether to put the server name in the index text and whether to move the default off plain `dense` (to `dense+server` or a hybrid): fix a rule on dev data (which now includes both spent batches), label `catalogs/test3` (ideally someone other than me, naming the service or listing every acceptable tool), then score it once.
 2. Find out how often real users and real model-written search queries name the service (the answer decides how much `+server` is worth); this needs real traffic or an end-to-end eval.
 3. Fix the BM25 camel-case tokenizer and re-run the comparisons (BM25 and hybrids shift; the dense default does not).
 4. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.

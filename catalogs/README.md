@@ -1,12 +1,13 @@
 # Real MCP tool catalogs
 
-Three generations of catalogs, in order of capture:
+Four generations of catalogs, in order of capture:
 
 | directory | status |
 |---|---|
 | `catalogs/*.json` | **dev**: used while building and choosing retrievers |
 | `catalogs/test/` | scored once on 2026-10-07, so **spent**: treat it as dev data from now on |
 | `catalogs/test2/` | scored once on 2026-10-07 (second time), so also **spent**: dev data from now on |
+| `catalogs/test3/` | **fresh batch**: captured after the second result; unlabeled and unscored |
 
 Verbatim `tools/list` results captured from real MCP servers with
 `scripts/capture_catalog.py` (the `source` block in each file records the exact
@@ -92,3 +93,33 @@ Rules for keeping it a clean test set:
 - Retrievers, slimmer settings and any new index features are chosen on **dev data only**, which now includes `catalogs/test/` with `queries/mcp-test.jsonl`.
 - Labels should be written by someone other than whoever built the retrievers, and committed before scoring. The lessons from the last set are in `queries/README.md`: name the service in each query or list every server's acceptable tool, and audit that up front for all queries.
 - Score once.
+
+## `test3/`: third batch (unlabeled, unscored)
+
+Captured after the second batch was spent. It is the largest so far (189 tools) and was chosen with the results of the first two in mind:
+
+- **New domains with heavy internal overlap**: three Office servers (Excel, Word, PowerPoint) that share verbs (`add_table`, `add_paragraph`, `create_*`), a key-value store (Redis) next to the earlier MongoDB/DynamoDB, a notes server (Obsidian) next to Notion and the filesystem, and a container server (Docker) next to Kubernetes and Heroku.
+- **A spread of naming styles.** Whether a tool's own text names its server varies a lot: Obsidian 15/15 and Docker 4/4 tools do, Redis 47/53, Word 23/54, Excel 6/26, PowerPoint 5/37 (word-boundary match on name + description). Heroku in the second batch showed that this asymmetry is what hurts a retriever when a query names the service, and it is exactly what the "server name in the index text" idea changes.
+
+| file | package | license | tools |
+|---|---|---|---:|
+| `test3/excel.json` | PyPI `excel-mcp-server@1.1.1` | MIT | 26 |
+| `test3/word.json` | PyPI `office-word-mcp-server@1.1.11` | MIT | 54 |
+| `test3/powerpoint.json` | PyPI `office-powerpoint-mcp-server@2.0.7` | MIT | 37 |
+| `test3/redis.json` | PyPI `redis-mcp-server@0.5.1` | MIT | 53 |
+| `test3/obsidian.json` | PyPI `mcp-obsidian@0.2.3` | MIT | 15 |
+| `test3/docker.json` | PyPI `docker-mcp@0.2.0` | MIT (license file; its copyright line is an unfilled template) | 4 |
+
+Load it with `--catalog catalogs/test3 --on-duplicate namespace`.
+
+**One name collision, handled explicitly.** `add_table` is defined by both the Word and the PowerPoint server, and my loader requires unique tool names. The files are left verbatim; the new `--on-duplicate namespace` policy (`load_catalogs(..., on_duplicate="namespace")`) renames only the colliding tools to `word__add_table` and `powerpoint__add_table`, a minimal version of what real MCP clients do for every tool. Labels for those two tools must use the namespaced names, and for those two the name text now contains the server, a small departure from the other 187 tools. The default policy still raises an error, so nothing is renamed silently. (Excel's `create_table` also collides with the spent SQLite server's; that only matters if the batches are merged.)
+
+Capture notes:
+
+- Excel ran against `mcp` 2.x (its latest release needs it); the others ran against isolated `mcp` 1.x installs. Reported `serverInfo` versions are often the SDK's, not the package's (Obsidian, PowerPoint and Redis report 1.30.0, Word 3.4.8, Docker 0.1.0), so the package versions above are the ones installed.
+- Fake credentials were used where a server asked for one; the files contain no credentials or local paths (checked).
+- Excel was started with a scratch working directory; tool lists did not depend on it.
+
+Token profile (estimates): 35,694 tokens for all 189 schemas; lossless slimming (level 1) saves 12.0%, level 3 saves 43.8%; the lazy gateway's 190-token fixed cost is 99.5% less. The weight is spread across all six servers (Excel 9,090, Redis 8,762, PowerPoint 8,610, Word 6,356, Obsidian 2,618, Docker 258).
+
+Rules for keeping it a clean test set: decisions about retrievers, the server-name idea and the default are made on **dev data only, which now includes `catalogs/test/` and `catalogs/test2/`**, with a rule fixed beforehand; labels should be written by someone other than whoever built the retrievers (or flagged as a draft) and committed before scoring, naming the service or listing every acceptable tool; score once.

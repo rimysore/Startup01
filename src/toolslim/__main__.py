@@ -23,6 +23,12 @@ def main() -> None:
         metavar="PATH",
         help="catalog JSON (MCP tools/list result or list of tool definitions) or a directory of them; repeat to merge several servers",
     )
+    parser.add_argument(
+        "--on-duplicate",
+        choices=("error", "namespace"),
+        default="error",
+        help="what to do when servers define the same tool name: fail (default), or rename the colliding tools to <server>__<name>",
+    )
     parser.add_argument("--labels", metavar="FILE", help="labeled queries (JSONL, see toolslim/labels.py) for scoring retrieval on --catalog")
     sub = parser.add_subparsers(dest="cmd", required=True)
     p_bench = sub.add_parser("bench", help="token and retrieval benchmark (synthetic catalog by default)")
@@ -45,7 +51,7 @@ def main() -> None:
 
     if args.labels and not args.catalog:
         parser.error("--labels needs --catalog")
-    tools = load_catalogs(args.catalog) if args.catalog else synthetic_catalog()
+    tools = load_catalogs(args.catalog, on_duplicate=args.on_duplicate) if args.catalog else synthetic_catalog()
 
     labels = None
     if args.labels:

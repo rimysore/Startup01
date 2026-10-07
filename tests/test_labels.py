@@ -172,6 +172,24 @@ class CommittedDataTests(unittest.TestCase):
             if lb.expected[0] in dedicated:
                 self.assertIn("kubectl_generic", lb.expected, lb.query)
 
+    def test_third_batch_needs_namespacing_and_stays_unlabeled(self):
+        with self.assertRaisesRegex(ValueError, "duplicate tool name 'add_table'"):
+            load_catalogs([ROOT / "catalogs" / "test3"])
+        batch = load_catalogs([ROOT / "catalogs" / "test3"], on_duplicate="namespace")
+        names = {t.name for t in batch}
+        self.assertEqual(len(batch), 189)
+        self.assertEqual(len(names), len(batch))
+        self.assertEqual({n for n in names if "__" in n}, {"word__add_table", "powerpoint__add_table"})
+        self.assertEqual({t.server for t in batch}, {"excel", "word", "powerpoint", "redis", "obsidian", "docker"})
+        for d in ("catalogs", "catalogs/test2"):
+            self.assertFalse(names & {t.name for t in load_catalogs([ROOT / d])}, d)
+        # Labels for this batch must be added deliberately (committed before scoring); update this test and
+        # catalogs/README.md when they are. Only names unique to this batch count: the spent SQLite label
+        # `create_table` legitimately shares a name with Excel's tool.
+        others = {t.name for d in ("catalogs", "catalogs/test", "catalogs/test2") for t in load_catalogs([ROOT / d])}
+        for f in (ROOT / "queries").glob("*.jsonl"):
+            self.assertFalse({e for lb in load_labels(f) for e in lb.expected} & (names - others), f.name)
+
     def test_dev_labels_do_not_reference_test_tools(self):
         test_names = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}
         dev_labels = load_labels(ROOT / "queries" / "mcp-reference.jsonl")
@@ -196,7 +214,7 @@ class CommittedDataTests(unittest.TestCase):
         self.assertFalse({e for lb in labels for e in lb.expected} & dev_names)
 
     def test_catalogs_carry_provenance(self):
-        for f in sorted((ROOT / "catalogs").glob("*.json")) + sorted((ROOT / "catalogs" / "test").glob("*.json")) + sorted((ROOT / "catalogs" / "test2").glob("*.json")):
+        for f in sorted((ROOT / "catalogs").glob("*.json")) + sorted((ROOT / "catalogs" / "test").glob("*.json")) + sorted((ROOT / "catalogs" / "test2").glob("*.json")) + sorted((ROOT / "catalogs" / "test3").glob("*.json")):
             src = json.loads(f.read_text())["source"]
             for key in ("name", "package", "license", "server", "captured_at"):
                 self.assertTrue(src.get(key), f"{f.name}: missing source.{key}")
@@ -218,6 +236,33 @@ class SelectionScriptIsolationTests(unittest.TestCase):
 
 
 class DuplicateToolNamesTests(unittest.TestCase):
+    def _two_servers(self, shared="same", other=("only_a", "only_b")):
+        d = Path(tempfile.mkdtemp())
+        for server, extra in (("srv_a", other[0]), ("srv_b", other[1])):
+            (d / f"{server}.json").write_text(json.dumps({
+                "source": {"name": server},
+                "tools": [{"name": shared, "inputSchema": {"type": "object"}}, {"name": extra, "inputSchema": {"type": "object"}}],
+            }))
+        return d
+
+    def test_namespace_policy_renames_only_the_colliding_tools(self):
+        tools = load_catalogs([self._two_servers()], on_duplicate="namespace")
+        self.assertEqual(sorted(t.name for t in tools), ["only_a", "only_b", "srv_a__same", "srv_b__same"])
+        self.assertEqual({t.name: t.server for t in tools}["srv_a__same"], "srv_a")
+
+    def test_default_policy_still_errors_and_bad_policy_is_rejected(self):
+        d = self._two_servers()
+        with self.assertRaisesRegex(ValueError, "duplicate tool name 'same'"):
+            load_catalogs([d])
+        with self.assertRaises(ValueError):
+            load_catalogs([d], on_duplicate="ignore")
+
+    def test_namespacing_cannot_hide_a_duplicate_within_one_server(self):
+        d = Path(tempfile.mkdtemp())
+        (d / "a.json").write_text(json.dumps({"source": {"name": "a"}, "tools": [{"name": "x", "inputSchema": {"type": "object"}}, {"name": "x", "inputSchema": {"type": "object"}}]}))
+        with self.assertRaisesRegex(ValueError, "still not unique"):
+            load_catalogs([d], on_duplicate="namespace")
+
     def test_load_catalogs_rejects_duplicates_across_files(self):
         d = Path(tempfile.mkdtemp())
         for name in ("a.json", "b.json"):
