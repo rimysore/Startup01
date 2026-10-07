@@ -62,7 +62,11 @@ Lint result (`check`): 210 queries, 105/105 tools covered, no unknown tools, no 
 | user-style mean overlap with tool-name words | 0.14 | 0.13 | 0.20 |
 | agent-style mean overlap with tool-name words | 0.83 | 0.57 | 0.68 |
 | queries accepting several tools | 8 / 154 | 14 / 140 | 34 / 210 |
+| user-style queries that name their server | 15 / 77 (19%) | 1 / 70 (1%) | 77 / 105 (73%) |
+| agent-style queries that name their server | 17 / 77 (22%) | 11 / 70 (16%) | 93 / 105 (89%) |
 
 Comparison caveats: this set names the service in most queries (the lesson from last time), which makes cross-server confusion easier to avoid than in `mcp-test`; and it is more lenient (34 multi-answer queries, 24 of them from the `kubectl_generic` rule). Scores are not directly comparable with the earlier sets.
 
 Scoring protocol is unchanged: fix any retriever or index change on dev data first (which now includes the spent test set), record it before scoring, score once, and do not edit labels afterwards without disclosure.
+
+The last two rows (a crude, tokenizer-independent detector; a server called `time` or `everything` is "named" by those ordinary words, and `kubernetes` is not named by "pod" or "cluster") matter for any feature that uses the server name: dev data can barely exercise it, while this set favors it. See "Server names in the index" in the top-level README.

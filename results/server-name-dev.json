@@ -1,0 +1,200 @@
+{
+  "decision": "dense",
+  "rule": "paired sign test z>=2 on pooled user-style recall@5; agent-style guard 2 points; no source worse",
+  "conditions": {
+    "a_sign_test": false,
+    "b_agent_guard": true,
+    "c_no_source_worse": true
+  },
+  "decision_pair": {
+    "gained": 7,
+    "lost": 3,
+    "needed_margin": 6.324555320336759
+  },
+  "pooled": {
+    "bm25": {
+      "user": {
+        "n": 227,
+        "recall5": 0.45374449339207046,
+        "recall10": 0.5682819383259912,
+        "mrr": 0.32090762883714424
+      },
+      "agent": {
+        "n": 187,
+        "recall5": 0.9946524064171123,
+        "recall10": 0.9946524064171123,
+        "mrr": 0.9598039215686274
+      }
+    },
+    "bm25+server": {
+      "user": {
+        "n": 227,
+        "recall5": 0.46255506607929514,
+        "recall10": 0.5638766519823789,
+        "mrr": 0.32075728970002093
+      },
+      "agent": {
+        "n": 187,
+        "recall5": 0.9946524064171123,
+        "recall10": 0.9946524064171123,
+        "mrr": 0.9606951871657754
+      }
+    },
+    "dense": {
+      "user": {
+        "n": 227,
+        "recall5": 0.6431718061674009,
+        "recall10": 0.7577092511013216,
+        "mrr": 0.4730595762534089
+      },
+      "agent": {
+        "n": 187,
+        "recall5": 0.9786096256684492,
+        "recall10": 0.9946524064171123,
+        "mrr": 0.9382480264833206
+      }
+    },
+    "dense+server": {
+      "user": {
+        "n": 227,
+        "recall5": 0.6607929515418502,
+        "recall10": 0.7709251101321586,
+        "mrr": 0.4812006153415845
+      },
+      "agent": {
+        "n": 187,
+        "recall5": 0.9786096256684492,
+        "recall10": 1.0,
+        "mrr": 0.9422141583906289
+      }
+    },
+    "hybrid-rrf": {
+      "user": {
+        "n": 227,
+        "recall5": 0.6431718061674009,
+        "recall10": 0.7533039647577092,
+        "mrr": 0.43533494161247466
+      },
+      "agent": {
+        "n": 187,
+        "recall5": 0.9946524064171123,
+        "recall10": 1.0,
+        "mrr": 0.9729649435531789
+      }
+    },
+    "hybrid-rrf+server": {
+      "user": {
+        "n": 227,
+        "recall5": 0.6651982378854625,
+        "recall10": 0.7665198237885462,
+        "mrr": 0.4417855394727641
+      },
+      "agent": {
+        "n": 187,
+        "recall5": 0.9946524064171123,
+        "recall10": 1.0,
+        "mrr": 0.9725193107546048
+      }
+    }
+  },
+  "paired_by_source": {
+    "dense -> dense+server": {
+      "synthetic": [
+        1,
+        0
+      ],
+      "real-merged": [
+        6,
+        3
+      ],
+      "real-dev-alone": [
+        8,
+        1
+      ],
+      "real-spent-alone": [
+        1,
+        0
+      ],
+      "POOLED": [
+        7,
+        3
+      ]
+    },
+    "bm25 -> bm25+server": {
+      "synthetic": [
+        0,
+        0
+      ],
+      "real-merged": [
+        3,
+        1
+      ],
+      "real-dev-alone": [
+        1,
+        0
+      ],
+      "real-spent-alone": [
+        0,
+        1
+      ],
+      "POOLED": [
+        3,
+        1
+      ]
+    },
+    "hybrid-rrf -> hybrid-rrf+server": {
+      "synthetic": [
+        0,
+        1
+      ],
+      "real-merged": [
+        8,
+        2
+      ],
+      "real-dev-alone": [
+        3,
+        1
+      ],
+      "real-spent-alone": [
+        1,
+        2
+      ],
+      "POOLED": [
+        8,
+        3
+      ]
+    }
+  },
+  "sizes": {
+    "synthetic": {
+      "tools": 40,
+      "servers": 8,
+      "user": 80,
+      "agent": 40
+    },
+    "real-merged": {
+      "tools": 148,
+      "servers": 13,
+      "user": 147,
+      "agent": 147
+    },
+    "real-dev-alone": {
+      "tools": 78,
+      "servers": 8,
+      "user": 77,
+      "agent": 77
+    },
+    "real-spent-alone": {
+      "tools": 70,
+      "servers": 5,
+      "user": 70,
+      "agent": 70
+    }
+  },
+  "environment": {
+    "python": "3.13.16",
+    "wordllama": "0.4.0.post1",
+    "numpy": "2.5.3"
+  },
+  "caveat": "the idea was generated from failures on this very data; confirm on the untouched batch"
+}

@@ -76,10 +76,43 @@ class ServerInDenseTextTests(unittest.TestCase):
 
 
 class ExperimentScriptIsolationTests(unittest.TestCase):
-    def test_server_name_experiment_never_names_the_next_batch(self):
-        code = (ROOT / "scripts" / "server_name_experiment.py").read_text().split('"""', 2)[2]
-        for forbidden in ("test2", "mcp-test2"):
-            self.assertNotIn(forbidden, code)
+    def test_experiment_scripts_never_name_the_next_batch(self):
+        for script in ("server_name_experiment.py", "server_name_analysis.py"):
+            code = (ROOT / "scripts" / script).read_text().split('"""', 2)[2]
+            for forbidden in ("test2", "mcp-test2"):
+                self.assertNotIn(forbidden, code, script)
+
+
+@unittest.skipUnless(HAS_NUMPY, "numpy not installed")
+class MentionsServerTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        import sys
+
+        sys.path.insert(0, str(ROOT / "scripts"))
+        from server_name_analysis import mentions_server
+
+        cls.mentions = staticmethod(mentions_server)
+
+    def test_brand_spellings_and_separators(self):
+        self.assertTrue(self.mentions("close issue 42 on GitHub", "github"))
+        self.assertTrue(self.mentions("look up this place on Google Maps", "google-maps"))
+        self.assertTrue(self.mentions("search my slack messages", "slack"))
+
+    def test_non_mentions(self):
+        self.assertFalse(self.mentions("find the page called Q3 roadmap", "notion"))
+        self.assertFalse(self.mentions("show me the pull requests", "github"))
+
+
+class KnownTokenizerLimitationTests(unittest.TestCase):
+    @unittest.expectedFailure
+    def test_camel_case_brand_names_should_match_their_lowercase_form(self):
+        """Known limitation: the BM25 tokenizer splits "GitHub" into git+hub, so it never matches the
+        lowercase token "github" in tool or server names (same for MongoDB, DynamoDB, PostgreSQL).
+        This test is expected to fail until that is fixed; it will then report an unexpected success."""
+        from toolslim.index import tokenize
+
+        self.assertEqual(tokenize("GitHub"), tokenize("github"))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,37 @@
+{
+  "merging_cost": {
+    "dense": {
+      "dev_alone": 0.7272727272727273,
+      "dev_merged": 0.6753246753246753,
+      "spent_alone": 0.6,
+      "spent_merged": 0.5571428571428572
+    },
+    "dense+server": {
+      "dev_alone": 0.8181818181818182,
+      "dev_merged": 0.7142857142857143,
+      "spent_alone": 0.6142857142857143,
+      "spent_merged": 0.5571428571428572
+    }
+  },
+  "server_named_in_query": {
+    "names its server": {
+      "n": 16,
+      "dense": 0.625,
+      "dense+server": 0.6875,
+      "gained": 1,
+      "lost": 0
+    },
+    "does not": {
+      "n": 131,
+      "dense": 0.6183206106870229,
+      "dense+server": 0.6335877862595419,
+      "gained": 5,
+      "lost": 3
+    }
+  },
+  "misses": {
+    "total": 56,
+    "top1_other_server": 41
+  },
+  "note": "exploratory and post hoc; decides nothing"
+}

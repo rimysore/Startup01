@@ -65,6 +65,7 @@ Known limitations:
 
 - Dense and hybrid search always return `k` results, even for nonsense queries (BM25 returns nothing when no words match). There is no "no match" signal yet.
 - `wordllama` 0.4.0 looks for its tokenizer in the wrong directory (`tokenizer/` vs the shipped `tokenizers/`); `dense.wordllama_embedder` works around it through the public `cache_dir` argument.
+- The BM25 tokenizer splits camel-case brand names ("GitHub" -> `git hub`), so they never match the lowercase form in tool or server names (details under "Server names in the index"). The dense default is unaffected.
 - Token counts are a chars/3.5 estimate, not the API's counter.
 
 ## Real MCP catalogs
@@ -119,6 +120,29 @@ One standard error is 3.5 points here, so five candidates are statistically tied
 - Dense has the lowest agent-style recall of the eligible candidates (97.4% vs 99.1%, two queries). That passed the pre-set guard, but if real traffic is mostly model-written queries, a hybrid is marginally safer on this data.
 - Nothing in the data tests identifier-style queries (exact names, IDs), where BM25 would matter; dense-only has no keyword path.
 - The result count of `search_tools` (default 5) was not tuned: the model passes `limit` per call, and the best value depends on what an extra search turn costs, which dev data cannot measure. Recall@10 is shown for reference.
+
+### Server names in the index (dev experiment)
+
+Idea: the failure analyses found cross-server confusion to be the main problem, and a gateway knows each tool's server for free, so put the server name into each tool's index text. The rule was committed before the run (`scripts/server_name_experiment.py`) and used dev data only, evaluated the way an agent would see it: all 13 real servers merged into one 148-tool catalog (plus the synthetic one). The untouched `catalogs/test2` batch was never read.
+
+Result on pooled user-style queries (227), recall@5 (full output: `results/server-name-dev.json`):
+
+| | without server name | with server name |
+|---|---:|---:|
+| bm25 | 45.4% | 46.3% |
+| **dense (default)** | **64.3%** | **66.1%** |
+| hybrid-rrf | 64.3% | 66.5% |
+
+The pre-registered rule for adopting `dense+server` needs the paired gain (queries gained minus lost) to clear 2 standard errors. It gained 7 queries and lost 3: net +4, needed +6.3. **Decision: keep `dense`; the default is unchanged.** The direction is mildly positive in all three comparisons (net +4, +2, +5), so this is "not shown", not "shown not to work".
+
+Why the gain is so small (exploratory and post hoc, `scripts/server_name_analysis.py`, `results/server-name-analysis.json`):
+
+- **Cross-server confusion is real**: in the merged catalog, 41 of dense's 56 user-style misses have a top result from a different server, and merging costs dense about 4-5 points (72.7% alone -> 67.5% merged on the dev queries, 60.0% -> 55.7% on the spent test queries).
+- **But the queries rarely carry the server name** that the feature could match: only 16 of 147 user-style queries (11%) mention their server, and for those the feature helped once and hurt never; for the other 131 the effect is +5/-3, i.e. noise. The confusion is semantic ("a new table" fits SQLite and Notion alike), and a server label does not resolve it unless the query says which one.
+- **The label sets differ sharply in this respect**: user-style queries that name their server are 19% in `mcp-reference`, 1% in `mcp-test`, and 73% in `mcp-test2` (agent-style: 22%, 16%, 89%). So dev data can barely exercise this feature, while the next batch is far more favorable to it, because I wrote it after learning that lesson. Whether real users or models name the service as often is unknown; a good result on `mcp-test2` would partly reflect how I wrote the queries, not just the feature.
+- The idea came from these same failures, so even a positive dev result would have earned a confirmation run, not adoption.
+
+A limitation found along the way: the BM25 tokenizer splits camel-case brand names, so "GitHub" becomes `git hub` and never matches the lowercase `github` in tool or server names (same for MongoDB, DynamoDB, PostgreSQL). It does not affect the dense default, but it does weaken BM25 and the hybrids, including the `+server` variants above. There is an expected-failure test for it; fixing it would shift recorded BM25 baselines, so it is left for a deliberate follow-up.
 
 ### Fresh test set, and what its schemas showed
 
@@ -176,11 +200,11 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Have someone other than me review or replace `queries/mcp-test2.jsonl`, make any retriever or index decision (fusion, server names in the index) on dev data first, record it, then score `catalogs/test2` once.
-2. Add the server name (and a short server description) to each tool's index text, to attack cross-server confusion; evaluate on the fresh batch, and on the dev sets as a no-regression check.
-3. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
+1. Decide how to use `catalogs/test2` (105 tools, 210 labels written by me, unscored): it is the only data left that is not dev. Proposal: score it once with `dense` as the headline (the recorded default) and `dense+server` as a second, pre-declared comparison, because its queries name their service far more often than the dev queries do. Have someone other than me review the labels first if possible.
+2. Fix the BM25 camel-case tokenizer and re-run the dev comparisons (BM25 and hybrids shift; the dense default does not).
+3. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.
 4. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
 5. Count tokens with the API's token counter instead of the estimate.
-6. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses and the right default `limit`).
+6. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses, the right default `limit`, and how often real queries name their service).
 7. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
 8. A proxy MCP server so any client can use the gateway unchanged.
