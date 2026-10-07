@@ -113,5 +113,53 @@ class RecordedDecisionTests(unittest.TestCase):
             self.assertEqual(inspect.signature(DenseIndex.__init__).parameters["hub_lambda"].default, lam)
 
 
+class LabelKitTests(unittest.TestCase):
+    def test_the_blind_kit_contains_only_tool_information(self):
+        import json
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parent.parent
+        out = Path(tempfile.mkdtemp())
+        subprocess.run([sys.executable, str(root / "scripts" / "make_label_kit.py"), str(out)], check=True, capture_output=True)
+        files = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
+        self.assertEqual(files, ["GUIDELINES.md", "dev/tools.json", "first-test/tools.json", "second-test/tools.json", "third-test/tools.json", "validate.py"])
+        counts = {b: len(json.loads((out / b / "tools.json").read_text())["tools"]) for b in ("dev", "first-test", "second-test", "third-test")}
+        self.assertEqual(counts, {"dev": 78, "first-test": 70, "second-test": 105, "third-test": 189})
+        everything = "".join(p.read_text() for p in out.rglob("*") if p.is_file()).lower()
+        for forbidden in ("toolslim", "bm25", "hybrid-rrf", "mcp-test", "mcp-reference", "recall@", "leave-one", "lazy gateway", "search_tools"):
+            self.assertNotIn(forbidden, everything)
+        # the third batch uses the namespaced names for the colliding add_table tools
+        names = {t["name"] for t in json.loads((out / "third-test" / "tools.json").read_text())["tools"]}
+        self.assertIn("word__add_table", names)
+        self.assertNotIn("add_table", names)
+
+    def test_the_validator_is_standalone_and_catches_problems(self):
+        import json
+        import subprocess
+        import sys
+        import tempfile
+        from pathlib import Path
+
+        root = Path(__file__).resolve().parent.parent
+        out = Path(tempfile.mkdtemp())
+        subprocess.run([sys.executable, str(root / "scripts" / "make_label_kit.py"), str(out)], check=True, capture_output=True)
+        tools = {"tools": [{"name": "a"}, {"name": "b"}]}
+        (out / "t.json").write_text(json.dumps(tools))
+        good = [{"query": "q1", "expected": ["a"], "style": "user"}, {"query": "q2", "expected": ["a"], "style": "agent"},
+                {"query": "q3", "expected": ["b", "a"], "style": "user"}, {"query": "q4", "expected": ["b"], "style": "agent"}]
+        (out / "good.jsonl").write_text("\n".join(map(json.dumps, good)))
+        bad = good[:3] + [{"query": "q1", "expected": ["zzz"], "style": "agent"}]
+        (out / "bad.jsonl").write_text("\n".join(map(json.dumps, bad)))
+        run = lambda f: subprocess.run([sys.executable, str(out / "validate.py"), str(out / "t.json"), str(out / f)], capture_output=True, text=True)
+        self.assertEqual(run("good.jsonl").returncode, 0)
+        r = run("bad.jsonl")
+        self.assertEqual(r.returncode, 1)
+        for fragment in ("unknown tool", "duplicate query", "not the first expected tool of any agent query"):
+            self.assertIn(fragment, r.stdout)
+
+
 if __name__ == "__main__":
     unittest.main()
