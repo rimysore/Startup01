@@ -25,7 +25,7 @@ python -m unittest discover -s tests
 | slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) | 10,583 (-62.7%) |
 | slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) | 7,184 (-74.7%) |
 | lazy gateway, first request | 190 (-97%) | 190 (-98.5%) | 190 (-99.3%) |
-| lazy gateway, after search + describe | 494 (-93%) | 503 (-96%) | 537 (-98.1%), optimistic: 40% of user-style queries missed at k=5 |
+| lazy gateway, after search + describe | 494 (-93%) | 505 (-96%) | 547 (-98.1%), optimistic: 36% of user-style queries missed at k=5 |
 
 How much slimming saves depends heavily on how a server generates its schemas: level 1 saves 11.5% on the dev servers but 55.6% on the test servers, almost entirely because Notion's generator attaches ~14k tokens of unused definitions to its tools (see below). The synthetic set overstated level 1 relative to the dev servers (28% vs 11.5%). Lazy loading's cost does not depend on the catalog.
 
@@ -34,7 +34,7 @@ Slimming levels:
 - **1**: lossless for tool calling: `title`, `$schema`, `examples`, `additionalProperties: false`, and `$defs`/`definitions` entries that no `$ref` reaches (transitively; skipped when a schema uses `$anchor`/`$id`/`$dynamicRef`, which are not resolved).
 - **2** and **3**: lossy. Not yet validated against real model behavior.
 
-The lazy rows use the default retriever (plain embedding search; see "Choosing the default" below). They only hold if the model finds the right tool on the first search, so retrieval quality matters as much as the token numbers.
+The lazy rows use the default retriever (`hybrid-rrf+server`: BM25 and embedding search fused, with each tool's server name in its index text; see "Choosing the default" below). They only hold if the model finds the right tool on the first search, so retrieval quality matters as much as the token numbers.
 
 ## Retrieval
 
@@ -51,7 +51,7 @@ Seven variants in total are in `python -m toolslim bench --sets all`.
 How to read this:
 
 - **Embeddings are the real gain.** BM25 -> dense is +20 points on dev and +26 on held-out user-style queries; the effect shows up in both sets.
-- **Fusion did not beat plain dense.** Hybrid won by 3 queries on dev but tied on held-out (and has a lower MRR). With 40 queries per set that gap is noise. Hybrid was the default when this was written; the default was later chosen by a pre-registered rule (see "Choosing the default"), which picked plain dense.
+- **Fusion did not beat plain dense.** Hybrid won by 3 queries on dev but tied on held-out (and has a lower MRR). With 40 queries per set that gap is noise. Hybrid was the default when this was written; a pre-registered rule then picked plain dense (round 1), and a second round, after the second test batch, picked a hybrid with server names (see "Choosing the default, round 2").
 - **Agent-style queries are easy.** Short intents like "refund a payment" hit 100% for every retriever, which supports the idea that model-written queries do better than user paraphrases. They were written by the same author who knows the tool names, so treat 100% as an upper bound, not a measurement.
 - **A ceiling around 80%.** Recall barely moves from k=5 (78%) to k=10 (82%) on dev. What's left needs inference ("hand PLAT-77 over to Dana" means *assign*; "how many users signed up" means *run a SQL query*) that static word vectors can't do. Next lever: an LLM-written or rewritten query, or a reranker.
 
@@ -65,7 +65,7 @@ Known limitations:
 
 - Dense and hybrid search always return `k` results, even for nonsense queries (BM25 returns nothing when no words match). There is no "no match" signal yet.
 - `wordllama` 0.4.0 looks for its tokenizer in the wrong directory (`tokenizer/` vs the shipped `tokenizers/`); `dense.wordllama_embedder` works around it through the public `cache_dir` argument.
-- The BM25 tokenizer splits camel-case brand names ("GitHub" -> `git hub`), so they never match the lowercase form in tool or server names (details under "Server names in the index"). The dense default is unaffected.
+- The BM25 tokenizer splits camel-case brand names ("GitHub" -> `git hub`), so they never match the lowercase form in tool or server names (details under "Server names in the index"). It weakens the BM25 half of the default hybrid; the dense half is unaffected.
 - Token counts are a chars/3.5 estimate, not the API's counter.
 
 ## Real MCP catalogs
@@ -98,7 +98,7 @@ What this says:
 - **Failures are mostly domain-level, not near-misses**: for 16 of the 24 user-style misses the top result was from a different server than the right tool. Eight of the misses are the memory server, whose tools talk about a "knowledge graph" of "entities" and "observations" while people say "remember" and "forget". Tool descriptions written in the server's own jargon are hard to find from everyday words, which suggests index-side enrichment (usage hints or aliases per tool) as the next lever.
 - **Asking for more results pays off on real catalogs**: recall@10 is 86% vs 69% at k=5 for the default (the synthetic set plateaued at ~80%). Each extra result costs roughly 40 tokens, so this is a cheap lever to evaluate properly.
 
-### Choosing the default
+### Choosing the default (round 1, superseded by round 2 below)
 
 The default retriever was chosen by `scripts/select_config.py`, whose rule was committed before it was run, using **dev data only** (the synthetic sets and `catalogs/` + `queries/mcp-reference.jsonl`; the fresh test set is never read, and a test checks that). Rule: among candidates whose agent-style recall@5 is within 2 points of the best, take those whose pooled user-style recall@5 is within one standard error of the best, and pick the simplest.
 
@@ -133,7 +133,7 @@ Result on pooled user-style queries (227), recall@5 (full output: `results/serve
 | **dense (default)** | **64.3%** | **66.1%** |
 | hybrid-rrf | 64.3% | 66.5% |
 
-The pre-registered rule for adopting `dense+server` needs the paired gain (queries gained minus lost) to clear 2 standard errors. It gained 7 queries and lost 3: net +4, needed +6.3. **Decision: keep `dense`; the default is unchanged.** The direction is mildly positive in all three comparisons (net +4, +2, +5), so this is "not shown", not "shown not to work".
+The pre-registered rule for adopting `dense+server` needs the paired gain (queries gained minus lost) to clear 2 standard errors. It gained 7 queries and lost 3: net +4, needed +6.3. **Decision at the time: keep `dense` (round 2 later moved the default).** The direction is mildly positive in all three comparisons (net +4, +2, +5), so this is "not shown", not "shown not to work".
 
 Why the gain is so small (exploratory and post hoc, `scripts/server_name_analysis.py`, `results/server-name-analysis.json`):
 
@@ -142,7 +142,7 @@ Why the gain is so small (exploratory and post hoc, `scripts/server_name_analysi
 - **The label sets differ sharply in this respect**: user-style queries that name their server are 19% in `mcp-reference`, 1% in `mcp-test`, and 73% in `mcp-test2` (agent-style: 22%, 16%, 89%). So dev data can barely exercise this feature, while the next batch is far more favorable to it, because I wrote it after learning that lesson. Whether real users or models name the service as often is unknown; a good result on `mcp-test2` would partly reflect how I wrote the queries, not just the feature.
 - The idea came from these same failures, so even a positive dev result would have earned a confirmation run, not adoption.
 
-A limitation found along the way: the BM25 tokenizer splits camel-case brand names, so "GitHub" becomes `git hub` and never matches the lowercase `github` in tool or server names (same for MongoDB, DynamoDB, PostgreSQL). It does not affect the dense default, but it does weaken BM25 and the hybrids, including the `+server` variants above. There is an expected-failure test for it; fixing it would shift recorded BM25 baselines, so it is left for a deliberate follow-up.
+A limitation found along the way: the BM25 tokenizer splits camel-case brand names, so "GitHub" becomes `git hub` and never matches the lowercase `github` in tool or server names (same for MongoDB, DynamoDB, PostgreSQL). It does not affect the dense part of any retriever, but it weakens the BM25 half of every hybrid, including the current default, and the `+server` variants above. There is an expected-failure test for it; fixing it would shift recorded BM25 baselines, so it is left for a deliberate follow-up.
 
 ### Second test result (scored once)
 
@@ -167,6 +167,44 @@ What it says:
 - **Differences to read carefully.** With 105 queries, a 95% interval is about +/-9 points, so dense, BM25 and hybrid-rrf are not separable on user-style queries. The paired `+server` result is the only comparison here that is statistically clear. No label was found to be objectively wrong, and none was changed.
 
 Consequences, stated as a decision for a new round and not something this run settles: the scoring protocol attached no default change to this comparison, and none was made. The evidence for putting the server name in the index text is now consistent in direction (dev: net positive for dense, BM25 and hybrid, never negative; this batch: strongly positive), but the strong part comes from a label set that mostly names its service, and this batch is now spent. Adopting it, and switching the default away from plain `dense` toward `dense+server` or a hybrid, should be tested on fresh data, ideally with queries written by someone else.
+
+### Choosing the default, round 2
+
+Why again: on the second test batch the round-1 default (`dense`) had the lowest agent-style recall of any set (90.5%, BM25 100%), and putting the server name in the index text helped a lot. Round 1's rule had counted user-style queries only, with a loose 2-point agent-style guard. `scripts/select_default_v2.py` (committed before it was run; `results/dev-selection-v2.json`) pools **all dev data**, which now includes both spent batches: the synthetic set plus dev, first test and second test merged into one **253-tool, 19-server catalog**, 624 queries (332 user-style, 292 agent-style). Both styles count, with a strict 1-point agent-style guard; ties are resolved by a paired sign test and then simplicity; and a switch away from `dense` must be significant in a paired test and leave no source more than 2 points worse.
+
+Disclosed: the rule was written after seeing the second batch's headline numbers, so it is not blind. The third batch is the confirmation.
+
+Pooled recall@5 (all / user-style / agent-style) and "all" by source:
+
+| candidate | all | user | agent | synthetic | dev | spent test | test2 | |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| bm25 | 74.0% | 51.5% | 99.7% | 64.2% | 72.1% | 70.0% | 83.8% | |
+| bm25+server | 74.7% | 52.7% | 99.7% | 64.2% | 72.7% | 70.0% | 85.2% | |
+| dense (round-1 default) | 77.2% | 62.0% | 94.5% | 79.2% | 79.2% | 73.6% | 77.1% | fails agent guard |
+| dense+server | 81.2% | 67.5% | 96.9% | 80.0% | 81.8% | 75.7% | 85.2% | fails agent guard |
+| hybrid-rrf | 80.6% | 64.8% | 98.6% | 81.7% | 80.5% | 76.4% | 82.9% | misses guard by 0.03 pt |
+| **hybrid-rrf+server** | **81.4%** | 66.0% | 99.0% | 80.8% | 81.8% | 77.9% | 83.8% | **chosen** |
+| hybrid-minmax 1:1 | 81.1% | 65.4% | 99.0% | 80.8% | 80.5% | 76.4% | 84.8% | |
+| hybrid-minmax 1:1+server | 82.5% | 67.8% | 99.3% | 80.0% | 83.8% | 77.9% | 86.2% | best, tied with the chosen one |
+
+The best-scoring eligible candidate is `hybrid-minmax 1:1+server`; it is not significantly better than `hybrid-rrf+server` (net +7, bar 9.2), so the simpler one is chosen. Against `dense` the chosen candidate gained 45 queries and lost 19 (net +26, bar +16), and the worst source is still +1.7 points ahead of `dense`. **Decision: adopt `hybrid-rrf+server` as the default** (`config.DEFAULT_RETRIEVER`; `toolslim.retrievers.build_retriever` builds any named variant).
+
+What the evidence supports, from a post-hoc check on the same data (`scripts/select_default_v2_analysis.py`, `results/dev-selection-v2-analysis.txt`; paired gained/lost, all queries):
+
+| change | gained / lost | clears 2 SE? |
+|---|---|:--:|
+| `dense` -> `hybrid-rrf` (fuse BM25 in) | 40 / 19 (agent-style 12 / 0) | yes |
+| `hybrid-rrf` -> `hybrid-rrf+server` | 11 / 6 | no |
+| `dense` -> `dense+server` | 28 / 3 | yes |
+| `bm25` -> `bm25+server` | 5 / 1 | no |
+| `dense` -> `hybrid-rrf+server` (the adopted change) | 45 / 19 | yes |
+
+- **Most of the gain is the fusion.** Bringing BM25 in repairs the agent-style weakness of embeddings (12 gained, 0 lost) and is significant on its own.
+- **The server name is a small, not significant extra once BM25 is in** (+5 net on top of the hybrid), although it is a large, significant gain for plain `dense`. `+server` is in the chosen candidate partly because plain `hybrid-rrf` missed the agent-style guard by 0.03 of a point; with a slightly looser guard the rule would have chosen the simpler `hybrid-rrf`. I did not move the threshold.
+- Merging servers into one catalog is what makes the server name matter at all; and these dev sets name their service in 19% (dev), 1% (spent test) and 73% (test2) of user-style queries, so the server-name effect depends on how queries are phrased.
+- The BM25 half of the default still has the camel-case tokenizer limitation (see Known limitations).
+
+Confirmation plan for the third batch, declared now: when `catalogs/test3` is labeled and scored once, the headline is `hybrid-rrf+server` (the default), with two pre-declared comparisons, each reported with its paired counts and nothing decided from them: against `dense` (the old default) and against `hybrid-rrf` (does the server name matter on top of fusion?).
 
 ### Fresh test set, and what its schemas showed
 
@@ -228,9 +266,9 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Decide whether to put the server name in the index text and whether to move the default off plain `dense` (to `dense+server` or a hybrid): fix a rule on dev data (which now includes both spent batches), label `catalogs/test3` (ideally someone other than me, naming the service or listing every acceptable tool), then score it once.
-2. Find out how often real users and real model-written search queries name the service (the answer decides how much `+server` is worth); this needs real traffic or an end-to-end eval.
-3. Fix the BM25 camel-case tokenizer and re-run the comparisons (BM25 and hybrids shift; the dense default does not).
+1. Label `catalogs/test3` (189 tools; ideally someone other than me, naming the service or listing every acceptable tool; the two `add_table` tools need namespaced names), commit the labels, then score it once under the confirmation plan in "Choosing the default, round 2".
+2. Find out how often real users and real model-written search queries name the service (it decides how much the server name is worth); this needs real traffic or an end-to-end eval.
+3. Fix the BM25 camel-case tokenizer and re-run the comparisons (BM25 and the BM25 half of the hybrids shift; dense does not).
 4. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.
 5. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
 6. Count tokens with the API's token counter instead of the estimate.

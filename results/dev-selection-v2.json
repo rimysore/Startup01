@@ -1,0 +1,160 @@
+{
+  "best_eligible": "hybrid-minmax 1:1+server",
+  "eligible": [
+    "bm25",
+    "bm25+server",
+    "hybrid-rrf+server",
+    "hybrid-minmax 1:1",
+    "hybrid-minmax 1:1+server"
+  ],
+  "tied_with_best": [
+    "hybrid-rrf+server",
+    "hybrid-minmax 1:1+server"
+  ],
+  "chosen_by_rule": "hybrid-rrf+server",
+  "decision": "hybrid-rrf+server",
+  "adopted": true,
+  "reasons": [
+    "(a) vs dense: gained 45, lost 19, need g-l >= 16.00 -> pass",
+    "(b) worst source difference vs dense: +0.017 (allowed >= -0.020) -> pass"
+  ],
+  "table": {
+    "bm25": {
+      "all": 0.7403846153846154,
+      "user": 0.5150602409638554,
+      "agent": 0.9965753424657534,
+      "sources": {
+        "synthetic": 0.6416666666666667,
+        "dev": 0.7207792207792207,
+        "spent-test": 0.7,
+        "test2": 0.8380952380952381
+      }
+    },
+    "dense": {
+      "all": 0.7724358974358975,
+      "user": 0.6204819277108434,
+      "agent": 0.9452054794520548,
+      "sources": {
+        "synthetic": 0.7916666666666666,
+        "dev": 0.7922077922077922,
+        "spent-test": 0.7357142857142858,
+        "test2": 0.7714285714285715
+      }
+    },
+    "bm25+server": {
+      "all": 0.7467948717948718,
+      "user": 0.5271084337349398,
+      "agent": 0.9965753424657534,
+      "sources": {
+        "synthetic": 0.6416666666666667,
+        "dev": 0.7272727272727273,
+        "spent-test": 0.7,
+        "test2": 0.8523809523809524
+      }
+    },
+    "dense+server": {
+      "all": 0.8125,
+      "user": 0.6746987951807228,
+      "agent": 0.9691780821917808,
+      "sources": {
+        "synthetic": 0.8,
+        "dev": 0.8181818181818182,
+        "spent-test": 0.7571428571428571,
+        "test2": 0.8523809523809524
+      }
+    },
+    "hybrid-rrf": {
+      "all": 0.8060897435897436,
+      "user": 0.6475903614457831,
+      "agent": 0.9863013698630136,
+      "sources": {
+        "synthetic": 0.8166666666666667,
+        "dev": 0.8051948051948052,
+        "spent-test": 0.7642857142857142,
+        "test2": 0.8285714285714286
+      }
+    },
+    "hybrid-rrf+server": {
+      "all": 0.8141025641025641,
+      "user": 0.6596385542168675,
+      "agent": 0.9897260273972602,
+      "sources": {
+        "synthetic": 0.8083333333333333,
+        "dev": 0.8181818181818182,
+        "spent-test": 0.7785714285714286,
+        "test2": 0.8380952380952381
+      }
+    },
+    "hybrid-minmax 1:1": {
+      "all": 0.8108974358974359,
+      "user": 0.6536144578313253,
+      "agent": 0.9897260273972602,
+      "sources": {
+        "synthetic": 0.8083333333333333,
+        "dev": 0.8051948051948052,
+        "spent-test": 0.7642857142857142,
+        "test2": 0.8476190476190476
+      }
+    },
+    "hybrid-minmax 1:1+server": {
+      "all": 0.8253205128205128,
+      "user": 0.677710843373494,
+      "agent": 0.9931506849315068,
+      "sources": {
+        "synthetic": 0.8,
+        "dev": 0.8376623376623377,
+        "spent-test": 0.7785714285714286,
+        "test2": 0.861904761904762
+      }
+    }
+  },
+  "n": {
+    "all": 624,
+    "user": 332,
+    "agent": 292,
+    "synthetic": 120,
+    "dev": 154,
+    "spent-test": 140,
+    "test2": 210
+  },
+  "context": {
+    "bm25": {
+      "mrr": 0.6427127849002849,
+      "recall10": 0.7964743589743589
+    },
+    "dense": {
+      "mrr": 0.6488832926332926,
+      "recall10": 0.8589743589743589
+    },
+    "bm25+server": {
+      "mrr": 0.6518149674399675,
+      "recall10": 0.7964743589743589
+    },
+    "dense+server": {
+      "mrr": 0.6875,
+      "recall10": 0.8717948717948718
+    },
+    "hybrid-rrf": {
+      "mrr": 0.6768315018315019,
+      "recall10": 0.8685897435897436
+    },
+    "hybrid-rrf+server": {
+      "mrr": 0.6995968152218152,
+      "recall10": 0.8878205128205128
+    },
+    "hybrid-minmax 1:1": {
+      "mrr": 0.6948959605209605,
+      "recall10": 0.8717948717948718
+    },
+    "hybrid-minmax 1:1+server": {
+      "mrr": 0.7162176943426943,
+      "recall10": 0.8878205128205128
+    }
+  },
+  "environment": {
+    "python": "3.13.16",
+    "wordllama": "0.4.0.post1",
+    "numpy": "2.5.3"
+  },
+  "rule": "agent guard 1pt; best pooled recall; paired sign test ties -> simplest; adopt over dense only if significantly better and no source >2pt worse"
+}

@@ -1,4 +1,5 @@
 import importlib.util
+from pathlib import Path
 import unittest
 import zlib
 
@@ -130,14 +131,17 @@ class WordLlamaRegressionTests(unittest.TestCase):
 
 
 class DefaultConfigTests(unittest.TestCase):
-    def test_default_matches_the_recorded_dev_selection(self):
+    RESULTS = Path(__file__).resolve().parent.parent / "results"
+
+    def test_default_matches_the_recorded_round_2_selection_and_round_1_is_kept_as_history(self):
         import json
-        from pathlib import Path
 
         from toolslim.config import DEFAULT_RETRIEVER
 
-        recorded = json.loads((Path(__file__).resolve().parent.parent / "results" / "dev-selection.json").read_text())
-        self.assertEqual(DEFAULT_RETRIEVER, recorded["chosen"])
+        v2 = json.loads((self.RESULTS / "dev-selection-v2.json").read_text())
+        self.assertEqual(DEFAULT_RETRIEVER, v2["decision"])
+        self.assertTrue(v2["adopted"])
+        self.assertEqual(json.loads((self.RESULTS / "dev-selection.json").read_text())["chosen"], "dense")  # round 1
 
     def test_default_retriever_falls_back_to_bm25_with_a_note_when_dense_is_missing(self):
         import sys
@@ -161,13 +165,51 @@ class DefaultConfigTests(unittest.TestCase):
         self.assertIn("falls back to BM25", note)
 
     @unittest.skipUnless(HAS_WORDLLAMA, "wordllama not installed")
-    def test_default_retriever_is_dense_when_available(self):
+    def test_default_retriever_is_the_hybrid_with_server_names_when_available(self):
         from toolslim.config import default_retriever
-        from toolslim.dense import DenseIndex
 
         retriever, note = default_retriever(synthetic_catalog())
-        self.assertIsInstance(retriever, DenseIndex)
+        self.assertIsInstance(retriever, HybridIndex)
         self.assertIsNone(note)
+
+    @unittest.skipUnless(HAS_WORDLLAMA, "wordllama not installed")
+    def test_bench_uses_the_default_as_its_primary_retriever(self):
+        from toolslim import bench
+        from toolslim.config import DEFAULT_RETRIEVER
+
+        report = bench.run(synthetic_catalog(), {"dev": bench.QUERY_SETS["dev"]()})
+        self.assertEqual(report.primary, DEFAULT_RETRIEVER)
+        self.assertIsNone(report.note)
+
+
+@unittest.skipUnless(HAS_WORDLLAMA, "wordllama not installed")
+class BuildRetrieverTests(unittest.TestCase):
+    def test_every_named_retriever_builds_and_answers(self):
+        from toolslim.dense import DenseIndex
+        from toolslim.index import ToolIndex
+        from toolslim.retrievers import NAMES, build_retriever
+
+        tools = synthetic_catalog()
+        expected = {"bm25": ToolIndex, "bm25+server": ToolIndex, "dense": DenseIndex, "dense+server": DenseIndex}
+        for name in NAMES:
+            retriever = build_retriever(name, tools)
+            self.assertIsInstance(retriever, expected.get(name, HybridIndex), name)
+            self.assertTrue(retriever.search("send an email", k=3), name)
+
+    def test_unknown_name_is_rejected(self):
+        from toolslim.retrievers import build_retriever
+
+        with self.assertRaises(ValueError):
+            build_retriever("hybrid-xyz", synthetic_catalog())
+
+    def test_server_variants_differ_only_for_tools_that_have_a_server(self):
+        from toolslim.catalog import Tool
+        from toolslim.retrievers import build_retriever
+
+        bare = [Tool("alpha_one", "does the thing", {"type": "object"}), Tool("alpha_two", "does the thing", {"type": "object"})]
+        a = [(t.name, round(sc, 6)) for t, sc in build_retriever("bm25", bare).search("thing")]
+        b = [(t.name, round(sc, 6)) for t, sc in build_retriever("bm25+server", bare).search("thing")]
+        self.assertEqual(a, b)
 
 
 class GatewayCustomIndexTests(unittest.TestCase):

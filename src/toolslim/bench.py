@@ -132,11 +132,22 @@ class Report:
 def run(
     tools: list[Tool],
     query_sets: dict[str, Queries],
-    primary: str = "bm25",
+    primary: str | None = None,
     counter: Counter = estimate_tokens,
     slim_levels: tuple[int, ...] = (1, 2, 3),
 ) -> Report:
+    from .config import DEFAULT_RETRIEVER
+
+    primary = primary or DEFAULT_RETRIEVER
     retrievers, note = candidate_retrievers(tools)
+    if primary not in retrievers:
+        try:
+            from .retrievers import NAMES, build_retriever
+
+            if primary in NAMES:
+                retrievers[primary] = build_retriever(primary, tools)
+        except ImportError:
+            pass  # the dense extra is missing; the fallback below reports it
     if primary not in retrievers:
         note = (note + "; " if note else "") + f"primary retriever {primary!r} unavailable, using bm25"
         primary = "bm25"
