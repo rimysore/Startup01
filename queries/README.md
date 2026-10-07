@@ -70,3 +70,7 @@ Comparison caveats: this set names the service in most queries (the lesson from 
 Scoring protocol is unchanged: fix any retriever or index change on dev data first (which now includes the spent test set), record it before scoring, score once, and do not edit labels afterwards without disclosure.
 
 The last two rows (a crude, tokenizer-independent detector; a server called `time` or `everything` is "named" by those ordinary words, and `kubernetes` is not named by "pod" or "cluster") matter for any feature that uses the server name: dev data can barely exercise it, while this set favors it. See "Server names in the index" in the top-level README.
+
+### Scoring protocol for `mcp-test2.jsonl` (fixed before the run)
+
+`scripts/score_test2.py`, committed before it was run on this batch. Headline: `dense` (the recorded default), user-style recall@5 over 105 queries, with a 95% interval. Declared second comparison: `dense+server` vs `dense`, paired (queries gained / lost), reported with counts and no decision attached. Everything else (BM25 and hybrids, with and without the server name, recall@10, MRR) is context. One run; labels and retrievers are not edited afterwards (an objectively wrong label may be fixed in a separate, disclosed commit with both scores reported). Results go to `results/test2-score.txt` and `.json`.

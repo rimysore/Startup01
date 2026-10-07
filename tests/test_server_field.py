@@ -104,6 +104,15 @@ class MentionsServerTests(unittest.TestCase):
         self.assertFalse(self.mentions("show me the pull requests", "github"))
 
 
+class ScoringScriptTests(unittest.TestCase):
+    def test_score_script_defaults_to_the_next_batch_and_declares_its_protocol(self):
+        code = (ROOT / "scripts" / "score_test2.py").read_text()
+        self.assertIn('"catalogs" / "test2"', code)
+        self.assertIn('"mcp-test2.jsonl"', code)
+        for phrase in ("Headline", "Declared second", "Context only", "Not allowed"):
+            self.assertIn(phrase, code)
+
+
 class KnownTokenizerLimitationTests(unittest.TestCase):
     @unittest.expectedFailure
     def test_camel_case_brand_names_should_match_their_lowercase_form(self):
