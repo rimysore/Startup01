@@ -25,7 +25,7 @@ python -m unittest discover -s tests
 | slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) | 10,583 (-62.7%) |
 | slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) | 7,184 (-74.7%) |
 | lazy gateway, first request | 190 (-97%) | 190 (-98.5%) | 190 (-99.3%) |
-| lazy gateway, after search + describe | 492 (-93%) | 506 (-96%) | needs labeled queries |
+| lazy gateway, after search + describe | 492 (-93%) | 506 (-96%) | not scored yet (draft labels exist) |
 
 How much slimming saves depends heavily on how a server generates its schemas: level 1 saves 11.5% on the dev servers but 55.6% on the test servers, almost entirely because Notion's generator attaches ~14k tokens of unused definitions to its tools (see below). The synthetic set overstated level 1 relative to the dev servers (28% vs 11.5%). Lazy loading's cost does not depend on the catalog.
 
@@ -99,7 +99,7 @@ What this says:
 
 ### Fresh test set, and what its schemas showed
 
-`catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results and not yet labeled. It exists so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
+`catalogs/test/` has 70 more tools from 5 servers in other domains (browser automation, SQLite, Slack, Notion, Google Maps), captured after the dev results. A draft of 140 labeled queries (`queries/mcp-test.jsonl`) is committed but **has not been scored**. It exists so retriever choices can be confirmed on data they were not tuned on (details in `catalogs/README.md`). Token counts need no queries, and they exposed a problem the dev servers don't have:
 
 | | tools | all schemas | slim L1 | slim L2 | slim L3 |
 |---|---:|---:|---:|---:|---:|
@@ -123,7 +123,7 @@ Caveats: the dev and synthetic catalogs contain no `$defs`, so their numbers did
 
 ## Next steps
 
-1. Label `catalogs/test/` (ideally someone other than the person who tuned the retrievers), decide fusion (RRF vs min-max) and result count on the dev data, then score the test set once.
+1. Fix the retriever configuration (RRF vs min-max, result count) on the dev data and record it; have someone other than me review or replace `queries/mcp-test.jsonl`; then score the test set once (protocol in `queries/README.md`).
 2. Index-side enrichment for jargon-heavy tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
 3. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
 4. Count tokens with the API's token counter instead of the estimate.

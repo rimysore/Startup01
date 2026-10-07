@@ -131,11 +131,28 @@ class CommittedDataTests(unittest.TestCase):
         # --catalog catalogs must not silently pull in the test set
         self.assertFalse({t.name for t in test} & {t.name for t in load_catalogs([ROOT / "catalogs"])})
 
-    def test_no_labels_exist_for_the_fresh_test_set_yet(self):
-        # Labels must be written deliberately (and committed before scoring). If this fails, update the docs too.
+    def test_dev_labels_do_not_reference_test_tools(self):
         test_names = {t.name for t in load_catalogs([ROOT / "catalogs" / "test"])}
         dev_labels = load_labels(ROOT / "queries" / "mcp-reference.jsonl")
         self.assertFalse({e for lb in dev_labels for e in lb.expected} & test_names)
+
+    def test_test_labels_match_test_catalogs_cleanly(self):
+        tools = load_catalogs([ROOT / "catalogs" / "test"])
+        labels = load_labels(ROOT / "queries" / "mcp-test.jsonl")
+        check = check_labels(labels, tools)
+        self.assertEqual(check.errors, [])
+        self.assertEqual(check.warnings, [])  # full coverage, no leaky user-style queries
+        self.assertEqual({lb.style for lb in labels}, {"user", "agent"})
+
+    def test_dev_and_test_label_files_share_no_queries(self):
+        dev = {lb.query.lower() for lb in load_labels(ROOT / "queries" / "mcp-reference.jsonl")}
+        test = {lb.query.lower() for lb in load_labels(ROOT / "queries" / "mcp-test.jsonl")}
+        self.assertFalse(dev & test)
+
+    def test_test_labels_only_reference_test_tools(self):
+        dev_names = {t.name for t in load_catalogs([ROOT / "catalogs"])}
+        labels = load_labels(ROOT / "queries" / "mcp-test.jsonl")
+        self.assertFalse({e for lb in labels for e in lb.expected} & dev_names)
 
     def test_catalogs_carry_provenance(self):
         for f in sorted((ROOT / "catalogs").glob("*.json")) + sorted((ROOT / "catalogs" / "test").glob("*.json")):

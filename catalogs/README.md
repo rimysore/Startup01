@@ -48,7 +48,7 @@ Captured *after* the dev results were in, from servers in different domains (bro
 
 70 tools, no name collisions with each other or with the dev set. Tool names, descriptions and schemas are their authors' work, reproduced unmodified for benchmarking (the Playwright MCP package declares Apache-2.0; see its upstream repository for the license text and any NOTICE).
 
-Rules for keeping it a test set: no labeled queries existed when it was captured, retrievers and slimmer settings must be chosen on the dev set only, and it should be scored once.
+Rules for keeping it a test set: no labeled queries existed when it was captured (a draft is now in `queries/mcp-test.jsonl`, committed before any scoring; see `queries/README.md`), retrievers and slimmer settings must be chosen on the dev set only, and it should be scored once.
 
 Capture notes:
 

@@ -1,0 +1,140 @@
+{"query": "what are the latitude and longitude of 1600 Pennsylvania Avenue", "expected": ["maps_geocode"], "style": "user"}
+{"query": "convert an address to coordinates", "expected": ["maps_geocode"], "style": "agent"}
+{"query": "what street address is at 40.7484, -73.9857", "expected": ["maps_reverse_geocode"], "style": "user"}
+{"query": "convert coordinates into an address", "expected": ["maps_reverse_geocode"], "style": "agent"}
+{"query": "find well-rated ramen restaurants near downtown Seattle", "expected": ["maps_search_places"], "style": "user"}
+{"query": "search for places", "expected": ["maps_search_places"], "style": "agent"}
+{"query": "I have the ID for that cafe, give me its opening hours and reviews", "expected": ["maps_place_details"], "style": "user"}
+{"query": "get detailed information about a place", "expected": ["maps_place_details"], "style": "agent"}
+{"query": "how long would it take to get from each of our three warehouses to each customer site", "expected": ["maps_distance_matrix"], "style": "user"}
+{"query": "calculate travel time and distance for multiple origins and destinations", "expected": ["maps_distance_matrix"], "style": "agent"}
+{"query": "how high above sea level is the summit of Mount Rainier", "expected": ["maps_elevation"], "style": "user"}
+{"query": "get elevation data for locations", "expected": ["maps_elevation"], "style": "agent"}
+{"query": "give me turn-by-turn instructions for driving from the airport to the hotel", "expected": ["maps_directions"], "style": "user"}
+{"query": "get directions between two points", "expected": ["maps_directions"], "style": "agent"}
+{"query": "who is the person with user id 8f2c1d in our workspace", "expected": ["API-get-user"], "style": "user", "note": "Notion; user ids"}
+{"query": "retrieve a notion user by id", "expected": ["API-get-user"], "style": "agent"}
+{"query": "list everyone who has access to our Notion workspace", "expected": ["API-get-users"], "style": "user"}
+{"query": "list all notion users", "expected": ["API-get-users"], "style": "agent"}
+{"query": "which bot account is this integration token running as", "expected": ["API-get-self"], "style": "user"}
+{"query": "retrieve the token's bot user", "expected": ["API-get-self"], "style": "agent"}
+{"query": "find the page called Q3 roadmap somewhere in our workspace", "expected": ["API-post-search"], "style": "user"}
+{"query": "search notion by title", "expected": ["API-post-search"], "style": "agent"}
+{"query": "show me the content blocks inside this page", "expected": ["API-get-block-children", "API-retrieve-page-markdown"], "style": "user", "note": "reading page content: blocks or the markdown rendering both work"}
+{"query": "list the child blocks of a block", "expected": ["API-get-block-children"], "style": "agent"}
+{"query": "add a new paragraph and a to-do list to the bottom of the meeting notes page", "expected": ["API-patch-block-children", "API-update-page-markdown"], "style": "user", "note": "appending content: block append or markdown update"}
+{"query": "append block children to a block", "expected": ["API-patch-block-children"], "style": "agent"}
+{"query": "get the details of one specific block by its id", "expected": ["API-retrieve-a-block"], "style": "user"}
+{"query": "retrieve a notion block", "expected": ["API-retrieve-a-block"], "style": "agent"}
+{"query": "change the text of that heading", "expected": ["API-update-a-block", "API-update-page-markdown"], "style": "user", "note": "editing existing text: block update or markdown update"}
+{"query": "update a notion block", "expected": ["API-update-a-block"], "style": "agent"}
+{"query": "remove that paragraph from the page", "expected": ["API-delete-a-block", "API-update-page-markdown"], "style": "user", "note": "removing content: delete the block or edit the markdown"}
+{"query": "delete a block", "expected": ["API-delete-a-block"], "style": "agent"}
+{"query": "pull up the properties of our onboarding checklist page", "expected": ["API-retrieve-a-page"], "style": "user"}
+{"query": "retrieve a notion page", "expected": ["API-retrieve-a-page"], "style": "agent"}
+{"query": "mark the project page as archived and change its icon", "expected": ["API-patch-page"], "style": "user"}
+{"query": "update page properties", "expected": ["API-patch-page"], "style": "agent"}
+{"query": "make a new page in the team wiki for the incident postmortem", "expected": ["API-post-page"], "style": "user"}
+{"query": "create a notion page", "expected": ["API-post-page"], "style": "agent"}
+{"query": "get just the value of the Status field on that page", "expected": ["API-retrieve-a-page-property", "API-retrieve-a-page"], "style": "user", "note": "one property; the whole page also contains it"}
+{"query": "retrieve a page property item", "expected": ["API-retrieve-a-page-property"], "style": "agent"}
+{"query": "what discussion comments have people left on this page", "expected": ["API-retrieve-a-comment"], "style": "user"}
+{"query": "retrieve comments", "expected": ["API-retrieve-a-comment"], "style": "agent"}
+{"query": "leave a note on the design doc saying I approve", "expected": ["API-create-a-comment"], "style": "user"}
+{"query": "create a comment on a page", "expected": ["API-create-a-comment"], "style": "agent"}
+{"query": "show me every row in the tasks table where status is In Progress, sorted by due date", "expected": ["API-query-data-source"], "style": "user"}
+{"query": "query a data source with a filter and sorts", "expected": ["API-query-data-source"], "style": "agent"}
+{"query": "what columns does the bug tracker table have", "expected": ["API-retrieve-a-data-source", "API-retrieve-a-database"], "style": "user", "note": "table schema lives on the data source; the database is its container"}
+{"query": "retrieve a data source", "expected": ["API-retrieve-a-data-source"], "style": "agent"}
+{"query": "add a new Priority column to the tasks table", "expected": ["API-update-a-data-source"], "style": "user"}
+{"query": "update a data source", "expected": ["API-update-a-data-source"], "style": "agent"}
+{"query": "set up a brand new table for tracking customer feedback", "expected": ["API-create-a-data-source"], "style": "user"}
+{"query": "create a data source", "expected": ["API-create-a-data-source"], "style": "agent"}
+{"query": "which starting layouts are available for adding rows to this table", "expected": ["API-list-data-source-templates"], "style": "user"}
+{"query": "list templates in a data source", "expected": ["API-list-data-source-templates"], "style": "agent"}
+{"query": "get the container for the product roadmap and see which tables it holds", "expected": ["API-retrieve-a-database"], "style": "user"}
+{"query": "retrieve a database", "expected": ["API-retrieve-a-database"], "style": "agent"}
+{"query": "relocate the draft under the Engineering section instead", "expected": ["API-move-page"], "style": "user"}
+{"query": "move a page to a new parent", "expected": ["API-move-page"], "style": "agent"}
+{"query": "give me the text of this page in a readable plain format", "expected": ["API-retrieve-page-markdown", "API-get-block-children"], "style": "user"}
+{"query": "retrieve a page as markdown", "expected": ["API-retrieve-page-markdown"], "style": "agent"}
+{"query": "rewrite the introduction of the page and leave everything else alone", "expected": ["API-update-page-markdown"], "style": "user"}
+{"query": "update a page's content as markdown", "expected": ["API-update-page-markdown"], "style": "agent"}
+{"query": "I'm finished testing, shut the browser page", "expected": ["browser_close", "browser_tabs"], "style": "user", "note": "closing: close the page, or close a tab"}
+{"query": "close the page", "expected": ["browser_close", "browser_tabs"], "style": "agent"}
+{"query": "make the window narrow like a phone screen", "expected": ["browser_resize"], "style": "user"}
+{"query": "resize the browser window", "expected": ["browser_resize"], "style": "agent"}
+{"query": "were there any JavaScript errors logged while the page loaded", "expected": ["browser_console_messages"], "style": "user"}
+{"query": "get console messages", "expected": ["browser_console_messages"], "style": "agent"}
+{"query": "dismiss the 'are you sure' popup that appeared", "expected": ["browser_handle_dialog"], "style": "user"}
+{"query": "handle a dialog", "expected": ["browser_handle_dialog"], "style": "agent"}
+{"query": "check how the site looks in dark mode", "expected": ["browser_emulate_media"], "style": "user"}
+{"query": "emulate a color scheme or reduced motion", "expected": ["browser_emulate_media"], "style": "agent"}
+{"query": "run a bit of script in the page to read its document title", "expected": ["browser_evaluate", "browser_run_code_unsafe"], "style": "user"}
+{"query": "evaluate javascript on the page", "expected": ["browser_evaluate", "browser_run_code_unsafe"], "style": "agent"}
+{"query": "attach resume.pdf to the application form", "expected": ["browser_file_upload"], "style": "user"}
+{"query": "upload files", "expected": ["browser_file_upload"], "style": "agent"}
+{"query": "simulate dragging an image file from my desktop onto the drop zone", "expected": ["browser_drop"], "style": "user"}
+{"query": "drop files onto an element", "expected": ["browser_drop"], "style": "agent"}
+{"query": "does the phrase 'Out of stock' appear anywhere on this page", "expected": ["browser_find", "browser_snapshot"], "style": "user", "note": "searching the page text: find, or read the snapshot"}
+{"query": "search the page for text", "expected": ["browser_find"], "style": "agent"}
+{"query": "enter my name, email and phone number into the signup form", "expected": ["browser_fill_form", "browser_type"], "style": "user"}
+{"query": "fill multiple form fields", "expected": ["browser_fill_form"], "style": "agent"}
+{"query": "hit the Escape key", "expected": ["browser_press_key"], "style": "user"}
+{"query": "press a keyboard key", "expected": ["browser_press_key"], "style": "agent"}
+{"query": "write 'hello world' into the search box", "expected": ["browser_type", "browser_fill_form"], "style": "user"}
+{"query": "type text into an element", "expected": ["browser_type"], "style": "agent"}
+{"query": "open https://example.com in the browser", "expected": ["browser_navigate"], "style": "user"}
+{"query": "navigate to a URL", "expected": ["browser_navigate"], "style": "agent"}
+{"query": "go back to the page I was just on", "expected": ["browser_navigate_back"], "style": "user"}
+{"query": "go back in history", "expected": ["browser_navigate_back"], "style": "agent"}
+{"query": "which API calls did the page make while it was loading", "expected": ["browser_network_requests"], "style": "user"}
+{"query": "list network requests", "expected": ["browser_network_requests"], "style": "agent"}
+{"query": "show me the headers and response body of the third request", "expected": ["browser_network_request"], "style": "user"}
+{"query": "get details of a single network request", "expected": ["browser_network_request"], "style": "agent"}
+{"query": "execute this multi-step script in one go", "expected": ["browser_run_code_unsafe"], "style": "user"}
+{"query": "run a playwright code snippet", "expected": ["browser_run_code_unsafe"], "style": "agent"}
+{"query": "grab a picture of what the page looks like right now", "expected": ["browser_take_screenshot"], "style": "user"}
+{"query": "take a screenshot", "expected": ["browser_take_screenshot"], "style": "agent"}
+{"query": "give me a structured text view of everything on the page so I can pick elements", "expected": ["browser_snapshot"], "style": "user"}
+{"query": "capture an accessibility snapshot of the page", "expected": ["browser_snapshot"], "style": "agent"}
+{"query": "press the Submit button", "expected": ["browser_click"], "style": "user"}
+{"query": "click an element", "expected": ["browser_click"], "style": "agent"}
+{"query": "move the card from the To Do column over to Done", "expected": ["browser_drag"], "style": "user"}
+{"query": "drag and drop between two elements", "expected": ["browser_drag"], "style": "agent"}
+{"query": "move the mouse over the menu so the submenu pops open", "expected": ["browser_hover"], "style": "user"}
+{"query": "hover over an element", "expected": ["browser_hover"], "style": "agent"}
+{"query": "pick Canada from the country list", "expected": ["browser_select_option"], "style": "user"}
+{"query": "select an option in a dropdown", "expected": ["browser_select_option"], "style": "agent"}
+{"query": "open a second tab and switch between them", "expected": ["browser_tabs"], "style": "user"}
+{"query": "list, create, close or select a browser tab", "expected": ["browser_tabs"], "style": "agent"}
+{"query": "hold on until the loading spinner text goes away", "expected": ["browser_wait_for"], "style": "user"}
+{"query": "wait for text to appear", "expected": ["browser_wait_for"], "style": "agent"}
+{"query": "which channels can I join in our company chat", "expected": ["slack_list_channels"], "style": "user"}
+{"query": "list slack channels", "expected": ["slack_list_channels"], "style": "agent"}
+{"query": "tell the whole team the deploy finished", "expected": ["slack_post_message"], "style": "user"}
+{"query": "post a message to a slack channel", "expected": ["slack_post_message"], "style": "agent"}
+{"query": "answer Dan's question right inside its conversation thread", "expected": ["slack_reply_to_thread"], "style": "user"}
+{"query": "reply to a thread", "expected": ["slack_reply_to_thread"], "style": "agent"}
+{"query": "react with a checkmark to the approval message", "expected": ["slack_add_reaction"], "style": "user"}
+{"query": "add a reaction emoji to a message", "expected": ["slack_add_reaction"], "style": "agent"}
+{"query": "catch me up on what was said in the support room this morning", "expected": ["slack_get_channel_history"], "style": "user"}
+{"query": "get recent messages from a channel", "expected": ["slack_get_channel_history"], "style": "agent"}
+{"query": "read every response under that announcement", "expected": ["slack_get_thread_replies"], "style": "user"}
+{"query": "get all replies in a thread", "expected": ["slack_get_thread_replies"], "style": "agent"}
+{"query": "who is in our workspace", "expected": ["slack_get_users"], "style": "user"}
+{"query": "list all users in the slack workspace", "expected": ["slack_get_users"], "style": "agent"}
+{"query": "what is Priya's job title and email address", "expected": ["slack_get_user_profile"], "style": "user"}
+{"query": "get a user's profile", "expected": ["slack_get_user_profile"], "style": "agent"}
+{"query": "how many customers signed up last month", "expected": ["read_query"], "style": "user"}
+{"query": "run a select query", "expected": ["read_query"], "style": "agent"}
+{"query": "change the status of order 1042 to shipped", "expected": ["write_query"], "style": "user"}
+{"query": "execute an insert, update or delete", "expected": ["write_query"], "style": "agent"}
+{"query": "set up a new table to store product reviews", "expected": ["create_table"], "style": "user"}
+{"query": "create a table", "expected": ["create_table"], "style": "agent"}
+{"query": "what tables are in this database", "expected": ["list_tables"], "style": "user"}
+{"query": "list all tables", "expected": ["list_tables"], "style": "agent"}
+{"query": "what columns does the orders table have", "expected": ["describe_table"], "style": "user"}
+{"query": "get the schema of a table", "expected": ["describe_table"], "style": "agent"}
+{"query": "note down that weekend sales are consistently higher", "expected": ["append_insight"], "style": "user"}
+{"query": "add a business insight to the memo", "expected": ["append_insight"], "style": "agent"}
