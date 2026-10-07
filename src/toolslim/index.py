@@ -39,7 +39,7 @@ def tokenize(text: str) -> list[str]:
 
 
 class ToolIndex:
-    def __init__(self, tools: list[Tool], k1: float = 1.5, b: float = 0.75):
+    def __init__(self, tools: list[Tool], k1: float = 1.5, b: float = 0.75, use_server: bool = False):
         self.tools = tools
         self.k1, self.b = k1, b
         self._tf: list[Counter] = []
@@ -47,6 +47,9 @@ class ToolIndex:
             tf: Counter = Counter()
             for term in tokenize(t.name):
                 tf[term] += NAME_WEIGHT
+            if use_server:  # the server name counts like a word of the tool's name
+                for term in tokenize(t.server):
+                    tf[term] += NAME_WEIGHT
             for term in tokenize(t.description):
                 tf[term] += DESC_WEIGHT
             for param in t.input_schema.get("properties", {}):

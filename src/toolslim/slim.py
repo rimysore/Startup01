@@ -148,4 +148,4 @@ def slim_tool(tool: Tool, level: int) -> Tool:
     description = tool.description
     if level >= 2:
         description = first_sentence(description, TOOL_DESC_LIMIT)
-    return Tool(tool.name, description, prune_unused_defs(_walk(tool.input_schema, level)))
+    return Tool(tool.name, description, prune_unused_defs(_walk(tool.input_schema, level)), tool.server)

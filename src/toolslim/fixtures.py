@@ -183,7 +183,7 @@ def _build_schema(tool_name: str, params: list[str]) -> dict:
 
 
 def synthetic_catalog() -> list[Tool]:
-    return [Tool(n, d, _build_schema(n, p)) for n, d, p, _ in _SPEC]
+    return [Tool(n, d, _build_schema(n, p), server=n.split("_")[0]) for n, d, p, _ in _SPEC]
 
 
 def synthetic_queries() -> list[tuple[str, str]]:

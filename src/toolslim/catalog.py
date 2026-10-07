@@ -14,6 +14,9 @@ class Tool:
     name: str
     description: str
     input_schema: dict
+    # Which MCP server the tool comes from (e.g. "notion"). Not part of the API definition;
+    # a gateway knows it from its configuration, and it can be used as retrieval context.
+    server: str = ""
 
     def to_api(self) -> dict:
         """The definition as it is sent in the `tools` array of a Messages API request."""
@@ -53,11 +56,13 @@ def load_catalog(path: str | Path) -> list[Tool]:
     """
     data = json.loads(Path(path).read_text())
     items = data["tools"] if isinstance(data, dict) else data
+    server = str(data.get("source", {}).get("name", "")) if isinstance(data, dict) else ""
     return [
         Tool(
             name=t["name"],
             description=t.get("description", ""),
             input_schema=t.get("inputSchema") or t.get("input_schema") or EMPTY_SCHEMA,
+            server=server,
         )
         for t in items
     ]

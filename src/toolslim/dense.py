@@ -20,6 +20,12 @@ def text_name_desc(tool: Tool) -> str:
     return f"{tool.name.replace('_', ' ')}. {tool.description}"
 
 
+def text_with_server(tool: Tool) -> str:
+    """`text_name_desc` prefixed with the server name (unchanged when the tool has none)."""
+    server = tool.server.replace("-", " ").replace("_", " ").strip()
+    return f"{server} {text_name_desc(tool)}" if server else text_name_desc(tool)
+
+
 def text_with_params(tool: Tool) -> str:
     params = " ".join(p.replace("_", " ") for p in tool.input_schema.get("properties", {}))
     return f"{text_name_desc(tool)} Parameters: {params}" if params else text_name_desc(tool)
