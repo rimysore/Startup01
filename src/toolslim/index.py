@@ -33,27 +33,41 @@ def _stem(w: str) -> str:
     return w
 
 
-def tokenize(text: str) -> list[str]:
-    words = re.findall(r"[a-z0-9]+", _CAMEL.sub(" ", text).lower())
-    return [_stem(w) for w in words if w not in _STOP]
+def tokenize(text: str, join_camel: bool = False) -> list[str]:
+    """Lowercased, stemmed words. Camel-case words are split ("createIssue" -> create, issue).
+
+    With `join_camel`, a camel-case word also yields its joined lowercase form, so brand
+    names match across spellings: "GitHub" -> github, git, hub, and so matches the
+    lowercase "github" in a tool or server name (default off: the original behavior).
+    """
+    if not join_camel:
+        words = re.findall(r"[a-z0-9]+", _CAMEL.sub(" ", text).lower())
+        return [_stem(w) for w in words if w not in _STOP]
+    out: list[str] = []
+    for run in re.findall(r"[A-Za-z0-9]+", text):
+        parts = _CAMEL.sub(" ", run).lower().split()
+        words = ([run.lower()] if len(parts) > 1 else []) + parts
+        out += [_stem(w) for w in words if w not in _STOP]
+    return out
 
 
 class ToolIndex:
-    def __init__(self, tools: list[Tool], k1: float = 1.5, b: float = 0.75, use_server: bool = False):
+    def __init__(self, tools: list[Tool], k1: float = 1.5, b: float = 0.75, use_server: bool = False, camel_join: bool = False):
         self.tools = tools
+        self._tokenize = lambda text: tokenize(text, camel_join)
         self.k1, self.b = k1, b
         self._tf: list[Counter] = []
         for t in tools:
             tf: Counter = Counter()
-            for term in tokenize(t.name):
+            for term in self._tokenize(t.name):
                 tf[term] += NAME_WEIGHT
             if use_server:  # the server name counts like a word of the tool's name
-                for term in tokenize(t.server):
+                for term in self._tokenize(t.server):
                     tf[term] += NAME_WEIGHT
-            for term in tokenize(t.description):
+            for term in self._tokenize(t.description):
                 tf[term] += DESC_WEIGHT
             for param in t.input_schema.get("properties", {}):
-                for term in tokenize(param):
+                for term in self._tokenize(param):
                     tf[term] += PARAM_WEIGHT
             self._tf.append(tf)
         self._len = [sum(tf.values()) for tf in self._tf]
@@ -65,7 +79,7 @@ class ToolIndex:
         self._idf = {term: math.log(1 + (n - d + 0.5) / (d + 0.5)) for term, d in df.items()}
 
     def search(self, query: str, k: int = 5) -> list[tuple[Tool, float]]:
-        terms = [t for t in tokenize(query) if t in self._idf]
+        terms = [t for t in self._tokenize(query) if t in self._idf]
         scored: list[tuple[Tool, float]] = []
         for tool, tf, dl in zip(self.tools, self._tf, self._len):
             score = 0.0

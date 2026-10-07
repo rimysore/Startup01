@@ -54,12 +54,34 @@ def _normalize(m: np.ndarray) -> np.ndarray:
 
 
 class DenseIndex:
-    def __init__(self, tools: list[Tool], embed: Embedder, doc_text: Callable[[Tool], str] = text_name_desc):
+    """Cosine search over embedded tool texts.
+
+    `hub_lambda` > 0 turns on a hubness correction (in the spirit of CSLS): a tool that sits close to
+    many other tools in the catalog is a "hub" that wins queries it should not, so its score is reduced
+    by `hub_lambda` times its mean cosine similarity to its `hub_k` nearest other tools. Needs no
+    queries; 0 (the default) leaves plain cosine similarity.
+    """
+
+    def __init__(
+        self,
+        tools: list[Tool],
+        embed: Embedder,
+        doc_text: Callable[[Tool], str] = text_name_desc,
+        hub_lambda: float = 0.0,
+        hub_k: int = 10,
+    ):
         self.tools = tools
         self._embed = embed
         self._mat = _normalize(embed([doc_text(t) for t in tools]))
+        self._penalty = np.zeros(len(tools), dtype=np.float32)
+        if hub_lambda and len(tools) > 1:
+            sims = self._mat @ self._mat.T
+            np.fill_diagonal(sims, -np.inf)
+            k = min(hub_k, len(tools) - 1)
+            nearest = -np.partition(-sims, k - 1, axis=1)[:, :k]  # the k largest similarities per tool
+            self._penalty = (hub_lambda * nearest.mean(axis=1)).astype(np.float32)
 
     def search(self, query: str, k: int = 5) -> list[tuple[Tool, float]]:
-        sims = self._mat @ _normalize(self._embed([query]))[0]
-        order = np.argsort(-sims)[:k]
-        return [(self.tools[i], float(sims[i])) for i in order]
+        scores = self._mat @ _normalize(self._embed([query]))[0] - self._penalty
+        order = np.argsort(-scores)[:k]
+        return [(self.tools[i], float(scores[i])) for i in order]
