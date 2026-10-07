@@ -139,9 +139,14 @@ class Test3ScoringScriptTests(unittest.TestCase):
         code = (ROOT / "scripts" / "score_test3.py").read_text()
         self.assertIn(f'HEADLINE = "{DEFAULT_RETRIEVER}"', code)
 
-    def test_no_test3_results_exist_before_the_confirmation_run(self):
-        # Delete this test when results/test3-score.* is committed after the single run.
-        self.assertFalse(list((ROOT / "results").glob("test3-score*")))
+    def test_recorded_test3_result_is_consistent_with_the_declared_reading(self):
+        result = json.loads((ROOT / "results" / "test3-score.json").read_text())
+        self.assertEqual(result["headline"]["retriever"], "hybrid-rrf+server")
+        self.assertEqual(result["sizes"], {"tools": 189, "user": 189, "agent": 189})
+        reading = result["declared_reading"]
+        self.assertEqual(reading["confirmed"], reading["c1_all_clears_2se"] and reading["headline_agent_within_1pt_of_best"])
+        # the paired comparison named in the protocol: the headline against dense and against hybrid-rrf
+        self.assertEqual({c["base"] for c in result["comparisons"].values()}, {"dense", "hybrid-rrf"})
 
 
 class KnownTokenizerLimitationTests(unittest.TestCase):

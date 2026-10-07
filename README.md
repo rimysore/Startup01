@@ -204,7 +204,38 @@ What the evidence supports, from a post-hoc check on the same data (`scripts/sel
 - Merging servers into one catalog is what makes the server name matter at all; and these dev sets name their service in 19% (dev), 1% (spent test) and 73% (test2) of user-style queries, so the server-name effect depends on how queries are phrased.
 - The BM25 half of the default still has the camel-case tokenizer limitation (see Known limitations).
 
-Confirmation plan for the third batch, declared now: when `catalogs/test3` is labeled and scored once, the headline is `hybrid-rrf+server` (the default), with two pre-declared comparisons, each reported with its paired counts and nothing decided from them: against `dense` (the old default) and against `hybrid-rrf` (does the server name matter on top of fusion?).
+Confirmation plan for the third batch, declared before the run (its result is in "Third test result" below): when `catalogs/test3` was labeled and scored once, the headline is `hybrid-rrf+server` (the default), with two pre-declared comparisons, each reported with its paired counts and nothing decided from them: against `dense` (the old default) and against `hybrid-rrf` (does the server name matter on top of fusion?).
+
+### Third test result (confirmation, scored once)
+
+Protocol (`scripts/score_test3.py`, committed before the run, with the reading declared in its docstring): headline `hybrid-rrf+server`, the round-2 default; paired comparisons C1 against `dense` and C2 against `hybrid-rrf`; the adoption counts as **confirmed** only if C1 on all queries clears the 2-SE bar *and* the headline's agent-style recall is within 1 point of the best candidate's. One run, no edits afterwards. Raw output: `results/test3-score.txt`.
+
+189 user-style and 189 agent-style queries over 189 tools / 6 servers (loaded with the `add_table` namespacing); recall@5 with 95% intervals:
+
+| retriever | user-style | MRR | recall@10 | agent-style | all |
+|---|---:|---:|---:|---:|---:|
+| bm25 | 73.0% [66, 79] | 0.56 | 79.4% | 99.5% | 86.2% |
+| dense (old default, C1) | 69.3% [62, 75] | 0.54 | 78.3% | 95.2% | 82.3% |
+| bm25+server | 73.0% [66, 79] | 0.58 | 81.5% | 99.5% | 86.2% |
+| dense+server | 72.0% [65, 78] | 0.56 | 78.8% | 94.7% | 83.3% |
+| hybrid-rrf (C2) | 73.0% [66, 79] | 0.58 | 83.1% | 97.9% | 85.4% |
+| **hybrid-rrf+server (headline)** | **74.6% [68, 80]** | 0.59 | 84.7% | **98.4%** | 86.5% |
+| hybrid-minmax 1:1 | 76.7% [70, 82] | 0.60 | 84.7% | 98.9% | 87.8% |
+| hybrid-minmax 1:1+server | 78.8% [72, 84] | 0.63 | 86.2% | 98.4% | 88.6% |
+
+Declared comparisons (paired, gained / lost): C1 `hybrid-rrf+server` vs `dense`: user-style 19 / 9 (net +10, bar 10.6: does not clear), agent-style 6 / 0 (net +6, bar 4.9: clears), **all 25 / 9 (net +16, bar 11.7: clears)**. C2 vs `hybrid-rrf`: user-style 6 / 3, agent-style 1 / 0, all 7 / 3 (net +4, bar 6.3: does not clear).
+
+**Declared reading: NOT CONFIRMED.** Condition (a) passes. Condition (b) fails narrowly: the headline's agent-style recall is 98.4% (3 misses) against 99.5% for BM25 (1 miss), a gap of 1.06 points against the 1.00 allowed, i.e. two queries. The threshold was not moved. The default is not changed by this run, and a new decision would need a new round.
+
+How to read it:
+
+- **The fusion gain over `dense` held up on fresh data.** On all queries the adopted candidate beats the old default by 25 gained to 9 lost, and agent-style by 6 to 0. That part of the round-2 decision replicated.
+- **The server name is again a small, unproven extra on top of fusion** (net +4, not significant), as on the dev data in round 2. It was never the strong part of the evidence.
+- **BM25 alone is a strong baseline here**: 86.2% on all queries against 86.5% for the headline, and the best agent-style recall (99.5%). The same held on the second batch (BM25 100% agent-style) and on pooled dev (99.7%). Across batches, BM25's user-style recall was 51%, 50%, 69%, 73% (dev, first, second, third batch, each on its own catalog) while dense's was 73%, 60%, 67%, 69%: the embedding advantage that looked large on the dev set shrank to nothing on later batches. In the same order, the share of words that user-style queries have in common with their tool's name rose (0.14, 0.13, 0.20, 0.25), so part of this is likely the labels becoming less paraphrased over time, not retrieval getting worse. That is a confound I cannot separate here.
+- **The best-scoring candidate nominally was `hybrid-minmax 1:1+server`** (88.6% on all queries), but nothing here supports switching to it: it was not the pre-declared headline, and it was among the candidates the round-2 rule found statistically tied.
+- **The agent-style guard is a knife-edge for the second time** (round 2: plain hybrid-rrf missed it by 0.03 points; now the headline misses it by 0.06). A fixed 1-point guard on ~190 queries is a two-query rule; a future rule should use a paired test for the guard too.
+- **Misses (48 user-style, 3 agent-style)**: PowerPoint 13/37, Word 10/54, Redis 9/53, Excel 8/26, Obsidian 8/15, Docker 0/4; only 13 of the 48 have a top result from another server. Looking at them (descriptive, after the fact), the failures look like hub words rather than missing vocabulary: queries containing "slide" return `add_slide`, `get_slide_info`, `extract_slide_text`; "workbook"/"spreadsheet" return `describe_workbook`, `export_workbook`, `import_workbook`; Redis "queue list" queries drift to `list-containers` and `list_presentations`; Obsidian "note" queries return the periodic-note tools. Redis queries that never say "Redis" (lpush, rpush, lrange, llen, sadd, srem) are hard for both halves of the hybrid.
+- **Caveats unchanged**: the labels were drafted by the retriever's author, and 97% of the agent-style queries (32% of user-style) name their service, which favors the server name in the index text. With 189 queries a 95% interval is about +/-6 points, so most differences between the top candidates are not established.
 
 ### Fresh test set, and what its schemas showed
 
@@ -253,9 +284,9 @@ What it says, and what it does not:
 
 `catalogs/test2/` has 105 more tools from 6 servers (Kubernetes, Heroku, MongoDB, DynamoDB, Pinecone, Tavily), chosen to overlap in vocabulary because cross-server confusion was the main failure on the first test set. 210 labeled queries (`queries/mcp-test2.jsonl`, written by me, so not independent) were scored once; the result is in "Second test result" below, so this batch is spent too. Token profile: 42,367 estimated tokens in total, but lossless slimming saves only 5.9% (level 3: 63%), since the weight is in long descriptions rather than schema scaffolding; the lazy gateway's fixed cost is still 190 tokens (99.6% less). Details and the rules for keeping it a clean test set are in `catalogs/README.md`. The first test set is spent and counts as dev data from now on.
 
-### Third batch (captured, labels drafted)
+### Third batch (captured, labeled, scored once)
 
-`catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). A draft of 378 labeled queries (`queries/mcp-test3.jsonl`, written by me, so not independent) is committed; nearly all of its agent-style queries (97%) name their service, a regime favorable to the server-name idea. It has not been scored. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
+`catalogs/test3/` has 189 more tools from 6 servers (Excel, Word, PowerPoint, Redis, Obsidian, Docker), chosen for heavy internal overlap and a spread of naming styles (some servers' tools nearly always say the server's name, others almost never). 378 labeled queries (`queries/mcp-test3.jsonl`, written by me, so not independent; 97% of the agent-style ones name their service) were scored once as the confirmation batch; the result is in "Third test result" above, so this batch is spent too. Estimated 35,694 tokens in total (level-1 slimming -12.0%, level 3 -43.8%, lazy gateway 190 tokens, 99.5% less). Because Word and PowerPoint both define `add_table`, loading it needs `--on-duplicate namespace`, which renames only the colliding tools. Details and the rules for keeping it a clean test set are in `catalogs/README.md`.
 
 ## Design notes
 
@@ -266,12 +297,13 @@ What it says, and what it does not:
 
 ## Next steps
 
-1. Have someone other than me review or replace `queries/mcp-test3.jsonl` if possible, then score `catalogs/test3` once under the confirmation plan in "Choosing the default, round 2" (script committed before the run, as for the second batch).
-2. Find out how often real users and real model-written search queries name the service (it decides how much the server name is worth); this needs real traffic or an end-to-end eval.
-3. Fix the BM25 camel-case tokenizer and re-run the comparisons (BM25 and the BM25 half of the hybrids shift; dense does not).
-4. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.
-5. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
-6. Count tokens with the API's token counter instead of the estimate.
-7. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses and the right default `limit`).
-8. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
-9. A proxy MCP server so any client can use the gateway unchanged.
+1. Decide what to do with a **not confirmed** verdict that is narrow on the guard and clear on the fusion gain: keep `hybrid-rrf+server`, or look again at BM25-leaning candidates (BM25 alone matched the headline on all queries and led on agent-style recall in every batch). That is a new round, and all four batches are now dev data, so it needs either a fifth batch, independently written queries, or a different kind of evidence.
+2. Independent labels: the strongest missing piece. Every query set was written by the same author who built and tuned the retrievers; a human reviewer, or a model that did not build them, would give an honest estimate. Real traffic would be better still.
+3. Fix the BM25 camel-case tokenizer and add a hub-word fix (the failures above look like shared words such as "slide", "workbook", "list" pulling toward a few generic tools); re-run the comparisons.
+4. Find out how often real users and real model-written search queries name the service (it decides how much the server name is worth); this needs real traffic or an end-to-end eval.
+5. Index-side enrichment for jargon-heavy or terse tools (author-supplied `when to use` hints, server descriptions from the MCP `instructions` field) and a "no match" threshold for dense search.
+6. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
+7. Count tokens with the API's token counter instead of the estimate.
+8. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses and the right default `limit`).
+9. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
+10. A proxy MCP server so any client can use the gateway unchanged.

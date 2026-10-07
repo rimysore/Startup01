@@ -8,7 +8,7 @@ Format: JSON Lines, documented in `src/toolslim/labels.py`. Validate with
 | `mcp-reference.jsonl` | `catalogs/` (8 servers, 78 tools) | **dev**: used while building and choosing retrievers | 154 |
 | `mcp-test.jsonl` | `catalogs/test/` (5 servers, 70 tools) | scored once on 2026-10-07, so **spent** (counts as dev data from now on) | 140 |
 | `mcp-test2.jsonl` | `catalogs/test2/` (6 servers, 105 tools) | scored once on 2026-10-07, so **spent** | 210 |
-| `mcp-test3.jsonl` | `catalogs/test3/` (6 servers, 189 tools) | **confirmation batch**: draft, not yet scored | 378 |
+| `mcp-test3.jsonl` | `catalogs/test3/` (6 servers, 189 tools) | scored once as the confirmation batch, so **spent** | 378 |
 
 ## How `mcp-test.jsonl` was produced
 
@@ -80,7 +80,7 @@ The last two rows (a crude, tokenizer-independent detector; a server called `tim
 
 Scored once with `scripts/score_test2.py`, protocol as above; raw output in `results/test2-score.txt`. Headline `dense`: user-style recall@5 = 66.7% (70/105, 95% interval 57-75%). Details, the declared `dense+server` comparison and caveats are in the top-level README. No labels or retrievers were changed afterwards, and no label was found to be objectively wrong.
 
-## `mcp-test3.jsonl` (draft, unscored; the confirmation batch)
+## `mcp-test3.jsonl` (scored once as the confirmation batch; written by the retriever's author)
 
 Written for `catalogs/test3/` by the same AI assistant that built the retrievers and chose the default, so it is a draft and not an independent test; a human reviewer or an independent author would strengthen it considerably. Written from tool names, descriptions and parameter names only, before any retrieval was run on this batch, and committed before scoring. One user-style and one agent-style query per tool (189 tools, 378 queries). Load it with `--catalog catalogs/test3 --on-duplicate namespace`.
 
@@ -103,3 +103,7 @@ Lint (`check`): 378 queries, 189/189 tools covered, no unknown tools, no duplica
 | agent-style queries that name their server | 22% | 16% | 89% | **97%** |
 
 Caveat for the confirmation: nearly every agent-style query here names its service (I put the product word in almost all of them), the same favorable regime as the second batch. So this batch tests the BM25/dense fusion well and tests the value of the server name in the index text under conditions that favor it; it says little about how often real model-written queries name their service. Scoring protocol and the declared comparisons are in the top-level README ("Choosing the default, round 2").
+
+### Result (confirmation run)
+
+Scored once with `scripts/score_test3.py`; raw output in `results/test3-score.txt`. Headline `hybrid-rrf+server`: user-style recall@5 = 74.6% (141/189, 95% interval 68-80%), agent-style 98.4%. The declared reading was NOT CONFIRMED: the fusion gain over `dense` cleared its bar (25 gained, 9 lost on all queries), but the agent-style guard missed by 0.06 points (two queries). Details and caveats are in the top-level README. No labels or retrievers were changed afterwards, and no label was found to be objectively wrong.
