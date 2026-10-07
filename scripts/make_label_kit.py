@@ -9,7 +9,7 @@ validator (no imports from this repository) are written next to it.
     python scripts/make_label_kit.py OUT_DIR
 
 Writes OUT_DIR/GUIDELINES.md, OUT_DIR/validate.py and OUT_DIR/<batch>/tools.json for
-batches: dev, first-test, second-test, third-test.
+batches: dev, first-test, second-test, third-test, fifth-test.
 """
 
 from __future__ import annotations
@@ -28,6 +28,7 @@ BATCHES = {
     "first-test": (["catalogs/test"], "error"),
     "second-test": (["catalogs/test2"], "error"),
     "third-test": (["catalogs/test3"], "namespace"),  # Word and PowerPoint both define add_table
+    "fifth-test": (["catalogs/test4"], "error"),
 }
 DESC_LIMIT = 700
 

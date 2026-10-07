@@ -125,9 +125,9 @@ class LabelKitTests(unittest.TestCase):
         out = Path(tempfile.mkdtemp())
         subprocess.run([sys.executable, str(root / "scripts" / "make_label_kit.py"), str(out)], check=True, capture_output=True)
         files = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
-        self.assertEqual(files, ["GUIDELINES.md", "dev/tools.json", "first-test/tools.json", "second-test/tools.json", "third-test/tools.json", "validate.py"])
-        counts = {b: len(json.loads((out / b / "tools.json").read_text())["tools"]) for b in ("dev", "first-test", "second-test", "third-test")}
-        self.assertEqual(counts, {"dev": 78, "first-test": 70, "second-test": 105, "third-test": 189})
+        self.assertEqual(files, ["GUIDELINES.md", "dev/tools.json", "fifth-test/tools.json", "first-test/tools.json", "second-test/tools.json", "third-test/tools.json", "validate.py"])
+        counts = {b: len(json.loads((out / b / "tools.json").read_text())["tools"]) for b in ("dev", "first-test", "second-test", "third-test", "fifth-test")}
+        self.assertEqual(counts, {"dev": 78, "first-test": 70, "second-test": 105, "third-test": 189, "fifth-test": 213})
         everything = "".join(p.read_text() for p in out.rglob("*") if p.is_file()).lower()
         for forbidden in ("toolslim", "bm25", "hybrid-rrf", "mcp-test", "mcp-reference", "recall@", "leave-one", "lazy gateway", "search_tools"):
             self.assertNotIn(forbidden, everything)

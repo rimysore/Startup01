@@ -31,7 +31,9 @@ class ScoreIndependentTests(unittest.TestCase):
             self.assertIn(b, self.s.sel.SIMPLICITY)
 
     def test_batches_match_the_labeling_kit(self):
-        kit = {k: (dirs, policy) for k, (dirs, policy) in self.kit.BATCHES.items()}
+        # the scorer covers the four spent batches; the fifth gets its own protocol, so it must not be scored here
+        kit = {k: (dirs, policy) for k, (dirs, policy) in self.kit.BATCHES.items() if k != "fifth-test"}
+        self.assertNotIn("fifth-test", self.s.BATCHES)
         got = {k: (dirs, policy) for k, (dirs, policy, _) in self.s.BATCHES.items()}
         self.assertEqual(kit, got)
         for _, (_, _, mine) in self.s.BATCHES.items():
