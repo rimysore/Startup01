@@ -1,6 +1,7 @@
 import json
 import unittest
 
+from toolslim.catalog import Tool
 from toolslim.fixtures import synthetic_catalog, synthetic_queries
 from toolslim.gateway import LazyToolGateway, signature
 from toolslim.index import ToolIndex, tokenize
@@ -46,6 +47,23 @@ class GatewayTests(unittest.TestCase):
         sig = signature(tool)
         self.assertIn("pull_number*:int", sig)
         self.assertIn("merge_method:merge|squash|rebase", sig)
+
+    def test_signature_handles_type_lists_unions_and_untyped(self):
+        tool = Tool(
+            "t",
+            "",
+            {
+                "type": "object",
+                "properties": {
+                    "a": {"type": ["string", "null"]},
+                    "b": {"anyOf": [{"type": "string"}, {"type": "integer"}]},
+                    "c": {},
+                    "d": {"$ref": "#/$defs/x"},
+                },
+                "required": ["a"],
+            },
+        )
+        self.assertEqual(signature(tool), "t(a*:str|null, b:str|int, c:any, d:any)")
 
     def test_search_returns_signatures(self):
         out = self.gw.handle("search_tools", {"query": "post a message to slack"})

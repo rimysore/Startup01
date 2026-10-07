@@ -16,16 +16,18 @@ python -m toolslim slim github_create_issue --level 2
 python -m unittest discover -s tests
 ```
 
-## Results so far (synthetic 40-tool catalog, estimated tokens)
+## Results so far (estimated tokens)
 
-| strategy | tokens/request | vs. full |
+| strategy | synthetic, 40 tools | real MCP servers, 78 tools |
 |---|---:|---:|
-| all schemas, as published | 6,780 | |
-| slimmed, level 1 (structural noise only) | 4,879 | 28% less |
-| slimmed, level 2 (+ first-sentence descriptions) | 4,529 | 33% less |
-| slimmed, level 3 (+ no param descriptions) | 3,322 | 51% less |
-| lazy gateway, first request | 190 | 97% less |
-| lazy gateway, after search + describe | 492 | 93% less |
+| all schemas, as published | 6,780 | 12,514 |
+| slimmed, level 1 (structural noise only) | 4,879 (-28%) | 11,076 (-11.5%) |
+| slimmed, level 2 (+ first-sentence descriptions) | 4,529 (-33%) | 8,905 (-29%) |
+| slimmed, level 3 (+ no param descriptions) | 3,322 (-51%) | 6,617 (-47%) |
+| lazy gateway, first request | 190 (-97%) | 190 (-98.5%) |
+| lazy gateway, after search + describe | 492 (-93%) | 506 (-96%) |
+
+My synthetic schemas were noisier than real ones, so they overstated level-1 slimming (28% vs 11.5% on real servers). Trust the right-hand column.
 
 Slimming levels:
 
@@ -65,6 +67,36 @@ Known limitations:
 - `wordllama` 0.4.0 looks for its tokenizer in the wrong directory (`tokenizer/` vs the shipped `tokenizers/`); `dense.wordllama_embedder` works around it through the public `cache_dir` argument.
 - Token counts are a chars/3.5 estimate, not the API's counter.
 
+## Real MCP catalogs
+
+`catalogs/` holds `tools/list` captured verbatim from 8 real servers (78 tools; provenance and licenses in `catalogs/README.md`). `queries/mcp-reference.jsonl` has 154 labeled queries for them: 77 user-style paraphrases and 77 agent-style intents. A label lists *every* tool that would do the job (8 queries have several), because real catalogs contain near-duplicates such as `read_file`/`read_text_file` or local `git_create_branch` vs GitHub's `create_branch`.
+
+```bash
+python -m toolslim --catalog catalogs --labels queries/mcp-reference.jsonl check   # validate + leakage lint
+python -m toolslim --catalog catalogs --labels queries/mcp-reference.jsonl bench   # score retrievers
+python scripts/capture_catalog.py --name time --out catalogs/time.json -- python3 -m mcp_server_time   # add a server
+```
+
+Use your own catalogs and labels the same way (format in `src/toolslim/labels.py`). `check` fails on unknown tool names and duplicates, and warns about untested tools and user-style queries that contain every word of the tool's name (those aren't paraphrases).
+
+Retrieval, recall@5 (MRR), 77 queries per set. The retrievers were fixed on the synthetic data before these queries existed, the queries were written and committed before they were scored, and this set was scored once:
+
+| retriever | user-style | agent-style |
+|---|---:|---:|
+| bm25 | 51% (0.38) | 99% (0.94) |
+| dense | 73% (0.52) | 96% (0.93) |
+| hybrid-rrf (default) | 69% (0.45) | 99% (0.95) |
+| hybrid-minmax 1:1 | 77% (0.50) | 99% (0.96) |
+| hybrid-minmax 1:2 | 78% (0.54) | 99% (0.96) |
+
+What this says:
+
+- **Embeddings help again** (BM25 51% -> dense 73%), matching the synthetic result (+20 to +26 points).
+- **The default did not win.** `hybrid-rrf` (69%) trailed plain dense and both min-max fusions (77-78%). I did not change the default, because switching on the strength of the test set would make it a tuning set. Min-max fusion now looks better on two independent sets; deciding that properly needs fresh queries (see next steps). With 77 queries and 8 variants, treat gaps under ~8 points as noise.
+- **Agent-style queries are solved** (96-99%), as before. The author caveat still applies.
+- **Failures are mostly domain-level, not near-misses**: for 16 of the 24 user-style misses the top result was from a different server than the right tool. Eight of the misses are the memory server, whose tools talk about a "knowledge graph" of "entities" and "observations" while people say "remember" and "forget". Tool descriptions written in the server's own jargon are hard to find from everyday words, which suggests index-side enrichment (usage hints or aliases per tool) as the next lever.
+- **Asking for more results pays off on real catalogs**: recall@10 is 86% vs 69% at k=5 for the default (the synthetic set plateaued at ~80%). Each extra result costs roughly 40 tokens, so this is a cheap lever to evaluate properly.
+
 ## Design notes
 
 - **Cache-friendly.** The three meta-tool definitions never change, so the prompt-cache prefix (`tools` renders first) stays stable. Dynamically adding tools after a search would invalidate the cache each time.
@@ -74,9 +106,10 @@ Known limitations:
 
 ## Next steps
 
-1. Run against real `tools/list` dumps (`--catalog`) with a labeled-queries file, so retrieval is measured on something I did not write.
-2. Query rewriting or reranking with a real model, to push past the ~80% ceiling; add a "no match" threshold.
-3. Count tokens with the API's token counter instead of the estimate.
-4. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses).
-5. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
-6. A proxy MCP server so any client can use the gateway unchanged.
+1. Fresh test data: capture more servers (databases, browsers, chat) and label them, then decide fusion (RRF vs min-max) and `limit` on the existing sets and confirm on the new ones.
+2. Index-side enrichment for jargon-heavy tools (author-supplied `when to use` hints or generated aliases) and a "no match" threshold for dense search.
+3. Query rewriting or reranking with a real model, to push past the retrieval ceiling.
+4. Count tokens with the API's token counter instead of the estimate.
+5. End-to-end eval with a real model: task success and total cost for full vs. slim vs. lazy (this also measures the retry cost of retrieval misses).
+6. Compare against the API's built-in tool search (`defer_loading`) as the baseline to beat.
+7. A proxy MCP server so any client can use the gateway unchanged.

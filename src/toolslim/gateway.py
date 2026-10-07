@@ -62,17 +62,30 @@ META_TOOLS = [
 ]
 
 
+def _kind(sub: dict) -> str:
+    """Compact type label for one property schema.
+
+    Real schemas use more than a bare string `type`: enums, type lists such as
+    ["string", "null"], and anyOf/oneOf unions.
+    """
+    if "enum" in sub:
+        return "|".join(str(v) for v in sub["enum"])
+    kind = sub.get("type")
+    if isinstance(kind, str):
+        return _TYPE_ABBREV.get(kind, kind)
+    if isinstance(kind, list):
+        return "|".join(_TYPE_ABBREV.get(k, str(k)) for k in kind)
+    for union in ("anyOf", "oneOf"):
+        if isinstance(sub.get(union), list):
+            return "|".join(_kind(option) for option in sub[union] if isinstance(option, dict))
+    return "any"
+
+
 def signature(tool: Tool) -> str:
     """`name(a*:str, b:int, mode:x|y)` - often enough to call the tool without describe_tool."""
     props = tool.input_schema.get("properties", {})
     required = set(tool.input_schema.get("required", []))
-    parts = []
-    for name, sub in props.items():
-        if "enum" in sub:
-            kind = "|".join(str(v) for v in sub["enum"])
-        else:
-            kind = _TYPE_ABBREV.get(sub.get("type", ""), sub.get("type", "any"))
-        parts.append(f"{name}{'*' if name in required else ''}:{kind}")
+    parts = [f"{name}{'*' if name in required else ''}:{_kind(sub)}" for name, sub in props.items()]
     return f"{tool.name}({', '.join(parts)})"
 
 
