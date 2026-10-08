@@ -75,3 +75,13 @@ higher ed → K-12 districts → cities and counties → **hospital and health s
 1. Which tools does your office use today (CMMS, capital planning, project management, Excel)?
 2. Which recurring report or task do you dread most?
 3. Who above you would sign a software purchase, and what was the last tool they bought?
+
+## Update (2026-10-08): sharper wedge from our own office
+Our office runs **AiM + e-Builder + Excel**. The worst jobs are **board reports and forecasting**, and the VP wants "all data about our work: how efficient are we?"
+
+**Sharpened v1:** a **facilities performance & reporting agent** that connects AiM (work orders, assets) and e-Builder (projects, budgets, change orders). It produces:
+- an always-current KPI view: work order backlog, response and close times, preventive vs. corrective maintenance, cost per square foot, project budget and schedule variance, change-order %, FCI,
+- forecasts: project cash flow, deferred maintenance growth,
+- a draft board report with narrative, in the institution's own format.
+
+Capital-plan prioritization becomes v2, once we hold the joined data. Next steps: `INTERVIEW_GUIDE.md` and `MARKET_SIZING.md`.
