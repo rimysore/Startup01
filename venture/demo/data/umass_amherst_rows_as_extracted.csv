@@ -1,0 +1,65 @@
+authority,row_type,project,building,building_dm_backlog,total_cost,dm_investment,campus_reserves,external,borrowed,state,status
+Board,project,Curry Hicks Cage Renovation,Athletic Center,1531158,11600000,11600000,6600000,5000000,0,0,BOT Vote 2 Approved
+Board,project,Energy Improvements,Campuswide,0,16700000,16700000,495000,2380000,11000000,2825000,BOT Vote 2 Approved
+Board,project,Faculty Hire Renovations,Campuswide,0,15000000,15000000,1800000,0,13200000,0,BOT Vote 2 Approved
+Board,project,Office/Lab/Academic Renovations,Campuswide,0,25620000,25620000,9800000,0,14720000,1100000,BOT Vote 2 Approved
+Board,project,Conte Cleanroom,Conte Polymer Research Center,21214422,10000000,5000000,10000000,0,0,0,Pending BOT Vote 1
+Board,project,Engineering Building,Draper Hall Annex,1181758,125000000,1181758,25000000,37000000,63000000,0,BOT Vote 2 Approved
+Board,project,Fine Arts Center Performance Hall Improvements,Fine Arts Center,44715428,19000000,6000000,19000000,0,0,0,Pending BOT Vote 1
+Board,project,Flint Renovations,Flint Laboratory,8055447,32000000,32000000,21000000,0,0,11000000,BOT Vote 2 Approved
+Board,project,Food Innovation Hub,New Construction,19387743,80000000,20000000,0,20000000,60000000,0,BOT Vote 1 Authorized
+Board,project,Computer and Information Sciences Building,New Construction,0,125000000,0,0,3000000,47000000,75000000,BOT Vote 2 Approved
+Board,project,North Campus Energy Exchange Center,New Construction,0,30000000,0,21000000,9000000,0,0,BOT Vote 2 Approved
+Board,project,Thermal Energy Storage Tank,New Construction,0,14250000,0,14250000,0,0,0,BOT Vote 2 Approved
+Board,project,School of Public Health and Health Sciences Hub,New Construction,6916992,43000000,0,300000,5000000,37700000,0,BOT Vote 2 Approved
+Board,project,PVTA Bus Garage Expansion,PVTA Bus Facility Building,1743398,11000000,0,0,11000000,0,0,BOT Vote 2 Approved
+Board,project,Skinner Nursing Addition,Skinner Hall,326506,40000000,0,25000000,5000000,0,10000000,BOT Vote 1 Authorized
+Board,project,Tobin Deferred Maintenance,Tobin Hall,51572255,40000000,40000000,0,0,40000000,0,BOT Vote 1 Authorized
+Board,total,Total,,156645107,638170000,173101758,154245000,97380000,286620000,99925000,
+President,project,Brooks/Brett Window Replacement,Brett House,3631338,3000000,3000000,3000000,0,0,0,President Approved
+President,project,Butterfield Flooring Replacement,Butterfield Hall,8720753,2000000,2000000,2000000,0,0,0,President Authorized
+President,project,Class Lab Renovations,Campuswide,0,5000000,5000000,5000000,0,0,0,President Authorized
+President,project,New Faculty Hire Renovations,Campuswide,0,8000000,8000000,8000000,0,0,0,President Authorized
+President,project,Utilities & Infrastructure,Campuswide,0,9000000,9000000,7800000,0,0,1200000,President Authorized
+President,project,Deferred Maintenance and Campus Infrastructure,Campuswide,0,8000000,8000000,8000000,0,0,0,President Approved
+President,project,Instructional Space Renovations,Campuswide,0,5000000,5000000,5000000,0,0,0,Pending President Approval
+President,project,Southwest Laundry and Cooling Space Renovations,Campuswide,0,2000000,2000000,2000000,0,0,0,President Approved
+President,project,Roof Replacements,Campuswide,0,7000000,7000000,5432000,0,0,1568000,President Approved
+President,project,Coolidge Life Safety Upgrades,Coolidge Hall,25171593,8000000,8000000,8000000,0,0,0,President Approved
+President,project,Gloucester Marine Station Improvements,Gloucester Marine Station,0,4550000,4550000,2550000,0,0,2000000,President Approved
+President,project,ISOM Restroom & Accessibility Renovations,Isenberg School of Management Building,18766316,2900000,2900000,2900000,0,0,0,President Authorized
+President,project,JQA Life Safety Upgrades & Renovation,John Quincy Adams House,0,9000000,9000000,9000000,0,0,0,President Approved
+President,project,JQA Student Experience Renovations,John Quincy Adams House,0,3000000,3000000,3000000,0,0,0,President Approved
+President,subtotal,Subtotal,John Quincy Adams House,27117848,12000000,12000000,12000000,0,0,0,
+President,project,Johnson Residence Hall DM,Johnson Hall,14087789,6000000,6000000,6000000,0,0,0,President Authorized
+President,project,Lederle Lab Renovation,Lederle Graduate Research Center,0,3000000,3000000,3000000,0,0,0,President Authorized
+President,project,Lederle Chemistry Teaching Laboratories,Lederle Graduate Research Center,0,9000000,9000000,9000000,0,0,0,President Approved
+President,subtotal,Subtotal,Lederle Graduate Research Center,90166558,12000000,12000000,12000000,0,0,0,
+President,project,Lincoln Campus Center Fire Alarm Upgrade,Lincoln Campus Center,0,3700000,3700000,3700000,0,0,0,President Approved
+President,project,Lincoln Campus Center 2nd Floor Restroom Reno,Lincoln Campus Center,0,2200000,2200000,2200000,0,0,0,President Approved
+President,subtotal,Subtotal,Lincoln Campus Center,41525838,5900000,5900000,5900000,0,0,0,
+President,subtotal,Subtotal,,229188032,100350000,100350000,95582000,0,0,4768000,
+President,project,Memorial Hall DM,Memorial Hall,5823508,2000000,2000000,2000000,0,0,0,President Approved
+President,project,Moore Electrical Upgrades,Moore Hall,9568216,2000000,2000000,2000000,0,0,0,President Approved
+President,project,Mt Ida Campus Center Roof & Infrastructure,Mt Ida,0,3500000,3500000,1540000,0,0,1960000,President Approved
+President,project,Mullins Arena Bowl Telscopic Seating,Mullins Center,0,2400000,2400000,2400000,0,0,0,President Approved
+President,project,Mullins Chillers,Mullins Center,0,9000000,9000000,3296555,0,0,5703445,President Approved
+President,project,Mullins Dehumidification,Mullins Center,0,3500000,3500000,1844093,0,0,1655907,President Approved
+President,subtotal,Subtotal,Mullins Center,18275,14900000,14900000,7540648,0,0,7359352,
+President,project,Center for Early Education and Care,New Construction,0,9500000,0,9500000,0,0,0,President Authorized
+President,project,Water Engineering Technology Laboratories,New Construction,0,8000000,0,1400000,5100000,0,1500000,President Approved
+President,project,Utility Storage Tanks,New Construction,0,2500000,0,2500000,0,0,0,President Approved
+President,project,Pavilion,New Construction,0,8425000,0,0,8425000,0,0,President Approved
+President,project,Southwest Lowrise Tunnel Renovation,Southwest Concourse,0,4000000,4000000,4000000,0,0,0,President Approved
+President,project,Southwest Lowrise Tunnel Renovation Phase 2,Southwest Concourse,0,4000000,4000000,4000000,0,0,0,President Approved
+President,subtotal,Subtotal,Southwest Concourse,1376647,8000000,8000000,8000000,0,0,0,
+President,project,SPHHS Dry Lab Renovations,Totman,6916992,2500000,2500000,2500000,0,0,0,President Authorized
+President,project,Van Meter Roof Rehabilitation,Van Meter House,13008517,4000000,4000000,1730336,0,0,2269664,President Approved
+President,project,Washington Life Safety/Fire Alarm Upgrades,Washington House,0,3000000,3000000,3000000,0,0,0,President Approved
+President,project,Washington & Kennedy Resident Halls Life Safety Upgrades Phase 2,"Washington House, Kennedy House",0,6230000,6230000,6230000,0,0,0,President Approved
+President,project,Washington and Kennedy Residence Halls Life Safety Upgrades,"Washington House, Kennedy House",0,5000000,5000000,5000000,0,0,0,President Approved
+President,subtotal,Subtotal,"Washington House, Kennedy House",49440639,11230000,11230000,11230000,0,0,0,
+President,project,Wheeler Basement Student Experience Upgrades,Wheeler House,6897308,3500000,3500000,3500000,0,0,0,President Approved
+President,project,Mt Ida Wingate Hall Dorm Renovations,Wingate,2177831,6000000,6000000,6000000,0,0,0,President Approved
+President,subtotal,Subtotal,,95227933,89055000,60630000,62440984,13525000,0,13089016,
+President,total,Total,,324415965,189405000,160980000,158022984,13525000,0,17857016,

@@ -1,0 +1,714 @@
+<title>Metric Studio UMass Edition</title>
+<meta name="description" content="Metric Studio run on the public UMass FY26–FY30 Capital Plan (Amherst campus).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: app shell. Header with persona + period, tab row, then a 12-column tile grid; definitions open in a side drawer. */
+:root {
+  --bg: #f3f5f4;
+  --panel: #ffffff;
+  --ink: #15201e;
+  --ink-2: #4b5755;
+  --ink-3: #7b8684;
+  --rule: #dce2e0;
+  --rule-strong: #bac4c1;
+  --accent: #0f6b62;
+  --accent-ink: #ffffff;
+  --accent-soft: #e0efec;
+  --prior: #9aa6a3;
+  --track: #e7ecea;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #c98500;
+  --good: #1f7a3a; --good-bg: #e2f2e6;
+  --warn: #8f5600; --warn-bg: #fbefd8;
+  --info: #23589b; --info-bg: #e3edf9;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1514; --panel: #172120; --ink: #ecf2f1; --ink-2: #b3bfbd; --ink-3: #87938f;
+    --rule: #28332f; --rule-strong: #3b4845; --accent: #4fc2b4; --accent-ink: #0b1a18; --accent-soft: #1b3431;
+    --prior: #6e7b78; --track: #222d2b;
+    --good: #72d18f; --good-bg: #183020; --warn: #f0b75a; --warn-bg: #36290f; --info: #8db8f0; --info-bg: #182a40;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1514; --panel: #172120; --ink: #ecf2f1; --ink-2: #b3bfbd; --ink-3: #87938f;
+  --rule: #28332f; --rule-strong: #3b4845; --accent: #4fc2b4; --accent-ink: #0b1a18; --accent-soft: #1b3431;
+  --prior: #6e7b78; --track: #222d2b;
+  --good: #72d18f; --good-bg: #183020; --warn: #f0b75a; --warn-bg: #36290f; --info: #8db8f0; --info-bg: #182a40;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 64px; display: grid; gap: 16px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-size: 1.35rem; font-weight: 800; }
+h2 { font-size: 1.25rem; font-weight: 700; }
+h3 { font-size: .95rem; font-weight: 700; }
+p { margin: 0; }
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-2); }
+.small { font-size: .84rem; }
+.eyebrow { font-family: var(--font-data); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+button, select, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+.brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.mark { width: 34px; height: 34px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; flex: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.field { display: grid; gap: 2px; }
+.field label { font-size: .72rem; color: var(--ink-3); font-family: var(--font-data); letter-spacing: .06em; text-transform: uppercase; }
+select, input[type=text], input[type=number], textarea { background: var(--panel); border: 1px solid var(--rule-strong); border-radius: 5px; padding: 6px 9px; min-width: 0; }
+.banner { font-size: .82rem; color: var(--ink-2); background: var(--panel); border: 1px dashed var(--rule-strong); border-radius: 6px; padding: 8px 12px; }
+
+/* tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--rule); overflow-x: auto; }
+.tabs a { padding: 8px 14px; text-decoration: none; color: var(--ink-2); font-weight: 600; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a[aria-current=page] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.btn { border: 1px solid var(--rule-strong); background: var(--panel); border-radius: 5px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: .88rem; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.link { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; cursor: pointer; }
+.btn[disabled] { opacity: .55; cursor: default; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.toolbar .left, .toolbar .right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-data); font-size: .68rem; letter-spacing: .04em; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.chip.cert { background: var(--good-bg); color: var(--good); }
+.chip.pers { background: var(--info-bg); color: var(--info); }
+.chip.pend { background: var(--warn-bg); color: var(--warn); }
+
+/* tiles */
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; grid-column: span 3; }
+.tile.wide { grid-column: span 6; }
+@media (max-width: 980px) { .tile { grid-column: span 6; } .tile.wide { grid-column: span 12; } }
+@media (max-width: 560px) { .tile, .tile.wide { grid-column: span 12; } }
+.tile-head { display: flex; gap: 8px; align-items: start; justify-content: space-between; }
+.tile-head h3 { font-size: .9rem; }
+.tile-tools { display: flex; gap: 2px; flex: none; }
+.icon { border: 0; background: none; color: var(--ink-3); cursor: pointer; padding: 2px 5px; border-radius: 4px; font-size: .9rem; line-height: 1; }
+.icon:hover { color: var(--ink); background: var(--track); }
+.kpi { font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: 0; padding: 0; text-align: left; color: var(--ink); }
+.delta { font-size: .8rem; color: var(--ink-2); }
+.delta b { font-family: var(--font-data); font-weight: 600; }
+.tile-foot { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: .78rem; color: var(--ink-3); }
+.tile svg { width: 100%; height: auto; display: block; }
+.tile svg text { fill: var(--ink-2); font-family: var(--font-data); font-size: 10px; }
+.legend { display: flex; gap: 12px; font-size: .75rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.rank { display: grid; gap: 5px; }
+.rank-row { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .82rem; }
+.rank-row span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar { height: 10px; border-radius: 3px; background: var(--accent); }
+
+/* add panel */
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 12px; align-content: start; }
+.form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+
+/* library */
+.lib { display: grid; gap: 8px; }
+.lib-item { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: start; }
+.lib-item .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+/* define */
+.define { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 900px) { .define { grid-template-columns: minmax(0, 1fr); } }
+textarea { width: 100%; min-height: 110px; resize: vertical; }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.examples button { border: 1px dashed var(--rule-strong); background: transparent; border-radius: 5px; padding: 5px 9px; cursor: pointer; font-size: .82rem; text-align: left; }
+.readback { background: var(--accent-soft); border-radius: 6px; padding: 12px 14px; }
+.rules { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.rules td { padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.rules td:first-child { color: var(--ink-3); width: 34%; font-family: var(--font-data); font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; }
+.result { border-radius: 6px; padding: 10px 12px; font-size: .9rem; }
+.result.ok { background: var(--good-bg); color: var(--good); }
+.result.bad { background: var(--warn-bg); color: var(--warn); }
+.result.info { background: var(--info-bg); color: var(--info); }
+pre.spec { background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 10px; font-size: .74rem; overflow-x: auto; margin: 0; max-height: 260px; }
+
+/* checks */
+.check { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; }
+.check .st { grid-row: span 2; font-family: var(--font-data); font-size: .72rem; padding: 2px 8px; border-radius: 99px; align-self: start; }
+
+/* drawer */
+.scrim { position: fixed; inset: 0; background: rgba(10, 16, 15, .35); z-index: 20; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--panel); border-left: 1px solid var(--rule); z-index: 21; overflow-y: auto; padding: calc(16px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; }
+table.rows { border-collapse: collapse; width: 100%; font-size: .78rem; }
+table.rows th, table.rows td { padding: 5px 8px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+table.rows th { font-family: var(--font-data); font-size: .66rem; text-transform: uppercase; color: var(--ink-3); letter-spacing: .05em; }
+.summary-out { display: grid; gap: 6px; }
+.summary-out mark { background: var(--warn-bg); color: var(--warn); border-radius: 3px; padding: 0 2px; }
+.summary-out .ok-num { border-bottom: 2px solid var(--good); }
+@media (prefers-reduced-motion: no-preference) { .tile { transition: border-color .15s; } }
+.mixbar { display: flex; height: 22px; border-radius: 4px; overflow: hidden; gap: 2px; background: var(--panel); }
+.mixleg { display: grid; gap: 4px; font-size: .82rem; }
+.mixleg div { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto auto; gap: 8px; align-items: center; }
+.mixleg i { width: 12px; height: 12px; border-radius: 2px; }
+.knowns { display: flex; flex-wrap: wrap; gap: 6px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; } }
+:root[data-theme="dark"] { --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; }
+.knowns button { border: 1px solid var(--rule-strong); background: var(--panel); border-radius: 99px; padding: 3px 10px; cursor: pointer; font-size: .8rem; }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">M</div>
+      <div>
+        <h1>Metric Studio <span class="muted" style="font-weight:600">· UMass edition</span></h1>
+        <div class="small muted">UMass Amherst capital plan, FY26–FY30 · public data as of June 2025</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="field"><label for="persona">Viewing as</label>
+        <select id="persona">
+          <option value="vp">VP, Capital Planning</option>
+          <option value="cfo">CFO / Treasurer</option>
+          <option value="board">Trustee</option>
+        </select>
+      </div>
+    </div>
+  </header>
+  <div class="banner">Built from the public <a href="https://www.umassp.edu/sites/default/files/publications/budget-office/capital-plans/fy26-30-capital-plan-final-for-website.pdf" target="_blank" rel="noopener">UMass FY26–FY30 Capital Plan</a> (Board of Trustees, Sept 2025): 54 Amherst projects plus the plan's building backlog table. Every number is calculated from a written definition. Not affiliated with UMass.</div>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#dashboard" data-tab="dashboard">My dashboard</a>
+    <a href="#library" data-tab="library">Metric library</a>
+    <a href="#define" data-tab="define">Define a metric</a>
+    <a href="#checks" data-tab="checks">Checks</a>
+  </nav>
+
+  <section data-view="dashboard">
+    <div style="display:grid;gap:12px">
+      <div class="toolbar">
+        <div class="left"><h2 id="dashTitle">Dashboard</h2><span class="small muted">Amherst · authorized &amp; approved projects</span></div>
+        <div class="right">
+          <button class="btn" type="button" id="summaryBtn" hidden>Draft board summary</button>
+          <button class="btn" type="button" id="resetBtn">Reset layout</button>
+          <button class="btn primary" type="button" id="addBtn">Add tile</button>
+        </div>
+      </div>
+      <div class="panel" id="addPanel" hidden>
+        <h3>Add a tile</h3>
+        <div class="form-row">
+          <div class="field"><label for="addMetric">Metric</label><select id="addMetric"></select></div>
+          <div class="field"><label for="addView">Show as</label><select id="addView"></select></div>
+          <div class="field" id="addGroupWrap"><label for="addGroup">Rank by</label><select id="addGroup"></select></div>
+          <button class="btn primary" type="button" id="addConfirm">Add to my dashboard</button>
+          <button class="btn" type="button" id="addCancel">Cancel</button>
+        </div>
+      </div>
+      <div class="panel summary-out" id="summaryPanel" hidden aria-live="polite"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section data-view="library" hidden>
+    <div style="display:grid;gap:12px">
+      <div class="toolbar"><div class="left"><h2>Metric library</h2></div>
+        <div class="right"><select id="libFilter" aria-label="Filter metrics"><option value="">All metrics</option><option value="certified">Certified</option><option value="personal">Personal</option></select></div></div>
+      <p class="muted small">Certified metrics are the official definitions for board reporting. Personal metrics belong to one person and are labeled wherever they appear.</p>
+      <div class="lib" id="lib"></div>
+    </div>
+  </section>
+
+  <section data-view="define" hidden>
+    <div class="define">
+      <div class="panel">
+        <h2>Explain your calculation</h2>
+        <p class="muted small">Describe the number the way you'd explain it to a colleague. The assistant turns it into a written definition; the engine does the math.</p>
+        <label class="eyebrow" for="defText">Your description</label>
+        <textarea id="defText" placeholder="e.g. What share of the plan is paid for with borrowed money?"></textarea>
+        <div class="toolbar"><div class="left"><button class="btn primary" type="button" id="draftBtn">Draft definition</button><span class="small muted" id="draftStatus"></span></div></div>
+        <div class="eyebrow">Or start from an example (no AI needed)</div>
+        <div class="examples" id="examples"></div>
+      </div>
+      <div class="panel" id="defResult">
+        <p class="muted">The drafted definition appears here: a plain-English readback, the counting rules you can change, a preview value and a test against a number printed in the plan.</p>
+      </div>
+    </div>
+  </section>
+
+  <section data-view="checks" hidden>
+    <div style="display:grid;gap:12px">
+      <h2>Reconciliation checks</h2>
+      <p class="muted small">Every extracted number is checked against the totals the plan prints. A flagged check stays visible on any report that uses the affected figures.</p>
+      <div style="display:grid;gap:8px" id="checks"></div>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Metric definition"></aside>
+
+<script>
+/* Source rows: the plan's Amherst project tables exactly as extracted (project, subtotal and total lines),
+   one public-private (P3) project from the plan's alternative-delivery table, and the building backlog table. */
+const RAW = [{"authority": "Board", "row_type": "project", "project": "Curry Hicks Cage Renovation", "building": "Athletic Center", "building_dm_backlog": 1531158, "total_cost": 11600000, "dm_investment": 11600000, "campus_reserves": 6600000, "external": 5000000, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Energy Improvements", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 16700000, "dm_investment": 16700000, "campus_reserves": 495000, "external": 2380000, "borrowed": 11000000, "state": 2825000, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Faculty Hire Renovations", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 15000000, "dm_investment": 15000000, "campus_reserves": 1800000, "external": 0, "borrowed": 13200000, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Office/Lab/Academic Renovations", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 25620000, "dm_investment": 25620000, "campus_reserves": 9800000, "external": 0, "borrowed": 14720000, "state": 1100000, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Conte Cleanroom", "building": "Conte Polymer Research Center", "building_dm_backlog": 21214422, "total_cost": 10000000, "dm_investment": 5000000, "campus_reserves": 10000000, "external": 0, "borrowed": 0, "state": 0, "status": "Pending BOT Vote 1", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Engineering Building", "building": "Draper Hall Annex", "building_dm_backlog": 1181758, "total_cost": 125000000, "dm_investment": 1181758, "campus_reserves": 25000000, "external": 37000000, "borrowed": 63000000, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Fine Arts Center Performance Hall Improvements", "building": "Fine Arts Center", "building_dm_backlog": 44715428, "total_cost": 19000000, "dm_investment": 6000000, "campus_reserves": 19000000, "external": 0, "borrowed": 0, "state": 0, "status": "Pending BOT Vote 1", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Flint Renovations", "building": "Flint Laboratory", "building_dm_backlog": 8055447, "total_cost": 32000000, "dm_investment": 32000000, "campus_reserves": 21000000, "external": 0, "borrowed": 0, "state": 11000000, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Food Innovation Hub", "building": "New Construction", "building_dm_backlog": 19387743, "total_cost": 80000000, "dm_investment": 20000000, "campus_reserves": 0, "external": 20000000, "borrowed": 60000000, "state": 0, "status": "BOT Vote 1 Authorized", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Computer and Information Sciences Building", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 125000000, "dm_investment": 0, "campus_reserves": 0, "external": 3000000, "borrowed": 47000000, "state": 75000000, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "North Campus Energy Exchange Center", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 30000000, "dm_investment": 0, "campus_reserves": 21000000, "external": 9000000, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Thermal Energy Storage Tank", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 14250000, "dm_investment": 0, "campus_reserves": 14250000, "external": 0, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "School of Public Health and Health Sciences Hub", "building": "New Construction", "building_dm_backlog": 6916992, "total_cost": 43000000, "dm_investment": 0, "campus_reserves": 300000, "external": 5000000, "borrowed": 37700000, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "PVTA Bus Garage Expansion", "building": "PVTA Bus Facility Building", "building_dm_backlog": 1743398, "total_cost": 11000000, "dm_investment": 0, "campus_reserves": 0, "external": 11000000, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Skinner Nursing Addition", "building": "Skinner Hall", "building_dm_backlog": 326506, "total_cost": 40000000, "dm_investment": 0, "campus_reserves": 25000000, "external": 5000000, "borrowed": 0, "state": 10000000, "status": "BOT Vote 1 Authorized", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Tobin Deferred Maintenance", "building": "Tobin Hall", "building_dm_backlog": 51572255, "total_cost": 40000000, "dm_investment": 40000000, "campus_reserves": 0, "external": 0, "borrowed": 40000000, "state": 0, "status": "BOT Vote 1 Authorized", "delivery": "Traditional"}, {"authority": "Board", "row_type": "total", "project": "Total", "building": "", "building_dm_backlog": 156645107, "total_cost": 638170000, "dm_investment": 173101758, "campus_reserves": 154245000, "external": 97380000, "borrowed": 286620000, "state": 99925000, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Brooks/Brett Window Replacement", "building": "Brett House", "building_dm_backlog": 3631338, "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Butterfield Flooring Replacement", "building": "Butterfield Hall", "building_dm_backlog": 8720753, "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Class Lab Renovations", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 5000000, "dm_investment": 5000000, "campus_reserves": 5000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "New Faculty Hire Renovations", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Utilities & Infrastructure", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 7800000, "external": 0, "borrowed": 0, "state": 1200000, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Deferred Maintenance and Campus Infrastructure", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Instructional Space Renovations", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 5000000, "dm_investment": 5000000, "campus_reserves": 5000000, "external": 0, "borrowed": 0, "state": 0, "status": "Pending President Approval", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Southwest Laundry and Cooling Space Renovations", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Roof Replacements", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 7000000, "dm_investment": 7000000, "campus_reserves": 5432000, "external": 0, "borrowed": 0, "state": 1568000, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Coolidge Life Safety Upgrades", "building": "Coolidge Hall", "building_dm_backlog": 25171593, "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Gloucester Marine Station Improvements", "building": "Gloucester Marine Station", "building_dm_backlog": 0, "total_cost": 4550000, "dm_investment": 4550000, "campus_reserves": 2550000, "external": 0, "borrowed": 0, "state": 2000000, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "ISOM Restroom & Accessibility Renovations", "building": "Isenberg School of Management Building", "building_dm_backlog": 18766316, "total_cost": 2900000, "dm_investment": 2900000, "campus_reserves": 2900000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "JQA Life Safety Upgrades & Renovation", "building": "John Quincy Adams House", "building_dm_backlog": 0, "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 9000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "JQA Student Experience Renovations", "building": "John Quincy Adams House", "building_dm_backlog": 0, "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "John Quincy Adams House", "building_dm_backlog": 27117848, "total_cost": 12000000, "dm_investment": 12000000, "campus_reserves": 12000000, "external": 0, "borrowed": 0, "state": 0, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Johnson Residence Hall DM", "building": "Johnson Hall", "building_dm_backlog": 14087789, "total_cost": 6000000, "dm_investment": 6000000, "campus_reserves": 6000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Lederle Lab Renovation", "building": "Lederle Graduate Research Center", "building_dm_backlog": 0, "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Lederle Chemistry Teaching Laboratories", "building": "Lederle Graduate Research Center", "building_dm_backlog": 0, "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 9000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "Lederle Graduate Research Center", "building_dm_backlog": 90166558, "total_cost": 12000000, "dm_investment": 12000000, "campus_reserves": 12000000, "external": 0, "borrowed": 0, "state": 0, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Lincoln Campus Center Fire Alarm Upgrade", "building": "Lincoln Campus Center", "building_dm_backlog": 0, "total_cost": 3700000, "dm_investment": 3700000, "campus_reserves": 3700000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Lincoln Campus Center 2nd Floor Restroom Reno", "building": "Lincoln Campus Center", "building_dm_backlog": 0, "total_cost": 2200000, "dm_investment": 2200000, "campus_reserves": 2200000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "Lincoln Campus Center", "building_dm_backlog": 41525838, "total_cost": 5900000, "dm_investment": 5900000, "campus_reserves": 5900000, "external": 0, "borrowed": 0, "state": 0, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "", "building_dm_backlog": 229188032, "total_cost": 100350000, "dm_investment": 100350000, "campus_reserves": 95582000, "external": 0, "borrowed": 0, "state": 4768000, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Memorial Hall DM", "building": "Memorial Hall", "building_dm_backlog": 5823508, "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Moore Electrical Upgrades", "building": "Moore Hall", "building_dm_backlog": 9568216, "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Mt Ida Campus Center Roof & Infrastructure", "building": "Mt Ida", "building_dm_backlog": 0, "total_cost": 3500000, "dm_investment": 3500000, "campus_reserves": 1540000, "external": 0, "borrowed": 0, "state": 1960000, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Mullins Arena Bowl Telscopic Seating", "building": "Mullins Center", "building_dm_backlog": 0, "total_cost": 2400000, "dm_investment": 2400000, "campus_reserves": 2400000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Mullins Chillers", "building": "Mullins Center", "building_dm_backlog": 0, "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 3296555, "external": 0, "borrowed": 0, "state": 5703445, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Mullins Dehumidification", "building": "Mullins Center", "building_dm_backlog": 0, "total_cost": 3500000, "dm_investment": 3500000, "campus_reserves": 1844093, "external": 0, "borrowed": 0, "state": 1655907, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "Mullins Center", "building_dm_backlog": 18275, "total_cost": 14900000, "dm_investment": 14900000, "campus_reserves": 7540648, "external": 0, "borrowed": 0, "state": 7359352, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Center for Early Education and Care", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 9500000, "dm_investment": 0, "campus_reserves": 9500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Water Engineering Technology Laboratories", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 8000000, "dm_investment": 0, "campus_reserves": 1400000, "external": 5100000, "borrowed": 0, "state": 1500000, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Utility Storage Tanks", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 2500000, "dm_investment": 0, "campus_reserves": 2500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Pavilion", "building": "New Construction", "building_dm_backlog": 0, "total_cost": 8425000, "dm_investment": 0, "campus_reserves": 0, "external": 8425000, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Southwest Lowrise Tunnel Renovation", "building": "Southwest Concourse", "building_dm_backlog": 0, "total_cost": 4000000, "dm_investment": 4000000, "campus_reserves": 4000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Southwest Lowrise Tunnel Renovation Phase 2", "building": "Southwest Concourse", "building_dm_backlog": 0, "total_cost": 4000000, "dm_investment": 4000000, "campus_reserves": 4000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "Southwest Concourse", "building_dm_backlog": 1376647, "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "SPHHS Dry Lab Renovations", "building": "Totman", "building_dm_backlog": 6916992, "total_cost": 2500000, "dm_investment": 2500000, "campus_reserves": 2500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Van Meter Roof Rehabilitation", "building": "Van Meter House", "building_dm_backlog": 13008517, "total_cost": 4000000, "dm_investment": 4000000, "campus_reserves": 1730336, "external": 0, "borrowed": 0, "state": 2269664, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Washington Life Safety/Fire Alarm Upgrades", "building": "Washington House", "building_dm_backlog": 0, "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Washington & Kennedy Resident Halls Life Safety Upgrades Phase 2", "building": "Washington House, Kennedy House", "building_dm_backlog": 0, "total_cost": 6230000, "dm_investment": 6230000, "campus_reserves": 6230000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Washington and Kennedy Residence Halls Life Safety Upgrades", "building": "Washington House, Kennedy House", "building_dm_backlog": 0, "total_cost": 5000000, "dm_investment": 5000000, "campus_reserves": 5000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "Washington House, Kennedy House", "building_dm_backlog": 49440639, "total_cost": 11230000, "dm_investment": 11230000, "campus_reserves": 11230000, "external": 0, "borrowed": 0, "state": 0, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Wheeler Basement Student Experience Upgrades", "building": "Wheeler House", "building_dm_backlog": 6897308, "total_cost": 3500000, "dm_investment": 3500000, "campus_reserves": 3500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "project", "project": "Mt Ida Wingate Hall Dorm Renovations", "building": "Wingate", "building_dm_backlog": 2177831, "total_cost": 6000000, "dm_investment": 6000000, "campus_reserves": 6000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved", "delivery": "Traditional"}, {"authority": "President", "row_type": "subtotal", "project": "Subtotal", "building": "", "building_dm_backlog": 95227933, "total_cost": 89055000, "dm_investment": 60630000, "campus_reserves": 62440984, "external": 13525000, "borrowed": 0, "state": 13089016, "status": "", "delivery": "Traditional"}, {"authority": "President", "row_type": "total", "project": "Total", "building": "", "building_dm_backlog": 324415965, "total_cost": 189405000, "dm_investment": 160980000, "campus_reserves": 158022984, "external": 13525000, "borrowed": 0, "state": 17857016, "status": "", "delivery": "Traditional"}, {"authority": "Board", "row_type": "project", "project": "Campus Development Opportunities (P3)", "building": "Campuswide", "building_dm_backlog": 0, "total_cost": 0, "dm_investment": 0, "campus_reserves": 0, "external": 0, "borrowed": 0, "state": 0, "status": "BOT Vote 1 Authorized (5/22/24), cost TBD", "delivery": "P3"}];
+const BUILDINGS = [{"building": "Athletic Center", "backlog": 1531158, "fci": "", "authorized_dm": 11600000, "hasProject": true, "topBacklog": false, "registerBacklog": 1531158, "planBacklog": 0}, {"building": "Bartlett Hall", "backlog": 57800000, "fci": "62%", "authorized_dm": 0, "hasProject": false, "topBacklog": true, "registerBacklog": 0, "planBacklog": 57800000}, {"building": "Brett House", "backlog": 3631338, "fci": "", "authorized_dm": 3000000, "hasProject": true, "topBacklog": false, "registerBacklog": 3631338, "planBacklog": 0}, {"building": "Butterfield Hall", "backlog": 8720753, "fci": "", "authorized_dm": 2000000, "hasProject": true, "topBacklog": false, "registerBacklog": 8720753, "planBacklog": 0}, {"building": "Conte Polymer Research Center", "backlog": 21214422, "fci": "", "authorized_dm": 5000000, "hasProject": true, "topBacklog": false, "registerBacklog": 21214422, "planBacklog": 0}, {"building": "Coolidge Hall", "backlog": 25171593, "fci": "", "authorized_dm": 8000000, "hasProject": true, "topBacklog": false, "registerBacklog": 25171593, "planBacklog": 0}, {"building": "Draper Hall Annex", "backlog": 1181758, "fci": "", "authorized_dm": 1181758, "hasProject": true, "topBacklog": false, "registerBacklog": 1181758, "planBacklog": 0}, {"building": "Dubois Library", "backlog": 116700000, "fci": "33%", "authorized_dm": 0, "hasProject": false, "topBacklog": true, "registerBacklog": 0, "planBacklog": 116700000}, {"building": "Fine Arts Center", "backlog": 44715428, "fci": "16%", "authorized_dm": 6000000, "hasProject": true, "topBacklog": true, "registerBacklog": 44715428, "planBacklog": 44700000}, {"building": "Flint Laboratory", "backlog": 8055447, "fci": "", "authorized_dm": 32000000, "hasProject": true, "topBacklog": false, "registerBacklog": 8055447, "planBacklog": 0}, {"building": "Herter Hall", "backlog": 33800000, "fci": "58%", "authorized_dm": 0, "hasProject": false, "topBacklog": true, "registerBacklog": 0, "planBacklog": 33800000}, {"building": "Isenberg School of Management Building", "backlog": 18766316, "fci": "", "authorized_dm": 2900000, "hasProject": true, "topBacklog": false, "registerBacklog": 18766316, "planBacklog": 0}, {"building": "John Quincy Adams House", "backlog": 27117848, "fci": "", "authorized_dm": 12000000, "hasProject": true, "topBacklog": false, "registerBacklog": 27117848, "planBacklog": 0}, {"building": "Johnson Hall", "backlog": 14087789, "fci": "", "authorized_dm": 6000000, "hasProject": true, "topBacklog": false, "registerBacklog": 14087789, "planBacklog": 0}, {"building": "Lederle Graduate Research Center", "backlog": 90166558, "fci": "21\u201329%", "authorized_dm": 12000000, "hasProject": true, "topBacklog": true, "registerBacklog": 90166558, "planBacklog": 90100000}, {"building": "Lincoln Campus Center", "backlog": 41525838, "fci": "24%", "authorized_dm": 5900000, "hasProject": true, "topBacklog": true, "registerBacklog": 41525838, "planBacklog": 41500000}, {"building": "Memorial Hall", "backlog": 5823508, "fci": "", "authorized_dm": 2000000, "hasProject": true, "topBacklog": false, "registerBacklog": 5823508, "planBacklog": 0}, {"building": "Moore Hall", "backlog": 9568216, "fci": "", "authorized_dm": 2000000, "hasProject": true, "topBacklog": false, "registerBacklog": 9568216, "planBacklog": 0}, {"building": "Morrill Science Center I", "backlog": 31700000, "fci": "65%", "authorized_dm": 0, "hasProject": false, "topBacklog": true, "registerBacklog": 0, "planBacklog": 31700000}, {"building": "Morrill Science Center III", "backlog": 45200000, "fci": "87%", "authorized_dm": 0, "hasProject": false, "topBacklog": true, "registerBacklog": 0, "planBacklog": 45200000}, {"building": "Mullins Center", "backlog": 18275, "fci": "", "authorized_dm": 14900000, "hasProject": true, "topBacklog": false, "registerBacklog": 18275, "planBacklog": 0}, {"building": "PVTA Bus Facility Building", "backlog": 1743398, "fci": "", "authorized_dm": 0, "hasProject": false, "topBacklog": false, "registerBacklog": 1743398, "planBacklog": 0}, {"building": "Skinner Hall", "backlog": 326506, "fci": "", "authorized_dm": 0, "hasProject": false, "topBacklog": false, "registerBacklog": 326506, "planBacklog": 0}, {"building": "Southwest Concourse", "backlog": 1376647, "fci": "", "authorized_dm": 8000000, "hasProject": true, "topBacklog": false, "registerBacklog": 1376647, "planBacklog": 0}, {"building": "Tobin Hall", "backlog": 51572255, "fci": "58%", "authorized_dm": 40000000, "hasProject": true, "topBacklog": true, "registerBacklog": 51572255, "planBacklog": 51600000}, {"building": "Totman", "backlog": 6916992, "fci": "", "authorized_dm": 2500000, "hasProject": true, "topBacklog": false, "registerBacklog": 6916992, "planBacklog": 0}, {"building": "Van Meter House", "backlog": 13008517, "fci": "", "authorized_dm": 4000000, "hasProject": true, "topBacklog": false, "registerBacklog": 13008517, "planBacklog": 0}, {"building": "Washington House, Kennedy House", "backlog": 49440639, "fci": "", "authorized_dm": 11230000, "hasProject": true, "topBacklog": false, "registerBacklog": 49440639, "planBacklog": 0}, {"building": "Wheeler House", "backlog": 6897308, "fci": "", "authorized_dm": 3500000, "hasProject": true, "topBacklog": false, "registerBacklog": 6897308, "planBacklog": 0}, {"building": "Wingate", "backlog": 2177831, "fci": "", "authorized_dm": 6000000, "hasProject": true, "topBacklog": false, "registerBacklog": 2177831, "planBacklog": 0}];
+const PRINTED = { boardTotal: 638170000, presidentTotal: 189405000, amherstTotal: 827575000, amherstProjects: 55,
+  mix: { campus_reserves: 38, external: 13, borrowed: 35, state: 14 }, fciTop10Printed: 108.4, fciTop10Rows: [28.7, 13.6, 9.7, 9.7, 8.8, 6.5, 4.3, 7.7, 14.6, 5.6] };
+
+RAW.forEach(r => {
+  r.stage = /Pending/.test(r.status) ? "Pending vote" : /Approved/.test(r.status) ? "Approved (Vote 2)" : /Authorized/.test(r.status) ? "Authorized (Vote 1)" : "Other";
+  r.isNewConstruction = r.building === "New Construction";
+  r.isCampuswide = r.building === "Campuswide";
+  r.usesState = r.state > 0; r.usesDebt = r.borrowed > 0;
+});
+
+/* ===================== engine ===================== */
+const FIELDS = {
+  project: { label: "project", type: "cat", grain: "project" },
+  building: { label: "building", type: "cat" },
+  authority: { label: "approving authority", type: "cat", values: ["Board", "President"], grain: "project" },
+  stage: { label: "approval stage", type: "cat", values: ["Approved (Vote 2)", "Authorized (Vote 1)", "Pending vote"], grain: "project" },
+  isNewConstruction: { label: "new construction", type: "bool", grain: "project" },
+  isCampuswide: { label: "campuswide (no single building)", type: "bool", grain: "project" },
+  usesState: { label: "uses state funding", type: "bool", grain: "project" },
+  usesDebt: { label: "uses borrowing", type: "bool", grain: "project" },
+  total_cost: { label: "total project cost", type: "money", grain: "project" },
+  dm_investment: { label: "deferred-maintenance investment", type: "money", grain: "project" },
+  campus_reserves: { label: "campus reserves", type: "money", grain: "project" },
+  external: { label: "external funds", type: "money", grain: "project" },
+  borrowed: { label: "borrowing", type: "money", grain: "project" },
+  state: { label: "state funding", type: "money", grain: "project" },
+  backlog: { label: "building backlog", type: "money", grain: "building" },
+  authorized_dm: { label: "authorized DM investment in the building", type: "money", grain: "building" },
+  hasProject: { label: "has an authorized project", type: "bool", grain: "building" },
+  topBacklog: { label: "among the plan's largest-backlog buildings", type: "bool", grain: "building" },
+};
+const MEASURES = ["count", "sum", "ratio", "share", "mix", "max"];
+const MIX_FIELDS = ["campus_reserves", "external", "borrowed", "state"];
+const MIX_COLORS = ["var(--s1)", "var(--s2)", "var(--s3)", "var(--s4)"];
+
+function source(spec) {
+  if (spec.grain === "building") return BUILDINGS;
+  const r = spec.rules || {};
+  return RAW.filter(x => (x.row_type === "project" || r.includeSubtotals) && (x.delivery !== "P3" || r.includeP3));
+}
+function test(r, c) {
+  const x = r[c.field];
+  switch (c.op) {
+    case "eq": return x === c.value; case "neq": return x !== c.value;
+    case "in": return (c.value || []).includes(x);
+    case "gt": return x > c.value; case "gte": return x >= c.value; case "lt": return x < c.value; case "lte": return x <= c.value;
+    case "is": return Boolean(x) === Boolean(c.value);
+    case "contains": return String(x).toLowerCase().includes(String(c.value).toLowerCase());
+  }
+  return false;
+}
+const selectRows = (spec, extra = []) => source(spec).filter(r => [...(spec.filter || []), ...extra].every(c => test(r, c)));
+const sumF = (rows, f) => rows.reduce((a, r) => a + (Number(r[f]) || 0), 0);
+function compute(spec, extra = []) {
+  const rows = selectRows(spec, extra), m = spec.measure;
+  switch (m.type) {
+    case "count": return rows.length;
+    case "sum": return sumF(rows, m.field);
+    case "max": return rows.length ? Math.max(...rows.map(r => Number(r[m.field]) || 0)) : NaN;
+    case "ratio": { const d = sumF(rows, m.den); return d ? sumF(rows, m.num) / d : NaN; }
+    case "share": return rows.length ? rows.filter(r => test(r, m.where)).length / rows.length : NaN;
+    case "mix": return sumF(rows, "total_cost");
+  }
+  return NaN;
+}
+function computeGrouped(spec, field) {
+  const keys = [...new Set(selectRows(spec).map(r => r[field]))];
+  return keys.map(k => ({ key: String(k), value: compute(spec, [{ field, op: "eq", value: k }]) })).filter(x => Number.isFinite(x.value) && x.value !== 0).sort((a, b) => b.value - a.value);
+}
+function validateSpec(s) {
+  const errs = [];
+  if (!s || typeof s !== "object") return ["The definition is empty."];
+  if (!["project", "building"].includes(s.grain)) errs.push("grain must be project or building");
+  if (!s.measure || !MEASURES.includes(s.measure.type)) errs.push("measure.type is not one of " + MEASURES.join(", "));
+  else {
+    const m = s.measure;
+    if (["sum", "max"].includes(m.type) && !FIELDS[m.field]) errs.push("measure.field is not a known field");
+    if (m.type === "ratio" && (!FIELDS[m.num] || !FIELDS[m.den])) errs.push("ratio needs known 'num' and 'den' fields");
+    if (m.type === "share" && (!m.where || !FIELDS[m.where.field])) errs.push("share needs a 'where' condition on a known field");
+  }
+  for (const c of s.filter || []) if (!FIELDS[c.field]) errs.push("filter field '" + c.field + "' is not known");
+  return errs;
+}
+
+/* ===================== readback ===================== */
+const OPS = { eq: "is", neq: "is not", in: "is one of", gt: "is over", gte: "is at least", lt: "is under", lte: "is at most", is: "", contains: "contains" };
+function fmtCond(c) {
+  const f = FIELDS[c.field] || { label: c.field };
+  if (f.type === "bool") return (c.value ? "" : "not ") + f.label;
+  let v = Array.isArray(c.value) ? c.value.join(" or ") : c.value;
+  if (f.type === "money") v = fmt(Number(v), "money");
+  return f.label + " " + OPS[c.op] + " " + v;
+}
+function readback(spec) {
+  const r = spec.rules || {}, unitWord = spec.grain === "building" ? "each building once" : "each project row";
+  const base = spec.grain === "building"
+    ? "Uses the plan's building backlog table, joined to authorized projects."
+    : "Uses the plan's project tables" + (r.includeSubtotals ? " including subtotal and total lines (these repeat amounts already counted)" : ", project lines only (subtotal and total lines left out)") + (r.includeP3 ? ", including public-private (P3) projects that have no cost yet." : ", traditional projects only (the P3 project with no cost yet is left out).");
+  const filt = (spec.filter || []).length ? "Includes rows where " + spec.filter.map(fmtCond).join(" and ") + "." : "";
+  const m = spec.measure, fl = f => (FIELDS[f] || { label: f }).label;
+  const what = {
+    count: "Counts " + unitWord + ".",
+    sum: "Adds up " + fl(m.field) + ".",
+    max: "Takes the largest " + fl(m.field) + ".",
+    ratio: "Divides total " + fl(m.num) + " by total " + fl(m.den) + ".",
+    share: "Shows the share of rows where " + (m.where ? fmtCond(m.where) : "?") + ".",
+    mix: "Splits total project cost by funding source: campus reserves, external funds, borrowing and state funding.",
+  }[m.type];
+  return [base, filt, what].filter(Boolean).join(" ");
+}
+
+/* ===================== library ===================== */
+const C = (id, name, extra) => Object.assign({ id, name, status: "certified", owner: "Capital Planning", version: 1, grain: "project", rules: { includeSubtotals: false, includeP3: false }, filter: [] }, extra);
+const CERTIFIED = [
+  C("plan_total", "Authorized plan, total cost", { measure: { type: "sum", field: "total_cost" } }),
+  C("project_count", "Projects with a cost estimate", { measure: { type: "count" } }),
+  C("dm_share", "Share of plan fixing existing buildings", { measure: { type: "ratio", num: "dm_investment", den: "total_cost" } }),
+  C("dm_total", "Deferred-maintenance investment", { measure: { type: "sum", field: "dm_investment" } }),
+  C("newcon_share", "Share of plan on new construction", { measure: { type: "ratio", num: "total_cost", den: "total_cost" }, filter: [] , id: "newcon_share" }),
+  C("funding_mix", "How the plan is paid for", { measure: { type: "mix" } }),
+  C("debt_total", "Borrowing in the plan", { measure: { type: "sum", field: "borrowed" } }),
+  C("reserves_share", "Share paid from campus reserves", { measure: { type: "ratio", num: "campus_reserves", den: "total_cost" } }),
+  C("state_total", "State funding in the plan", { measure: { type: "sum", field: "state" } }),
+  C("pending_count", "Projects waiting on a vote", { filter: [{ field: "stage", op: "eq", value: "Pending vote" }], measure: { type: "count" } }),
+  C("pending_cost", "Cost waiting on a vote", { filter: [{ field: "stage", op: "eq", value: "Pending vote" }], measure: { type: "sum", field: "total_cost" } }),
+  C("largest", "Largest single project", { measure: { type: "max", field: "total_cost" } }),
+  C("top_backlog", "Backlog in the largest-backlog buildings", { grain: "building", filter: [{ field: "topBacklog", op: "is", value: true }], measure: { type: "sum", field: "backlog" } }),
+  C("top_coverage", "Share of that backlog with authorized DM money", { grain: "building", filter: [{ field: "topBacklog", op: "is", value: true }], measure: { type: "ratio", num: "authorized_dm", den: "backlog" } }),
+  C("top_no_project", "Largest-backlog buildings with no project", { grain: "building", filter: [{ field: "topBacklog", op: "is", value: true }, { field: "hasProject", op: "is", value: false }], measure: { type: "count" } }),
+  C("bldg_backlog", "Building backlog", { grain: "building", measure: { type: "sum", field: "backlog" } }),
+];
+// New-construction share: numerator restricted to new construction, so it is defined as its own ratio below.
+CERTIFIED.find(m => m.id === "newcon_share").measure = { type: "ratio", num: "newcon_cost", den: "total_cost" };
+RAW.forEach(r => { r.newcon_cost = r.isNewConstruction ? r.total_cost : 0; });
+FIELDS.newcon_cost = { label: "cost of new construction", type: "money", grain: "project" };
+const SEED_PERSONAL = [{ id: "p_count55", name: "Projects (as in the plan headline)", status: "personal", owner: "Trustee", version: 1, basedOn: "project_count",
+  grain: "project", rules: { includeSubtotals: false, includeP3: true }, filter: [], measure: { type: "count" } }];
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let personal = store.get("msu.personal", SEED_PERSONAL);
+const allMetrics = () => [...CERTIFIED, ...personal];
+const metricById = id => allMetrics().find(m => m.id === id);
+
+/* ===================== formatting ===================== */
+function unitOf(spec) {
+  const m = spec.measure;
+  if (m.type === "ratio" || m.type === "share") return "pct";
+  if (m.type === "mix") return "money";
+  if (m.type === "sum" || m.type === "max") return (FIELDS[m.field] || {}).type === "money" ? "money" : "num";
+  return "num";
+}
+function fmt(v, unit) {
+  if (!Number.isFinite(v)) return "—";
+  if (unit === "pct") return Math.round(v * 100) + "%";
+  if (unit === "money") return v >= 1e9 ? "$" + (v / 1e9).toFixed(2) + "B" : v >= 1e6 ? "$" + (v / 1e6).toFixed(1) + "M" : v >= 1e3 ? "$" + Math.round(v / 1e3) + "K" : "$" + Math.round(v);
+  return Math.round(v).toLocaleString();
+}
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const statusChip = m => m.status === "certified" ? '<span class="chip cert">✓ Certified</span>' : m.status === "pending" ? '<span class="chip pend">Pending review</span>' : '<span class="chip pers">Personal</span>';
+const el = id => document.getElementById(id);
+
+/* ===================== personas ===================== */
+const PERSONAS = {
+  vp: { title: "Capital planning overview", tiles: [
+    { m: "plan_total", v: "kpi" }, { m: "project_count", v: "kpi" }, { m: "dm_share", v: "kpi" }, { m: "pending_count", v: "kpi" },
+    { m: "bldg_backlog", v: "rank", g: "building", f: "top" }, { m: "dm_total", v: "rank", g: "building" },
+    { m: "top_coverage", v: "kpi" }, { m: "top_no_project", v: "kpi" }, { m: "top_backlog", v: "kpi" }, { m: "pending_cost", v: "kpi" }] },
+  cfo: { title: "Funding & debt", tiles: [
+    { m: "funding_mix", v: "mix" }, { m: "debt_total", v: "rank", g: "project" },
+    { m: "debt_total", v: "kpi" }, { m: "reserves_share", v: "kpi" }, { m: "state_total", v: "kpi" }, { m: "largest", v: "kpi" },
+    { m: "state_total", v: "rank", g: "project" }] },
+  board: { title: "Trustee briefing", tiles: [
+    { m: "plan_total", v: "kpi" }, { m: "p_count55", v: "kpi" }, { m: "newcon_share", v: "kpi" }, { m: "dm_share", v: "kpi" },
+    { m: "plan_total", v: "rank", g: "stage" }, { m: "plan_total", v: "rank", g: "authority" }] },
+};
+const persona = () => el("persona").value;
+const tilesFor = p => store.get("msu.dash." + p, PERSONAS[p].tiles);
+const saveTiles = (p, t) => store.set("msu.dash." + p, t);
+const GROUPS = { building: "building", project: "project", stage: "approval stage", authority: "approving authority" };
+
+/* ===================== dashboard ===================== */
+let lastTileValues = [];
+function renderDashboard() {
+  const tiles = tilesFor(persona());
+  el("dashTitle").textContent = PERSONAS[persona()].title;
+  lastTileValues = [];
+  el("grid").innerHTML = tiles.map((t, i) => {
+    const m = metricById(t.m); if (!m) return "";
+    const unit = unitOf(m);
+    const tools = `<div class="tile-tools"><button class="icon" type="button" data-move="${i}" data-dir="-1" aria-label="Move earlier">↑</button><button class="icon" type="button" data-move="${i}" data-dir="1" aria-label="Move later">↓</button><button class="icon" type="button" data-remove="${i}" aria-label="Remove tile">×</button></div>`;
+    const foot = `<div class="tile-foot">${statusChip(m)}<button class="btn link small" type="button" data-explain="${m.id}">How it's calculated</button></div>`;
+    if (t.v === "kpi") {
+      const v = compute(m);
+      lastTileValues.push({ label: m.name, value: fmt(v, unit) });
+      return `<article class="tile"><div class="tile-head"><h3>${esc(m.name)}</h3>${tools}</div><button class="kpi num" type="button" data-explain="${m.id}">${fmt(v, unit)}</button><span class="delta">${m.grain === "building" ? "From the plan's building table" : "Amherst, as of June 2025"}</span>${foot}</article>`;
+    }
+    if (t.v === "mix") {
+      const rows = selectRows(m), tot = sumF(rows, "total_cost");
+      const parts = MIX_FIELDS.map((f, j) => ({ f, label: FIELDS[f].label, v: sumF(rows, f), c: MIX_COLORS[j] }));
+      parts.forEach(p => lastTileValues.push({ label: m.name + ": " + p.label, value: fmt(p.v, "money") + " (" + fmt(p.v / tot, "pct") + ")" }));
+      return `<article class="tile wide"><div class="tile-head"><h3>${esc(m.name)}</h3>${tools}</div>
+        <button class="kpi num" type="button" data-explain="${m.id}">${fmt(tot, "money")}</button>
+        <div class="mixbar" role="img" aria-label="Funding split">${parts.map(p => `<span style="flex:${p.v};background:${p.c}" title="${p.label}: ${fmt(p.v, "money")}"></span>`).join("")}</div>
+        <div class="mixleg">${parts.map(p => `<div><i style="background:${p.c}"></i><span>${p.label}</span><span class="num">${fmt(p.v, "money")}</span><span class="num muted">${fmt(p.v / tot, "pct")}</span></div>`).join("")}</div>${foot}</article>`;
+    }
+    if (t.v === "rank") {
+      const extra = t.f === "top" ? [{ field: "topBacklog", op: "is", value: true }] : [];
+      const rows = (extra.length ? computeGroupedExtra(m, t.g, extra) : computeGrouped(m, t.g)).slice(0, 8), max = Math.max(...rows.map(r => r.value), 1);
+      const cover = m.id === "bldg_backlog" && t.f === "top";
+      return `<article class="tile wide"><div class="tile-head"><h3>${esc(m.name)} by ${GROUPS[t.g]}${t.f === "top" ? " (largest-backlog buildings)" : ""}</h3>${tools}</div><div class="rank">${rows.map(r => {
+        const b = cover ? BUILDINGS.find(x => x.building === r.key) : null, dm = b ? b.authorized_dm : 0;
+        return `<div class="rank-row"><span title="${esc(r.key)}">${esc(r.key)}</span><div style="background:var(--track);border-radius:3px;position:relative"><div class="bar" style="width:${Math.max(2, 100 * r.value / max)}%;${cover ? "background:var(--prior)" : ""}"></div>${cover && dm ? `<div class="bar" style="position:absolute;left:0;top:0;width:${Math.max(2, 100 * dm / max)}%"></div>` : ""}</div><span class="num">${fmt(r.value, unit)}${cover ? (dm ? " · " + fmt(dm, "money") + " funded" : " · no project") : ""}</span></div>`; }).join("")}</div>
+        ${cover ? '<div class="legend"><span><i style="background:var(--prior)"></i>Backlog</span><span><i style="background:var(--accent)"></i>Authorized DM investment</span></div>' : ""}${foot}</article>`;
+    }
+    return "";
+  }).join("") || '<p class="muted">No tiles yet. Use "Add tile" to build your dashboard.</p>';
+}
+function computeGroupedExtra(spec, field, extra) {
+  const keys = [...new Set(selectRows(spec, extra).map(r => r[field]))];
+  return keys.map(k => ({ key: String(k), value: compute(spec, [...extra, { field, op: "eq", value: k }]) })).filter(x => x.value).sort((a, b) => b.value - a.value);
+}
+
+/* ===================== add tile ===================== */
+function viewsFor(m) { return m.measure.type === "mix" ? ["mix"] : ["kpi", "rank"]; }
+function groupsFor(m) { return m.grain === "building" ? ["building"] : ["building", "project", "stage", "authority"]; }
+function fillAdd() {
+  el("addMetric").innerHTML = allMetrics().map(m => `<option value="${m.id}">${esc(m.name)}${m.status === "certified" ? "" : " (personal)"}</option>`).join("");
+  syncAdd();
+}
+function syncAdd() {
+  const m = metricById(el("addMetric").value);
+  el("addView").innerHTML = viewsFor(m).map(v => `<option value="${v}">${{ kpi: "Single number", rank: "Ranking", mix: "Funding split" }[v]}</option>`).join("");
+  el("addGroup").innerHTML = groupsFor(m).map(g => `<option value="${g}">${GROUPS[g]}</option>`).join("");
+  el("addGroupWrap").hidden = el("addView").value !== "rank";
+}
+
+/* ===================== drawer ===================== */
+function openExplain(id) {
+  const m = metricById(id); if (!m) return;
+  const rows = selectRows(m), v = compute(m), unit = unitOf(m), r = m.rules || {};
+  const rules = m.grain === "building"
+    ? [["Counting unit", "One row per building (plan's backlog table joined to authorized projects)"], ["Filters", (m.filter || []).map(c => esc(fmtCond(c))).join("<br>") || "None"], ["Owner · version", esc(m.owner) + " · v" + m.version]]
+    : [["Counting unit", "One row per project line"], ["Subtotal & total lines", r.includeSubtotals ? "Included (repeats amounts)" : "Left out"], ["P3 projects (no cost yet)", r.includeP3 ? "Included" : "Left out"],
+       ["Filters", (m.filter || []).map(c => esc(fmtCond(c))).join("<br>") || "None"], ["Owner · version", esc(m.owner) + " · v" + m.version]];
+  let diff = "";
+  const base = m.basedOn && metricById(m.basedOn);
+  if (base) {
+    const bv = compute(base), br = base.rules || {}, ch = [];
+    if (!!br.includeP3 !== !!r.includeP3) ch.push(r.includeP3 ? "includes the P3 project" : "leaves out the P3 project");
+    if (!!br.includeSubtotals !== !!r.includeSubtotals) ch.push(r.includeSubtotals ? "includes subtotal lines" : "leaves out subtotal lines");
+    if (JSON.stringify(base.filter) !== JSON.stringify(m.filter)) ch.push("has different filters");
+    diff = `<div class="result info"><b>Differs from the certified "${esc(base.name)}":</b> ${ch.join("; ") || "same rules"}. Certified value ${fmt(bv, unitOf(base))}; this one ${fmt(v, unit)}.</div>`;
+  }
+  const sample = rows.slice().sort((a, b) => (b.total_cost || b.backlog || 0) - (a.total_cost || a.backlog || 0)).slice(0, 10);
+  const table = m.grain === "building"
+    ? `<thead><tr><th>Building</th><th>Backlog</th><th>FCI</th><th>Authorized DM</th></tr></thead><tbody>${sample.map(b => `<tr><td>${esc(b.building)}</td><td class="num">${fmt(b.backlog, "money")}</td><td class="num">${esc(b.fci || "—")}</td><td class="num">${b.authorized_dm ? fmt(b.authorized_dm, "money") : "none"}</td></tr>`).join("")}</tbody>`
+    : `<thead><tr><th>Project</th><th>Building</th><th>Cost</th><th>DM</th><th>Stage</th></tr></thead><tbody>${sample.map(p => `<tr><td>${esc(p.project)}${p.row_type !== "project" ? " <span class='chip pend'>" + p.row_type + "</span>" : ""}${p.delivery === "P3" ? " <span class='chip pers'>P3</span>" : ""}</td><td>${esc(p.building)}</td><td class="num">${fmt(p.total_cost, "money")}</td><td class="num">${fmt(p.dm_investment, "money")}</td><td>${esc(p.stage)}</td></tr>`).join("")}</tbody>`;
+  el("drawer").innerHTML = `
+    <div class="toolbar"><div class="left">${statusChip(m)}</div><button class="btn" type="button" id="closeDrawer">Close</button></div>
+    <div><div class="eyebrow">How it's calculated</div><h2>${esc(m.name)}</h2></div>
+    <div><span class="kpi num" style="cursor:default">${fmt(v, unit)}</span> <span class="muted small">${rows.length} ${m.grain === "building" ? "buildings" : "rows"} included</span></div>
+    <p class="readback">${esc(readback(m))}</p>
+    ${diff}
+    <table class="rules"><tbody>${rules.map(x => `<tr><td>${x[0]}</td><td>${x[1]}</td></tr>`).join("")}</tbody></table>
+    <div class="eyebrow">Largest included rows</div>
+    <div class="tablewrap"><table class="rows">${table}</table></div>
+    <details><summary class="small muted">Definition as stored</summary><pre class="spec">${esc(JSON.stringify({ grain: m.grain, rules: m.rules, filter: m.filter, measure: m.measure }, null, 2))}</pre></details>
+    ${m.status === "personal" ? '<button class="btn" type="button" id="requestCert">Request certification</button>' : ""}`;
+  el("drawer").hidden = false; el("scrim").hidden = false;
+  el("closeDrawer").onclick = closeDrawer; el("closeDrawer").focus();
+  const rc = el("requestCert");
+  if (rc) rc.onclick = () => { m.status = "pending"; store.set("msu.personal", personal); openExplain(id); renderAll(); };
+}
+function closeDrawer() { el("drawer").hidden = true; el("scrim").hidden = true; }
+
+function renderLibrary() {
+  const f = el("libFilter").value;
+  el("lib").innerHTML = allMetrics().filter(m => !f || (f === "certified" ? m.status === "certified" : m.status !== "certified")).map(m => `
+    <div class="lib-item"><div style="display:grid;gap:4px;min-width:0"><div class="meta"><h3>${esc(m.name)}</h3>${statusChip(m)}<span class="small muted">${esc(m.owner)} · v${m.version}</span></div>
+    <p class="small muted">${esc(readback(m))}</p></div>
+    <div style="display:grid;gap:4px;justify-items:end"><span class="num" style="font-weight:600">${fmt(compute(m), unitOf(m))}</span><button class="btn link small" type="button" data-explain="${m.id}">Definition</button></div></div>`).join("");
+}
+
+/* ===================== define ===================== */
+const DEF_RULES = { includeSubtotals: false, includeP3: false };
+const EXAMPLES = [
+  { text: "What share of the plan is paid for with borrowed money?", spec: { name: "Share paid by borrowing", grain: "project", rules: DEF_RULES, filter: [], measure: { type: "ratio", num: "borrowed", den: "total_cost" } } },
+  { text: "How much state money goes to projects that are not new construction?", spec: { name: "State money for existing buildings", grain: "project", rules: DEF_RULES, filter: [{ field: "isNewConstruction", op: "is", value: false }], measure: { type: "sum", field: "state" } } },
+  { text: "Total backlog in the largest-backlog buildings that have no authorized project.", spec: { name: "Unaddressed backlog, largest buildings", grain: "building", filter: [{ field: "topBacklog", op: "is", value: true }, { field: "hasProject", op: "is", value: false }], measure: { type: "sum", field: "backlog" } } },
+  { text: "Add up every line in the plan's project tables to get the total cost.", spec: { name: "Total cost, every table line", grain: "project", rules: { includeSubtotals: true, includeP3: false }, filter: [], measure: { type: "sum", field: "total_cost" } } },
+];
+const KNOWNS = [["55 projects (plan headline)", 55, "num"], ["$827.6M Amherst total", 827.575, "money"], ["$638.2M Board projects", 638.17, "money"]];
+let draft = null, sampleFn = null;
+function renderExamples() { el("examples").innerHTML = EXAMPLES.map((e, i) => `<button type="button" data-example="${i}">${esc(e.text)}</button>`).join(""); }
+function setDraft(spec, source) { draft = Object.assign({ status: "personal", owner: PERSONAS[persona()].title, version: 1, filter: [], rules: Object.assign({}, DEF_RULES) }, JSON.parse(JSON.stringify(spec))); renderDraft(source); }
+function renderDraft(source) {
+  const errs = validateSpec(draft);
+  if (errs.length) { el("defResult").innerHTML = `<div class="result bad"><b>The draft can't run yet:</b> ${errs.map(esc).join("; ")}. Try describing it differently.</div>`; return; }
+  const v = compute(draft), unit = unitOf(draft), proj = draft.grain === "project";
+  el("defResult").innerHTML = `
+    <div class="toolbar"><div class="left"><span class="chip pers">Draft · personal</span><span class="small muted">${esc(source)}</span></div></div>
+    <div class="field"><label for="dName">Name</label><input type="text" id="dName" value="${esc(draft.name || "My metric")}"></div>
+    <div><div class="eyebrow">Plain-English readback</div><p class="readback">${esc(readback(draft))}</p></div>
+    ${proj ? `<div class="form-row">
+      <div class="field"><label for="dSub">Subtotal &amp; total lines</label><select id="dSub"><option value="0">Leave out</option><option value="1">Include</option></select></div>
+      <div class="field"><label for="dP3">P3 projects (no cost yet)</label><select id="dP3"><option value="0">Leave out</option><option value="1">Include</option></select></div></div>` : ""}
+    <div><span class="kpi num" style="cursor:default">${fmt(v, unit)}</span> <span class="small muted">preview</span></div>
+    <div class="panel" style="padding:12px;background:var(--bg)">
+      <h3>Test against a number printed in the plan</h3>
+      <div class="knowns">${KNOWNS.map(k => `<button type="button" data-known="${k[1]}" data-kind="${k[2]}">${k[0]}</button>`).join("")}</div>
+      <div class="form-row"><div class="field"><label for="dKnown">Known value${unit === "money" ? " ($ millions)" : unit === "pct" ? " (%)" : ""}</label><input type="number" id="dKnown" step="any"></div><button class="btn" type="button" id="dTest">Compare</button></div>
+      <div id="dTestOut" aria-live="polite"></div>
+    </div>
+    <details><summary class="small muted">Definition as stored</summary><pre class="spec">${esc(JSON.stringify({ grain: draft.grain, rules: draft.rules, filter: draft.filter, measure: draft.measure }, null, 2))}</pre></details>
+    <div class="toolbar"><div class="left"><button class="btn primary" type="button" id="dSave">Save as my metric</button><span class="small muted" id="dSaved"></span></div></div>`;
+  if (proj) {
+    el("dSub").value = draft.rules.includeSubtotals ? "1" : "0"; el("dP3").value = draft.rules.includeP3 ? "1" : "0";
+    el("dSub").onchange = e => { draft.rules.includeSubtotals = e.target.value === "1"; renderDraft(source); };
+    el("dP3").onchange = e => { draft.rules.includeP3 = e.target.value === "1"; renderDraft(source); };
+  }
+  el("dName").oninput = e => { draft.name = e.target.value; };
+  el("dTest").onclick = () => runKnownTest(v, unit);
+  el("dSave").onclick = () => {
+    const id = "p_" + Date.now().toString(36);
+    personal.push(Object.assign({}, draft, { id, name: draft.name || "My metric" })); store.set("msu.personal", personal);
+    const t = tilesFor(persona()); t.push({ m: id, v: viewsFor(draft)[0] }); saveTiles(persona(), t);
+    el("dSaved").textContent = "Saved and added to your dashboard."; renderAll();
+  };
+}
+function runKnownTest(v, unit) {
+  const raw = el("dKnown").value, out = el("dTestOut");
+  let known = Number(raw);
+  if (!raw || !Number.isFinite(known)) { out.innerHTML = '<div class="result bad">Enter a number to compare.</div>'; return; }
+  if (unit === "money") known *= 1e6; if (unit === "pct") known /= 100;
+  const close = (a, b) => unit === "pct" ? Math.abs(a - b) < 0.005 : unit === "money" ? Math.abs(a - b) <= 60000 : Math.abs(a - b) < 0.5;
+  if (close(v, known)) { out.innerHTML = `<div class="result ok">✓ Matches the plan. This definition gives ${fmt(v, unit)}.</div>`; return; }
+  const variants = [];
+  if (draft.grain === "project") {
+    const r = draft.rules;
+    const tryV = (label, rules) => { const x = compute(Object.assign({}, draft, { rules })); variants.push({ label, x, ok: close(x, known) }); };
+    tryV(r.includeP3 ? "leaving out the P3 project" : "including the P3 project (listed in the plan with no cost yet)", { ...r, includeP3: !r.includeP3 });
+    tryV(r.includeSubtotals ? "leaving out subtotal and total lines" : "including subtotal and total lines", { ...r, includeSubtotals: !r.includeSubtotals });
+    ["Board", "President"].forEach(a => { const x = compute(draft, [{ field: "authority", op: "eq", value: a }]); variants.push({ label: "only " + a + "-approved projects", x, ok: close(x, known) }); });
+  }
+  const hit = variants.find(x => x.ok);
+  out.innerHTML = `<div class="result bad">Doesn't match: this definition gives ${fmt(v, unit)}, the plan says ${fmt(known, unit)}.</div>` +
+    (hit ? `<div class="result info" style="margin-top:6px"><b>Likely cause:</b> ${hit.label} gives ${fmt(hit.x, unit)}, which matches. The printed figure probably uses that rule.</div>`
+         : `<div class="result info" style="margin-top:6px">No single rule change explains the gap.${variants.length ? " Tried: " + variants.map(x => x.label + " → " + fmt(x.x, unit)).join("; ") + "." : ""}</div>`);
+}
+const DEFINE_PROMPT = `You convert a description of a capital-plan metric into a JSON definition for a deterministic metric engine. You never compute numbers.
+Project-grain fields: project, building, authority (Board|President), stage ("Approved (Vote 2)"|"Authorized (Vote 1)"|"Pending vote"), isNewConstruction, isCampuswide, usesState, usesDebt (booleans), total_cost, dm_investment, newcon_cost, campus_reserves, external, borrowed, state (dollars).
+Building-grain fields: building, backlog, authorized_dm (dollars), hasProject, topBacklog (booleans).
+Filter ops: eq, neq, in (array), gt, gte, lt, lte, is (true/false), contains.
+Measures: count; sum (field); max (field); ratio (num, den: sums divided); share (where: one condition); mix (funding split).
+grain: "project" or "building". For project grain include "rules": {"includeSubtotals": false, "includeP3": false} unless the description clearly asks otherwise.
+Reply with only JSON: {"name", "grain", "rules", "filter": [{"field","op","value"}], "measure": {...}}.
+Example: "share of the plan from state money" -> {"name":"Share from state","grain":"project","rules":{"includeSubtotals":false,"includeP3":false},"filter":[],"measure":{"type":"ratio","num":"state","den":"total_cost"}}
+Description: `;
+async function draftWithAI() {
+  const text = el("defText").value.trim();
+  if (!text) { el("draftStatus").textContent = "Describe the metric first."; return; }
+  const ex = EXAMPLES.find(e => e.text === text);
+  if (ex) { setDraft(ex.spec, "From an example (no AI)"); return; }
+  if (!sampleFn) { el("draftStatus").textContent = "The assistant isn't available here. Start from an example instead."; return; }
+  el("draftBtn").disabled = true; el("draftStatus").textContent = "Drafting…";
+  try { setDraft(await sampleFn.json(DEFINE_PROMPT + text, { modelTier: "quick" }), "Drafted by the assistant from your description. Check the readback."); el("draftStatus").textContent = ""; }
+  catch (e) {
+    el("draftStatus").textContent = { not_granted: "The assistant wasn't allowed for this page.", rate_limited: "Too many requests. Try again in a minute.", invalid_json: "The draft came back in the wrong shape. Try rephrasing." }[e && e.code] || "Couldn't draft that. Try again or start from an example.";
+    if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled"].includes(e.code)) sampleFn = null;
+  } finally { el("draftBtn").disabled = false; }
+}
+async function draftSummary() {
+  if (!sampleFn) return;
+  const panel = el("summaryPanel");
+  panel.hidden = false; panel.innerHTML = '<p class="muted">Drafting a board summary from the numbers on this dashboard…</p>';
+  const facts = lastTileValues.map(t => `- ${t.label}: ${t.value}`).join("\n");
+  const prompt = `Write 3 short bullet points for a university board of trustees about the UMass Amherst FY26-FY30 capital plan. Use ONLY these figures, copied exactly as written; do not calculate new numbers.\n${facts}\nReply with the 3 bullets only, each starting with "- ".`;
+  try {
+    const { text } = await sampleFn(prompt, { modelTier: "quick" });
+    const allowed = new Set(lastTileValues.flatMap(t => t.value.split(/[ ()]+/)).filter(Boolean));
+    const numRe = /\$?\d[\d,]*(?:\.\d+)?(?:[KMB]|%)?/g; let bad = 0;
+    const html = esc(text).split("\n").filter(l => l.trim()).map(l => "<p>" + l.replace(numRe, mt => { const ok = allowed.has(mt) || /^(FY)?\d{2}$/.test(mt) || /^20\d\d$/.test(mt) || mt === "3"; if (!ok) bad++; return ok ? `<span class="ok-num">${mt}</span>` : `<mark title="Not a figure from the dashboard">${mt}</mark>`; }) + "</p>").join("");
+    panel.innerHTML = `<div class="toolbar"><h3>Draft board summary</h3><button class="btn" type="button" id="closeSummary">Close</button></div>${html}<p class="small ${bad ? "" : "muted"}">${bad ? `<mark>${bad} figure(s)</mark> don't match a dashboard number. Check them before sharing.` : "Every figure matches a number on this dashboard (underlined)."}</p>`;
+    el("closeSummary").onclick = () => { panel.hidden = true; };
+  } catch (e) {
+    panel.innerHTML = '<p class="muted">Couldn\'t draft a summary right now.</p>';
+    if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled"].includes(e.code)) { sampleFn = null; el("summaryBtn").hidden = true; }
+  }
+}
+
+/* ===================== checks ===================== */
+function renderChecks() {
+  const proj = RAW.filter(r => r.row_type === "project" && r.delivery !== "P3");
+  const board = sumF(proj.filter(r => r.authority === "Board"), "total_cost"), pres = sumF(proj.filter(r => r.authority === "President"), "total_cost"), tot = board + pres;
+  const rowsOk = proj.every(r => r.campus_reserves + r.external + r.borrowed + r.state === r.total_cost);
+  const mixOk = MIX_FIELDS.every(f => Math.round(100 * sumF(proj, f) / tot) === PRINTED.mix[f]);
+  const subs = RAW.filter(r => r.row_type !== "project"), withSubs = tot + sumF(subs, "total_cost");
+  const p3 = RAW.filter(r => r.delivery === "P3");
+  const fciSum = PRINTED.fciTop10Rows.reduce((a, b) => a + b, 0);
+  const overlaps = BUILDINGS.filter(b => b.registerBacklog && b.planBacklog);
+  const bOk = overlaps.every(b => Math.abs(b.registerBacklog - b.planBacklog) <= 150000);
+  const C = (ok, title, detail, kind) => ({ ok, title, detail, kind });
+  const checks = [
+    C(board === PRINTED.boardTotal, "Board projects match the printed Board total", `${fmt(board, "money")} extracted vs ${fmt(PRINTED.boardTotal, "money")} printed.`),
+    C(pres === PRINTED.presidentTotal, "President projects match the printed total", `${fmt(pres, "money")} extracted vs ${fmt(PRINTED.presidentTotal, "money")} printed.`),
+    C(tot === PRINTED.amherstTotal, "Campus total matches the summary page", `${fmt(tot, "money")} vs $827,575K on the plan's summary page.`),
+    C(rowsOk, "Funding sources add up to cost on every project", `${proj.length} of ${proj.length} projects: reserves + external + borrowing + state = total cost.`),
+    C(mixOk, "Funding mix matches the campus chart", MIX_FIELDS.map(f => `${FIELDS[f].label} ${Math.round(100 * sumF(proj, f) / tot)}%`).join(", ") + " vs 38 / 13 / 35 / 14% printed."),
+    C(true, "Subtotal and total lines are left out", `${subs.length} subtotal/total lines are in the tables. Adding every line would give ${fmt(withSubs, "money")}, double counting ${fmt(withSubs - tot, "money")}.`, "info"),
+    C(true, "Why the plan says 55 projects and the register has 54", `The plan's count includes ${p3.length} public-private (P3) project, "${p3[0] ? p3[0].project : ""}", which has no cost yet.`, "info"),
+    C(bOk, "Building backlog agrees between the two tables", overlaps.map(b => `${b.building}: ${fmt(b.registerBacklog, "money")} vs ${fmt(b.planBacklog, "money")}`).join("; ") + "."),
+    C(Math.abs(fciSum - PRINTED.fciTop10Printed) < 0.05, "Top-10-by-FCI table adds up", `The 10 rows sum to $${fciSum.toFixed(1)}M, but the plan prints $${PRINTED.fciTop10Printed}M. Someone should check this table in the source PDF.`),
+  ];
+  el("checks").innerHTML = checks.map(c => {
+    const st = c.kind === "info" ? ["info", "INFO"] : c.ok ? ["ok", "PASS"] : ["bad", "FLAG"];
+    return `<div class="check"><span class="st result ${st[0]}">${st[1]}</span><h3>${esc(c.title)}</h3><p class="small muted">${esc(c.detail)}</p></div>`;
+  }).join("");
+}
+
+/* ===================== wiring ===================== */
+function showTab() {
+  const tab = ["dashboard", "library", "define", "checks"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "dashboard";
+  document.querySelectorAll("[data-view]").forEach(s => { s.hidden = s.dataset.view !== tab; });
+  document.querySelectorAll("[data-tab]").forEach(a => { if (a.dataset.tab === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+}
+function renderAll() { renderDashboard(); renderLibrary(); renderChecks(); fillAdd(); }
+document.addEventListener("click", e => {
+  const x = e.target.closest("[data-explain]"); if (x) { openExplain(x.dataset.explain); return; }
+  const rm = e.target.closest("[data-remove]"); if (rm) { const t = tilesFor(persona()); t.splice(Number(rm.dataset.remove), 1); saveTiles(persona(), t); renderDashboard(); return; }
+  const mv = e.target.closest("[data-move]"); if (mv) { const t = tilesFor(persona()), i = Number(mv.dataset.move), j = i + Number(mv.dataset.dir); if (j >= 0 && j < t.length) { [t[i], t[j]] = [t[j], t[i]]; saveTiles(persona(), t); renderDashboard(); } return; }
+  const ex = e.target.closest("[data-example]"); if (ex) { const it = EXAMPLES[Number(ex.dataset.example)]; el("defText").value = it.text; setDraft(it.spec, "From an example (no AI)"); return; }
+  const kn = e.target.closest("[data-known]"); if (kn) { const u = draft ? unitOf(draft) : "num", val = Number(kn.dataset.known); el("dKnown").value = kn.dataset.kind === u ? val : ""; if (el("dKnown").value) el("dTest").click(); else el("dTestOut").innerHTML = '<div class="result info">That figure is a different kind of number than this metric. Pick a matching one or type your own.</div>'; }
+});
+el("scrim").onclick = closeDrawer;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !el("drawer").hidden) closeDrawer(); });
+el("persona").onchange = () => { try { localStorage.setItem("msu.persona", persona()); } catch {} el("summaryPanel").hidden = true; renderAll(); };
+el("libFilter").onchange = renderLibrary;
+el("addBtn").onclick = () => { el("addPanel").hidden = false; el("addMetric").focus(); };
+el("addCancel").onclick = () => { el("addPanel").hidden = true; };
+el("addMetric").onchange = syncAdd;
+el("addView").onchange = () => { el("addGroupWrap").hidden = el("addView").value !== "rank"; };
+el("addConfirm").onclick = () => { const t = tilesFor(persona()), tile = { m: el("addMetric").value, v: el("addView").value }; if (tile.v === "rank") tile.g = el("addGroup").value; t.push(tile); saveTiles(persona(), t); el("addPanel").hidden = true; renderDashboard(); };
+el("resetBtn").onclick = () => { try { localStorage.removeItem("msu.dash." + persona()); } catch {} renderDashboard(); };
+el("draftBtn").onclick = draftWithAI;
+el("summaryBtn").onclick = draftSummary;
+window.addEventListener("hashchange", showTab);
+try { const p = localStorage.getItem("msu.persona"); if (p && PERSONAS[p]) el("persona").value = p; } catch {}
+renderExamples(); renderAll(); showTab();
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  try { sampleFn = await window.claude.use("sample"); } catch { sampleFn = null; }
+  if (sampleFn) el("summaryBtn").hidden = false;
+})();
+</script>

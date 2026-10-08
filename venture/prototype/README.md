@@ -12,3 +12,8 @@ What it shows:
 - **Draft summary**: AI writes bullets from dashboard values only, and every figure is checked against the dashboard.
 
 Open `metric-studio.html` in a browser; the AI features only appear when it's opened as a claude.ai artifact.
+
+## UMass edition
+`metric-studio-umass.html` runs the same ideas on the **public UMass FY26–FY30 Capital Plan** (Amherst): 54 projects, the plan's P3 project, its subtotal/total lines and its building backlog table. Rebuild it with `python3 build_umass_studio.py` (reads `../demo/data/umass_amherst_rows_as_extracted.csv`, made by `../demo/extract_umass.py`).
+
+It shows real-world counting rules: the plan says 55 projects but 54 have costs (one P3 project has none yet), and adding every table line gives $1.91B instead of $827.6M because subtotals repeat amounts. The Checks tab reconciles everything to the plan's printed totals and flags one plan table whose rows don't add up.
