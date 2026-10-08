@@ -1,0 +1,523 @@
+<title>Capital Plan Copilot</title>
+<meta name="description" content="Demo: an AI capital-planning analyst run on the public UMass FY26–30 capital plan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:wght@400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one drafting-sheet column; each section is a "sheet" with a title-block label, like a facilities drawing set. */
+:root {
+  --bg: #f5f6f4;
+  --sheet: #ffffff;
+  --ink: #16201f;
+  --ink-2: #4d5957;
+  --ink-3: #7a8584;
+  --rule: #d9dedc;
+  --rule-strong: #b8c0be;
+  --accent: #0f6b62;
+  --accent-soft: #e2efed;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --track: #e4e8e7;
+  --good: #1f7a3a; --good-bg: #e3f2e7;
+  --warn: #9a5b00; --warn-bg: #fbefd9;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111716; --sheet: #182120; --ink: #eef3f2; --ink-2: #b5c0be; --ink-3: #8a9694;
+    --rule: #2a3533; --rule-strong: #3d4a48; --accent: #4fc2b4; --accent-soft: #1d3532;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --track: #26302f;
+    --good: #6fd08c; --good-bg: #1b3324; --warn: #f0b75a; --warn-bg: #3a2c12;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111716; --sheet: #182120; --ink: #eef3f2; --ink-2: #b5c0be; --ink-3: #8a9694;
+  --rule: #2a3533; --rule-strong: #3d4a48; --accent: #4fc2b4; --accent-soft: #1d3532;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --track: #26302f;
+  --good: #6fd08c; --good-bg: #1b3324; --warn: #f0b75a; --warn-bg: #3a2c12;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; }
+.wrap { max-width: 1040px; margin: 0 auto; padding-inline: 16px; padding-block: 32px 64px; display: grid; gap: 28px; }
+h1, h2, h3 { font-family: var(--font-display); font-stretch: 85%; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 800; line-height: 1.02; }
+h2 { font-size: 1.55rem; font-weight: 700; line-height: 1.15; }
+h3 { font-size: 1.05rem; font-weight: 700; }
+p { margin: 0; max-width: 68ch; }
+.num, td.n, .mono { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.eyebrow { font-family: var(--font-data); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); }
+.muted { color: var(--ink-2); }
+.small { font-size: .86rem; }
+a { color: var(--accent); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+header.top { display: grid; gap: 14px; padding-block: 8px 4px; }
+.lede { font-size: 1.12rem; color: var(--ink-2); }
+.source { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--ink-3); }
+
+.sheet { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; display: grid; gap: 20px; padding: clamp(18px, 3vw, 28px); min-width: 0; }
+.sheet-head { display: grid; gap: 6px; }
+.sheet-tag { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; border-bottom: 1px solid var(--rule); padding-bottom: 10px; font-family: var(--font-data); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.sheet-tag b { color: var(--accent); font-weight: 600; }
+
+/* ingest checks */
+.checks { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.check { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; padding: 12px 14px; border-radius: 4px; background: var(--good-bg); }
+.check.flag { background: var(--warn-bg); }
+.check .ic { font-family: var(--font-data); font-weight: 600; color: var(--good); grid-row: span 2; }
+.check.flag .ic { color: var(--warn); }
+.check strong { font-size: .95rem; }
+.check span { font-size: .85rem; color: var(--ink-2); }
+
+/* KPI tiles */
+.kpis { display: grid; gap: 1px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); background: var(--rule); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.kpi { background: var(--sheet); padding: 16px; display: grid; gap: 4px; align-content: start; }
+.kpi .v { font-family: var(--font-display); font-stretch: 80%; font-weight: 700; font-size: 2.1rem; line-height: 1; }
+.kpi .l { font-size: .88rem; color: var(--ink-2); }
+.pill { justify-self: start; font-family: var(--font-data); font-size: .7rem; padding: 2px 8px; border-radius: 99px; background: var(--warn-bg); color: var(--warn); }
+.pill.ok { background: var(--good-bg); color: var(--good); }
+
+.grid2 { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.chart { display: grid; gap: 8px; min-width: 0; }
+.chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.chart svg text { fill: var(--ink-2); font-family: var(--font-data); font-size: 11px; }
+.chart svg .lbl-strong { fill: var(--ink); font-weight: 600; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .82rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.insight { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; color: var(--ink); }
+
+/* scenario */
+.scenario { display: grid; gap: 20px; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
+@media (max-width: 760px) { .scenario { grid-template-columns: minmax(0, 1fr); } }
+.control { display: grid; gap: 8px; }
+.control label { font-weight: 600; }
+.control output { font-family: var(--font-display); font-stretch: 80%; font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.toggle { display: flex; gap: 0; border: 1px solid var(--rule-strong); border-radius: 4px; overflow: hidden; justify-self: start; }
+.toggle button { font: inherit; font-size: .85rem; padding: 6px 12px; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; }
+.toggle button[aria-pressed=true] { background: var(--accent); color: var(--sheet); }
+.plist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.plist li { display: grid; grid-template-columns: 1.4rem minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 8px 10px; border-radius: 4px; border: 1px solid var(--rule); font-size: .9rem; }
+.plist li.in { border-color: var(--accent); background: var(--accent-soft); }
+.plist li .mk { font-family: var(--font-data); color: var(--ink-3); }
+.plist li.in .mk { color: var(--accent); font-weight: 600; }
+.plist li .sub { display: block; font-size: .8rem; color: var(--ink-3); }
+.res { display: grid; gap: 1px; grid-template-columns: repeat(2, minmax(0, 1fr)); background: var(--rule); border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; }
+.res > div { background: var(--sheet); padding: 12px 14px; display: grid; gap: 2px; }
+.res .v { font-family: var(--font-display); font-stretch: 80%; font-weight: 700; font-size: 1.6rem; line-height: 1.05; }
+.res .l { font-size: .8rem; color: var(--ink-2); }
+.draft { background: var(--bg); border: 1px dashed var(--rule-strong); border-radius: 4px; padding: 16px 18px; display: grid; gap: 10px; }
+.draft p { font-size: .97rem; }
+.copy { font: inherit; font-size: .82rem; justify-self: start; padding: 6px 12px; border-radius: 4px; border: 1px solid var(--rule-strong); background: var(--sheet); color: var(--ink); cursor: pointer; }
+
+/* Q&A */
+.qs { display: flex; flex-wrap: wrap; gap: 8px; }
+.qs button { font: inherit; font-size: .9rem; text-align: left; padding: 8px 12px; border-radius: 4px; border: 1px solid var(--rule-strong); background: var(--sheet); color: var(--ink); cursor: pointer; }
+.qs button[aria-pressed=true] { border-color: var(--accent); background: var(--accent-soft); }
+.answer { display: grid; gap: 8px; padding: 16px 18px; border-radius: 4px; background: var(--bg); min-height: 6rem; }
+.answer ul { margin: 0; padding-left: 1.2rem; }
+.answer .cite { font-size: .8rem; color: var(--ink-3); }
+
+/* register */
+.tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.tools input, .tools select { font: inherit; font-size: .9rem; padding: 7px 10px; border-radius: 4px; border: 1px solid var(--rule-strong); background: var(--sheet); color: var(--ink); }
+.tools input { flex: 1 1 220px; min-width: 0; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 4px; max-height: 520px; }
+table { border-collapse: collapse; width: 100%; font-size: .86rem; }
+th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { position: sticky; top: 0; background: var(--sheet); font-family: var(--font-data); font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
+th button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; letter-spacing: inherit; text-transform: inherit; }
+td.n, th.n { text-align: right; white-space: nowrap; }
+.fbar { display: flex; height: 8px; width: 90px; border-radius: 2px; overflow: hidden; gap: 1px; background: var(--sheet); }
+.status { font-size: .78rem; color: var(--ink-2); white-space: nowrap; }
+
+.next { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.next div { display: grid; gap: 4px; }
+.next h3 { font-size: .98rem; }
+.next p { font-size: .9rem; color: var(--ink-2); }
+footer { font-size: .82rem; color: var(--ink-3); display: grid; gap: 6px; }
+
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--sheet); font-size: .8rem; padding: 6px 9px; border-radius: 4px; max-width: 260px; line-height: 1.35; }
+@media (prefers-reduced-motion: no-preference) { .plist li, .res .v { transition: background-color .2s, border-color .2s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Demo · built only on public data</div>
+    <h1>Capital Plan Copilot</h1>
+    <p class="lede">An AI analyst that reads a university's capital plan, checks the numbers, finds where money and need don't line up, and drafts the board narrative. This run uses the University of Massachusetts FY26–FY30 Capital Plan.</p>
+    <div class="source">
+      <span>Source: <a href="https://www.umassp.edu/sites/default/files/publications/budget-office/capital-plans/fy26-30-capital-plan-final-for-website.pdf" target="_blank" rel="noopener">UMass FY26–FY30 Capital Plan (PDF)</a></span>
+      <span>Board of Trustees, Administration &amp; Finance Committee · Sept 25, 2025</span>
+      <span>Deferred maintenance data: Gordian FY24 report, as cited in the plan</span>
+    </div>
+  </header>
+
+  <section class="sheet" aria-labelledby="s1">
+    <div class="sheet-tag"><span><b>Sheet 1</b> · Ingest &amp; check</span><span>PDF → clean register</span></div>
+    <div class="sheet-head">
+      <h2 id="s1">From a board PDF to a register you can trust</h2>
+      <p class="muted">The agent pulled the UMass Amherst project tables out of the PDF, then reconciled every number against the totals the plan itself prints. This is the step analysts do by hand in Excel today.</p>
+    </div>
+    <div class="checks" id="checks"></div>
+  </section>
+
+  <section class="sheet" aria-labelledby="s2">
+    <div class="sheet-tag"><span><b>Sheet 2</b> · System condition</span><span>All 5 campuses · 537 buildings · 27.6M GSF</span></div>
+    <div class="sheet-head">
+      <h2 id="s2">The backlog isn't shrinking. It's being held flat.</h2>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><span class="v num">$4.8B</span><span class="l">10-year deferred maintenance backlog</span><span class="pill">≈27% of $17.5B replacement value</span></div>
+      <div class="kpi"><span class="v num">$3.4B</span><span class="l">of that comes due in 1–3 years (Timeframe A)</span><span class="pill">70% of backlog</span></div>
+      <div class="kpi"><span class="v num">53%</span><span class="l">FY25 keep-up spending vs. target ($135M of $254M)</span><span class="pill">Below target</span></div>
+      <div class="kpi"><span class="v num">41%</span><span class="l">of the $1.8B plan paid from campus reserves (19% in 2019)</span><span class="pill">Pressure on bond rating</span></div>
+    </div>
+    <div class="grid2">
+      <div class="chart">
+        <h3>Backlog bridge, FY22 → FY24 ($M)</h3>
+        <svg id="bridge" viewBox="0 0 460 250" role="img" aria-label="Waterfall chart: FY22 backlog 4,830; inflation +210; new needs +585; completed work −802; FY24 backlog 4,823."></svg>
+        <p class="insight small">Completed and removed work retired <b>$802M</b>, but inflation and newly identified needs added <b>$795M</b>. Two years of spending kept the backlog where it was.</p>
+      </div>
+      <div class="chart">
+        <h3>Deferred maintenance spending by year ($M)</h3>
+        <div class="legend"><span><i style="background:var(--s1)"></i>Keep-up</span><span><i style="background:var(--s2)"></i>Catch-up</span><span><i style="background:none;border-top:2px dashed var(--ink);height:0;border-radius:0"></i>FY25 keep-up target ($254M)</span></div>
+        <svg id="spend" viewBox="0 0 460 236" role="img" aria-label="Stacked bars of keep-up and catch-up spending, 2020 to 2025."></svg>
+        <p class="insight small">FY25 keep-up spending was <b>$135M</b> against a <b>$254M</b> target, the amount needed just to stop the backlog from growing.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="s3">
+    <div class="sheet-tag"><span><b>Sheet 3</b> · Gap analysis</span><span>UMass Amherst · 55 projects · $828M</span></div>
+    <div class="sheet-head">
+      <h2 id="s3">Is the plan funding the buildings in the worst shape?</h2>
+      <p class="muted">The agent joined the building-level backlog table to the project register and compared each building's backlog with the deferred maintenance investment in authorized projects.</p>
+    </div>
+    <div class="chart">
+      <div class="legend"><span><i style="background:var(--track)"></i>Building backlog</span><span><i style="background:var(--s1)"></i>Authorized DM investment</span></div>
+      <div style="overflow-x:auto"><svg id="gap" style="min-width:620px" viewBox="0 0 720 330" role="img" aria-label="Horizontal bars comparing backlog and authorized investment for the nine Amherst buildings with the largest backlog."></svg></div>
+    </div>
+    <p class="insight" id="gapInsight"></p>
+  </section>
+
+  <section class="sheet" aria-labelledby="s4">
+    <div class="sheet-tag"><span><b>Sheet 4</b> · Scenario</span><span>Conceptual (not yet authorized) projects · Amherst</span></div>
+    <div class="sheet-head">
+      <h2 id="s4">If new money came in, what should it fund first?</h2>
+      <p class="muted">Amherst lists $2B of conceptual projects. Move the slider to set a budget. The agent picks projects in priority order and recalculates the backlog. You can compare its order with funding the biggest projects first.</p>
+    </div>
+    <div class="scenario">
+      <div style="display:grid;gap:16px;min-width:0">
+        <div class="control">
+          <label for="budget">New capital available</label>
+          <output id="budgetOut" for="budget">$175M</output>
+          <input id="budget" type="range" min="0" max="400" step="5" value="175">
+        </div>
+        <div class="toggle" role="group" aria-label="Prioritization rule">
+          <button type="button" id="ruleRoi" aria-pressed="true">Backlog retired per $</button>
+          <button type="button" id="ruleSize" aria-pressed="false">Biggest projects first</button>
+        </div>
+        <ol class="plist" id="plist"></ol>
+      </div>
+      <div style="display:grid;gap:16px;align-content:start;min-width:0">
+        <div class="res">
+          <div><span class="v num" id="rFunded">—</span><span class="l">Projects funded</span></div>
+          <div><span class="v num" id="rRetired">—</span><span class="l">Backlog retired</span></div>
+          <div><span class="v num" id="rBacklog">—</span><span class="l">Amherst backlog after (from $1,763M)</span></div>
+          <div><span class="v num" id="rFci">—</span><span class="l">Amherst FCI after (from 20.0%)</span></div>
+        </div>
+        <div class="draft" aria-live="polite">
+          <div class="eyebrow">Draft board narrative · written by the agent</div>
+          <p id="narrative"></p>
+          <button class="copy" type="button" id="copyBtn">Copy draft</button>
+        </div>
+        <p class="small muted">Assumptions: a project retires backlog up to the smaller of its cost and its building's backlog. Replacement value (≈$8.8B) is implied by the plan's 20% FCI. This is illustrative; a real model uses component-level data.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="s5">
+    <div class="sheet-tag"><span><b>Sheet 5</b> · Ask the plan</span><span>Answers computed from the register</span></div>
+    <div class="sheet-head">
+      <h2 id="s5">Questions a VP asks on a Monday morning</h2>
+    </div>
+    <div class="qs" id="qs" role="group" aria-label="Sample questions"></div>
+    <div class="answer" id="answer" aria-live="polite"></div>
+  </section>
+
+  <section class="sheet" aria-labelledby="s6">
+    <div class="sheet-tag"><span><b>Sheet 6</b> · Register</span><span id="regCount"></span></div>
+    <div class="sheet-head">
+      <h2 id="s6">The clean project register</h2>
+      <p class="muted small">Funding bar: <span style="color:var(--s1)">■</span> campus reserves · <span style="color:var(--s2)">■</span> external · <span style="color:var(--s3)">■</span> borrowed · <span style="color:var(--s4)">■</span> state</p>
+    </div>
+    <div class="tools">
+      <input id="q" type="search" placeholder="Search project or building" aria-label="Search project or building">
+      <select id="auth" aria-label="Approval authority">
+        <option value="">All approvals</option>
+        <option value="Board">Board of Trustees</option>
+        <option value="President">President</option>
+      </select>
+    </div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr>
+          <th><button type="button" data-sort="project">Project</button></th>
+          <th>Building</th>
+          <th>Status</th>
+          <th class="n"><button type="button" data-sort="total_cost">Cost ($M) ↓</button></th>
+          <th class="n"><button type="button" data-sort="dm_investment">DM inv. ($M)</button></th>
+          <th>Funding</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sheet" aria-labelledby="s7">
+    <div class="sheet-tag"><span><b>Sheet 7</b> · The real product</span><span>What changes with live data</span></div>
+    <h2 id="s7">What this becomes when it's connected to a campus's own systems</h2>
+    <div class="next">
+      <div><h3>Live, not once a year</h3><p>Connects to the work-order system (e.g. AiM) and project system (e.g. e-Builder), so condition and spending update weekly instead of per report cycle.</p></div>
+      <div><h3>Efficiency KPIs</h3><p>Work-order backlog, response time, preventive vs. corrective, cost per GSF, project budget and schedule variance, all in one view.</p></div>
+      <div><h3>Board-ready drafts</h3><p>Narrative, charts and tables in the institution's own template, with every figure traceable to its source row.</p></div>
+      <div><h3>Ask anything</h3><p>Plain-English questions over the joined data, answered in seconds with citations.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Demo prototype. All figures come from the public UMass plan cited above. Project-level analysis covers the Amherst campus only. Not affiliated with or endorsed by UMass; the scenario rule is an illustration, not a recommendation.</span>
+  </footer>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+const PROJECTS = [{"campus": "Amherst", "authority": "Board", "project": "Curry Hicks Cage Renovation", "building": "Athletic Center", "building_dm_backlog": "1531158", "total_cost": 11600000, "dm_investment": 11600000, "campus_reserves": 6600000, "external": 5000000, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Energy Improvements", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 16700000, "dm_investment": 16700000, "campus_reserves": 495000, "external": 2380000, "borrowed": 11000000, "state": 2825000, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Faculty Hire Renovations", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 15000000, "dm_investment": 15000000, "campus_reserves": 1800000, "external": 0, "borrowed": 13200000, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Office/Lab/Academic Renovations", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 25620000, "dm_investment": 25620000, "campus_reserves": 9800000, "external": 0, "borrowed": 14720000, "state": 1100000, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Conte Cleanroom", "building": "Conte Polymer Research Center", "building_dm_backlog": "21214422", "total_cost": 10000000, "dm_investment": 5000000, "campus_reserves": 10000000, "external": 0, "borrowed": 0, "state": 0, "status": "Pending BOT Vote 1"}, {"campus": "Amherst", "authority": "Board", "project": "Engineering Building", "building": "Draper Hall Annex", "building_dm_backlog": "1181758", "total_cost": 125000000, "dm_investment": 1181758, "campus_reserves": 25000000, "external": 37000000, "borrowed": 63000000, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Fine Arts Center Performance Hall Improvements", "building": "Fine Arts Center", "building_dm_backlog": "44715428", "total_cost": 19000000, "dm_investment": 6000000, "campus_reserves": 19000000, "external": 0, "borrowed": 0, "state": 0, "status": "Pending BOT Vote 1"}, {"campus": "Amherst", "authority": "Board", "project": "Flint Renovations", "building": "Flint Laboratory", "building_dm_backlog": "8055447", "total_cost": 32000000, "dm_investment": 32000000, "campus_reserves": 21000000, "external": 0, "borrowed": 0, "state": 11000000, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Food Innovation Hub", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 80000000, "dm_investment": 20000000, "campus_reserves": 0, "external": 20000000, "borrowed": 60000000, "state": 0, "status": "BOT Vote 1 Authorized"}, {"campus": "Amherst", "authority": "Board", "project": "Computer and Information Sciences Building", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 125000000, "dm_investment": 0, "campus_reserves": 0, "external": 3000000, "borrowed": 47000000, "state": 75000000, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "North Campus Energy Exchange Center", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 30000000, "dm_investment": 0, "campus_reserves": 21000000, "external": 9000000, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Thermal Energy Storage Tank", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 14250000, "dm_investment": 0, "campus_reserves": 14250000, "external": 0, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "School of Public Health and Health Sciences Hub", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 43000000, "dm_investment": 0, "campus_reserves": 300000, "external": 5000000, "borrowed": 37700000, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "PVTA Bus Garage Expansion", "building": "PVTA Bus Facility Building", "building_dm_backlog": "1743398", "total_cost": 11000000, "dm_investment": 0, "campus_reserves": 0, "external": 11000000, "borrowed": 0, "state": 0, "status": "BOT Vote 2 Approved"}, {"campus": "Amherst", "authority": "Board", "project": "Skinner Nursing Addition", "building": "Skinner Hall", "building_dm_backlog": "326506", "total_cost": 40000000, "dm_investment": 0, "campus_reserves": 25000000, "external": 5000000, "borrowed": 0, "state": 10000000, "status": "BOT Vote 1 Authorized"}, {"campus": "Amherst", "authority": "Board", "project": "Tobin Deferred Maintenance", "building": "Tobin Hall", "building_dm_backlog": "51572255", "total_cost": 40000000, "dm_investment": 40000000, "campus_reserves": 0, "external": 0, "borrowed": 40000000, "state": 0, "status": "BOT Vote 1 Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Brooks/Brett Window Replacement", "building": "Brett House", "building_dm_backlog": "3631338", "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Butterfield Flooring Replacement", "building": "Butterfield Hall", "building_dm_backlog": "8720753", "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Class Lab Renovations", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 5000000, "dm_investment": 5000000, "campus_reserves": 5000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "New Faculty Hire Renovations", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Utilities & Infrastructure", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 7800000, "external": 0, "borrowed": 0, "state": 1200000, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Deferred Maintenance and Campus Infrastructure", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Instructional Space Renovations", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 5000000, "dm_investment": 5000000, "campus_reserves": 5000000, "external": 0, "borrowed": 0, "state": 0, "status": "Pending President Approval"}, {"campus": "Amherst", "authority": "President", "project": "Southwest Laundry and Cooling Space Renovations", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Roof Replacements", "building": "Campuswide", "building_dm_backlog": "", "total_cost": 7000000, "dm_investment": 7000000, "campus_reserves": 5432000, "external": 0, "borrowed": 0, "state": 1568000, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Coolidge Life Safety Upgrades", "building": "Coolidge Hall", "building_dm_backlog": "25171593", "total_cost": 8000000, "dm_investment": 8000000, "campus_reserves": 8000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Gloucester Marine Station Improvements", "building": "Gloucester Marine Station", "building_dm_backlog": "", "total_cost": 4550000, "dm_investment": 4550000, "campus_reserves": 2550000, "external": 0, "borrowed": 0, "state": 2000000, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "ISOM Restroom & Accessibility Renovations", "building": "Isenberg School of Management Building", "building_dm_backlog": "18766316", "total_cost": 2900000, "dm_investment": 2900000, "campus_reserves": 2900000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "JQA Life Safety Upgrades & Renovation", "building": "John Quincy Adams House", "building_dm_backlog": "27117848", "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 9000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "JQA Student Experience Renovations", "building": "John Quincy Adams House", "building_dm_backlog": "27117848", "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Johnson Residence Hall DM", "building": "Johnson Hall", "building_dm_backlog": "14087789", "total_cost": 6000000, "dm_investment": 6000000, "campus_reserves": 6000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Lederle Lab Renovation", "building": "Lederle Graduate Research Center", "building_dm_backlog": "90166558", "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Lederle Chemistry Teaching Laboratories", "building": "Lederle Graduate Research Center", "building_dm_backlog": "90166558", "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 9000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Lincoln Campus Center Fire Alarm Upgrade", "building": "Lincoln Campus Center", "building_dm_backlog": "41525838", "total_cost": 3700000, "dm_investment": 3700000, "campus_reserves": 3700000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Lincoln Campus Center 2nd Floor Restroom Reno", "building": "Lincoln Campus Center", "building_dm_backlog": "41525838", "total_cost": 2200000, "dm_investment": 2200000, "campus_reserves": 2200000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Memorial Hall DM", "building": "Memorial Hall", "building_dm_backlog": "5823508", "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Moore Electrical Upgrades", "building": "Moore Hall", "building_dm_backlog": "9568216", "total_cost": 2000000, "dm_investment": 2000000, "campus_reserves": 2000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Mt Ida Campus Center Roof & Infrastructure", "building": "Mt Ida", "building_dm_backlog": "", "total_cost": 3500000, "dm_investment": 3500000, "campus_reserves": 1540000, "external": 0, "borrowed": 0, "state": 1960000, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Mullins Arena Bowl Telscopic Seating", "building": "Mullins Center", "building_dm_backlog": "18275", "total_cost": 2400000, "dm_investment": 2400000, "campus_reserves": 2400000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Mullins Chillers", "building": "Mullins Center", "building_dm_backlog": "18275", "total_cost": 9000000, "dm_investment": 9000000, "campus_reserves": 3296555, "external": 0, "borrowed": 0, "state": 5703445, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Mullins Dehumidification", "building": "Mullins Center", "building_dm_backlog": "18275", "total_cost": 3500000, "dm_investment": 3500000, "campus_reserves": 1844093, "external": 0, "borrowed": 0, "state": 1655907, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Center for Early Education and Care", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 9500000, "dm_investment": 0, "campus_reserves": 9500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Water Engineering Technology Laboratories", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 8000000, "dm_investment": 0, "campus_reserves": 1400000, "external": 5100000, "borrowed": 0, "state": 1500000, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Utility Storage Tanks", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 2500000, "dm_investment": 0, "campus_reserves": 2500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Pavilion", "building": "New Construction", "building_dm_backlog": "6916992", "total_cost": 8425000, "dm_investment": 0, "campus_reserves": 0, "external": 8425000, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Southwest Lowrise Tunnel Renovation", "building": "Southwest Concourse", "building_dm_backlog": "1376647", "total_cost": 4000000, "dm_investment": 4000000, "campus_reserves": 4000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Southwest Lowrise Tunnel Renovation Phase 2", "building": "Southwest Concourse", "building_dm_backlog": "1376647", "total_cost": 4000000, "dm_investment": 4000000, "campus_reserves": 4000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "SPHHS Dry Lab Renovations", "building": "Totman", "building_dm_backlog": "6916992", "total_cost": 2500000, "dm_investment": 2500000, "campus_reserves": 2500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Authorized"}, {"campus": "Amherst", "authority": "President", "project": "Van Meter Roof Rehabilitation", "building": "Van Meter House", "building_dm_backlog": "13008517", "total_cost": 4000000, "dm_investment": 4000000, "campus_reserves": 1730336, "external": 0, "borrowed": 0, "state": 2269664, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Washington Life Safety/Fire Alarm Upgrades", "building": "Washington House", "building_dm_backlog": "", "total_cost": 3000000, "dm_investment": 3000000, "campus_reserves": 3000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Washington & Kennedy Resident Halls Life Safety Upgrades Phase 2", "building": "Washington House, Kennedy House", "building_dm_backlog": "49440639", "total_cost": 6230000, "dm_investment": 6230000, "campus_reserves": 6230000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Washington and Kennedy Residence Halls Life Safety Upgrades", "building": "Washington House, Kennedy House", "building_dm_backlog": "49440639", "total_cost": 5000000, "dm_investment": 5000000, "campus_reserves": 5000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Wheeler Basement Student Experience Upgrades", "building": "Wheeler House", "building_dm_backlog": "6897308", "total_cost": 3500000, "dm_investment": 3500000, "campus_reserves": 3500000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}, {"campus": "Amherst", "authority": "President", "project": "Mt Ida Wingate Hall Dorm Renovations", "building": "Wingate", "building_dm_backlog": "2177831", "total_cost": 6000000, "dm_investment": 6000000, "campus_reserves": 6000000, "external": 0, "borrowed": 0, "state": 0, "status": "President Approved"}];
+
+const SYSTEM = {
+  bridge: [ ["FY22 backlog", 4830, "total"], ["Inflation", 210, "up"], ["New needs", 585, "up"], ["Completed / removed", -802, "down"], ["FY24 backlog", 4823, "total"] ],
+  spend: [ [2020, 90, 217], [2021, 62, 178], [2022, 67, 159], [2023, 100, 119], [2024, 126, 127], [2025, 135, 138] ],
+  keepUpTarget2025: 254,
+};
+// Amherst buildings with the largest backlog (plan p.59), joined to authorized DM investment from the register.
+const TOP_BUILDINGS = [
+  { name: "Dubois Library", backlog: 116.7, fci: "33%", match: [], concept: null },
+  { name: "Lederle GRC + addition", backlog: 90.1, fci: "21–29%", match: ["Lederle Graduate Research Center"], concept: "$100M repairs & renovations" },
+  { name: "Bartlett Hall", backlog: 57.8, fci: "62%", match: [], concept: "$300M New Central Academic Building" },
+  { name: "Tobin Hall", backlog: 51.6, fci: "58%", match: ["Tobin Hall"], concept: null },
+  { name: "Morrill Science Center III", backlog: 45.2, fci: "87%", match: [], concept: "$50M Morrill renovations" },
+  { name: "Fine Arts Center", backlog: 44.7, fci: "16%", match: ["Fine Arts Center"], concept: null },
+  { name: "Lincoln Campus Center", backlog: 41.5, fci: "24%", match: ["Lincoln Campus Center"], concept: null },
+  { name: "Herter Hall", backlog: 33.8, fci: "58%", match: [], concept: "$25M Herter renovations" },
+  { name: "Morrill Science Center I", backlog: 31.7, fci: "65%", match: [], concept: "$50M Morrill renovations" },
+];
+// Amherst conceptual projects tied to a building (plan's conceptual project table). $ in millions.
+const CONCEPTUAL = [
+  { p: "Morrill Science Ctr Renovations", b: "Morrill Science Center", dm: 120.69, cost: 50 },
+  { p: "Herter Renovations", b: "Herter Hall", dm: 33.84, cost: 25 },
+  { p: "Lederle Research Center Repairs and Renovations", b: "Lederle Graduate Research Center", dm: 90.17, cost: 100 },
+  { p: "Franklin Dining Commons Reno/Addition", b: "Franklin Dining Commons", dm: 12.78, cost: 40 },
+  { p: "Memorial Hall Renovations", b: "Memorial Hall", dm: 5.81, cost: 20 },
+  { p: "New Central Academic Building", b: "Bartlett Hall", dm: 57.85, cost: 300 },
+  { p: "DOER CHP Electric Heat Pump", b: "New Central Heat Plant", dm: 3.79, cost: 20 },
+  { p: "Life Science Laboratories Fit out", b: "Life Science Laboratories", dm: 1.79, cost: 15 },
+  { p: "Indoor and Outdoor Student Recreation Expansion", b: "Recreation Center", dm: 0.37, cost: 200 },
+  { p: "Boyden Renovation/Replacement", b: "Boyden Gymnasium", dm: 0.02, cost: 75 },
+  { p: "Mullins Center Improvements & Upgrades", b: "Mullins Center", dm: 0.02, cost: 35 },
+];
+const AMHERST_BACKLOG = 1763, AMHERST_RV = 1763 / 0.20;
+
+const M = v => v / 1e6;
+const fmt = (v, d = 1) => "$" + v.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }) + "M";
+const sum = (arr, f) => arr.reduce((a, x) => a + f(x), 0);
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const svgEl = (tag, attrs, text) => { const e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; return e; };
+
+/* tooltip */
+const tip = document.getElementById("tip");
+document.addEventListener("pointermove", e => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.getAttribute("data-tip"); tip.hidden = false;
+  const x = Math.min(e.clientX + 14, window.innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px";
+});
+
+/* Sheet 1: checks */
+(function () {
+  const board = sum(PROJECTS.filter(p => p.authority === "Board"), p => p.total_cost);
+  const pres = sum(PROJECTS.filter(p => p.authority === "President"), p => p.total_cost);
+  const rowsOk = PROJECTS.every(p => p.campus_reserves + p.external + p.borrowed + p.state === p.total_cost);
+  const tot = board + pres;
+  const share = k => Math.round(100 * sum(PROJECTS, p => p[k]) / tot);
+  const items = [
+    ["✓", `${PROJECTS.length} projects extracted`, `${fmt(M(tot))} total, matching the Amherst total on the summary page ($827.6M)`],
+    ["✓", "Board subtotal reconciles", `${fmt(M(board))} vs. ${fmt(638.17)} printed`],
+    ["✓", "President subtotal reconciles", `${fmt(M(pres))} vs. ${fmt(189.405, 1)} printed`],
+    [rowsOk ? "✓" : "!", "Funding sources sum to cost on every row", `Mix ${share("campus_reserves")}% reserves · ${share("external")}% external · ${share("borrowed")}% debt · ${share("state")}% state, matching the campus chart`],
+    ["!", "1 item flagged for review", "The 'Top 10 by FCI' rows sum to $109.2M, but the plan prints $108.4M. A person should check this against the PDF.", true],
+  ];
+  document.getElementById("checks").innerHTML = items.map(([ic, s, d, flag]) =>
+    `<div class="check${flag ? " flag" : ""}"><span class="ic">${ic}</span><strong>${s}</strong><span>${d}</span></div>`).join("");
+})();
+
+/* Sheet 2: bridge */
+(function () {
+  const svg = document.getElementById("bridge"), W = 460, H = 250, L = 8, R = 8, T = 22, B = 46;
+  const lo = 4000, hi = 5450, y = v => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  const n = SYSTEM.bridge.length, slot = (W - L - R) / n, bw = slot * 0.56;
+  [4000, 4500, 5000].forEach(g => { svg.append(svgEl("line", { x1: L, x2: W - R, y1: y(g), y2: y(g), stroke: css("--rule"), "stroke-width": 1 })); svg.append(svgEl("text", { x: W - R, y: y(g) - 4, "text-anchor": "end" }, g.toLocaleString())); });
+  let run = 0;
+  SYSTEM.bridge.forEach(([label, v, kind], i) => {
+    const x = L + slot * i + (slot - bw) / 2;
+    let a, b, fill;
+    if (kind === "total") { a = lo; b = v; run = v; fill = css("--s1"); }
+    else { a = run; b = run + v; run = b; fill = kind === "up" ? css("--s2") : css("--s3"); }
+    const top = y(Math.max(a, b)), h = Math.max(2, Math.abs(y(a) - y(b)));
+    svg.append(svgEl("rect", { x, y: top, width: bw, height: h, rx: 3, fill, "data-tip": `${label}: ${kind === "total" ? "" : v > 0 ? "+" : "−"}${Math.abs(v).toLocaleString()}M` }));
+    svg.append(svgEl("text", { x: x + bw / 2, y: top - 6, "text-anchor": "middle", class: "lbl-strong" }, (kind === "total" ? "" : v > 0 ? "+" : "−") + Math.abs(v).toLocaleString()));
+    const words = label.split(" ");
+    const lines = words.length > 2 ? [words.slice(0, 2).join(" "), words.slice(2).join(" ")] : [label];
+    lines.forEach((ln, j) => svg.append(svgEl("text", { x: x + bw / 2, y: H - B + 16 + j * 13, "text-anchor": "middle" }, ln)));
+    if (i < n - 1) svg.append(svgEl("line", { x1: x + bw, x2: x + slot, y1: y(run), y2: y(run), stroke: css("--rule-strong"), "stroke-dasharray": "2 3" }));
+  });
+  svg.append(svgEl("text", { x: L, y: H - 4 }, "Axis starts at 4,000"));
+})();
+
+/* Sheet 2: spending */
+(function () {
+  const svg = document.getElementById("spend"), W = 460, H = 236, L = 34, R = 8, T = 14, B = 24, max = 320;
+  const y = v => T + (H - T - B) * (1 - v / max);
+  [0, 100, 200, 300].forEach(g => { svg.append(svgEl("line", { x1: L, x2: W - R, y1: y(g), y2: y(g), stroke: css("--rule"), "stroke-width": 1 })); svg.append(svgEl("text", { x: L - 6, y: y(g) + 4, "text-anchor": "end" }, g)); });
+  const slot = (W - L - R) / SYSTEM.spend.length, bw = slot * 0.5;
+  SYSTEM.spend.forEach(([yr, k, c], i) => {
+    const x = L + slot * i + (slot - bw) / 2;
+    svg.append(svgEl("rect", { x, y: y(k), width: bw, height: y(0) - y(k), fill: css("--s1"), "data-tip": `${yr} keep-up: $${k}M` }));
+    svg.append(svgEl("rect", { x, y: y(k + c), width: bw, height: y(k) - y(k + c) - 2, rx: 3, fill: css("--s2"), "data-tip": `${yr} catch-up: $${c}M` }));
+    svg.append(svgEl("text", { x: x + bw / 2, y: y(k + c) - 5, "text-anchor": "middle", class: "lbl-strong" }, k + c));
+    svg.append(svgEl("text", { x: x + bw / 2, y: H - 6, "text-anchor": "middle" }, yr));
+  });
+  const xs = L + slot * 5 + (slot - bw) / 2 - 6, t = SYSTEM.keepUpTarget2025;
+  svg.append(svgEl("line", { x1: xs, x2: xs + bw + 12, y1: y(t), y2: y(t), stroke: css("--ink"), "stroke-width": 2, "stroke-dasharray": "4 3" }));
+})();
+
+/* Sheet 3: gap */
+(function () {
+  const rows = TOP_BUILDINGS.map(b => ({ ...b, inv: sum(PROJECTS.filter(p => b.match.includes(p.building)), p => M(p.dm_investment)) }));
+  const svg = document.getElementById("gap"), W = 720, rowH = 34, T = 6, labW = 250, R = 150, max = 120;
+  const x = v => labW + (W - labW - R) * v / max;
+  svg.setAttribute("viewBox", `0 0 ${W} ${T + rows.length * rowH + 20}`);
+  rows.forEach((r, i) => {
+    const y0 = T + i * rowH;
+    svg.append(svgEl("text", { x: labW - 10, y: y0 + 15, "text-anchor": "end", class: "lbl-strong" }, r.name));
+    svg.append(svgEl("text", { x: labW - 10, y: y0 + 28, "text-anchor": "end" }, `FCI ${r.fci}`));
+    svg.append(svgEl("rect", { x: labW, y: y0 + 4, width: x(r.backlog) - labW, height: 22, rx: 3, fill: css("--track"), "data-tip": `${r.name}: backlog $${r.backlog}M` }));
+    if (r.inv > 0) svg.append(svgEl("rect", { x: labW, y: y0 + 8, width: Math.max(3, x(r.inv) - labW), height: 14, rx: 2, fill: css("--s1"), "data-tip": `${r.name}: $${r.inv.toFixed(1)}M authorized DM investment` }));
+    const note = r.inv > 0 ? `${fmt(r.inv)} authorized` : (r.concept ? "only conceptual" : "nothing planned");
+    svg.append(svgEl("text", { x: x(r.backlog) + 8, y: y0 + 19, class: r.inv > 0 ? "" : "lbl-strong" }, `$${r.backlog}M · ${note}`));
+  });
+  const total = sum(rows, r => r.backlog), inv = sum(rows, r => r.inv);
+  const none = rows.filter(r => r.inv === 0);
+  document.getElementById("gapInsight").innerHTML =
+    `These 9 buildings carry <b>${fmt(total)}</b> of backlog. The authorized plan puts <b>${fmt(inv)}</b> (${Math.round(100 * inv / total)}%) of deferred maintenance investment into them. ` +
+    `<b>${none.length} of them</b> have no authorized project, including <b>Dubois Library</b>, the campus's largest backlog at $116.7M, which doesn't appear in the conceptual list either.`;
+})();
+
+/* Sheet 4: scenario */
+(function () {
+  let rule = "roi";
+  const budget = document.getElementById("budget");
+  const ranked = () => CONCEPTUAL.map(c => ({ ...c, retire: Math.min(c.dm, c.cost), roi: Math.min(c.dm, c.cost) / c.cost }))
+    .sort((a, b) => rule === "roi" ? b.roi - a.roi || a.cost - b.cost : b.cost - a.cost);
+  function run() {
+    const B = +budget.value; let left = B;
+    const list = ranked().map(c => { const inn = c.cost <= left; if (inn) left -= c.cost; return { ...c, inn }; });
+    const chosen = list.filter(c => c.inn), retired = sum(chosen, c => c.retire), spent = sum(chosen, c => c.cost);
+    const after = AMHERST_BACKLOG - retired, fci = 100 * after / AMHERST_RV;
+    document.getElementById("budgetOut").textContent = "$" + B + "M";
+    document.getElementById("plist").innerHTML = list.map((c, i) =>
+      `<li class="${c.inn ? "in" : ""}"><span class="mk">${c.inn ? "✓" : i + 1}</span><span>${c.p}<span class="sub">${c.b} · building backlog $${c.dm.toFixed(1)}M</span></span><span class="num">$${c.cost}M</span></li>`).join("");
+    document.getElementById("rFunded").textContent = `${chosen.length} · $${spent}M`;
+    document.getElementById("rRetired").textContent = fmt(retired);
+    document.getElementById("rBacklog").textContent = fmt(after, 0);
+    document.getElementById("rFci").textContent = fci.toFixed(1) + "%";
+    const names = chosen.map(c => c.p.replace(/ (Renovations|Repairs and Renovations)$/, "")).join(", ");
+    document.getElementById("narrative").textContent = chosen.length === 0
+      ? `With $${B}M of new capital, no conceptual Amherst project fits within the budget. The campus backlog remains $1,763M (FCI 20.0%).`
+      : `With $${B}M of new capital, we recommend advancing ${chosen.length} project${chosen.length > 1 ? "s" : ""} (${names}) for authorization, at a total cost of $${spent}M. ` +
+        `Together they would retire an estimated $${retired.toFixed(1)}M of deferred maintenance, reducing the Amherst backlog from $1,763M to $${after.toFixed(0)}M and its FCI from 20.0% to ${fci.toFixed(1)}%. ` +
+        `Each dollar spent retires about $${(retired / spent).toFixed(2)} of backlog.` +
+        (rule === "roi" ? "" : " Note: this list follows project size, not backlog impact; reordering by backlog retired per dollar retires more backlog with the same money.");
+  }
+  budget.addEventListener("input", run);
+  const setRule = r => { rule = r; document.getElementById("ruleRoi").setAttribute("aria-pressed", r === "roi"); document.getElementById("ruleSize").setAttribute("aria-pressed", r === "size"); run(); };
+  document.getElementById("ruleRoi").onclick = () => setRule("roi");
+  document.getElementById("ruleSize").onclick = () => setRule("size");
+  document.getElementById("copyBtn").onclick = async e => {
+    const t = document.getElementById("narrative").textContent;
+    try { await navigator.clipboard.writeText(t); e.target.textContent = "Copied"; }
+    catch { const r = document.createRange(); r.selectNodeContents(document.getElementById("narrative")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); e.target.textContent = "Selected; press Ctrl+C"; }
+    setTimeout(() => e.target.textContent = "Copy draft", 2000);
+  };
+  run();
+})();
+
+/* Sheet 5: Q&A */
+(function () {
+  const tot = M(sum(PROJECTS, p => p.total_cost));
+  const dm = M(sum(PROJECTS, p => p.dm_investment));
+  const nc = M(sum(PROJECTS.filter(p => p.building === "New Construction"), p => p.total_cost));
+  const state = PROJECTS.filter(p => p.state > 0).sort((a, b) => b.state - a.state);
+  const pending = PROJECTS.filter(p => /Pending/.test(p.status));
+  const debt = PROJECTS.filter(p => p.borrowed > 0).sort((a, b) => b.borrowed - a.borrowed);
+  const QA = [
+    ["How much of Amherst's plan actually fixes existing buildings?",
+      `<p><b>${fmt(dm)}</b> of the ${fmt(tot)} plan (${Math.round(100 * dm / tot)}%) is counted as deferred maintenance investment. New construction accounts for <b>${fmt(nc)}</b> (${Math.round(100 * nc / tot)}%).</p>`,
+      "Register: dm_investment and building = New Construction"],
+    ["Which projects depend on state money?",
+      `<p>${state.length} projects, <b>${fmt(M(sum(state, p => p.state)))}</b> in total. The largest:</p><ul>${state.slice(0, 4).map(p => `<li>${p.project}: ${fmt(M(p.state))} of ${fmt(M(p.total_cost))}</li>`).join("")}</ul>`,
+      "Register: state funding column"],
+    ["What is still waiting on a vote?",
+      `<ul>${pending.map(p => `<li>${p.project} (${fmt(M(p.total_cost))}): ${p.status}</li>`).join("")}</ul>`,
+      "Register: status column"],
+    ["Where does the debt go?",
+      `<p>${debt.length} projects use <b>${fmt(M(sum(debt, p => p.borrowed)))}</b> of borrowing:</p><ul>${debt.map(p => `<li>${p.project}: ${fmt(M(p.borrowed))}</li>`).join("")}</ul><p>The University's debt service burden is 6.3%, while the plan says peers are under 5%.</p>`,
+      "Register: borrowed column · plan's Debt Facts"],
+    ["Are we keeping up with maintenance?",
+      `<p>No. FY25 keep-up spending was <b>$135M</b> against a <b>$254M</b> target (53%), and catch-up was <b>$138M</b> against <b>$322M</b> (43%). The system backlog held at $4.8B only because completed work ($802M) offset inflation and new needs ($795M).</p>`,
+      "Plan's deferred maintenance pages (Gordian FY24 data)"],
+  ];
+  const qs = document.getElementById("qs"), ans = document.getElementById("answer");
+  const show = i => { [...qs.children].forEach((b, j) => b.setAttribute("aria-pressed", i === j)); ans.innerHTML = QA[i][1] + `<span class="cite">Computed from: ${QA[i][2]}</span>`; };
+  QA.forEach((q, i) => { const b = document.createElement("button"); b.type = "button"; b.textContent = q[0]; b.onclick = () => show(i); qs.append(b); });
+  show(0);
+})();
+
+/* Sheet 6: register */
+(function () {
+  let key = "total_cost", dir = -1;
+  const q = document.getElementById("q"), auth = document.getElementById("auth");
+  const cols = [["campus_reserves", "--s1", "reserves"], ["external", "--s2", "external"], ["borrowed", "--s3", "borrowed"], ["state", "--s4", "state"]];
+  function render() {
+    const s = q.value.trim().toLowerCase();
+    const rows = PROJECTS.filter(p => (!auth.value || p.authority === auth.value) && (!s || (p.project + " " + p.building).toLowerCase().includes(s)))
+      .sort((a, b) => (typeof a[key] === "string" ? a[key].localeCompare(b[key]) : a[key] - b[key]) * dir);
+    document.getElementById("tbody").innerHTML = rows.map(p => {
+      const bar = cols.filter(([k]) => p[k] > 0).map(([k, c, l]) => `<span style="flex:${p[k]};background:var(${c})" data-tip="${l}: ${fmt(M(p[k]))}"></span>`).join("");
+      return `<tr><td>${p.project}</td><td>${p.building}</td><td class="status">${p.status}</td><td class="n">${M(p.total_cost).toFixed(1)}</td><td class="n">${p.dm_investment ? M(p.dm_investment).toFixed(1) : "—"}</td><td><div class="fbar">${bar}</div></td></tr>`;
+    }).join("");
+    document.getElementById("regCount").textContent = `${rows.length} of ${PROJECTS.length} projects · ${fmt(M(sum(rows, p => p.total_cost)))}`;
+  }
+  q.addEventListener("input", render); auth.addEventListener("change", render);
+  document.querySelectorAll("th button").forEach(b => b.onclick = () => {
+    const k = b.dataset.sort; dir = key === k ? -dir : (k === "project" ? 1 : -1); key = k;
+    document.querySelectorAll("th button").forEach(x => x.textContent = x.textContent.replace(/ [↑↓]$/, ""));
+    b.textContent += dir === 1 ? " ↑" : " ↓"; render();
+  });
+  render();
+})();
+</script>
