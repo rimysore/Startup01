@@ -1,0 +1,864 @@
+<title>Metric Studio</title>
+<meta name="description" content="Prototype: configurable facilities dashboards on a deterministic metric engine, with made-up data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: app shell. Header with persona + period, tab row, then a 12-column tile grid; definitions open in a side drawer. */
+:root {
+  --bg: #f3f5f4;
+  --panel: #ffffff;
+  --ink: #15201e;
+  --ink-2: #4b5755;
+  --ink-3: #7b8684;
+  --rule: #dce2e0;
+  --rule-strong: #bac4c1;
+  --accent: #0f6b62;
+  --accent-ink: #ffffff;
+  --accent-soft: #e0efec;
+  --prior: #9aa6a3;
+  --track: #e7ecea;
+  --good: #1f7a3a; --good-bg: #e2f2e6;
+  --warn: #8f5600; --warn-bg: #fbefd8;
+  --info: #23589b; --info-bg: #e3edf9;
+  --font-display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1514; --panel: #172120; --ink: #ecf2f1; --ink-2: #b3bfbd; --ink-3: #87938f;
+    --rule: #28332f; --rule-strong: #3b4845; --accent: #4fc2b4; --accent-ink: #0b1a18; --accent-soft: #1b3431;
+    --prior: #6e7b78; --track: #222d2b;
+    --good: #72d18f; --good-bg: #183020; --warn: #f0b75a; --warn-bg: #36290f; --info: #8db8f0; --info-bg: #182a40;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1514; --panel: #172120; --ink: #ecf2f1; --ink-2: #b3bfbd; --ink-3: #87938f;
+  --rule: #28332f; --rule-strong: #3b4845; --accent: #4fc2b4; --accent-ink: #0b1a18; --accent-soft: #1b3431;
+  --prior: #6e7b78; --track: #222d2b;
+  --good: #72d18f; --good-bg: #183020; --warn: #f0b75a; --warn-bg: #36290f; --info: #8db8f0; --info-bg: #182a40;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 16px; padding-block: 16px 64px; display: grid; gap: 16px; }
+h1, h2, h3 { font-family: var(--font-display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+h1 { font-size: 1.35rem; font-weight: 800; }
+h2 { font-size: 1.25rem; font-weight: 700; }
+h3 { font-size: .95rem; font-weight: 700; }
+p { margin: 0; }
+.num { font-family: var(--font-data); font-variant-numeric: tabular-nums; }
+.muted { color: var(--ink-2); }
+.small { font-size: .84rem; }
+.eyebrow { font-family: var(--font-data); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+button, select, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+.brand { display: flex; gap: 12px; align-items: center; min-width: 0; }
+.mark { width: 34px; height: 34px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; flex: none; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+.field { display: grid; gap: 2px; }
+.field label { font-size: .72rem; color: var(--ink-3); font-family: var(--font-data); letter-spacing: .06em; text-transform: uppercase; }
+select, input[type=text], input[type=number], textarea { background: var(--panel); border: 1px solid var(--rule-strong); border-radius: 5px; padding: 6px 9px; min-width: 0; }
+.banner { font-size: .82rem; color: var(--ink-2); background: var(--panel); border: 1px dashed var(--rule-strong); border-radius: 6px; padding: 8px 12px; }
+
+/* tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--rule); overflow-x: auto; }
+.tabs a { padding: 8px 14px; text-decoration: none; color: var(--ink-2); font-weight: 600; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a[aria-current=page] { color: var(--ink); border-bottom-color: var(--accent); }
+
+.btn { border: 1px solid var(--rule-strong); background: var(--panel); border-radius: 5px; padding: 6px 12px; cursor: pointer; font-weight: 600; font-size: .88rem; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.link { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; cursor: pointer; }
+.btn[disabled] { opacity: .55; cursor: default; }
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; }
+.toolbar .left, .toolbar .right { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-data); font-size: .68rem; letter-spacing: .04em; padding: 2px 7px; border-radius: 99px; white-space: nowrap; }
+.chip.cert { background: var(--good-bg); color: var(--good); }
+.chip.pers { background: var(--info-bg); color: var(--info); }
+.chip.pend { background: var(--warn-bg); color: var(--warn); }
+
+/* tiles */
+.grid { display: grid; gap: 12px; grid-template-columns: repeat(12, minmax(0, 1fr)); }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; align-content: start; min-width: 0; grid-column: span 3; }
+.tile.wide { grid-column: span 6; }
+@media (max-width: 980px) { .tile { grid-column: span 6; } .tile.wide { grid-column: span 12; } }
+@media (max-width: 560px) { .tile, .tile.wide { grid-column: span 12; } }
+.tile-head { display: flex; gap: 8px; align-items: start; justify-content: space-between; }
+.tile-head h3 { font-size: .9rem; }
+.tile-tools { display: flex; gap: 2px; flex: none; }
+.icon { border: 0; background: none; color: var(--ink-3); cursor: pointer; padding: 2px 5px; border-radius: 4px; font-size: .9rem; line-height: 1; }
+.icon:hover { color: var(--ink); background: var(--track); }
+.kpi { font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1; cursor: pointer; background: none; border: 0; padding: 0; text-align: left; color: var(--ink); }
+.delta { font-size: .8rem; color: var(--ink-2); }
+.delta b { font-family: var(--font-data); font-weight: 600; }
+.tile-foot { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; font-size: .78rem; color: var(--ink-3); }
+.tile svg { width: 100%; height: auto; display: block; }
+.tile svg text { fill: var(--ink-2); font-family: var(--font-data); font-size: 10px; }
+.legend { display: flex; gap: 12px; font-size: .75rem; color: var(--ink-2); }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 4px; vertical-align: -1px; }
+.rank { display: grid; gap: 5px; }
+.rank-row { display: grid; grid-template-columns: minmax(0, 9rem) minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .82rem; }
+.rank-row span:first-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar { height: 10px; border-radius: 3px; background: var(--accent); }
+
+/* add panel */
+.panel { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 12px; align-content: start; }
+.form-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
+
+/* library */
+.lib { display: grid; gap: 8px; }
+.lib-item { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 16px; align-items: start; }
+.lib-item .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+/* define */
+.define { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 900px) { .define { grid-template-columns: minmax(0, 1fr); } }
+textarea { width: 100%; min-height: 110px; resize: vertical; }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.examples button { border: 1px dashed var(--rule-strong); background: transparent; border-radius: 5px; padding: 5px 9px; cursor: pointer; font-size: .82rem; text-align: left; }
+.readback { background: var(--accent-soft); border-radius: 6px; padding: 12px 14px; }
+.rules { width: 100%; border-collapse: collapse; font-size: .84rem; }
+.rules td { padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.rules td:first-child { color: var(--ink-3); width: 34%; font-family: var(--font-data); font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; }
+.result { border-radius: 6px; padding: 10px 12px; font-size: .9rem; }
+.result.ok { background: var(--good-bg); color: var(--good); }
+.result.bad { background: var(--warn-bg); color: var(--warn); }
+.result.info { background: var(--info-bg); color: var(--info); }
+pre.spec { background: var(--bg); border: 1px solid var(--rule); border-radius: 6px; padding: 10px; font-size: .74rem; overflow-x: auto; margin: 0; max-height: 260px; }
+
+/* checks */
+.check { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; }
+.check .st { grid-row: span 2; font-family: var(--font-data); font-size: .72rem; padding: 2px 8px; border-radius: 99px; align-self: start; }
+
+/* drawer */
+.scrim { position: fixed; inset: 0; background: rgba(10, 16, 15, .35); z-index: 20; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(560px, 100%); background: var(--panel); border-left: 1px solid var(--rule); z-index: 21; overflow-y: auto; padding: calc(16px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; align-content: start; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 6px; }
+table.rows { border-collapse: collapse; width: 100%; font-size: .78rem; }
+table.rows th, table.rows td { padding: 5px 8px; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; }
+table.rows th { font-family: var(--font-data); font-size: .66rem; text-transform: uppercase; color: var(--ink-3); letter-spacing: .05em; }
+.summary-out { display: grid; gap: 6px; }
+.summary-out mark { background: var(--warn-bg); color: var(--warn); border-radius: 3px; padding: 0 2px; }
+.summary-out .ok-num { border-bottom: 2px solid var(--good); }
+@media (prefers-reduced-motion: no-preference) { .tile { transition: border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="mark" aria-hidden="true">M</div>
+      <div>
+        <h1>Metric Studio</h1>
+        <div class="small muted">Ridgeview University (fictional) · work orders Jan 2025 – Sep 2026</div>
+      </div>
+    </div>
+    <div class="controls">
+      <div class="field"><label for="persona">Viewing as</label>
+        <select id="persona">
+          <option value="vp">VP, Facilities</option>
+          <option value="hvac">HVAC shop supervisor</option>
+          <option value="planner">Capital planner</option>
+        </select>
+      </div>
+      <div class="field"><label for="period">Period</label>
+        <select id="period">
+          <option value="ytd26">2026 year to date</option>
+          <option value="ay26">Aug – Sep 2026</option>
+          <option value="l30">Last 30 days</option>
+          <option value="fy25">Calendar 2025</option>
+        </select>
+      </div>
+    </div>
+  </header>
+  <div class="banner">Prototype with made-up data. Every number is calculated by code from a written definition; AI only drafts definitions and summaries. Dashboards are saved in this browser.</div>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#dashboard" data-tab="dashboard">My dashboard</a>
+    <a href="#library" data-tab="library">Metric library</a>
+    <a href="#define" data-tab="define">Define a metric</a>
+    <a href="#checks" data-tab="checks">Checks</a>
+  </nav>
+
+  <section id="view-dashboard" data-view="dashboard">
+    <div style="display:grid;gap:12px">
+      <div class="toolbar">
+        <div class="left"><h2 id="dashTitle">Dashboard</h2><span class="small muted" id="dashScope"></span></div>
+        <div class="right">
+          <button class="btn" type="button" id="summaryBtn" hidden>Draft summary</button>
+          <button class="btn" type="button" id="resetBtn">Reset layout</button>
+          <button class="btn primary" type="button" id="addBtn">Add tile</button>
+        </div>
+      </div>
+      <div class="panel" id="addPanel" hidden>
+        <h3>Add a tile</h3>
+        <div class="form-row">
+          <div class="field"><label for="addMetric">Metric</label><select id="addMetric"></select></div>
+          <div class="field"><label for="addView">Show as</label><select id="addView"></select></div>
+          <div class="field" id="addGroupWrap"><label for="addGroup">Rank by</label>
+            <select id="addGroup"><option value="building">Building</option><option value="shop">Shop</option><option value="workType">Type of work</option></select></div>
+          <div class="field"><label for="addShop">Only shop</label><select id="addShop"><option value="">All shops</option></select></div>
+          <button class="btn primary" type="button" id="addConfirm">Add to my dashboard</button>
+          <button class="btn" type="button" id="addCancel">Cancel</button>
+        </div>
+      </div>
+      <div class="panel summary-out" id="summaryPanel" hidden aria-live="polite"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="view-library" data-view="library" hidden>
+    <div style="display:grid;gap:12px">
+      <div class="toolbar"><div class="left"><h2>Metric library</h2></div>
+        <div class="right"><select id="libFilter" aria-label="Filter metrics"><option value="">All metrics</option><option value="certified">Certified</option><option value="personal">Personal</option></select></div></div>
+      <p class="muted small">Certified metrics are the official definitions used on leadership dashboards. Personal metrics belong to one person and are labeled wherever they appear.</p>
+      <div class="lib" id="lib"></div>
+    </div>
+  </section>
+
+  <section id="view-define" data-view="define" hidden>
+    <div class="define">
+      <div class="panel">
+        <h2>Explain your calculation</h2>
+        <p class="muted small">Describe the number the way you'd explain it to a colleague. The assistant turns it into a written definition; the engine does the math.</p>
+        <label class="eyebrow" for="defText">Your description</label>
+        <textarea id="defText" placeholder="e.g. Count urgent and emergency work orders once each, and show the share closed within 2 working days."></textarea>
+        <div class="toolbar"><div class="left"><button class="btn primary" type="button" id="draftBtn">Draft definition</button><span class="small muted" id="draftStatus"></span></div></div>
+        <div class="eyebrow">Or start from an example (no AI needed)</div>
+        <div class="examples" id="examples"></div>
+      </div>
+      <div class="panel" id="defResult">
+        <p class="muted">The drafted definition appears here: a plain-English readback, the counting rules you can change, a preview value and a test against a number you already know.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-checks" data-view="checks" hidden>
+    <div style="display:grid;gap:12px">
+      <h2>Reconciliation checks</h2>
+      <p class="muted small">Run on every refresh for the selected period. A flagged check appears on any report that uses the affected numbers.</p>
+      <div style="display:grid;gap:8px" id="checks"></div>
+    </div>
+  </section>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden aria-label="Metric definition"></aside>
+
+<script>
+/* ===================== made-up data ===================== */
+const DAY0 = Date.UTC(2025, 0, 1);              // 2025-01-01 is a Wednesday
+const TODAY = 636;                              // 2026-09-29 as a day index
+const dayToDate = d => new Date(DAY0 + d * 864e5);
+const dayOf = (y, m, dd) => Math.round((Date.UTC(y, m, dd) - DAY0) / 864e5);
+const dow = d => (d + 3) % 7;                   // 0 = Sunday
+const fmtDate = d => dayToDate(d).toISOString().slice(0, 10);
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+const HOLIDAYS = new Set();
+for (const y of [2025, 2026]) {
+  const nth = (m, wd, n) => { let d = dayOf(y, m, 1); while (dow(d) !== wd) d++; return d + 7 * (n - 1); };
+  const last = (m, wd) => { let d = dayOf(y, m + 1, 1) - 1; while (dow(d) !== wd) d--; return d; };
+  [dayOf(y,0,1), nth(0,1,3), last(4,1), dayOf(y,5,19), dayOf(y,6,4), nth(8,1,1), nth(10,4,4), nth(10,4,4)+1, dayOf(y,11,24), dayOf(y,11,25), dayOf(y,11,31)].forEach(d => HOLIDAYS.add(d));
+}
+const isWorking = d => dow(d) !== 0 && dow(d) !== 6 && !HOLIDAYS.has(d);
+const workingDaysIn = (a, b) => { let n = 0; for (let d = a; d <= b; d++) if (isWorking(d)) n++; return n; };
+
+function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const R = rng(20261008);
+const gauss = () => Math.sqrt(-2 * Math.log(R() + 1e-12)) * Math.cos(2 * Math.PI * R());
+const pick = (items, weights) => { const t = weights.reduce((a, b) => a + b, 0); let x = R() * t; for (let i = 0; i < items.length; i++) { x -= weights[i]; if (x <= 0) return items[i]; } return items[items.length - 1]; };
+
+const BUILDINGS = ["Life Sciences Hall","Main Library","Ridgeview Stadium","Music Library","Chemistry Building","Science Hall II","North Quad Residences","Business School","Education Building","Performing Arts Center","Student Union","Engineering Hall","Recreation Center","Physics Building","Humanities Hall","Health Sciences Center","Arena","Fine Arts Building","Law School","Psychology Building","Admin Building","East Residence Hall","West Residence Hall","Dining Commons","Research Services Building","Central Heating Plant","Campus Grounds & Utilities","Geology Building","Journalism Hall","Mathematics Building","Nursing Building","Agriculture Lab","Observatory","Tennis Center","Aquatics Center","Library Annex","Visitor Center","Police Station","Child Care Center","Greenhouse","Art Museum","Theatre Building","History Hall","Languages Building","Computer Science Building","South Residence Hall","Field House","Parking Garage A","Parking Garage B","Alumni Center"];
+const BW = BUILDINGS.map((_, i) => 1 / Math.pow(i + 1, 0.85));
+const WORK = [
+  ["HVAC","HVAC",22],["Pumps","Plumbing",9],["Plumbing","Plumbing",14],["Electrical","Electrical",13],["Locks & hardware","Locksmith",8],
+  ["Elevator","Elevator",5],["Fire alarm","Fire & Life Safety",6],["Refrigeration","Refrigeration",5],["Carpentry","Carpentry",9],
+  ["Roofing","Sheet Metal",3],["Painting","Paint",2],["Grounds","Grounds",4]];
+const SHOPS = [...new Set(WORK.map(w => w[1]))];
+const PRIORITIES = ["Emergency","Urgent","Routine","Preventive"];
+const SEASON = [1.15,1.05,1.0,.95,.82,.95,.92,1.12,1.2,1.05,1.0,.85];
+const DUR = { Emergency: [0.7, 1.1], Urgent: [2, 1.0], Routine: [7, 0.9], Preventive: [11, 0.8] };
+
+const WOS = [], PHASES = [];
+let woSeq = 250000;
+for (let d = 0; d <= TODAY; d++) {
+  const month = dayToDate(d).getUTCMonth(), yr = dayToDate(d).getUTCFullYear();
+  const base = isWorking(d) ? 52 : 13;
+  const n = Math.round(base * SEASON[month] * (yr === 2026 ? 1.02 : 1) * (0.85 + 0.3 * R()));
+  for (let k = 0; k < n; k++) {
+    const priority = pick(PRIORITIES, [10, 30, 45, 15]);
+    const hour = priority === "Emergency" ? R() * 24 : 6.5 + R() * 10.5;
+    const w = pick(WORK, WORK.map(x => x[2]));
+    const shops = [w[1]];
+    if (R() < 0.12) { const s2 = pick(SHOPS, SHOPS.map(() => 1)); if (s2 !== w[1]) shops.push(s2); }
+    const building = pick(BUILDINGS, BW);
+    const [med, sig] = DUR[priority];
+    const dur = med * Math.exp(sig * gauss());
+    const enteredH = d * 24 + hour, closedH = enteredH + dur * 24;
+    const closed = closedH > (TODAY + 1) * 24 - 6 ? null : closedH;
+    const nPh = Math.max(shops.length, pick([1, 2, 3], [70, 22, 8]));
+    const wo = { id: "WO" + (woSeq++), priority, building, workType: w[0], shops, enteredH, closedH: closed,
+      enteredDay: d, closedDay: closed == null ? null : Math.floor(closed / 24),
+      afterHours: !isWorking(d) || hour < 7 || hour >= 18, phases: [] };
+    let mat = R() < 0.21 ? Math.round(230 * Math.exp(1.15 * gauss())) : 0;
+    if (R() < 0.009) mat += Math.round(4000 + R() * 30000);
+    for (let p = 0; p < nPh; p++) {
+      const hrs = Math.max(0.5, Math.round((priority === "Emergency" ? 3 : 2.2) * Math.exp(0.6 * gauss()) * 2) / 2);
+      const ph = { wo: wo.id, phase: p + 1, shop: shops[p] || shops[0], laborHours: hrs, laborCost: Math.round(hrs * 58),
+        materialCost: p === 0 ? mat : 0, tech: "T" + (100 + Math.floor(R() * 180)) };
+      wo.phases.push(ph); PHASES.push(Object.assign(ph, { ref: wo }));
+    }
+    wo.laborHours = wo.phases.reduce((a, p) => a + p.laborHours, 0);
+    wo.laborCost = wo.phases.reduce((a, p) => a + p.laborCost, 0);
+    wo.materialCost = wo.phases.reduce((a, p) => a + p.materialCost, 0);
+    wo.cost = wo.laborCost + wo.materialCost;
+    wo.multiShop = shops.length > 1;
+    wo.hasMaterials = wo.materialCost > 0;
+    wo.isOpen = closed == null;
+    WOS.push(wo);
+  }
+}
+
+/* ===================== metric engine ===================== */
+const FIELDS = {
+  priority: { label: "priority", type: "cat", values: PRIORITIES },
+  shop: { label: "shop", type: "cat", values: SHOPS },
+  building: { label: "building", type: "cat", values: BUILDINGS },
+  workType: { label: "type of work", type: "cat", values: WORK.map(w => w[0]) },
+  afterHours: { label: "raised at night or on a weekend", type: "bool" },
+  multiShop: { label: "needed more than one shop", type: "bool" },
+  hasMaterials: { label: "needed materials", type: "bool" },
+  isOpen: { label: "still open", type: "bool" },
+  cost: { label: "total cost", type: "money" },
+  laborCost: { label: "labor cost", type: "money" },
+  materialCost: { label: "materials cost", type: "money" },
+  laborHours: { label: "labor hours", type: "hours" },
+  daysToClose: { label: "days to close", type: "days" },
+};
+const MEASURES = ["count","per_working_day","sum","mean","median","share","distinct","pareto"];
+
+function rowValue(r, field, spec) {
+  const wo = r.ref || r;
+  switch (field) {
+    case "shop": return r.ref ? [r.shop] : wo.shops;
+    case "daysToClose": {
+      if (wo.closedH == null) return Infinity;
+      return spec.dayBasis === "working"
+        ? (wo.closedDay === wo.enteredDay ? 0 : workingDaysIn(wo.enteredDay + 1, wo.closedDay))
+        : (wo.closedH - wo.enteredH) / 24;
+    }
+    case "laborHours": case "laborCost": case "materialCost": return r.ref ? r[field] : wo[field];
+    case "cost": return r.ref ? r.laborCost + r.materialCost : wo.cost;
+    default: return wo[field];
+  }
+}
+function test(r, c, spec) {
+  const v = rowValue(r, c.field, spec);
+  const vals = Array.isArray(v) ? v : [v];
+  return vals.some(x => {
+    switch (c.op) {
+      case "eq": return x === c.value;
+      case "neq": return x !== c.value;
+      case "in": return (c.value || []).includes(x);
+      case "gt": return x > c.value;
+      case "gte": return x >= c.value;
+      case "lt": return x < c.value;
+      case "lte": return x <= c.value;
+      case "is": return Boolean(x) === Boolean(c.value);
+      default: return false;
+    }
+  });
+}
+function selectRows(spec, range, extra = []) {
+  const src = spec.grain === "phase" ? PHASES : WOS;
+  const filters = [...(spec.filter || []), ...extra];
+  const out = [];
+  for (const r of src) {
+    const wo = r.ref || r;
+    const d = spec.dateBasis === "closed" ? wo.closedDay : wo.enteredDay;
+    if (d == null || d < range[0] || d > range[1]) continue;
+    if (filters.every(c => test(r, c, spec))) out.push(r);
+  }
+  return out;
+}
+function median(a) { if (!a.length) return NaN; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; }
+function compute(spec, range, extra = []) {
+  const rows = selectRows(spec, range, extra), m = spec.measure;
+  switch (m.type) {
+    case "count": return rows.length;
+    case "per_working_day": return rows.length / Math.max(1, workingDaysIn(range[0], Math.min(range[1], TODAY)));
+    case "sum": return rows.reduce((a, r) => a + rowValue(r, m.field, spec), 0);
+    case "mean": { const v = rows.map(r => rowValue(r, m.field, spec)).filter(Number.isFinite); return v.length ? v.reduce((a, b) => a + b, 0) / v.length : NaN; }
+    case "median": return median(rows.map(r => rowValue(r, m.field, spec)).filter(Number.isFinite));
+    case "share": return rows.length ? rows.filter(r => test(r, m.where, spec)).length / rows.length : NaN;
+    case "distinct": return new Set(rows.flatMap(r => [].concat(rowValue(r, m.field, spec)))).size;
+    case "pareto": {
+      const g = new Map();
+      for (const r of rows) for (const k of [].concat(rowValue(r, m.field, spec))) g.set(k, (g.get(k) || 0) + (m.of === "cost" ? rowValue(r, "cost", spec) : 1));
+      const vals = [...g.values()].sort((a, b) => b - a), total = vals.reduce((a, b) => a + b, 0);
+      let acc = 0, n = 0; for (const v of vals) { acc += v; n++; if (acc >= total * (m.share || 0.5)) break; }
+      return n;
+    }
+  }
+  return NaN;
+}
+function computeGrouped(spec, range, extra, field) {
+  const keys = new Set();
+  for (const r of selectRows(spec, range, extra)) for (const k of [].concat(rowValue(r, field, spec))) keys.add(k);
+  return [...keys].map(k => ({ key: k, value: compute(spec, range, [...extra, { field, op: "eq", value: k }]) }))
+    .filter(x => Number.isFinite(x.value)).sort((a, b) => b.value - a.value);
+}
+function validateSpec(s) {
+  const errs = [];
+  if (!s || typeof s !== "object") return ["The definition is empty."];
+  if (!["work_order", "phase"].includes(s.grain)) errs.push("grain must be work_order or phase");
+  if (!["entered", "closed"].includes(s.dateBasis)) errs.push("dateBasis must be entered or closed");
+  if (!["calendar", "working"].includes(s.dayBasis)) errs.push("dayBasis must be calendar or working");
+  if (!s.measure || !MEASURES.includes(s.measure.type)) errs.push("measure.type is not one of " + MEASURES.join(", "));
+  else {
+    const needsField = ["sum", "mean", "median", "distinct", "pareto"].includes(s.measure.type);
+    if (needsField && !FIELDS[s.measure.field]) errs.push("measure.field is not a known field");
+    if (s.measure.type === "share" && (!s.measure.where || !FIELDS[s.measure.where.field])) errs.push("share needs a 'where' condition on a known field");
+  }
+  for (const c of s.filter || []) if (!FIELDS[c.field]) errs.push("filter field '" + c.field + "' is not known");
+  return errs;
+}
+
+/* ===================== readback (deterministic, no AI) ===================== */
+const OPS = { eq: "is", neq: "is not", in: "is one of", gt: "is over", gte: "is at least", lt: "is under", lte: "is at most", is: "" };
+function fmtCond(c, spec) {
+  const f = FIELDS[c.field] || { label: c.field, type: "cat" };
+  if (f.type === "bool") return (c.value ? "" : "not ") + f.label;
+  let v = c.value;
+  if (Array.isArray(v)) v = v.join(" or ");
+  else if (f.type === "money") v = "$" + Number(v).toLocaleString();
+  else if (f.type === "days") v = v + " " + (spec.dayBasis === "working" ? "working" : "calendar") + " day" + (v === 1 ? "" : "s");
+  return f.label + " " + OPS[c.op] + " " + v;
+}
+function readback(spec) {
+  const unit = spec.grain === "phase" ? "each phase row (a work order with several phases counts several times)" : "each work order once (its phases rolled up, costs summed)";
+  const filt = (spec.filter || []).length ? "Includes work orders where " + spec.filter.map(c => fmtCond(c, spec)).join(" and ") + "." : "Includes all work orders.";
+  const m = spec.measure, fl = f => (FIELDS[f] || { label: f }).label;
+  const what = {
+    count: "Counts " + unit + ".",
+    per_working_day: "Counts " + unit + ", divided by the working days in the period (weekends and holidays excluded).",
+    sum: "Adds up " + fl(m.field) + " across " + unit + ".",
+    mean: "Takes the average " + fl(m.field) + " across " + unit + ".",
+    median: "Takes the median " + fl(m.field) + " across " + unit + (m.field === "daysToClose" ? "; open work orders are left out" : "") + ".",
+    share: "Shows the share of " + unit.replace("each ", "") + " where " + (m.where ? fmtCond(m.where, spec) : "?") + (m.where && m.where.field === "daysToClose" ? "; open work orders count as not yet closed" : "") + ".",
+    distinct: "Counts the different " + fl(m.field) + " values involved.",
+    pareto: "Counts how few " + fl(m.field) + " values make up " + Math.round((m.share || .5) * 100) + "% of " + (m.of === "cost" ? "cost" : "work orders") + ".",
+  }[m.type];
+  const dates = "Assigns each work order to the period by the date it was " + spec.dateBasis + ".";
+  return [filt, what, dates].join(" ");
+}
+
+/* ===================== metric library ===================== */
+const UE = { field: "priority", op: "in", value: ["Emergency", "Urgent"] };
+const C = (id, name, extra) => Object.assign({ id, name, status: "certified", owner: "Facilities Analytics", version: 1, grain: "work_order", dateBasis: "entered", dayBasis: "calendar", filter: [] }, extra);
+const CERTIFIED = [
+  C("ue_count", "Urgent & emergency work orders", { filter: [UE], measure: { type: "count" }, version: 3 }),
+  C("ue_per_day", "Urgent & emergency per working day", { filter: [UE], measure: { type: "per_working_day" } }),
+  C("em_1day", "Emergencies closed within 1 day", { filter: [{ field: "priority", op: "eq", value: "Emergency" }], measure: { type: "share", where: { field: "daysToClose", op: "lte", value: 1 } }, version: 2 }),
+  C("ur_1day", "Urgent work closed within 1 day", { filter: [{ field: "priority", op: "eq", value: "Urgent" }], measure: { type: "share", where: { field: "daysToClose", op: "lte", value: 1 } } }),
+  C("ue_median_days", "Median days to close, urgent & emergency", { filter: [UE], measure: { type: "median", field: "daysToClose" } }),
+  C("em_after_hours", "Emergencies raised after hours", { filter: [{ field: "priority", op: "eq", value: "Emergency" }], measure: { type: "share", where: { field: "afterHours", op: "is", value: true } } }),
+  C("ue_cost", "Cost of urgent & emergency work", { filter: [UE], measure: { type: "sum", field: "cost" }, version: 2 }),
+  C("ue_materials", "Materials spend, urgent & emergency", { filter: [UE], measure: { type: "sum", field: "materialCost" } }),
+  C("ue_mat_share", "Work orders needing materials", { filter: [UE], measure: { type: "share", where: { field: "hasMaterials", op: "is", value: true } } }),
+  C("big_jobs", "Jobs over $5,000", { filter: [{ field: "cost", op: "gt", value: 5000 }], measure: { type: "count" } }),
+  C("pareto_bldg", "Buildings making up half of urgent work", { filter: [UE], measure: { type: "pareto", field: "building", of: "count", share: 0.5 } }),
+  C("open_backlog", "Open work orders, all priorities", { filter: [{ field: "isOpen", op: "is", value: true }], measure: { type: "count" } }),
+  C("pm_share", "Preventive share of all work", { measure: { type: "share", where: { field: "priority", op: "eq", value: "Preventive" } } }),
+  C("multi_shop", "Jobs needing more than one shop", { filter: [UE], measure: { type: "count" }, filterExtra: true }),
+  C("all_count", "All work orders", { measure: { type: "count" } }),
+  C("labor_hours", "Labor hours, urgent & emergency", { filter: [UE], measure: { type: "sum", field: "laborHours" } }),
+];
+CERTIFIED.find(m => m.id === "multi_shop").filter.push({ field: "multiShop", op: "is", value: true });
+const SEED_PERSONAL = [{ id: "p_ue_rows", name: "Urgent & emergency (my export count)", status: "personal", owner: "Capital planner", version: 1, basedOn: "ue_count",
+  grain: "phase", dateBasis: "entered", dayBasis: "calendar", filter: [UE], measure: { type: "count" } }];
+
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let personal = store.get("ms.personal", SEED_PERSONAL);
+const allMetrics = () => [...CERTIFIED, ...personal];
+const metricById = id => allMetrics().find(m => m.id === id);
+
+/* ===================== formatting ===================== */
+function unitOf(spec) {
+  const m = spec.measure;
+  if (m.type === "share") return "pct";
+  if (m.type === "per_working_day") return "rate";
+  if (["sum", "mean", "median"].includes(m.type)) { const t = (FIELDS[m.field] || {}).type; return t === "money" ? "money" : t === "hours" ? "hours" : t === "days" ? "days" : "num"; }
+  return "num";
+}
+function fmt(v, unit) {
+  if (!Number.isFinite(v)) return "—";
+  switch (unit) {
+    case "pct": return Math.round(v * 100) + "%";
+    case "rate": return Math.round(v).toLocaleString();
+    case "money": return v >= 1e6 ? "$" + (v / 1e6).toFixed(2) + "M" : v >= 1e4 ? "$" + Math.round(v / 1e3) + "K" : "$" + Math.round(v).toLocaleString();
+    case "hours": return v >= 1e4 ? Math.round(v / 1e3) + "K hrs" : Math.round(v).toLocaleString() + " hrs";
+    case "days": return v.toFixed(1) + " days";
+    default: return Math.round(v).toLocaleString();
+  }
+}
+
+/* ===================== periods & personas ===================== */
+const PERIODS = {
+  ytd26: { label: "2026 year to date", range: [dayOf(2026, 0, 1), TODAY] },
+  ay26: { label: "Aug – Sep 2026", range: [dayOf(2026, 7, 1), TODAY] },
+  l30: { label: "last 30 days", range: [TODAY - 29, TODAY] },
+  fy25: { label: "calendar 2025", range: [0, dayOf(2025, 11, 31)] },
+};
+const prior = r => r[0] - 365 >= 0 ? [r[0] - 365, r[1] - 365] : null;
+const PERSONAS = {
+  vp: { title: "Campus overview", scope: "All shops", extra: [], tiles: [
+    { m: "ue_count", v: "kpi" }, { m: "ue_per_day", v: "kpi" }, { m: "em_1day", v: "kpi" }, { m: "ue_cost", v: "kpi" },
+    { m: "ue_count", v: "trend" }, { m: "ue_count", v: "rank", g: "building" },
+    { m: "ue_cost", v: "rank", g: "shop" }, { m: "pareto_bldg", v: "kpi" }, { m: "em_after_hours", v: "kpi" }] },
+  hvac: { title: "HVAC shop", scope: "Only HVAC work", extra: [{ field: "shop", op: "eq", value: "HVAC" }], tiles: [
+    { m: "ue_count", v: "kpi" }, { m: "ue_median_days", v: "kpi" }, { m: "em_after_hours", v: "kpi" }, { m: "open_backlog", v: "kpi" },
+    { m: "ue_count", v: "trend" }, { m: "ue_count", v: "rank", g: "building" }] },
+  planner: { title: "Cost & buildings", scope: "All shops", extra: [], tiles: [
+    { m: "ue_cost", v: "kpi" }, { m: "ue_materials", v: "kpi" }, { m: "big_jobs", v: "kpi" }, { m: "p_ue_rows", v: "kpi" },
+    { m: "ue_cost", v: "rank", g: "building" }, { m: "ue_cost", v: "trend" }, { m: "ue_materials", v: "rank", g: "workType" }] },
+};
+const el = id => document.getElementById(id);
+const persona = () => el("persona").value;
+const period = () => PERIODS[el("period").value];
+const tilesFor = p => store.get("ms.dash." + p, PERSONAS[p].tiles);
+const saveTiles = (p, t) => store.set("ms.dash." + p, t);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const statusChip = m => m.status === "certified" ? '<span class="chip cert">✓ Certified</span>' : m.status === "pending" ? '<span class="chip pend">Pending review</span>' : '<span class="chip pers">Personal</span>';
+
+/* ===================== dashboard ===================== */
+function tileExtra(t) { return [...PERSONAS[persona()].extra, ...(t.shop ? [{ field: "shop", op: "eq", value: t.shop }] : [])]; }
+let lastTileValues = [];
+function renderDashboard() {
+  const p = PERSONAS[persona()], per = period(), tiles = tilesFor(persona());
+  el("dashTitle").textContent = p.title;
+  el("dashScope").textContent = p.scope + " · " + per.label;
+  lastTileValues = [];
+  el("grid").innerHTML = tiles.map((t, i) => {
+    const m = metricById(t.m); if (!m) return "";
+    const extra = tileExtra(t), unit = unitOf(m), title = esc(m.name) + (t.shop ? " · " + esc(t.shop) : "");
+    const tools = `<div class="tile-tools"><button class="icon" type="button" data-move="${i}" data-dir="-1" aria-label="Move earlier">↑</button><button class="icon" type="button" data-move="${i}" data-dir="1" aria-label="Move later">↓</button><button class="icon" type="button" data-remove="${i}" aria-label="Remove tile">×</button></div>`;
+    const foot = `<div class="tile-foot">${statusChip(m)}<button class="btn link small" type="button" data-explain="${m.id}" data-tile="${i}">How it's calculated</button></div>`;
+    if (t.v === "kpi") {
+      const v = compute(m, per.range, extra), pr = prior(per.range), pv = pr ? compute(m, pr, extra) : NaN;
+      lastTileValues.push({ label: m.name + (t.shop ? " (" + t.shop + ")" : ""), value: fmt(v, unit), prior: Number.isFinite(pv) ? fmt(pv, unit) : null });
+      let delta = '<span class="delta">No prior-year data for this period</span>';
+      if (Number.isFinite(pv) && Number.isFinite(v) && pv !== 0) {
+        delta = unit === "pct"
+          ? (Math.round((v - pv) * 100) === 0 ? `<span class="delta"><b>Same</b> as same period last year (${fmt(pv, unit)})</span>` : `<span class="delta"><b>${(v - pv >= 0 ? "+" : "−") + Math.abs(Math.round((v - pv) * 100))} pts</b> vs ${fmt(pv, unit)} same period last year</span>`)
+          : (Math.round((v / pv - 1) * 100) === 0 ? `<span class="delta"><b>Same</b> as same period last year (${fmt(pv, unit)})</span>` : `<span class="delta"><b>${(v >= pv ? "+" : "−") + Math.abs(Math.round((v / pv - 1) * 100))}%</b> vs ${fmt(pv, unit)} same period last year</span>`);
+      }
+      return `<article class="tile"><div class="tile-head"><h3>${title}</h3>${tools}</div><button class="kpi num" type="button" data-explain="${m.id}" data-tile="${i}">${fmt(v, unit)}</button>${delta}${foot}</article>`;
+    }
+    if (t.v === "trend") return `<article class="tile wide"><div class="tile-head"><h3>${title} by month</h3>${tools}</div>${trendSvg(m, per.range, extra)}${foot}</article>`;
+    if (t.v === "rank") {
+      const rows = computeGrouped(m, per.range, extra, t.g).slice(0, 8), max = Math.max(...rows.map(r => r.value), 1);
+      const gl = { building: "building", shop: "shop", workType: "type of work" }[t.g];
+      return `<article class="tile wide"><div class="tile-head"><h3>${title} by ${gl}</h3>${tools}</div><div class="rank">${rows.map(r =>
+        `<div class="rank-row"><span title="${esc(r.key)}">${esc(r.key)}</span><div style="background:var(--track);border-radius:3px"><div class="bar" style="width:${Math.max(2, 100 * r.value / max)}%"></div></div><span class="num">${fmt(r.value, unit)}</span></div>`).join("") || '<p class="muted small">No matching work orders.</p>'}</div>${foot}</article>`;
+    }
+    return "";
+  }).join("") || '<p class="muted">No tiles yet. Use "Add tile" to build your dashboard.</p>';
+}
+function trendSvg(m, range, extra) {
+  const months = [];
+  let d = range[0];
+  while (d <= range[1]) {
+    const dt = dayToDate(d), y = dt.getUTCFullYear(), mo = dt.getUTCMonth();
+    const end = Math.min(range[1], dayOf(y, mo + 1, 1) - 1);
+    months.push({ label: MONTHS[mo] + (range[1] - range[0] > 400 ? " " + String(y).slice(2) : ""), r: [d, end] });
+    d = end + 1;
+  }
+  const unit = unitOf(m);
+  const vals = months.map(x => compute(m, x.r, extra));
+  const pvals = months.map(x => { const p = prior(x.r); return p ? compute(m, p, extra) : NaN; });
+  const max = Math.max(...vals.filter(Number.isFinite), ...pvals.filter(Number.isFinite), 1) * 1.15;
+  const W = 560, H = 190, L = 6, B = 22, T = 18, slot = (W - 2 * L) / months.length, bw = Math.min(34, slot * 0.6);
+  const y = v => T + (H - T - B) * (1 - v / max);
+  let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(m.name)} by month">`;
+  s += `<line x1="${L}" x2="${W - L}" y1="${y(0)}" y2="${y(0)}" stroke="var(--rule-strong)"/>`;
+  months.forEach((mo, i) => {
+    const x = L + slot * i + (slot - bw) / 2, v = vals[i];
+    if (Number.isFinite(v)) s += `<rect x="${x}" y="${y(v)}" width="${bw}" height="${Math.max(1, y(0) - y(v))}" rx="3" fill="var(--accent)"><title>${mo.label}: ${fmt(v, unit)}${Number.isFinite(pvals[i]) ? " (last year " + fmt(pvals[i], unit) + ")" : ""}</title></rect>`;
+    if (Number.isFinite(pvals[i])) s += `<circle cx="${x + bw / 2}" cy="${y(pvals[i])}" r="4" fill="var(--prior)" stroke="var(--panel)" stroke-width="2"/>`;
+    if (months.length <= 12 && Number.isFinite(v)) s += `<text x="${x + bw / 2}" y="${Math.min(y(v), Number.isFinite(pvals[i]) ? y(pvals[i]) - 4 : y(v)) - 6}" text-anchor="middle">${fmt(v, unit).replace(" days", "d").replace(" hrs", "h")}</text>`;
+    s += `<text x="${x + bw / 2}" y="${H - 6}" text-anchor="middle">${mo.label}</text>`;
+  });
+  s += "</svg>";
+  return s + `<div class="legend"><span><i style="background:var(--accent)"></i>This period</span><span><i style="background:var(--prior);border-radius:50%"></i>Same month last year</span></div>`;
+}
+
+/* ===================== add tile ===================== */
+function viewsFor(m) { return m.measure.type === "pareto" ? ["kpi"] : ["kpi", "trend", "rank"]; }
+function fillAdd() {
+  el("addMetric").innerHTML = allMetrics().map(m => `<option value="${m.id}">${esc(m.name)}${m.status === "certified" ? "" : " (personal)"}</option>`).join("");
+  el("addShop").innerHTML = '<option value="">All shops</option>' + SHOPS.map(s => `<option>${esc(s)}</option>`).join("");
+  syncAddView();
+}
+function syncAddView() {
+  const m = metricById(el("addMetric").value);
+  el("addView").innerHTML = viewsFor(m).map(v => `<option value="${v}">${{ kpi: "Single number", trend: "Trend by month", rank: "Ranking" }[v]}</option>`).join("");
+  el("addGroupWrap").hidden = el("addView").value !== "rank";
+}
+
+/* ===================== drawer: how it's calculated ===================== */
+function openExplain(id, tileIdx) {
+  const m = metricById(id); if (!m) return;
+  const t = tileIdx != null ? tilesFor(persona())[tileIdx] : null;
+  const extra = t ? tileExtra(t) : PERSONAS[persona()].extra;
+  const per = period(), unit = unitOf(m);
+  const rows = selectRows(m, per.range, extra), v = compute(m, per.range, extra);
+  const sample = rows.slice(-8).reverse().map(r => r.ref || r);
+  const rules = [
+    ["Counting unit", m.grain === "phase" ? "One row per phase" : "One row per work order (phases rolled up)"],
+    ["Filters", (m.filter || []).length ? m.filter.map(c => esc(fmtCond(c, m))).join("<br>") : "None"],
+    ["Dashboard filter", extra.length ? extra.map(c => esc(fmtCond(c, m))).join("<br>") : "None"],
+    ["Date that sets the period", "Date " + m.dateBasis],
+    ["Days counted as", m.dayBasis === "working" ? "Working days (weekends & holidays excluded)" : "Calendar days"],
+    ["Owner · version", esc(m.owner) + " · v" + m.version],
+  ];
+  let diff = "";
+  const base = m.basedOn && metricById(m.basedOn);
+  if (base) {
+    const bv = compute(base, per.range, extra), changes = [];
+    if (base.grain !== m.grain) changes.push("counts " + (m.grain === "phase" ? "phase rows" : "work orders") + " instead of " + (base.grain === "phase" ? "phase rows" : "work orders"));
+    if (base.dayBasis !== m.dayBasis) changes.push("uses " + m.dayBasis + " days");
+    if (base.dateBasis !== m.dateBasis) changes.push("uses the date " + m.dateBasis);
+    if (JSON.stringify(base.filter) !== JSON.stringify(m.filter)) changes.push("has different filters");
+    diff = `<div class="result info"><b>Differs from the certified "${esc(base.name)}":</b> ${changes.join("; ") || "same rules"}. Certified value ${fmt(bv, unitOf(base))}; this one ${fmt(v, unit)} (${v >= bv ? "+" : "−"}${fmt(Math.abs(v - bv), unit)}).</div>`;
+  }
+  el("drawer").innerHTML = `
+    <div class="toolbar"><div class="left">${statusChip(m)}</div><button class="btn" type="button" id="closeDrawer">Close</button></div>
+    <div><div class="eyebrow">How it's calculated</div><h2>${esc(m.name)}</h2></div>
+    <div><span class="kpi num" style="cursor:default">${fmt(v, unit)}</span> <span class="muted small">for ${per.label} · ${rows.length.toLocaleString()} ${m.grain === "phase" ? "phase rows" : "work orders"} included</span></div>
+    <p class="readback">${esc(readback(m))}</p>
+    ${diff}
+    <table class="rules"><tbody>${rules.map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</tbody></table>
+    <div class="eyebrow">Latest included work orders</div>
+    <div class="tablewrap"><table class="rows"><thead><tr><th>WO</th><th>Entered</th><th>Priority</th><th>Building</th><th>Shop</th><th>Days</th><th>Cost</th></tr></thead><tbody>
+      ${sample.map(w => `<tr><td class="num">${w.id}</td><td class="num">${fmtDate(w.enteredDay)}</td><td>${w.priority}</td><td>${esc(w.building)}</td><td>${esc(w.shops.join(", "))}</td><td class="num">${w.closedH == null ? "open" : ((w.closedH - w.enteredH) / 24).toFixed(1)}</td><td class="num">$${w.cost.toLocaleString()}</td></tr>`).join("")}
+    </tbody></table></div>
+    <details><summary class="small muted">Definition as stored</summary><pre class="spec">${esc(JSON.stringify({ grain: m.grain, filter: m.filter, measure: m.measure, dateBasis: m.dateBasis, dayBasis: m.dayBasis }, null, 2))}</pre></details>
+    ${m.status === "personal" ? `<button class="btn" type="button" id="requestCert">Request certification</button>` : ""}`;
+  el("drawer").hidden = false; el("scrim").hidden = false;
+  el("closeDrawer").onclick = closeDrawer; el("closeDrawer").focus();
+  const rc = el("requestCert");
+  if (rc) rc.onclick = () => { m.status = "pending"; store.set("ms.personal", personal); openExplain(id, tileIdx); renderAll(); };
+}
+function closeDrawer() { el("drawer").hidden = true; el("scrim").hidden = true; }
+
+/* ===================== library ===================== */
+function renderLibrary() {
+  const f = el("libFilter").value, per = period();
+  el("lib").innerHTML = allMetrics().filter(m => !f || (f === "certified" ? m.status === "certified" : m.status !== "certified")).map(m => `
+    <div class="lib-item"><div style="display:grid;gap:4px;min-width:0"><div class="meta"><h3>${esc(m.name)}</h3>${statusChip(m)}<span class="small muted">${esc(m.owner)} · v${m.version}</span></div>
+    <p class="small muted">${esc(readback(m))}</p></div>
+    <div style="display:grid;gap:4px;justify-items:end"><span class="num" style="font-weight:600">${fmt(compute(m, per.range, PERSONAS[persona()].extra), unitOf(m))}</span><button class="btn link small" type="button" data-explain="${m.id}">Definition</button></div></div>`).join("");
+}
+
+/* ===================== define a metric ===================== */
+const EXAMPLES = [
+  { text: "Urgent and emergency work orders closed within 2 working days. Count each work order once.", spec: { name: "Urgent & emergency closed within 2 working days", grain: "work_order", dateBasis: "entered", dayBasis: "working", filter: [UE], measure: { type: "share", where: { field: "daysToClose", op: "lte", value: 2 } } } },
+  { text: "Average materials cost for urgent and emergency jobs that needed materials.", spec: { name: "Average materials per job that needed them", grain: "work_order", dateBasis: "entered", dayBasis: "calendar", filter: [UE, { field: "hasMaterials", op: "is", value: true }], measure: { type: "mean", field: "materialCost" } } },
+  { text: "How many emergency work orders came in at night or on weekends?", spec: { name: "After-hours emergencies", grain: "work_order", dateBasis: "entered", dayBasis: "calendar", filter: [{ field: "priority", op: "eq", value: "Emergency" }, { field: "afterHours", op: "is", value: true }], measure: { type: "count" } } },
+  { text: "Number of urgent and emergency work orders, counted the way our export lists them (one line per phase).", spec: { name: "Urgent & emergency, export lines", grain: "phase", dateBasis: "entered", dayBasis: "calendar", filter: [UE], measure: { type: "count" } } },
+];
+let draft = null, sampleFn = null, draftCtl = null;
+function renderExamples() {
+  el("examples").innerHTML = EXAMPLES.map((e, i) => `<button type="button" data-example="${i}">${esc(e.text)}</button>`).join("");
+}
+function setDraft(spec, source) {
+  draft = Object.assign({ status: "personal", owner: PERSONAS[persona()].title, version: 1, filter: [] }, spec);
+  renderDraft(source);
+}
+function renderDraft(source) {
+  const errs = validateSpec(draft);
+  if (errs.length) { el("defResult").innerHTML = `<div class="result bad"><b>The draft can't run yet:</b> ${errs.map(esc).join("; ")}. Try describing it differently.</div>`; return; }
+  const per = period(), extra = PERSONAS[persona()].extra, v = compute(draft, per.range, extra), unit = unitOf(draft);
+  el("defResult").innerHTML = `
+    <div class="toolbar"><div class="left"><span class="chip pers">Draft · personal</span><span class="small muted">${source}</span></div></div>
+    <div class="field"><label for="dName">Name</label><input type="text" id="dName" value="${esc(draft.name || "My metric")}"></div>
+    <div><div class="eyebrow">Plain-English readback</div><p class="readback">${esc(readback(draft))}</p></div>
+    <div class="form-row">
+      <div class="field"><label for="dGrain">Count</label><select id="dGrain"><option value="work_order">Each work order once</option><option value="phase">Each phase row</option></select></div>
+      <div class="field"><label for="dDate">Period by date</label><select id="dDate"><option value="entered">Entered</option><option value="closed">Closed</option></select></div>
+      <div class="field"><label for="dDays">Days</label><select id="dDays"><option value="calendar">Calendar</option><option value="working">Working</option></select></div>
+    </div>
+    <div><span class="kpi num" style="cursor:default">${fmt(v, unit)}</span> <span class="small muted">preview for ${per.label}</span></div>
+    <div class="panel" style="padding:12px;background:var(--bg)">
+      <h3>Test against a number you already know</h3>
+      <p class="small muted">Enter a figure from an existing report for ${per.label}. We'll compare and look for the counting rule that explains any gap.</p>
+      <div class="form-row"><div class="field"><label for="dKnown">Known value</label><input type="number" id="dKnown" step="any" placeholder="${unit === "pct" ? "e.g. 63 (percent)" : "e.g. 1905"}"></div><button class="btn" type="button" id="dTest">Compare</button></div>
+      <div id="dTestOut" aria-live="polite"></div>
+    </div>
+    <details><summary class="small muted">Definition as stored</summary><pre class="spec">${esc(JSON.stringify({ grain: draft.grain, filter: draft.filter, measure: draft.measure, dateBasis: draft.dateBasis, dayBasis: draft.dayBasis }, null, 2))}</pre></details>
+    <div class="toolbar"><div class="left"><button class="btn primary" type="button" id="dSave">Save as my metric</button><span class="small muted" id="dSaved"></span></div></div>`;
+  el("dGrain").value = draft.grain; el("dDate").value = draft.dateBasis; el("dDays").value = draft.dayBasis;
+  el("dGrain").onchange = e => { draft.grain = e.target.value; renderDraft(source); };
+  el("dDate").onchange = e => { draft.dateBasis = e.target.value; renderDraft(source); };
+  el("dDays").onchange = e => { draft.dayBasis = e.target.value; renderDraft(source); };
+  el("dName").oninput = e => { draft.name = e.target.value; };
+  el("dTest").onclick = () => runKnownTest(v, unit);
+  el("dSave").onclick = () => {
+    const id = "p_" + Date.now().toString(36);
+    personal.push(Object.assign({}, draft, { id, name: draft.name || "My metric" }));
+    store.set("ms.personal", personal);
+    const tiles = tilesFor(persona()); tiles.push({ m: id, v: "kpi" }); saveTiles(persona(), tiles);
+    el("dSaved").textContent = "Saved and added to your dashboard.";
+    renderAll();
+  };
+}
+function runKnownTest(v, unit) {
+  let known = Number(el("dKnown").value);
+  const out = el("dTestOut");
+  if (!el("dKnown").value || !Number.isFinite(known)) { out.innerHTML = '<div class="result bad">Enter a number to compare.</div>'; return; }
+  if (unit === "pct" && known > 1) known = known / 100;
+  const close = (a, b) => unit === "pct" ? Math.abs(a - b) < 0.005 : Math.abs(a - b) <= Math.max(0.5, Math.abs(b) * 0.002);
+  if (close(v, known)) { out.innerHTML = `<div class="result ok">✓ Matches. This definition gives ${fmt(v, unit)}.</div>`; return; }
+  const per = period(), extra = PERSONAS[persona()].extra, variants = [];
+  const tryV = (label, patch) => { const s = Object.assign({}, draft, patch); const x = compute(s, per.range, extra); variants.push({ label, x, ok: close(x, known) }); };
+  tryV(draft.grain === "phase" ? "counting each work order once" : "counting each phase row", { grain: draft.grain === "phase" ? "work_order" : "phase" });
+  tryV(draft.dateBasis === "entered" ? "assigning by close date" : "assigning by entry date", { dateBasis: draft.dateBasis === "entered" ? "closed" : "entered" });
+  tryV(draft.dayBasis === "calendar" ? "using working days" : "using calendar days", { dayBasis: draft.dayBasis === "calendar" ? "working" : "calendar" });
+  const hit = variants.find(x => x.ok);
+  out.innerHTML = `<div class="result bad">Doesn't match: this definition gives ${fmt(v, unit)}, your number is ${fmt(known, unit)} (difference ${fmt(Math.abs(v - known), unit)}).</div>` +
+    (hit ? `<div class="result info" style="margin-top:6px"><b>Likely cause:</b> ${hit.label} gives ${fmt(hit.x, unit)}, which matches your number. Your existing report probably uses that rule. Change it above if that's the rule you want.</div>`
+         : `<div class="result info" style="margin-top:6px">No single rule change explains the gap. Tried: ${variants.map(x => x.label + " → " + fmt(x.x, unit)).join("; ")}. Check the filters or the period.</div>`);
+}
+const DEFINE_PROMPT = `You convert a facilities manager's description of a metric into a JSON definition for a deterministic metric engine. You never compute numbers.
+Fields: priority (one of ${PRIORITIES.join(", ")}), shop (one of ${SHOPS.join(", ")}), building (text), workType (one of ${WORK.map(w => w[0]).join(", ")}), afterHours (boolean: raised at night or weekend), multiShop (boolean), hasMaterials (boolean), isOpen (boolean), cost, laborCost, materialCost (dollars), laborHours, daysToClose (number; open work orders are Infinity).
+Filter ops: eq, neq, in (value is an array), gt, gte, lt, lte, is (value true/false).
+Measure types: count; per_working_day; sum/mean/median (with "field"); share (with "where": one condition); distinct (with "field"); pareto (with "field", "of": "count"|"cost", "share": 0.5).
+grain: "work_order" (each work order once, the default) or "phase" (one row per phase). dateBasis: "entered" (default) or "closed". dayBasis: "calendar" (default) or "working".
+Reply with only JSON: {"name": short name, "grain", "dateBasis", "dayBasis", "filter": [{"field","op","value"}], "measure": {...}}.
+Example: "share of emergencies closed within a day" -> {"name":"Emergencies closed within 1 day","grain":"work_order","dateBasis":"entered","dayBasis":"calendar","filter":[{"field":"priority","op":"eq","value":"Emergency"}],"measure":{"type":"share","where":{"field":"daysToClose","op":"lte","value":1}}}
+Description: `;
+async function draftWithAI() {
+  const text = el("defText").value.trim();
+  if (!text) { el("draftStatus").textContent = "Describe the metric first."; return; }
+  const ex = EXAMPLES.find(e => e.text === text);
+  if (ex) { setDraft(JSON.parse(JSON.stringify(ex.spec)), "From an example (no AI)"); return; }
+  if (!sampleFn) { el("draftStatus").textContent = "The assistant isn't available here. Start from an example instead."; return; }
+  draftCtl = new AbortController();
+  el("draftBtn").disabled = true; el("draftStatus").textContent = "Drafting…";
+  try {
+    const spec = await sampleFn.json(DEFINE_PROMPT + text, { modelTier: "quick", signal: draftCtl.signal });
+    setDraft(spec, "Drafted by the assistant from your description. Check the readback.");
+    el("draftStatus").textContent = "";
+  } catch (e) {
+    const msg = { not_granted: "The assistant wasn't allowed for this page.", sampling_disabled: "The assistant isn't available for this account.", rate_limited: "Too many requests. Try again in a minute.", invalid_json: "The draft came back in the wrong shape. Try rephrasing.", cancelled: "" }[e && e.code];
+    el("draftStatus").textContent = msg ?? "Couldn't draft that. Try again or start from an example.";
+    if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled"].includes(e.code)) sampleFn = null;
+  } finally { el("draftBtn").disabled = false; }
+}
+
+/* ===================== draft summary (numbers verified) ===================== */
+async function draftSummary() {
+  if (!sampleFn) return;
+  const panel = el("summaryPanel");
+  panel.hidden = false; panel.innerHTML = '<p class="muted">Drafting a summary from the numbers on this dashboard…</p>';
+  const facts = lastTileValues.map(t => `- ${t.label}: ${t.value}${t.prior ? " (same period last year: " + t.prior + ")" : ""}`).join("\n");
+  const prompt = `Write 3 short bullet points for a university facilities VP about ${period().label}. Use ONLY these figures, copied exactly as written; do not calculate new numbers, percentages or differences.\n${facts}\nReply with the 3 bullets only, each starting with "- ".`;
+  try {
+    const { text } = await sampleFn(prompt, { modelTier: "quick" });
+    const allowed = new Set(lastTileValues.flatMap(t => [t.value, t.prior]).filter(Boolean));
+    const numRe = /\$?\d[\d,]*(?:\.\d+)?(?:[KM]| ?%| days| hrs| pts)?/g;
+    let unverified = 0;
+    const html = esc(text).split("\n").filter(l => l.trim()).map(l => "<p>" + l.replace(numRe, mt => {
+      const ok = allowed.has(mt) || allowed.has(mt.replace(/ /g, ""));
+      if (!ok) unverified++;
+      return ok ? `<span class="ok-num">${mt}</span>` : `<mark title="Not a figure from the dashboard">${mt}</mark>`;
+    }) + "</p>").join("");
+    panel.innerHTML = `<div class="toolbar"><h3>Draft summary</h3><button class="btn" type="button" id="closeSummary">Close</button></div>${html}
+      <p class="small ${unverified ? "" : "muted"}">${unverified ? `<mark>${unverified} figure(s)</mark> don't match a dashboard number. Check or remove them before sharing.` : "Every figure matches a number on this dashboard (underlined)."}</p>`;
+    el("closeSummary").onclick = () => { panel.hidden = true; };
+  } catch (e) {
+    panel.innerHTML = '<p class="muted">Couldn\'t draft a summary right now.</p>';
+    if (e && ["not_granted", "sampling_disabled", "not_declared", "capability_disabled"].includes(e.code)) { sampleFn = null; el("summaryBtn").hidden = true; }
+  }
+}
+
+/* ===================== checks ===================== */
+function renderChecks() {
+  const per = period(), r = per.range, ue = CERTIFIED.find(m => m.id === "ue_count");
+  const total = compute(ue, r);
+  let monthSum = 0, d = r[0];
+  while (d <= r[1]) { const dt = dayToDate(d); const end = Math.min(r[1], dayOf(dt.getUTCFullYear(), dt.getUTCMonth() + 1, 1) - 1); monthSum += compute(ue, [d, end]); d = end + 1; }
+  const wos = selectRows(ue, r), ph = selectRows(Object.assign({}, ue, { grain: "phase" }), r);
+  const woCost = wos.reduce((a, w) => a + w.cost, 0), phCost = ph.reduce((a, p) => a + p.laborCost + p.materialCost, 0);
+  const lab = wos.reduce((a, w) => a + w.laborCost, 0), mat = wos.reduce((a, w) => a + w.materialCost, 0);
+  const shopTotal = SHOPS.reduce((a, s) => a + compute(ue, r, [{ field: "shop", op: "eq", value: s }]), 0);
+  const recentOpen = WOS.filter(w => w.isOpen && w.enteredDay >= Math.max(r[0], TODAY - 29) && w.enteredDay <= r[1]).length;
+  const checks = [
+    ["pass", "Months add up to the period total", `${monthSum.toLocaleString()} across months = ${total.toLocaleString()} for ${per.label}.`, monthSum === total],
+    ["pass", "Labor + materials = total cost", `${fmt(lab, "money")} + ${fmt(mat, "money")} = ${fmt(woCost, "money")}.`, lab + mat === woCost],
+    ["pass", "Phase costs roll up to work-order costs", `${ph.length.toLocaleString()} phase rows (${fmt(phCost, "money")}) roll up to ${wos.length.toLocaleString()} work orders (${fmt(woCost, "money")}).`, phCost === woCost],
+    ["info", "Shop totals are higher than the work-order total", `Shops sum to ${shopTotal.toLocaleString()} vs ${total.toLocaleString()} work orders, because ${(shopTotal - total).toLocaleString()} jobs involved more than one shop. Expected; noted on shop tables.`, true],
+    [recentOpen ? "flag" : "pass", "Recent costs may still be posting", recentOpen ? `${recentOpen.toLocaleString()} work orders from the last 30 days are still open, so their costs are incomplete. Reports using this period carry a caveat.` : "No open work from the last 30 days in this period.", !recentOpen],
+  ];
+  el("checks").innerHTML = checks.map(([kind, title, detail, ok]) => {
+    const st = kind === "info" ? ["info", "INFO"] : ok ? ["ok", "PASS"] : ["bad", "FLAG"];
+    return `<div class="check"><span class="st result ${st[0]}">${st[1]}</span><h3>${title}</h3><p class="small muted">${detail}</p></div>`;
+  }).join("");
+}
+
+/* ===================== wiring ===================== */
+function showTab() {
+  const tab = ["dashboard", "library", "define", "checks"].includes(location.hash.slice(1)) ? location.hash.slice(1) : "dashboard";
+  document.querySelectorAll("[data-view]").forEach(s => { s.hidden = s.dataset.view !== tab; });
+  document.querySelectorAll("[data-tab]").forEach(a => { if (a.dataset.tab === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+}
+function renderAll() { renderDashboard(); renderLibrary(); renderChecks(); fillAdd(); }
+document.addEventListener("click", e => {
+  const x = e.target.closest("[data-explain]");
+  if (x) { openExplain(x.dataset.explain, x.dataset.tile != null ? Number(x.dataset.tile) : null); return; }
+  const rm = e.target.closest("[data-remove]");
+  if (rm) { const t = tilesFor(persona()); t.splice(Number(rm.dataset.remove), 1); saveTiles(persona(), t); renderDashboard(); return; }
+  const mv = e.target.closest("[data-move]");
+  if (mv) { const t = tilesFor(persona()), i = Number(mv.dataset.move), j = i + Number(mv.dataset.dir); if (j >= 0 && j < t.length) { [t[i], t[j]] = [t[j], t[i]]; saveTiles(persona(), t); renderDashboard(); } return; }
+  const ex = e.target.closest("[data-example]");
+  if (ex) { const item = EXAMPLES[Number(ex.dataset.example)]; el("defText").value = item.text; setDraft(JSON.parse(JSON.stringify(item.spec)), "From an example (no AI)"); }
+});
+el("scrim").onclick = closeDrawer;
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !el("drawer").hidden) closeDrawer(); });
+el("persona").onchange = () => { try { localStorage.setItem("ms.persona", persona()); } catch {} el("summaryPanel").hidden = true; renderAll(); if (draft) renderDraft("Draft"); };
+el("period").onchange = () => { el("summaryPanel").hidden = true; renderAll(); if (draft) renderDraft("Draft"); };
+el("libFilter").onchange = renderLibrary;
+el("addBtn").onclick = () => { el("addPanel").hidden = false; el("addMetric").focus(); };
+el("addCancel").onclick = () => { el("addPanel").hidden = true; };
+el("addMetric").onchange = syncAddView;
+el("addView").onchange = () => { el("addGroupWrap").hidden = el("addView").value !== "rank"; };
+el("addConfirm").onclick = () => {
+  const t = tilesFor(persona()), tile = { m: el("addMetric").value, v: el("addView").value };
+  if (tile.v === "rank") tile.g = el("addGroup").value;
+  if (el("addShop").value) tile.shop = el("addShop").value;
+  t.push(tile); saveTiles(persona(), t); el("addPanel").hidden = true; renderDashboard();
+};
+el("resetBtn").onclick = () => { try { localStorage.removeItem("ms.dash." + persona()); } catch {} renderDashboard(); };
+el("draftBtn").onclick = draftWithAI;
+el("summaryBtn").onclick = draftSummary;
+window.addEventListener("hashchange", showTab);
+
+try { const p = localStorage.getItem("ms.persona"); if (p && PERSONAS[p]) el("persona").value = p; } catch {}
+renderExamples(); renderAll(); showTab();
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  try { sampleFn = await window.claude.use("sample"); } catch { sampleFn = null; }
+  if (sampleFn) { el("summaryBtn").hidden = false; }
+})();
+</script>
