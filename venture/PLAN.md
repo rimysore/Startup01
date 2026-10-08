@@ -1,5 +1,7 @@
 # Founding plan: an agentic money coach that acts at the moment you spend
 
+> **Status (2026-10-08): parked.** We are now exploring vertical B2B ideas instead; see `VERTICALS.md`. Kept for reference.
+
 Working name: **Tapwise** (placeholder; check trademark and domain before using it publicly).
 
 Written 2026-10-08. This is a living document. Every number marked *(assumption)* must be checked before it goes in front of an investor.
