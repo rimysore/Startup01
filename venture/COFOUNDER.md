@@ -78,3 +78,47 @@ I'm looking for a technical cofounder. Would you be up for a 30-minute call this
 - [YC co-founder matching guide 2026 (unofficial)](https://www.roundfunded.com/en/blogs/yc-cofounder-matching-guide-2026)
 - [Freethink on YC's matching and agreement template](https://www.freethink.com/entrepreneurship-innovation/cofounder-matchmaking)
 - [TechCrunch: what people want in a co-founder](https://techcrunch.com/2021/10/21/what-do-people-want-in-a-co-founder-yc-has-some-answers/)
+
+---
+
+# Indiana leads (researched 2026-10-09)
+
+Public sources only. Verify current roles before reaching out, and message people through the platform where they posted (LinkedIn, Meetup), not personal addresses.
+
+## Events to attend in the next 7 weeks
+| Date | Event | Why go |
+|---|---|---|
+| **Thu Oct 15, 2026** | [Midwest AI Summit](https://midwestaisummit.com/), Crane Bay, Indianapolis | Practitioner speakers (SEP and others) and an "AI Engineering Lounge" for 1:1 time with engineers |
+| **Wed Nov 4, 2026** | [Indy .NET Consortium: run your own local LLM](https://www.meetup.com/indy-net-consortium/events/315044422/), Indianapolis | Hands-on engineers |
+| **Sat Nov 7, 2026** | [Indy Init: AI Builders Hackathon & Conference](https://indyinit.com/), Launch Fishers (by Indy Hackers) | **Best single event:** a hackathon plus a "founding and freelancing" track. Join a team, or bring our problem as a hackathon project. Speaker applications close Oct 15. |
+| **Tue Nov 24, 2026** | [IndyPy quarterly meetup](https://www.meetup.com/indypy/events/311855037/) (hybrid) | Indiana's largest Python group (2,400+ members), organized by Six Feet Up |
+| Monthly | [AI Indy](https://www.linkedin.com/company/ai-indy) "Afternoon Brews" and GroundUp workshops | Their own posts say "you might leave with a collaborator, a co-founder" |
+| Monthly | [AI Collective – Indianapolis](https://www.linkedin.com/posts/aaronkopel_indianapolis-chapter-the-ai-collective-activity-7505290617367973889-lnVD) at Launch Fishers | New chapter (first meeting Sept 16, 2026, 80+ registered) |
+| Recurring | [Snowflake Indianapolis User Group](https://usergroups.snowflake.com/events/details/snowflake-indianapolis-presents-indianapolis-user-group-meeting-1/) | Enterprise data engineers |
+| Fridays | [Indianapolis Tech Social mixer](https://www.eventbrite.com/e/indianapolis-tech-mixer-and-social-tech-ai-data-it-tickets-1987408991794), Mass Ave | Informal; has a Discord/WhatsApp community |
+| Spring | Indiana MPH **Data Day** (state government data conference) | Public-sector data people, close to our K-12/government expansion |
+
+## Community organizers (great for introductions, not necessarily cofounders)
+- **Indy Hackers:** nonprofit and Indiana's largest technical community; hosts Indy Init
+- **Calvin Hendryx-Parker:** CTO of Six Feet Up, organizer of IndyPy
+- **AI Indy:** Connor Lyon (founding board member); workshop leads Sean Miller and Jake Shumaker
+- **AI Collective – Indianapolis:** Aaron Kopel and Gervais Johnson (cofounders of the chapter)
+- **Launch Fishers:** coworking hub hosting several of these events
+
+Ask organizers: "I'm a non-technical founder with a working prototype in facilities analytics, looking for a technical cofounder. Who in the community should I meet?"
+
+## People whose public profiles fit (verify, then reach out)
+| Name | Public profile says | Why they fit | Approach as |
+|---|---|---|---|
+| **Jeffery Gough** | Sr. Data Architect (MISO); founder of Cascade Foundry; built "Statements to Sheets", a SaaS turning financial PDFs into clean spreadsheets with AI data-quality validation | Has already built our exact core skill (PDF extraction + validated data) and run a SaaS. Strongest technical-cofounder lead. | Cofounder |
+| **Sri Balaji Muruganandam** | Data engineer in Indianapolis; Snowflake/BigQuery; built data platforms for state government agencies; hackathon winner | Public-sector data + reconciliation-heavy pipelines; builder mindset | Cofounder or early engineer |
+| **Leonard Acha** | Lead Data Engineer; "building trusted data foundations... source of truth" | "Single source of truth" is our product promise. *Location not confirmed as Indiana.* | Cofounder or advisor |
+| **Michelle Morin** | Indianapolis; data & analytics leader in regulated pharma (GxP compliance) | Deep correctness and audit mindset, which our customers will demand | Advisor or cofounder |
+| **Will Jaynes** | CTO at Entegrata; serial startup engineering leader | Has done zero-to-one several times; probably not available, but a great advisor and source of intros | Advisor |
+| **Adam Darrah** | Co-founder & Head of Engineering, Opendate (Indianapolis) | Local technical founder who built vertical SaaS; advice and intros | Advisor |
+| **Logan Mattingly** | Founder, Precursor Data; construction background turned data systems for contractors | Adjacent problem (construction data for contractors). Peer founder: compare notes, possible partner. | Peer / partner |
+
+## Suggested message (LinkedIn)
+```
+Hi [Name], I saw [specific thing: their SaaS / talk / project]. I'm a capital-planning insider building an AI analyst for university facilities data: reconciled numbers you can trust, every figure calculated from a readable definition. I have a working prototype on a public capital plan and I'm looking for a technical cofounder (or advice on who to meet in Indy). Open to a 20-minute coffee or call? Prototype link: [link]
+```
