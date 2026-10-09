@@ -82,3 +82,6 @@ Referrals:
 - 🟢 Strong: "We spent $X on consultants for this," "two people lose 3 weeks every quarter," "can I see it now?", unprompted referrals, sharing a sample report.
 - 🟡 Weak: "That's interesting," "we'd probably use that," compliments.
 - 🔴 Kill signal: pain exists but nobody owns a budget for it, or "AiM's new module already does that and we're happy."
+
+## Pricing
+Price questions have their own guide: see `PRICING_INTERVIEWS.md`. Use them at the end of outside interviews, after the demo.
