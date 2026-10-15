@@ -119,8 +119,9 @@ const sections: LegalSection[] = [
     title: "International transfers",
     body: (
       <p>
-        Some providers, including Google and Anthropic, process data outside India (for example in the United States). We transfer data only as
-        permitted under the DPDP Act and any restrictions notified by the Government of India.
+        {COMPANY.product} is operated from the United States, and some providers, including Google and Anthropic, also process data outside
+        India. We transfer data only as permitted under the DPDP Act and any restrictions notified by the Government of India, and protect it
+        the same way wherever it&apos;s processed.
       </p>
     ),
   },

@@ -17,9 +17,11 @@ const devanagari = Noto_Sans_Devanagari({
 const telugu = Noto_Sans_Telugu({ variable: "--font-telugu", subsets: ["telugu"], weight: ["500", "800"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.APP_URL ?? "https://mitracreators.com"),
   title: "Mitra — your channel's digital manager",
   description:
     "Mitra is the AI growth manager for creators who make videos in Hindi, Hinglish, Telugu, Tamil and more.",
+  openGraph: { siteName: "Mitra", type: "website", url: "/" },
 };
 
 // Applies the saved theme before paint so there is no flash.

@@ -13,7 +13,9 @@ const sections: LegalSection[] = [
     body: (
       <>
         <p>
-          {COMPANY.product} is operated by <strong>{COMPANY.legalName}</strong>, {COMPANY.address} (&ldquo;we&rdquo;, &ldquo;us&rdquo;).
+          {COMPANY.product} is operated by <strong>{COMPANY.legalName}</strong>, {COMPANY.operatorType} based in {COMPANY.address}{" "}
+          (&ldquo;we&rdquo;, &ldquo;us&rdquo;). {COMPANY.product} is currently in beta: features may change, and we&apos;ll tell you before
+          anything you rely on is removed.
           These Terms of Service (&ldquo;Terms&rdquo;) are a contract between you and us for your use of the {COMPANY.product} website,
           dashboard and related services (the &ldquo;Service&rdquo;).
         </p>
@@ -29,7 +31,7 @@ const sections: LegalSection[] = [
     title: "Eligibility and your account",
     body: (
       <ul>
-        <li>You must be at least 18 years old and able to enter into a binding contract under Indian law.</li>
+        <li>You must be at least 18 years old and able to enter into a binding contract under the law that applies to you.</li>
         <li>
           You sign in with Google. You&apos;re responsible for activity under your account and for keeping access to your Google account secure.
           Tell us at <a href={`mailto:${COMPANY.supportEmail}`}>{COMPANY.supportEmail}</a> if you think your account has been misused.
@@ -199,9 +201,10 @@ const sections: LegalSection[] = [
     title: "Governing law and disputes",
     body: (
       <p>
-        These Terms are governed by the laws of India. Before going to court, please contact our Grievance Officer (see{" "}
-        <Link href="/contact">Contact</Link>) so we can try to resolve the issue. Subject to your rights under consumer protection law, the courts at{" "}
-        {COMPANY.jurisdictionCity} have exclusive jurisdiction.
+        These Terms are governed by the laws of {COMPANY.governingLaw}. Before going to court, please contact our Grievance Officer (see{" "}
+        <Link href="/contact">Contact</Link>) so we can try to resolve the issue. The courts of {COMPANY.jurisdictionCity} have jurisdiction,
+        but nothing in these Terms removes consumer-protection rights you have under the law of the country where you live, including
+        India&apos;s Consumer Protection Act, 2019, or your right to bring a claim there.
       </p>
     ),
   },
@@ -230,7 +233,7 @@ export default function TermsPage() {
           <li>AI suggestions can be wrong. Review them before publishing. We can&apos;t guarantee views or subscribers.</li>
           <li>Paid plans renew monthly until you cancel. Cancel any time; you keep your plan until the period ends.</li>
           <li>You own your content. Don&apos;t use Mitra for anything unlawful or misleading.</li>
-          <li>Indian law applies.</li>
+          <li>Indiana (USA) law applies, but you keep the consumer rights you have where you live.</li>
         </ul>
       }
     />

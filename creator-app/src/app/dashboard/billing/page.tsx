@@ -187,6 +187,11 @@ export default function BillingPage() {
   return (
     <div className="rise">
       <PageHeader eyebrow="Plan & billing" title="Your plan" />
+      {!me.config.billing && !me.config.simulateBilling && (
+        <div className="mb-4">
+          <DemoNote>Mitra is in free beta. Paid plans open soon; until then you can&apos;t be charged.</DemoNote>
+        </div>
+      )}
       {!me.config.billing && me.config.simulateBilling && (
         <div className="mb-4">
           <DemoNote>Razorpay keys aren&apos;t set, so upgrades run in test mode and no money moves.</DemoNote>
@@ -265,7 +270,7 @@ export default function BillingPage() {
               <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>
             ))}
           </ul>
-          <a href="mailto:hello@mitra.example?subject=Mitra%20Agency%20plan" className="mt-6 rounded-full border border-line px-4 py-2.5 text-center text-sm font-semibold hover:bg-surface-2">
+          <a href="mailto:hello@mitracreators.com?subject=Mitra%20Agency%20plan" className="mt-6 rounded-full border border-line px-4 py-2.5 text-center text-sm font-semibold hover:bg-surface-2">
             Talk to us
           </a>
         </div>

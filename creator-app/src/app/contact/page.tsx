@@ -20,9 +20,8 @@ const sections: LegalSection[] = [
     body: (
       <dl>
         <Row label="Email"><a href={`mailto:${COMPANY.supportEmail}`}>{COMPANY.supportEmail}</a></Row>
-        <Row label="Phone">{COMPANY.phone}</Row>
-        <Row label="Hours">Monday–Saturday, 10:00–18:00 IST</Row>
-        <Row label="Response time">Within 1 business day</Row>
+        {COMPANY.phone && <Row label="Phone">{COMPANY.phone}</Row>}
+        <Row label="Response time">Within 1 business day (we&apos;re a small team in beta)</Row>
       </dl>
     ),
   },
@@ -46,11 +45,12 @@ const sections: LegalSection[] = [
   },
   {
     id: "company",
-    title: "Company details",
+    title: "Who runs Mitra",
     body: (
       <dl>
-        <Row label="Legal name">{COMPANY.legalName}</Row>
-        <Row label="Registered office">{COMPANY.address}</Row>
+        <Row label="Operated by">{COMPANY.legalName}, {COMPANY.operatorType}</Row>
+        <Row label="Based in">{COMPANY.address}</Row>
+        <Row label="Website"><a href={COMPANY.website}>{COMPANY.website.replace("https://", "")}</a></Row>
         <Row label="Privacy requests"><a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a></Row>
       </dl>
     ),

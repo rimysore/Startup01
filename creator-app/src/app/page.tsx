@@ -29,7 +29,7 @@ const PRICING = [
     per: "/month",
     points: ["Up to 25 channels", "Team seats", "Client-ready reports", "API access"],
     cta: "Talk to us",
-    href: "mailto:hello@mitra.example?subject=Mitra%20Agency%20plan",
+    href: "mailto:hello@mitracreators.com?subject=Mitra%20Agency%20plan",
     featured: false,
   },
 ];
