@@ -1,8 +1,10 @@
+import { currentUser } from "@/lib/auth";
 import { demoSummary } from "@/lib/demo";
-import { currentTokens, fetchSummary } from "@/lib/youtube";
+import { fetchSummary, youtubeTokens } from "@/lib/youtube";
 
 export async function GET() {
-  const tokens = await currentTokens().catch(() => null);
+  const user = await currentUser();
+  const tokens = user ? await youtubeTokens(user.id).catch(() => null) : null;
   if (!tokens) return Response.json(demoSummary());
   try {
     return Response.json(await fetchSummary(tokens));

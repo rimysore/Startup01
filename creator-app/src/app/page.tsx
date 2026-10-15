@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo, ThemeToggle } from "@/components/ui";
 import { LANGUAGES } from "@/lib/languages";
+import { PLANS, rupees } from "@/lib/plans";
 
 const FEATURES = [
   { title: "Video Doctor", body: "See exactly where viewers left and why — then get three fixes for your next upload.", tag: "Retention" },
@@ -11,11 +12,25 @@ const FEATURES = [
   { title: "WhatsApp Reports", body: "Every Monday: your 3 wins, 3 fixes and what to post this week.", tag: "Coming soon" },
 ];
 
-const PLANS = [
-  { name: "Free", price: "₹0", per: "", points: ["Channel report card", "3 video diagnoses / month", "Trend Radar preview"], cta: "Start free" },
-  { name: "Pro", price: "₹399", per: "/month", points: ["Unlimited Video Doctor", "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"], cta: "Go Pro", featured: true },
-  { name: "Creator+", price: "₹999", per: "/month", points: ["Everything in Pro", "Multiple channels", "WhatsApp weekly reports", "Priority AI"], cta: "Choose Creator+" },
-  { name: "Agency", price: "₹9,999", per: "/month", points: ["Up to 25 channels", "Team seats", "Client-ready reports", "API access"], cta: "Talk to us" },
+const PRICING = [
+  ...Object.values(PLANS).map((p) => ({
+    name: p.name,
+    price: rupees(p.pricePaise),
+    per: p.pricePaise ? "/month" : "",
+    points: p.points,
+    cta: p.id === "free" ? "Start free" : `Get ${p.name}`,
+    href: p.id === "free" ? "/login?next=/dashboard" : `/dashboard/billing?plan=${p.id}`,
+    featured: p.id === "pro",
+  })),
+  {
+    name: "Agency",
+    price: "₹9,999",
+    per: "/month",
+    points: ["Up to 25 channels", "Team seats", "Client-ready reports", "API access"],
+    cta: "Talk to us",
+    href: "mailto:hello@mitra.example?subject=Mitra%20Agency%20plan",
+    featured: false,
+  },
 ];
 
 function HeroPreview() {
@@ -71,6 +86,9 @@ export default function Home() {
         </nav>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
+          <Link href="/login" className="hidden rounded-full px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 sm:block">
+            Sign in
+          </Link>
           <Link href="/dashboard" className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-bg">
             Open dashboard
           </Link>
@@ -165,7 +183,7 @@ export default function Home() {
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Pricing</p>
         <h2 className="mt-2 font-display text-5xl sm:text-6xl">Priced for Bharat. Pay with UPI.</h2>
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {PLANS.map((p) => (
+          {PRICING.map((p) => (
             <div key={p.name} className={`card flex flex-col p-6 ${p.featured ? "!border-accent ring-2 ring-accent/30" : ""}`}>
               <div className="flex items-center justify-between">
                 <p className="font-semibold">{p.name}</p>
@@ -180,12 +198,12 @@ export default function Home() {
                   <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>
                 ))}
               </ul>
-              <Link
-                href="/dashboard"
+              <a
+                href={p.href}
                 className={`mt-6 rounded-full px-4 py-2.5 text-center text-sm font-semibold ${p.featured ? "bg-accent text-accent-ink" : "border border-line hover:bg-surface-2"}`}
               >
                 {p.cta}
-              </Link>
+              </a>
             </div>
           ))}
         </div>

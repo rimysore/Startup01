@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { postAi, useDashboard } from "@/components/dashboard-context";
-import { Button, Card, DemoNote, ErrorNote, PageHeader, Select, Spinner } from "@/components/ui";
+import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
+import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, PageHeader, Select, Spinner } from "@/components/ui";
 import type { CommentInsights } from "@/lib/ai";
 import type { Comment } from "@/lib/types";
 
@@ -39,11 +39,11 @@ function MoodBar({ mood }: { mood: CommentInsights["mood"] }) {
 }
 
 export default function CommentsPage() {
-  const { summary, language } = useDashboard();
+  const { summary, language, refreshMe } = useDashboard();
   const [picked, setPicked] = useState<string | null>(null);
   const [loaded, setLoaded] = useState<{ id: string; data: CommentsRes } | null>(null);
-  const [insights, setInsights] = useState<{ id: string; demo?: boolean; data: CommentInsights } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [insights, setInsights] = useState<{ id: string; demo?: boolean; demoReason?: "signin" | "nokey"; data: CommentInsights } | null>(null);
+  const [error, setError] = useState<AiError | null>(null);
   const [running, setRunning] = useState(false);
 
   const videoId = picked ?? summary?.videos[0]?.id ?? null;
@@ -73,8 +73,9 @@ export default function CommentsPage() {
       comments: comments.comments.map(({ author, text, likes }) => ({ author, text: text.slice(0, 2000), likes })),
     });
     setRunning(false);
-    if (res.result) setInsights({ id, demo: res.demo, data: res.result });
-    else setError(res.error ?? "Something went wrong.");
+    refreshMe();
+    if (res.result) setInsights({ id, demo: res.demo, demoReason: res.demoReason, data: res.result });
+    else setError(res.error ?? { message: "Something went wrong." });
   }
 
   return (
@@ -97,7 +98,7 @@ export default function CommentsPage() {
         />
       </div>
 
-      {error && <div className="mb-4"><ErrorNote>{error}</ErrorNote></div>}
+      {error && <div className="mb-4"><AiErrorNote error={error} /></div>}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <Card className="lg:max-h-[640px] lg:overflow-y-auto">
@@ -132,7 +133,7 @@ export default function CommentsPage() {
           )}
           {result && !running && (
             <div className="rise space-y-6">
-              {result.demo && <DemoNote>Sample analysis. Add an Anthropic API key to analyse real comments.</DemoNote>}
+              {result.demo && <AiDemoNote reason={result.demoReason} what="analysis" />}
               <Card>
                 <h3 className="mb-3 font-semibold">Mood</h3>
                 <MoodBar mood={result.data.mood} />

@@ -1,22 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { postAi, useDashboard, useQueryParam } from "@/components/dashboard-context";
+import { postAi, useDashboard, useQueryParam, type AiError } from "@/components/dashboard-context";
 import { ThumbnailMaker } from "@/components/ThumbnailMaker";
-import { Button, Card, DemoNote, ErrorNote, PageHeader, Select, Spinner } from "@/components/ui";
+import { AiDemoNote, AiErrorNote, Button, Card, PageHeader, Select, Spinner } from "@/components/ui";
 import type { Titles } from "@/lib/ai";
 import { languageLabel } from "@/lib/languages";
 
 const TONES = ["Energetic", "Honest & trustworthy", "Funny", "Educational", "Dramatic"];
 
 export default function StudioPage() {
-  const { summary, language } = useDashboard();
+  const { summary, language, refreshMe } = useDashboard();
   const prefill = useQueryParam("topic");
   const [typed, setTopic] = useState<string | null>(null);
   const topic = typed ?? prefill ?? "";
   const [tone, setTone] = useState(TONES[0]);
-  const [result, setResult] = useState<{ demo?: boolean; data: Titles } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [result, setResult] = useState<{ demo?: boolean; demoReason?: "signin" | "nokey"; data: Titles } | null>(null);
+  const [error, setError] = useState<AiError | null>(null);
   const [running, setRunning] = useState(false);
   const [thumbText, setThumbText] = useState("कौन जीता?");
 
@@ -26,9 +26,10 @@ export default function StudioPage() {
     const res = await postAi<Titles>("/api/ai/titles", { language, topic, tone, channel: summary?.channel.title ?? "" });
     setRunning(false);
     if (res.result) {
-      setResult({ demo: res.demo, data: res.result });
+      setResult({ demo: res.demo, demoReason: res.demoReason, data: res.result });
       if (res.result.thumbnailText[0]) setThumbText(res.result.thumbnailText[0]);
-    } else setError(res.error ?? "Something went wrong.");
+    } else setError(res.error ?? { message: "Something went wrong." });
+    refreshMe();
   }
 
   return (
@@ -57,12 +58,12 @@ export default function StudioPage() {
         </div>
       </Card>
 
-      {error && <div className="mt-4"><ErrorNote>{error}</ErrorNote></div>}
+      {error && <div className="mt-4"><AiErrorNote error={error} /></div>}
       {running && <Card className="mt-6"><Spinner label="Mitra is writing options…" /></Card>}
 
       {result && !running && (
         <div className="rise mt-6 space-y-6">
-          {result.demo && <DemoNote>Sample output. Add an Anthropic API key for titles written for your topic.</DemoNote>}
+          {result.demo && <AiDemoNote reason={result.demoReason} what="set of titles" />}
           <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
             <Card>
               <h2 className="mb-4 font-semibold">Title options</h2>

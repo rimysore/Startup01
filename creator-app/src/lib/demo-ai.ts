@@ -66,8 +66,7 @@ export const DEMO_COMMENTS: CommentInsights = {
 };
 
 export const DEMO_CHAT_REPLY =
-  "Demo mode me hoon (AI key set nahi hai), to ye ek sample jawab hai:\n\n" +
+  "(Sample jawab — sign in karke apne channel ke liye asli jawab paao.)\n\n" +
   "• **Is hafte ka plan:** Tuesday 7 PM long video (₹20k camera test), Thursday + Saturday 2 Shorts uske clips se.\n" +
   "• **Sabse bada fix:** Pichhle 3 videos me pehle 30 sec me ~30% log chhod rahe hain. Verdict pehle dikhao.\n" +
-  "• **Quick win:** UPI Fraud wale video (2.1L views) ka Part 2 banao — comments me 40+ log maang rahe hain.\n\n" +
-  "Real answers ke liye `.env.local` me ANTHROPIC_API_KEY daalo.";
+  "• **Quick win:** UPI Fraud wale video (2.1L views) ka Part 2 banao — comments me 40+ log maang rahe hain.";

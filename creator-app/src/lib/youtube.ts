@@ -1,34 +1,49 @@
+import { eq } from "drizzle-orm";
+import { db, schema } from "@/db";
+import { decrypt, encrypt } from "./crypto";
 import type { ChannelSummary, Comment, DailyPoint, RetentionPoint, Video } from "./types";
-import { readTokens, writeTokens, type YouTubeTokens } from "./session";
 
-const SCOPES = [
+export interface GoogleTokens {
+  accessToken: string;
+  refreshToken?: string;
+  expiresAt: number; // epoch ms
+}
+
+export const LOGIN_SCOPES = ["openid", "email", "profile"];
+export const YOUTUBE_SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly",
   "https://www.googleapis.com/auth/yt-analytics.readonly",
 ];
 
 export function googleConfigured(): boolean {
-  return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.SESSION_SECRET);
+  return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET);
 }
 
 export function redirectUri(origin: string): string {
-  return `${process.env.APP_URL ?? origin}/api/auth/youtube/callback`;
+  return `${process.env.APP_URL ?? origin}/api/auth/google/callback`;
 }
 
-export function authUrl(origin: string, state: string): string {
+export function authUrl(origin: string, state: string, scopes: string[], loginHint?: string): string {
   const params = new URLSearchParams({
     client_id: process.env.GOOGLE_CLIENT_ID!,
     redirect_uri: redirectUri(origin),
     response_type: "code",
-    scope: SCOPES.join(" "),
-    access_type: "offline",
+    scope: scopes.join(" "),
     include_granted_scopes: "true",
-    prompt: "consent",
     state,
   });
+  if (scopes.some((s) => YOUTUBE_SCOPES.includes(s))) {
+    // A refresh token lets us keep reading analytics after the hour-long access token expires.
+    params.set("access_type", "offline");
+    params.set("prompt", "consent");
+  } else {
+    params.set("prompt", "select_account");
+  }
+  if (loginHint) params.set("login_hint", loginHint);
   return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
-async function tokenRequest(body: Record<string, string>): Promise<YouTubeTokens> {
+async function tokenRequest(body: Record<string, string>): Promise<GoogleTokens> {
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -47,22 +62,60 @@ async function tokenRequest(body: Record<string, string>): Promise<YouTubeTokens
   };
 }
 
-export function exchangeCode(code: string, origin: string): Promise<YouTubeTokens> {
+export function exchangeCode(code: string, origin: string): Promise<GoogleTokens> {
   return tokenRequest({ code, grant_type: "authorization_code", redirect_uri: redirectUri(origin) });
 }
 
-/** Returns usable tokens for the current visitor, refreshing (and re-saving) them if they're about to expire. */
-export async function currentTokens(): Promise<YouTubeTokens | null> {
-  const tokens = await readTokens();
-  if (!tokens) return null;
+export async function googleProfile(tokens: GoogleTokens): Promise<{ email: string; emailVerified: boolean; name?: string; picture?: string }> {
+  const res = await fetch("https://openidconnect.googleapis.com/v1/userinfo", {
+    headers: { Authorization: `Bearer ${tokens.accessToken}` },
+  });
+  if (!res.ok) throw new Error(`Google userinfo failed: ${res.status}`);
+  const p = (await res.json()) as { email: string; email_verified?: boolean; name?: string; picture?: string };
+  return { email: p.email, emailVerified: p.email_verified === true, name: p.name, picture: p.picture };
+}
+
+// ---- Stored YouTube connection ----------------------------------------------
+
+export async function saveYouTubeConnection(userId: string, tokens: GoogleTokens, channel?: { id: string; title: string }) {
+  const values = {
+    accessToken: encrypt(tokens.accessToken),
+    refreshToken: tokens.refreshToken ? encrypt(tokens.refreshToken) : null,
+    expiresAt: new Date(tokens.expiresAt),
+    updatedAt: new Date(),
+    ...(channel ? { channelId: channel.id, channelTitle: channel.title } : {}),
+  };
+  await (await db())
+    .insert(schema.youtubeConnections)
+    .values({ userId, ...values })
+    .onConflictDoUpdate({ target: schema.youtubeConnections.userId, set: values });
+}
+
+export async function removeYouTubeConnection(userId: string) {
+  await (await db()).delete(schema.youtubeConnections).where(eq(schema.youtubeConnections.userId, userId));
+}
+
+export async function youtubeConnection(userId: string) {
+  const [row] = await (await db()).select().from(schema.youtubeConnections).where(eq(schema.youtubeConnections.userId, userId));
+  return row ?? null;
+}
+
+/** Usable tokens for the user's connected channel, refreshed (and re-saved) when close to expiry. */
+export async function youtubeTokens(userId: string): Promise<GoogleTokens | null> {
+  const row = await youtubeConnection(userId);
+  if (!row) return null;
+  const accessToken = decrypt(row.accessToken);
+  const refreshToken = row.refreshToken ? decrypt(row.refreshToken) ?? undefined : undefined;
+  if (!accessToken) return null;
+  const tokens: GoogleTokens = { accessToken, refreshToken, expiresAt: row.expiresAt.getTime() };
   if (tokens.expiresAt - Date.now() > 60_000) return tokens;
-  if (!tokens.refreshToken) return null;
-  const fresh = await tokenRequest({ refresh_token: tokens.refreshToken, grant_type: "refresh_token" });
-  await writeTokens(fresh);
+  if (!refreshToken || !googleConfigured()) return null;
+  const fresh = await tokenRequest({ refresh_token: refreshToken, grant_type: "refresh_token" });
+  await saveYouTubeConnection(userId, fresh);
   return fresh;
 }
 
-async function api<T>(tokens: YouTubeTokens, url: string): Promise<T> {
+async function api<T>(tokens: GoogleTokens, url: string): Promise<T> {
   const res = await fetch(url, { headers: { Authorization: `Bearer ${tokens.accessToken}` } });
   if (!res.ok) throw new Error(`YouTube API ${res.status}: ${await res.text()}`);
   return (await res.json()) as T;
@@ -86,12 +139,12 @@ interface AnalyticsReport {
   rows?: Array<Array<string | number>>;
 }
 
-function report(tokens: YouTubeTokens, params: Record<string, string>) {
+function report(tokens: GoogleTokens, params: Record<string, string>) {
   const q = new URLSearchParams({ ids: "channel==MINE", ...params });
   return api<AnalyticsReport>(tokens, `${ANALYTICS}?${q}`);
 }
 
-export async function fetchSummary(tokens: YouTubeTokens): Promise<ChannelSummary> {
+export async function fetchSummary(tokens: GoogleTokens): Promise<ChannelSummary> {
   type ChannelsRes = {
     items?: Array<{
       id: string;
@@ -188,7 +241,7 @@ export async function fetchSummary(tokens: YouTubeTokens): Promise<ChannelSummar
   };
 }
 
-export async function fetchRetention(tokens: YouTubeTokens, videoId: string): Promise<RetentionPoint[]> {
+export async function fetchRetention(tokens: GoogleTokens, videoId: string): Promise<RetentionPoint[]> {
   const r = await report(tokens, {
     startDate: "2010-01-01",
     endDate: ymd(new Date()),
@@ -199,7 +252,7 @@ export async function fetchRetention(tokens: YouTubeTokens, videoId: string): Pr
   return (r.rows ?? []).map(([t, w]) => ({ t: Number(t), watching: Number(w) }));
 }
 
-export async function fetchComments(tokens: YouTubeTokens, videoId: string): Promise<Comment[]> {
+export async function fetchComments(tokens: GoogleTokens, videoId: string): Promise<Comment[]> {
   type ThreadsRes = {
     items?: Array<{
       id: string;

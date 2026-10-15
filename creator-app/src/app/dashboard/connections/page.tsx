@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, ErrorNote, PageHeader } from "@/components/ui";
@@ -7,8 +8,8 @@ import { Button, Card, ErrorNote, PageHeader } from "@/components/ui";
 const ERRORS: Record<string, string> = {
   not_configured: "YouTube sign-in isn't set up on this server yet. See the setup steps below.",
   denied: "You cancelled the Google sign-in, or didn't grant access.",
-  state: "The sign-in link expired. Please try again.",
   exchange: "Google didn't accept the sign-in. Check the client ID, secret and redirect URI.",
+  no_channel: "That Google account doesn't seem to have a YouTube channel. Try a different account.",
 };
 
 function StatusPill({ on, label }: { on: boolean; label: string }) {
@@ -26,14 +27,13 @@ const SOON = [
 ];
 
 export default function ConnectionsPage() {
-  const { status, summary, reload } = useDashboard();
+  const { me, reload } = useDashboard();
   const error = useQueryParam("error");
   const [busy, setBusy] = useState(false);
-  const connected = status?.connected && summary?.mode === "live";
 
   async function disconnect() {
     setBusy(true);
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/youtube/disconnect", { method: "POST" });
     setBusy(false);
     reload();
   }
@@ -55,14 +55,18 @@ export default function ConnectionsPage() {
             </div>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {connected ? (
+            {!me ? null : !me.user ? (
+              <Link href="/login?next=/dashboard/connections" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+                Sign in to connect
+              </Link>
+            ) : me.youtube ? (
               <>
-                <StatusPill on label={`Connected · ${summary?.channel.title}`} />
+                <StatusPill on label={`Connected · ${me.youtube.channelTitle ?? "your channel"}`} />
                 <Button variant="ghost" onClick={disconnect} disabled={busy}>Disconnect</Button>
               </>
             ) : (
               <a href="/api/auth/youtube/start" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
-                Connect with Google
+                Connect YouTube
               </a>
             )}
           </div>
@@ -74,15 +78,14 @@ export default function ConnectionsPage() {
         <Card>
           <h2 className="font-semibold">Server setup</h2>
           <div className="mt-3 flex flex-wrap gap-2">
-            <StatusPill on={Boolean(status?.googleConfigured)} label="Google sign-in" />
-            <StatusPill on={Boolean(status?.aiConfigured)} label="Mitra AI" />
+            <StatusPill on={Boolean(me?.config.google)} label="Google sign-in" />
+            <StatusPill on={Boolean(me?.config.ai)} label="Mitra AI" />
+            <StatusPill on={Boolean(me?.config.billing)} label="Razorpay" />
           </div>
-          <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-sm text-ink-2">
-            <li>Copy <code className="rounded bg-surface-2 px-1">.env.example</code> to <code className="rounded bg-surface-2 px-1">.env.local</code>.</li>
-            <li>Create an OAuth client (Web) in Google Cloud and enable YouTube Data API v3 + YouTube Analytics API.</li>
-            <li>Add <code className="rounded bg-surface-2 px-1">{"<your-url>"}/api/auth/youtube/callback</code> as a redirect URI.</li>
-            <li>Set <code className="rounded bg-surface-2 px-1">ANTHROPIC_API_KEY</code> to switch on real AI answers.</li>
-          </ol>
+          <p className="mt-4 text-sm text-ink-2">
+            Copy <code className="rounded bg-surface-2 px-1">.env.example</code> to <code className="rounded bg-surface-2 px-1">.env.local</code> and
+            fill in the keys. The README walks through Google Cloud and Razorpay setup.
+          </p>
         </Card>
       </div>
 

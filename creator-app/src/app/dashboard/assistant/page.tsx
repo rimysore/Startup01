@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { postAi, useDashboard } from "@/components/dashboard-context";
-import { Button, Card, ErrorNote, PageHeader } from "@/components/ui";
+import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
+import { AiErrorNote, Button, Card, PageHeader } from "@/components/ui";
 import { compact } from "@/lib/format";
 import type { ChannelSummary } from "@/lib/types";
 
@@ -49,11 +49,11 @@ function Rich({ text }: { text: string }) {
 }
 
 export default function AssistantPage() {
-  const { summary, language } = useDashboard();
+  const { summary, language, refreshMe } = useDashboard();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<AiError | null>(null);
   const end = useRef<HTMLDivElement>(null);
 
   useEffect(() => end.current?.scrollIntoView({ behavior: "smooth", block: "end" }), [messages, sending]);
@@ -69,7 +69,8 @@ export default function AssistantPage() {
     const res = await postAi<string>("/api/ai/chat", { language, context: context(summary), messages: next.slice(-20) });
     setSending(false);
     if (res.result) setMessages([...next, { role: "assistant", content: res.result }]);
-    else setError(res.error ?? "Something went wrong.");
+    else setError(res.error ?? { message: "Something went wrong." });
+    refreshMe();
   }
 
   return (
@@ -110,7 +111,7 @@ export default function AssistantPage() {
               <div className="rounded-2xl rounded-bl-md bg-surface-2 px-4 py-3 text-sm text-muted">Mitra is typing…</div>
             </div>
           )}
-          {error && <ErrorNote>{error}</ErrorNote>}
+          {error && <AiErrorNote error={error} />}
           <div ref={end} />
         </div>
         <form

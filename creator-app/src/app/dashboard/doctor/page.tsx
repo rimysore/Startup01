@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { postAi, useDashboard, useQueryParam } from "@/components/dashboard-context";
+import { postAi, useDashboard, useQueryParam, type AiError } from "@/components/dashboard-context";
 import { LineChart } from "@/components/LineChart";
-import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, PageHeader, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
 import type { Doctor } from "@/lib/ai";
 import { compact } from "@/lib/format";
@@ -34,13 +34,13 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 export default function DoctorPage() {
-  const { summary, language } = useDashboard();
+  const { summary, language, refreshMe } = useDashboard();
   const requested = useQueryParam("v");
   const [picked, setPicked] = useState<string | null>(null);
   // Each piece of state remembers which video it belongs to, so switching videos never shows stale data.
   const [loaded, setLoaded] = useState<{ id: string; data: RetentionRes } | null>(null);
-  const [diagnosis, setDiagnosis] = useState<{ id: string; demo?: boolean; data: Doctor } | null>(null);
-  const [failure, setFailure] = useState<{ id: string; message: string } | null>(null);
+  const [diagnosis, setDiagnosis] = useState<{ id: string; demo?: boolean; demoReason?: "signin" | "nokey"; data: Doctor } | null>(null);
+  const [failure, setFailure] = useState<{ id: string; error: AiError } | null>(null);
   const [running, setRunning] = useState(false);
 
   const videos = summary?.videos ?? [];
@@ -48,7 +48,7 @@ export default function DoctorPage() {
   const video = videos.find((v) => v.id === videoId) ?? null;
   const retention = loaded?.id === videoId ? loaded.data : null;
   const result = diagnosis?.id === videoId ? diagnosis : null;
-  const error = failure?.id === videoId ? failure.message : null;
+  const error = failure?.id === videoId ? failure.error : null;
 
   useEffect(() => {
     if (!videoId) return;
@@ -81,8 +81,9 @@ export default function DoctorPage() {
       retention: points,
     });
     setRunning(false);
-    if (res.result) setDiagnosis({ id, demo: res.demo, data: res.result });
-    else setFailure({ id, message: res.error ?? "Something went wrong." });
+    refreshMe();
+    if (res.result) setDiagnosis({ id, demo: res.demo, demoReason: res.demoReason, data: res.result });
+    else setFailure({ id, error: res.error ?? { message: "Something went wrong." } });
   }
 
   return (
@@ -171,12 +172,12 @@ export default function DoctorPage() {
             </Card>
           )}
 
-          {error && <ErrorNote>{error}</ErrorNote>}
+          {error && <AiErrorNote error={error} />}
           {running && <Card><Spinner label="Mitra is watching the curve and reading the numbers…" /></Card>}
 
           {result && !running && (
             <div className="rise space-y-6">
-              {result.demo && <DemoNote>This is a sample diagnosis. Add an Anthropic API key to get a real one for your video.</DemoNote>}
+              {result.demo && <AiDemoNote reason={result.demoReason} what="diagnosis" />}
               <Card className="flex flex-wrap items-center gap-5">
                 <ScoreRing score={result.data.score} />
                 <p className="min-w-0 flex-1 font-display text-2xl leading-snug sm:text-3xl">“{result.data.verdict}”</p>

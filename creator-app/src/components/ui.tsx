@@ -130,3 +130,40 @@ export function Select({
     </label>
   );
 }
+
+/** Explains why an AI answer is a sample, with the next step to get a real one. */
+export function AiDemoNote({ reason, what }: { reason?: "signin" | "nokey"; what: string }) {
+  return (
+    <DemoNote>
+      {reason === "signin" ? (
+        <>
+          This is a sample {what}.{" "}
+          <Link href="/login?next=/dashboard" className="font-semibold underline underline-offset-2">
+            Sign in free
+          </Link>{" "}
+          to get a real one.
+        </>
+      ) : (
+        <>This is a sample {what}. Add an Anthropic API key on the server to get real answers.</>
+      )}
+    </DemoNote>
+  );
+}
+
+export function AiErrorNote({ error }: { error: { message: string; upgrade?: boolean; signin?: boolean } }) {
+  return (
+    <ErrorNote>
+      {error.message}{" "}
+      {error.upgrade && (
+        <Link href="/dashboard/billing" className="font-semibold underline underline-offset-2">
+          Upgrade your plan →
+        </Link>
+      )}
+      {error.signin && (
+        <Link href="/login?next=/dashboard" className="font-semibold underline underline-offset-2">
+          Sign in →
+        </Link>
+      )}
+    </ErrorNote>
+  );
+}
