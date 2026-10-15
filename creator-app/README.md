@@ -148,6 +148,9 @@ Vercel setup (once): import the GitHub repo, **Root Directory** `creator-app`, *
 Region `sin1` (Singapore) matches the Neon database region (Neon has no Mumbai region). The app talks to
 the database several times per page, so keeping the two together matters more than being in India itself.
 
+No domain yet? Leave `APP_URL` unset: sign-in uses whatever address the visitor arrived on, so the free
+`<project>.vercel.app` address works. Register that address's `/api/auth/google/callback` in Google Cloud.
+
 Before the first production deploy, with the production values exported in your shell:
 
 ```bash

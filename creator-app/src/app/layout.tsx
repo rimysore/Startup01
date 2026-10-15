@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/company";
 import { Inter, Instrument_Serif, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import "./globals.css";
 
@@ -17,7 +18,7 @@ const devanagari = Noto_Sans_Devanagari({
 const telugu = Noto_Sans_Telugu({ variable: "--font-telugu", subsets: ["telugu"], weight: ["500", "800"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL ?? "https://mitracreators.com"),
+  metadataBase: new URL(SITE_URL),
   title: "Mitra — your channel's digital manager",
   description:
     "Mitra is the AI growth manager for creators who make videos in Hindi, Hinglish, Telugu, Tamil and more.",

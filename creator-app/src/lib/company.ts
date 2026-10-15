@@ -5,21 +5,29 @@
  */
 const OPERATOR = "[Your full legal name]";
 
+/** The public site address: APP_URL, else Vercel's production URL (e.g. mitra.vercel.app), else the planned domain. */
+export const SITE_URL =
+  process.env.APP_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://mitracreators.com");
+
+/** One inbox for support, privacy and grievance mail until the domain's own addresses exist. */
+const EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "[contact email]";
+
 export const COMPANY = {
   product: "Mitra",
   legalName: OPERATOR,
   /** How the operator is described: "an individual" now, e.g. "a private limited company" later. */
   operatorType: "an individual",
   address: "Bloomington, Indiana, United States",
-  supportEmail: "support@mitracreators.com",
-  privacyEmail: "privacy@mitracreators.com",
+  supportEmail: EMAIL,
+  privacyEmail: EMAIL,
   /** Optional; leave empty to hide. */
   phone: "",
   grievanceOfficer: OPERATOR,
-  grievanceEmail: "grievance@mitracreators.com",
+  grievanceEmail: EMAIL,
   governingLaw: "the State of Indiana, United States",
   jurisdictionCity: "Monroe County, Indiana",
-  website: "https://mitracreators.com",
+  website: SITE_URL,
 };
 
 /** Date the current versions of the legal pages take effect. Update whenever the text changes. */

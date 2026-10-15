@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Logo, ThemeToggle } from "@/components/ui";
+import { COMPANY } from "@/lib/company";
 import { LANGUAGES } from "@/lib/languages";
 import { PLANS, rupees } from "@/lib/plans";
 
@@ -29,7 +30,7 @@ const PRICING = [
     per: "/month",
     points: ["Up to 25 channels", "Team seats", "Client-ready reports", "API access"],
     cta: "Talk to us",
-    href: "mailto:hello@mitracreators.com?subject=Mitra%20Agency%20plan",
+    href: `mailto:${COMPANY.supportEmail}?subject=Mitra%20Agency%20plan`,
     featured: false,
   },
 ];
