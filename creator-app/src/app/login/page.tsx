@@ -117,7 +117,10 @@ export default function LoginPage() {
           </div>
 
           <p className="mt-8 text-xs text-muted">
-            Mitra only reads your YouTube data when you connect it, and never posts for you.
+            By continuing you agree to our{" "}
+            <Link href="/terms" className="underline underline-offset-2">Terms</Link> and{" "}
+            <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>. Mitra only reads your YouTube data
+            when you connect it, and never posts for you.
           </p>
           <Link href="/dashboard" className="mt-4 text-sm font-semibold text-accent">
             ← Keep exploring the demo

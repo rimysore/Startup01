@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/SiteFooter";
 import { Logo, ThemeToggle } from "@/components/ui";
 import { LANGUAGES } from "@/lib/languages";
 import { PLANS, rupees } from "@/lib/plans";
@@ -219,13 +220,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-line">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-8 text-sm text-muted sm:px-8">
-          <Logo />
-          <span>Made for Bharat&apos;s creators.</span>
-          <span className="ml-auto">© {2026} Mitra</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

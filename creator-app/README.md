@@ -29,6 +29,7 @@ npm run dev                  # http://localhost:3000
 | `/dashboard/connections` | Connect / disconnect YouTube, setup status | Google OAuth |
 | `/dashboard/billing` | Current plan, monthly AI credits, upgrade / cancel | Razorpay |
 | `/login` | Google sign-in (plus a local test sign-in) | Google OAuth |
+| `/terms`, `/privacy`, `/refunds`, `/contact` | Legal and contact pages (required by Razorpay and Google's OAuth review) | `src/lib/company.ts` |
 
 The output language (top bar) controls what language the AI writes in.
 
@@ -69,6 +70,20 @@ The output language (top bar) controls what language the AI writes in.
    Before charging real customers you'll also need Razorpay account activation (KYC) and published
    terms, privacy and refund policies.
 
+## Legal pages
+
+`/terms`, `/privacy`, `/refunds` and `/contact` describe what the app actually does (data collected, YouTube
+Limited Use, cookies, credits, auto-renewal, cancellation and refunds, grievance officer). Before launch:
+
+1. Fill in every `[bracketed]` value in `src/lib/company.ts` — the pages show a "Draft" banner until you do.
+2. Fill in your hosting and database providers in the Privacy Policy's provider table.
+3. Have a lawyer review the text. The refund rules (7 days / 20 credits for a first-payment refund) are a
+   business choice; change them in `src/app/refunds/page.tsx` if you prefer different terms.
+4. Update `LEGAL_EFFECTIVE_DATE` whenever the text changes.
+
+Users can delete their account from Plan & billing; this cancels any live Razorpay subscription first and
+then removes all their data.
+
 ## Tests
 
 `npm test` runs the credit-limit and plan-entitlement tests against an in-memory database.
@@ -83,4 +98,4 @@ The output language (top bar) controls what language the AI writes in.
 ## Not built yet
 
 Live trend data, WhatsApp weekly reports, Instagram, GST invoices, team seats for the Agency plan,
-interface translation (only AI output is multilingual today), terms/privacy pages.
+interface translation (only AI output is multilingual today).

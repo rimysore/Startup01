@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
@@ -40,6 +41,57 @@ async function post<T>(url: string, body?: unknown): Promise<T & { error?: strin
     body: body ? JSON.stringify(body) : undefined,
   });
   return res.json();
+}
+
+function DeleteAccount() {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const [typed, setTyped] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function remove() {
+    setBusy(true);
+    setError(null);
+    const res = await post("/api/account/delete", { confirm: typed });
+    setBusy(false);
+    if (res.error) setError(res.error);
+    else router.push("/");
+  }
+
+  return (
+    <section className="mt-12 rounded-2xl border border-bad/30 p-5 sm:p-6">
+      <h2 className="font-semibold text-bad">Delete my account</h2>
+      <p className="mt-1 max-w-2xl text-sm text-ink-2">
+        Permanently deletes your account, your saved YouTube connection and your usage history, and cancels any subscription immediately. This
+        can&apos;t be undone. See our <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link> for what Razorpay keeps.
+      </p>
+      {!open ? (
+        <Button variant="ghost" className="mt-4 !border-bad/40 !text-bad" onClick={() => setOpen(true)}>
+          Delete my account…
+        </Button>
+      ) : (
+        <div className="mt-4 flex flex-wrap items-end gap-3">
+          <label className="flex flex-col gap-1 text-xs font-medium text-muted">
+            Type DELETE to confirm
+            <input
+              value={typed}
+              onChange={(e) => setTyped(e.target.value)}
+              className="rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-bad"
+              autoComplete="off"
+            />
+          </label>
+          <Button onClick={remove} disabled={busy || typed !== "DELETE"} className="!bg-bad !text-white">
+            {busy ? "Deleting…" : "Permanently delete"}
+          </Button>
+          <Button variant="ghost" onClick={() => { setOpen(false); setTyped(""); }} disabled={busy}>
+            Keep my account
+          </Button>
+        </div>
+      )}
+      {error && <div className="mt-3"><ErrorNote>{error}</ErrorNote></div>}
+    </section>
+  );
 }
 
 export default function BillingPage() {
@@ -219,7 +271,15 @@ export default function BillingPage() {
         </div>
       </div>
       {hasLiveSub && <p className="mt-4 text-xs text-muted">To switch plans, cancel your current subscription first; the new plan can start right away.</p>}
-      <p className="mt-6 text-xs text-muted">Payments are processed by Razorpay. UPI Autopay, cards and netbanking supported.</p>
+      <p className="mt-6 max-w-3xl text-xs leading-relaxed text-muted">
+        Paid plans renew automatically every month at the price shown until you cancel, which you can do here at any time. By subscribing you
+        agree to our{" "}
+        <Link href="/terms" className="underline underline-offset-2">Terms</Link> and{" "}
+        <Link href="/refunds" className="underline underline-offset-2">Refund &amp; Cancellation Policy</Link>. Payments are processed by
+        Razorpay; UPI Autopay, cards and netbanking are supported.
+      </p>
+
+      <DeleteAccount />
     </div>
   );
 }

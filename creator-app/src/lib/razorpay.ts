@@ -62,8 +62,9 @@ export function fetchSubscription(id: string): Promise<RazorpaySubscription> {
   return call("GET", `/subscriptions/${encodeURIComponent(id)}`);
 }
 
-export function cancelSubscription(id: string): Promise<RazorpaySubscription> {
-  return call("POST", `/subscriptions/${encodeURIComponent(id)}/cancel`, { cancel_at_cycle_end: 1 });
+/** Cancels at the end of the paid period by default; pass `immediately` to stop it now (e.g. account deletion). */
+export function cancelSubscription(id: string, immediately = false): Promise<RazorpaySubscription> {
+  return call("POST", `/subscriptions/${encodeURIComponent(id)}/cancel`, { cancel_at_cycle_end: immediately ? 0 : 1 });
 }
 
 /** Checkout success: HMAC-SHA256(payment_id + "|" + subscription_id) with the API key secret. */

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { DashboardProvider, useDashboard } from "./dashboard-context";
+import { LEGAL_LINKS } from "./SiteFooter";
 import { Logo, ThemeToggle } from "./ui";
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
 
@@ -182,6 +183,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <p className="font-display text-xl leading-snug">Weekly report on WhatsApp</p>
             <p className="mt-1 text-xs opacity-70">Every Monday, your 3 biggest wins and fixes. Coming soon.</p>
           </div>
+          <nav className="mt-4 flex flex-wrap gap-x-3 gap-y-1 px-3 text-[11px] text-muted" aria-label="Legal">
+            {LEGAL_LINKS.map((l) => (
+              <Link key={l.href} href={l.href} className="hover:text-ink">
+                {l.label}
+              </Link>
+            ))}
+          </nav>
         </aside>
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
