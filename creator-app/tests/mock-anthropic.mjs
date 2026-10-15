@@ -30,7 +30,7 @@ http
       }
       const body = JSON.parse(raw || "{}");
       const feature = featureOf(body);
-      requests.push({ feature, model: body.model, effort: body.output_config?.effort, fallbacks: body.fallbacks ?? null, betas: req.headers["anthropic-beta"] ?? null, max_tokens: body.max_tokens, system: body.system, prompt: JSON.stringify(body.messages) });
+      requests.push({ feature, model: body.model, effort: body.output_config?.effort, fallbacks: body.fallbacks ?? null, betas: req.headers["anthropic-beta"] ?? null, workspace: req.headers["anthropic-workspace-id"] ?? null, max_tokens: body.max_tokens, system: body.system, prompt: JSON.stringify(body.messages) });
       const text = feature === "chat" ? "• Is hafte 2 Shorts banao." : JSON.stringify(ANSWERS[feature]);
       res.setHeader("content-type", "application/json");
       res.end(
