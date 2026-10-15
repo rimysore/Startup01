@@ -19,6 +19,8 @@ const [a, b] = await Promise.all([cached("u1", "summary", 60_000, load), cached(
 assert(calls === 1 && a.value.views === 1 && b.value.views === 1, "two requests at once share one YouTube call");
 await cached("u1", "summary", 60_000, load);
 assert(calls === 1, "second request served from memory");
+await cached("u1", "summary", 60_000, load, { force: true });
+assert(calls === 1, "Refresh within a minute of the last fetch doesn't call YouTube again");
 const [row] = await d.select().from(schema.youtubeCache).where(eq(schema.youtubeCache.key, "u1:summary"));
 assert(row && !row.value.includes("views"), "stored in Postgres, encrypted");
 

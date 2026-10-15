@@ -26,10 +26,21 @@ function remember(key: string, value: unknown, fetchedAt: number, expires: numbe
   memory.set(key, { value, fetchedAt, expires });
 }
 
-export async function cached<T>(userId: string, name: string, ttlMs: number, load: () => Promise<T>): Promise<Cached<T>> {
+/** A manual refresh never refetches data younger than this, so a refresh button can't burn YouTube quota. */
+export const MIN_REFRESH_MS = 60_000;
+
+export async function cached<T>(
+  userId: string,
+  name: string,
+  ttlMs: number,
+  load: () => Promise<T>,
+  { force = false }: { force?: boolean } = {},
+): Promise<Cached<T>> {
   const key = `${userId}:${name}`;
+  // With force, anything older than MIN_REFRESH_MS counts as expired.
+  const freshUntil = (fetchedAt: number, expires: number) => (force ? Math.min(expires, fetchedAt + MIN_REFRESH_MS) : expires);
   const hit = memory.get(key);
-  if (hit && hit.expires > Date.now()) return { value: hit.value as T, fetchedAt: hit.fetchedAt, stale: false };
+  if (hit && freshUntil(hit.fetchedAt, hit.expires) > Date.now()) return { value: hit.value as T, fetchedAt: hit.fetchedAt, stale: false };
 
   const running = inflight.get(key);
   if (running) return running as Promise<Cached<T>>;
@@ -37,7 +48,7 @@ export async function cached<T>(userId: string, name: string, ttlMs: number, loa
     const d = await db();
     const [row] = await d.select().from(schema.youtubeCache).where(eq(schema.youtubeCache.key, key));
     const stored = row ? decrypt(row.value) : null;
-    if (row && stored && row.expiresAt.getTime() > Date.now()) {
+    if (row && stored && freshUntil(row.fetchedAt.getTime(), row.expiresAt.getTime()) > Date.now()) {
       remember(key, JSON.parse(stored), row.fetchedAt.getTime(), row.expiresAt.getTime());
       return { value: JSON.parse(stored) as T, fetchedAt: row.fetchedAt.getTime(), stale: false };
     }

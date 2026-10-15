@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useDashboard } from "@/components/dashboard-context";
 import { LineChart } from "@/components/LineChart";
-import { Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
 import { compact, full, pctChange, shortDate } from "@/lib/format";
 import type { ChannelSummary, Video } from "@/lib/types";
@@ -61,7 +61,7 @@ function actions(s: ChannelSummary): Array<{ title: string; body: string; href: 
 }
 
 export default function Overview() {
-  const { summary } = useDashboard();
+  const { summary, refresh } = useDashboard();
   if (!summary) return <Spinner label="Loading your channel" />;
 
   const { channel, daily, videos } = summary;
@@ -76,10 +76,21 @@ export default function Overview() {
   return (
     <div className="rise">
       <PageHeader eyebrow="Overview" title={`Namaste, ${channel.title} 👋`}>
-        {summary.mode === "demo" && (
+        {summary.mode === "demo" ? (
           <Link href="/dashboard/connections" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
             Connect your YouTube
           </Link>
+        ) : (
+          <div className="flex items-center gap-3">
+            {summary.fetchedAt && (
+              <span className="text-xs text-muted">
+                Updated {new Date(summary.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+              </span>
+            )}
+            <Button variant="ghost" onClick={refresh} title="Fetch the latest numbers from YouTube">
+              Refresh
+            </Button>
+          </div>
         )}
       </PageHeader>
       {summary.error && <div className="mb-4"><ErrorNote>{summary.error}</ErrorNote></div>}
@@ -163,7 +174,12 @@ export default function Overview() {
               </Link>
             </div>
           ))}
-          {!videos.length && <p className="py-6 text-sm text-muted">No uploads yet.</p>}
+          {!videos.length && (
+            <p className="py-6 text-sm text-muted">
+              No uploads found yet. A new video can take a few minutes to show up after YouTube finishes processing it (drafts never
+              appear). Press Refresh to check again.
+            </p>
+          )}
         </div>
       </Card>
     </div>

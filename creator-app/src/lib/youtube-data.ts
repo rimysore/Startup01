@@ -22,6 +22,7 @@ export async function loadYouTube<T>(
   name: string,
   ttlMs: number,
   fetch: (tokens: GoogleTokens) => Promise<T>,
+  { force = false }: { force?: boolean } = {},
 ): Promise<Loaded<T>> {
   if (!userId) return { kind: "demo" };
   const yt = await youtubeConnection(userId);
@@ -32,7 +33,7 @@ export async function loadYouTube<T>(
     const tokens = await youtubeTokens(userId);
     if (!tokens) throw new Error("YouTube access is no longer valid");
     return fetch(tokens);
-  });
+  }, { force });
   return { kind: "live", ...result };
 }
 

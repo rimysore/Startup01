@@ -35,6 +35,8 @@ export interface ChannelSummary {
   channel: Channel;
   daily: DailyPoint[];
   videos: Video[];
+  /** When this data was fetched from YouTube (epoch ms); live data only. */
+  fetchedAt?: number;
 }
 
 /** Audience retention: share of viewers still watching at each point (ratio of video length 0..1). */

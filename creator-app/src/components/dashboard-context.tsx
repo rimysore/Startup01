@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ChannelSummary } from "@/lib/types";
 import { isLanguageCode, type LanguageCode } from "@/lib/languages";
 import type { PlanId } from "@/lib/plans";
@@ -25,6 +25,8 @@ interface DashboardState {
   setLanguage: (l: LanguageCode) => void;
   /** Reloads the account and channel data (after sign-in changes, connecting YouTube, upgrading). */
   reload: () => void;
+  /** Re-ask YouTube now instead of using the cached copy. */
+  refresh: () => void;
   /** Reloads only the account data (e.g. credits after an AI call). */
   refreshMe: () => void;
 }
@@ -43,11 +45,18 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [version, setVersion] = useState(0);
   const [meVersion, setMeVersion] = useState(0);
   const reload = useCallback(() => setVersion((v) => v + 1), []);
+  const force = useRef(false);
+  const refresh = useCallback(() => {
+    force.current = true;
+    setVersion((v) => v + 1);
+  }, []);
   const refreshMe = useCallback(() => setMeVersion((v) => v + 1), []);
 
   useEffect(() => {
     let live = true;
-    getJson<ChannelSummary>("/api/channel")
+    const url = force.current ? "/api/channel?refresh=1" : "/api/channel";
+    force.current = false;
+    getJson<ChannelSummary>(url)
       .then((s) => live && setSummary(s))
       .catch(() => live && setSummary(null));
     return () => {
@@ -66,7 +75,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   }, [version, meVersion]);
 
   return (
-    <Ctx.Provider value={{ summary, me, language, setLanguage, reload, refreshMe }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ summary, me, language, setLanguage, reload, refresh, refreshMe }}>{children}</Ctx.Provider>
   );
 }
 
