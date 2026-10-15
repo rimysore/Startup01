@@ -4,7 +4,7 @@ export type PlanId = "free" | "pro" | "creator";
  * AI credits each answer costs. Video Doctor runs on a larger model, so it costs more; this keeps every plan's
  * worst-case AI bill below its price. Shared by the server (charging) and the UI (labels).
  */
-export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1, thumbnail: 1 } as const;
+export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1, thumbnail: 1, image: 1, trends: 1, audience: 1 } as const;
 
 export interface Plan {
   id: PlanId;

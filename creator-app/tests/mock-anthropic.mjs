@@ -5,16 +5,20 @@ const requests = [];
 let mode = "ok"; // ok | refusal | max_tokens
 
 const ANSWERS = {
-  doctor: { score: 150, verdict: "Intro was too long.", whatWorked: ["Good thumbnail"], whatHurt: [{ at: "0:12", issue: "Slow intro", fix: "Start with the result" }], nextVideo: ["Hook first"], titleIdeas: ["A", "B", "C"] },
+  trends: { summary: "Festival food is rising.", emotions: [{ emotion: "joy", share: 3 }, { emotion: "curiosity", share: 1 }, { emotion: "humor", share: 0 }], topics: [{ topic: "Dasara biryani", why: "Festival week", emotion: "joy", examples: ["దసరా బిర్యానీ"], angle: "Your city's festival dish" }], regional: ["Hyderabad"], formats: ["Shorts"] },
+  audience: { persona: "Young men in Hyderabad.", regions: [{ place: "Hyderabad", insight: "Core city" }], discovery: "Search.", searchIntent: ["biryani"], emotions: [{ emotion: "pride", share: 70 }, { emotion: "joy", share: 30 }], actions: ["Do X"] },
+  doctor: { score: 150, verdict: "Intro was too long.", traffic: "Mostly search from Lucknow.", whatWorked: ["Good thumbnail"], whatHurt: [{ at: "0:12", issue: "Slow intro", fix: "Start with the result" }], nextVideo: ["Hook first"], titleIdeas: ["A", "B", "C"] },
   titles: { titles: [{ title: "Raat me test kiya", why: "curiosity", strength: 42 }], thumbnailText: ["कौन जीता?"], hook: "Raat ke 11 baje…" },
-  thumbnail: { headline: "रात में कौन जीता?", highlight: "जीता?", badge: "₹20K TEST", layout: "subject-right", images: [{ index: 0, role: "subject", focusX: 0.5, focusY: 0.35, zoom: 7 }, { index: 9, role: "inset", focusX: 0.5, focusY: 0.5, zoom: 1 }], palette: { accent: "#ffd23f", text: "#ffffff", stroke: "#000000", glow: "#ff7a1a", bgFrom: "#1b1446", bgTo: "not-a-colour" }, backgroundQuery: "city night <b>lights</b>", emoji: "🌙", arrow: true, why: "Price plus a question makes people click." },
-  comments: { mood: { positive: 3, neutral: 1, negative: 1 }, themes: [{ theme: "Battery", share: 250, example: "battery?" }], questions: ["mic?"], videoIdeas: ["part 2"], replies: [{ to: "Mohit", reply: "Thanks!" }] },
+  thumbnail: { headline: "रात में कौन जीता?", highlight: "जीता?", badge: "₹20K TEST", layout: "subject-right", images: [{ index: 0, role: "subject", focusX: 0.5, focusY: 0.35, zoom: 7 }, { index: 9, role: "inset", focusX: 0.5, focusY: 0.5, zoom: 1 }], palette: { accent: "#ffd23f", text: "#ffffff", stroke: "#000000", glow: "#ff7a1a", bgFrom: "#1b1446", bgTo: "not-a-colour" }, backgroundQuery: "city night <b>lights</b>", imagePrompt: "Rainy <city> street at night", emoji: "🌙", arrow: true, why: "Price plus a question makes people click." },
+  comments: { mood: { positive: 3, neutral: 1, negative: 1 }, emotions: [{ emotion: "joy", share: 2 }, { emotion: "anger", share: 2 }], themes: [{ theme: "Battery", share: 250, example: "battery?" }], questions: ["mic?"], videoIdeas: ["part 2"], replies: [{ to: "Mohit", reply: "Thanks!" }] },
 };
 
 function featureOf(body) {
   const props = Object.keys(body.output_config?.format?.schema?.properties ?? {});
   if (props.includes("verdict")) return "doctor";
   if (props.includes("headline")) return "thumbnail";
+  if (props.includes("regional")) return "trends";
+  if (props.includes("persona")) return "audience";
   if (props.includes("hook")) return "titles";
   if (props.includes("mood")) return "comments";
   return "chat";

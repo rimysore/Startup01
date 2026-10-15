@@ -25,6 +25,7 @@ export function defaultDesign(text: string): ThumbnailDesign {
     images: [],
     palette: STYLES[0].palette,
     backgroundQuery: "",
+    imagePrompt: "",
     emoji: "",
     arrow: false,
     why: "",
@@ -424,6 +425,17 @@ export function ThumbnailMaker({
             />
           </label>
         </div>
+        {design.imagePrompt && (
+          <label className="block text-xs font-medium text-muted">
+            Background idea (for the AI image)
+            <textarea
+              value={design.imagePrompt}
+              onChange={(e) => onDesignChange({ ...design, imagePrompt: e.target.value.slice(0, 400) })}
+              rows={3}
+              className="mt-1 w-full rounded-xl border border-line bg-surface px-3 py-2 text-xs text-ink outline-none focus:border-accent"
+            />
+          </label>
+        )}
         <div>
           <p className="text-xs font-medium text-muted">Colours</p>
           <div className="mt-1 flex gap-2">

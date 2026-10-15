@@ -311,3 +311,107 @@ export async function fetchComments(tokens: GoogleTokens, videoId: string): Prom
     return { id: t.id, author: s.authorDisplayName, text: s.textOriginal, likes: s.likeCount, publishedAt: s.publishedAt.slice(0, 10) };
   });
 }
+
+// ---- Audience: where viewers are, how they find the channel, who they are ----------------------------
+
+export interface AudienceReport {
+  days: number;
+  countries: { country: string; views: number; minutes: number }[];
+  cities: { city: string; country: string; views: number; minutes: number }[];
+  sources: { source: string; views: number; minutes: number }[];
+  searchTerms: { term: string; views: number }[];
+  demographics: { ageGroup: string; gender: string; percent: number }[];
+  subscribed: { status: string; views: number }[];
+}
+
+/**
+ * Channel-wide (or, with `videoId`, one video's) audience for the last `days` days. Each part is fetched
+ * separately and left empty if YouTube has no data yet (new channels, small videos), so one gap never
+ * hides the rest. City data exists from 2022 on; search terms only for views from YouTube search.
+ */
+export async function fetchAudience(tokens: GoogleTokens, { days = 28, videoId }: { days?: number; videoId?: string } = {}): Promise<AudienceReport> {
+  const end = new Date();
+  const range = { startDate: ymd(new Date(end.getTime() - (days - 1) * 86_400_000)), endDate: ymd(end) };
+  const video: Record<string, string> = videoId ? { filters: `video==${videoId}` } : {};
+  const withFilter = (extra: string) => ({ filters: [videoId ? `video==${videoId}` : "", extra].filter(Boolean).join(";") });
+  const rows = async (params: Record<string, string>) => {
+    try {
+      return (await report(tokens, { ...range, ...params })).rows ?? [];
+    } catch (err) {
+      console.error(`Audience report failed (${params.dimensions})`, err instanceof Error ? err.message.slice(0, 300) : err);
+      return [];
+    }
+  };
+  const [countries, cities, sources, searchTerms, demographics, subscribed] = await Promise.all([
+    rows({ dimensions: "country", metrics: "views,estimatedMinutesWatched", sort: "-views", maxResults: "10", ...video }),
+    rows({ dimensions: "city,country", metrics: "views,estimatedMinutesWatched", sort: "-views", maxResults: "15", ...video }),
+    rows({ dimensions: "insightTrafficSourceType", metrics: "views,estimatedMinutesWatched", sort: "-views", ...video }),
+    rows({ dimensions: "insightTrafficSourceDetail", metrics: "views", sort: "-views", maxResults: "15", ...withFilter("insightTrafficSourceType==YT_SEARCH") }),
+    rows({ dimensions: "ageGroup,gender", metrics: "viewerPercentage", ...video }),
+    rows({ dimensions: "subscribedStatus", metrics: "views", ...video }),
+  ]);
+  return {
+    days,
+    countries: countries.map(([c, v, m]) => ({ country: String(c), views: Number(v), minutes: Number(m) })),
+    cities: cities.map(([city, c, v, m]) => ({ city: String(city), country: String(c), views: Number(v), minutes: Number(m) })),
+    sources: sources.map(([s, v, m]) => ({ source: String(s), views: Number(v), minutes: Number(m) })),
+    searchTerms: searchTerms.map(([t, v]) => ({ term: String(t), views: Number(v) })),
+    demographics: demographics.map(([a, g, p]) => ({ ageGroup: String(a), gender: String(g), percent: Number(p) })),
+    subscribed: subscribed.map(([s, v]) => ({ status: String(s), views: Number(v) })),
+  };
+}
+
+// ---- Trending in a country -------------------------------------------------------------------------
+
+export interface TrendingVideo {
+  id: string;
+  title: string;
+  channelTitle: string;
+  categoryId: string;
+  language: string | null;
+  publishedAt: string;
+  durationSec: number;
+  views: number;
+  likes: number;
+  comments: number;
+  tags: string[];
+  thumbnail: string | null;
+}
+
+/** YouTube's "Trending" chart for a country (1 quota unit per 50 videos). Region is country-level only. */
+export async function fetchTrending(tokens: GoogleTokens, regionCode = "IN", pages = 2): Promise<TrendingVideo[]> {
+  type Res = {
+    nextPageToken?: string;
+    items?: Array<{
+      id: string;
+      snippet: { title: string; channelTitle: string; categoryId: string; defaultAudioLanguage?: string; defaultLanguage?: string; publishedAt: string; tags?: string[]; thumbnails?: { medium?: { url: string } } };
+      statistics: { viewCount?: string; likeCount?: string; commentCount?: string };
+      contentDetails: { duration: string };
+    }>;
+  };
+  const out: TrendingVideo[] = [];
+  let pageToken = "";
+  for (let i = 0; i < pages; i++) {
+    const q = new URLSearchParams({ part: "snippet,statistics,contentDetails", chart: "mostPopular", regionCode, maxResults: "50", ...(pageToken ? { pageToken } : {}) });
+    const res = await api<Res>(tokens, `${DATA}/videos?${q}`);
+    for (const v of res.items ?? []) {
+      out.push({
+        id: v.id,
+        title: v.snippet.title,
+        channelTitle: v.snippet.channelTitle,
+        categoryId: v.snippet.categoryId,
+        language: v.snippet.defaultAudioLanguage ?? v.snippet.defaultLanguage ?? null,
+        publishedAt: v.snippet.publishedAt,
+        durationSec: parseDuration(v.contentDetails.duration),
+        views: Number(v.statistics.viewCount ?? 0),
+        likes: Number(v.statistics.likeCount ?? 0),
+        comments: Number(v.statistics.commentCount ?? 0),
+        tags: (v.snippet.tags ?? []).slice(0, 8),
+        thumbnail: v.snippet.thumbnails?.medium?.url ?? null,
+      });
+    }
+    if (!res.nextPageToken) break;
+    pageToken = res.nextPageToken;
+  }
+  return out;
+}

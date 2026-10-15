@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
+import { EmotionBars } from "@/components/insights";
 import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, PageHeader, Select, Spinner } from "@/components/ui";
 import type { CommentInsights } from "@/lib/ai";
 import type { Comment } from "@/lib/types";
@@ -137,6 +138,12 @@ export default function CommentsPage() {
               <Card>
                 <h3 className="mb-3 font-semibold">Mood</h3>
                 <MoodBar mood={result.data.mood} />
+                {result.data.emotions?.length > 0 && (
+                  <>
+                    <h3 className="mb-3 mt-6 font-semibold">Emotions</h3>
+                    <EmotionBars emotions={result.data.emotions} />
+                  </>
+                )}
               </Card>
               <Card>
                 <h3 className="mb-4 font-semibold">Themes</h3>

@@ -11,7 +11,7 @@ import { languageLabel } from "@/lib/languages";
 const TONES = ["Energetic", "Honest & trustworthy", "Funny", "Educational", "Dramatic"];
 
 export default function StudioPage() {
-  const { summary, language, refreshMe } = useDashboard();
+  const { summary, language, refreshMe, me } = useDashboard();
   const prefill = useQueryParam("topic");
   const [typed, setTopic] = useState<string | null>(null);
   const topic = typed ?? prefill ?? "";
@@ -21,23 +21,52 @@ export default function StudioPage() {
   const [running, setRunning] = useState(false);
   const [design, setDesign] = useState<ThumbnailDesign>(() => defaultDesign("कौन जीता?"));
   const [photos, setPhotos] = useState<Photo[]>([]);
-  const [background, setBackground] = useState<{ img: HTMLImageElement; credit: string | null; query: string; n: number; count: number } | null>(null);
+  const [background, setBackground] = useState<{ img: HTMLImageElement; credit: string | null; query: string; n: number; count: number; ai: boolean } | null>(null);
   const [designing, setDesigning] = useState(false);
+  const [painting, setPainting] = useState(false);
   const [designNote, setDesignNote] = useState<{ demo?: boolean; demoReason?: "signin" | "nokey"; error?: AiError } | null>(null);
   const setThumbText = (t: string) => setDesign((d) => ({ ...d, headline: t }));
+
+  function showImage(res: Response, extra: { query: string; n: number; count: number; ai: boolean }) {
+    return res.blob().then(
+      (blob) =>
+        new Promise<void>((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const credit = res.headers.get("X-Photo-Credit");
+            setBackground({ img, credit: credit && decodeURIComponent(credit), ...extra });
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = URL.createObjectURL(blob);
+        }),
+    );
+  }
 
   /** Fetches a stock photo for the AI's search words. Quietly keeps the drawn background if none is available. */
   async function loadBackground(query: string, n: number) {
     if (!query) return setBackground(null);
     const res = await fetch(`/api/thumbnail/background?${new URLSearchParams({ q: query, n: String(n) })}`).catch(() => null);
     if (!res?.ok) return setBackground(null);
-    const url = URL.createObjectURL(await res.blob());
-    const img = new Image();
-    img.onload = () => {
-      const credit = res.headers.get("X-Photo-Credit");
-      setBackground({ img, credit: credit && decodeURIComponent(credit), query, n, count: Number(res.headers.get("X-Photo-Count")) || 1 });
-    };
-    img.src = url;
+    await showImage(res, { query, n, count: Number(res.headers.get("X-Photo-Count")) || 1, ai: false });
+  }
+
+  /** Paints a new background with the image model (1 credit). */
+  async function paintBackground(prompt: string) {
+    if (!prompt.trim()) return;
+    setPainting(true);
+    const res = await fetch("/api/thumbnail/background", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt }),
+    }).catch(() => null);
+    if (res?.ok) await showImage(res, { query: prompt, n: 0, count: 1, ai: true });
+    else {
+      const body = (await res?.json().catch(() => null)) as { error?: string; upgrade?: boolean } | null;
+      setDesignNote({ error: { message: body?.error ?? "Couldn't make a background right now.", upgrade: body?.upgrade } });
+    }
+    setPainting(false);
+    refreshMe();
   }
 
   async function designWithMitra() {
@@ -57,7 +86,9 @@ export default function StudioPage() {
     setDesignNote({ demo: res.demo, demoReason: res.demoReason });
     // A stock photo only when the creator's own photos don't already fill the background.
     const ownBackground = d.images.some((im) => im.role === "background") || (d.layout === "full-bleed" && photos.length > 0) || (d.layout === "split" && photos.length > 1);
-    await loadBackground(ownBackground || res.demo ? "" : d.backgroundQuery, 0);
+    if (ownBackground || res.demo) setBackground(null);
+    else if (me?.config.images) await paintBackground(d.imagePrompt || d.backgroundQuery);
+    else await loadBackground(d.backgroundQuery, 0);
   }
 
   async function generate() {
@@ -158,7 +189,12 @@ export default function StudioPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            {background && background.count > 1 && (
+            {me?.config.images && design.imagePrompt && (
+              <Button variant="ghost" onClick={() => paintBackground(design.imagePrompt)} disabled={painting}>
+                {painting ? "Painting…" : `New AI background · ${FEATURE_CREDITS.image} credit`}
+              </Button>
+            )}
+            {background && !background.ai && background.count > 1 && (
               <Button variant="ghost" onClick={() => loadBackground(background.query, (background.n + 1) % background.count)}>
                 Another background
               </Button>

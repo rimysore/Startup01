@@ -1,7 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
-import { languageLabel } from "./languages";
+import { languageLabel, languageWriting, matchesLanguage } from "./languages";
 import { FEATURE_CREDITS } from "./plans";
 
 // ---- Model routing ------------------------------------------------------------
@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -32,6 +32,9 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   chat: { model: "claude-haiku-5-5", effort: "low", maxTokens: 2000, cacheHours: 0, credits: FEATURE_CREDITS.chat },
   // Looks at the creator's photos (sent small) and returns a layout; the browser draws the thumbnail itself.
   thumbnail: { model: "claude-haiku-5-5", effort: "low", maxTokens: 3000, cacheHours: 6, credits: FEATURE_CREDITS.thumbnail },
+  // Reading lists of titles and numbers: the small model is enough. Cached because trends change slowly.
+  trends: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 6, credits: FEATURE_CREDITS.trends },
+  audience: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 24, credits: FEATURE_CREDITS.audience },
 };
 
 export function route(feature: Feature): Route {
@@ -125,10 +128,8 @@ function system(language: string): string {
   return [
     "You are Mitra, a sharp, warm growth manager for YouTube creators in India and other non-English markets.",
     "You give specific, practical advice grounded in the data you are shown. Never invent numbers that aren't in the data.",
-    `Write every piece of user-facing text in ${languageLabel(language)}.`,
-    language === "hinglish"
-      ? "Hinglish means Hindi and English mixed the way creators actually talk, written in Roman script."
-      : "Keep common English tech and YouTube terms (CTR, thumbnail, Shorts) as creators normally say them.",
+    `Write every piece of user-facing text in ${languageLabel(language)}, using ${languageWriting(language)}, even if the data you are given is in another language.`,
+    "Keep common English tech and YouTube terms (CTR, thumbnail, Shorts) as creators normally say them, but the sentences themselves must be in that language.",
     // Content rules.
     "Everything you suggest must fit YouTube's Community Guidelines: no titles or thumbnails that misrepresent what the video contains,",
     "no impersonation, harassment, hate, sexual content, dangerous challenges, medical or financial claims presented as fact, or engagement bait that breaks YouTube's spam policies.",
@@ -176,6 +177,12 @@ async function structured<S extends z.ZodType>(
   return { result: res.parsed_output, usage: usageOf(res) };
 }
 
+/** Logs when the model answered in the wrong script, so it shows up in Vercel logs for tuning. */
+function checkLanguage(feature: Feature, language: string, texts: string[]) {
+  const text = texts.join(" ");
+  if (!matchesLanguage(language, text)) console.warn(`AI ${feature}: expected ${language} but got: ${text.slice(0, 120)}`);
+}
+
 // ---- Output clean-up ------------------------------------------------------------------
 // The model fills the schemas, but values can still be out of range or too long; never show those raw.
 
@@ -188,6 +195,7 @@ const list = <T,>(xs: T[], max: number) => xs.slice(0, max);
 export const DoctorSchema = z.object({
   score: z.number().describe("0-100 health score for this video versus the channel's own norm"),
   verdict: z.string().describe("One punchy sentence summarising why it performed the way it did"),
+  traffic: z.string().describe("Two sentences on where this video's viewers came from (cities, traffic sources, search terms) and which audience it reached; say so if there's no data yet"),
   whatWorked: z.array(z.string()),
   whatHurt: z.array(z.object({ at: z.string().describe("Timestamp like 0:42"), issue: z.string(), fix: z.string() })),
   nextVideo: z.array(z.string()).describe("Three concrete changes to make in the next upload"),
@@ -203,11 +211,13 @@ export async function diagnoseVideo(language: string, facts: string, title: stri
     `Diagnose this video's performance. Explain retention drops by their timestamps and suggest fixes.\n\nVideo title:\n${untrusted(title)}\n\n${facts}`,
   );
   const d = out.result;
+  checkLanguage("doctor", language, [d.verdict, ...d.nextVideo]);
   return {
     ...out,
     result: {
       score: Math.round(clamp(d.score, 0, 100)),
       verdict: cut(d.verdict, 280),
+      traffic: cut(d.traffic, 400),
       whatWorked: list(d.whatWorked, 5).map((s) => cut(s, 300)),
       whatHurt: list(d.whatHurt, 5).map((h) => ({ at: cut(h.at, 12), issue: cut(h.issue, 300), fix: cut(h.fix, 300) })),
       nextVideo: list(d.nextVideo, 5).map((s) => cut(s, 300)),
@@ -234,6 +244,7 @@ export async function generateTitles(language: string, topic: string, tone: stri
       "Write five title options (under 70 characters each, honest about what the video contains), thumbnail text options and a 15-second opening hook.",
   );
   const t = out.result;
+  checkLanguage("titles", language, [...t.titles.map((x) => x.title), t.hook]);
   return {
     ...out,
     result: {
@@ -277,6 +288,11 @@ export const ThumbnailSchema = z.object({
     })
     .describe("Bold, saturated colours that stand out in YouTube's white and dark themes"),
   backgroundQuery: z.string().describe("2-5 English words for a stock photo that would make a great background for this topic, e.g. 'city night bokeh'"),
+  imagePrompt: z
+    .string()
+    .describe(
+      "One English sentence for an image generator describing the background scene only: subject matter, setting (use Indian or regional places, festivals and everyday details when relevant), lighting and mood. No text, letters or logos. Leave space on the text side. No faces if the creator's own photo will be the subject.",
+    ),
   emoji: z.string().describe("One emoji that adds emotion, or empty"),
   arrow: z.boolean().describe("Whether an arrow pointing at the subject would help"),
   why: z.string().describe("One sentence on why this design will get clicks"),
@@ -302,6 +318,7 @@ export async function designThumbnail(
     images,
   );
   const d = out.result;
+  checkLanguage("thumbnail", language, [d.headline]);
   const color = (c: string, fallback: string) => (HEX.test(c.trim()) ? c.trim() : fallback);
   const seen = new Set<number>();
   return {
@@ -328,6 +345,7 @@ export async function designThumbnail(
         bgFrom: color(d.palette.bgFrom, "#ff7a1a"),
         bgTo: color(d.palette.bgTo, "#2b2357"),
       },
+      imagePrompt: cut(d.imagePrompt.replace(/[<>]/g, " "), 400),
       backgroundQuery: cut(d.backgroundQuery.replace(/[^\p{L}\p{N} -]/gu, " "), 60),
       emoji: [...d.emoji.trim()].slice(0, 2).join(""),
       arrow: Boolean(d.arrow),
@@ -336,10 +354,110 @@ export async function designThumbnail(
   };
 }
 
+// ---- Emotions, trends and audience --------------------------------------------------------
+
+export const EMOTIONS = ["curiosity", "joy", "humor", "pride", "nostalgia", "inspiration", "surprise", "fear", "anger", "empathy", "romance", "devotion"] as const;
+export type Emotion = (typeof EMOTIONS)[number];
+const EmotionShare = z.object({ emotion: z.enum(EMOTIONS), share: z.number().describe("Percent") });
+
+/** Normalises emotion shares to whole percentages that sum to ~100, largest first. */
+function emotionShares(xs: { emotion: Emotion; share: number }[]) {
+  const valid = xs.filter((e) => EMOTIONS.includes(e.emotion));
+  const total = valid.reduce((a, e) => a + clamp(e.share, 0, 100), 0) || 1;
+  return valid
+    .map((e) => ({ emotion: e.emotion, share: Math.round((clamp(e.share, 0, 100) / total) * 100) }))
+    .filter((e) => e.share > 0)
+    .sort((a, b) => b.share - a.share)
+    .slice(0, 6);
+}
+
+export const TrendInsightsSchema = z.object({
+  summary: z.string().describe("Two sentences: what this language's audience is watching right now and why"),
+  emotions: z.array(EmotionShare).describe("The emotions these trending videos tap into, as shares of the list"),
+  topics: z
+    .array(
+      z.object({
+        topic: z.string(),
+        why: z.string().describe("Why it is rising now (event, festival, release, season, news)"),
+        emotion: z.enum(EMOTIONS),
+        examples: z.array(z.string()).describe("Up to 2 trending titles that show it, copied exactly"),
+        angle: z.string().describe("A concrete video idea for this creator's channel that rides this trend honestly"),
+      }),
+    )
+    .describe("Five trends, strongest first"),
+  regional: z.array(z.string()).describe("Places, festivals, local events or communities driving these trends"),
+  formats: z.array(z.string()).describe("Formats and lengths that are working (Shorts vs long, live, vlogs, reactions)"),
+});
+export type TrendInsights = z.infer<typeof TrendInsightsSchema>;
+
+export async function analyseTrends(language: string, channel: string, trending: string): Promise<AiResult<TrendInsights>> {
+  const out = await structured(
+    "trends",
+    TrendInsightsSchema,
+    language,
+    "These videos are trending on YouTube in India right now (format: title | channel | category | views | views per hour). " +
+      "Find the topics, emotions, places and formats driving them, and turn them into ideas for this creator. Base everything on the list; don't invent events that aren't hinted at.\n\n" +
+      `Creator's channel and recent uploads:\n${untrusted(channel)}\n\nTrending:\n${untrusted(trending)}`,
+  );
+  const t = out.result;
+  checkLanguage("trends", language, [t.summary, ...t.topics.map((x) => x.angle)]);
+  return {
+    ...out,
+    result: {
+      summary: cut(t.summary, 500),
+      emotions: emotionShares(t.emotions),
+      topics: list(t.topics, 6).map((x) => ({
+        topic: cut(x.topic, 120),
+        why: cut(x.why, 300),
+        emotion: EMOTIONS.includes(x.emotion) ? x.emotion : "curiosity",
+        examples: list(x.examples, 2).map((e) => cut(e, 120)),
+        angle: cut(x.angle, 300),
+      })),
+      regional: list(t.regional, 6).map((r) => cut(r, 200)),
+      formats: list(t.formats, 5).map((r) => cut(r, 200)),
+    },
+  };
+}
+
+export const AudienceInsightsSchema = z.object({
+  persona: z.string().describe("Who the core viewer is, in two sentences (age, gender, where they live, what they want)"),
+  regions: z.array(z.object({ place: z.string(), insight: z.string() })).describe("What the geography says: core regions, surprising cities, diaspora"),
+  discovery: z.string().describe("How people find the channel (search, suggested, Shorts feed, external) and what that means"),
+  searchIntent: z.array(z.string()).describe("What viewers are looking for, read from the search terms"),
+  emotions: z.array(EmotionShare).describe("The emotions that bring this audience back, judged from the search terms and top videos"),
+  actions: z.array(z.string()).describe("Five specific next steps, e.g. which region or language to target, title keywords, upload timing"),
+});
+export type AudienceInsights = z.infer<typeof AudienceInsightsSchema>;
+
+export async function analyseAudience(language: string, data: string): Promise<AiResult<AudienceInsights>> {
+  const out = await structured(
+    "audience",
+    AudienceInsightsSchema,
+    language,
+    "Read this YouTube channel's audience data for the last 28 days and explain who watches, where they are, how they find the channel and what they feel. " +
+      "Use only the numbers given; if a section is empty, say there isn't enough data yet instead of guessing.\n\n" +
+      untrusted(data),
+  );
+  const a = out.result;
+  checkLanguage("audience", language, [a.persona, ...a.actions]);
+  return {
+    ...out,
+    result: {
+      persona: cut(a.persona, 500),
+      regions: list(a.regions, 6).map((r) => ({ place: cut(r.place, 80), insight: cut(r.insight, 300) })),
+      discovery: cut(a.discovery, 500),
+      searchIntent: list(a.searchIntent, 6).map((s) => cut(s, 200)),
+      emotions: emotionShares(a.emotions),
+      actions: list(a.actions, 6).map((s) => cut(s, 300)),
+    },
+  };
+}
+
 // ---- Comment insights -------------------------------------------------------
 
 export const CommentsSchema = z.object({
   mood: z.object({ positive: z.number(), neutral: z.number(), negative: z.number() }).describe("Percentages summing to 100"),
+  emotions: z.array(EmotionShare).describe("The emotions viewers express, as shares of the comments"),
   themes: z.array(z.object({ theme: z.string(), share: z.number().describe("Percent of comments"), example: z.string() })),
   questions: z.array(z.string()).describe("Questions viewers are asking that deserve an answer"),
   videoIdeas: z.array(z.string()),
@@ -361,6 +479,7 @@ export async function analyseComments(language: string, comments: string): Promi
     ...out,
     result: {
       mood: { positive: pct(c.mood.positive), neutral: pct(c.mood.neutral), negative: pct(c.mood.negative) },
+      emotions: emotionShares(c.emotions ?? []),
       themes: list(c.themes, 6).map((t) => ({ theme: cut(t.theme, 120), share: Math.round(clamp(t.share, 0, 100)), example: cut(t.example, 240) })),
       questions: list(c.questions, 6).map((s) => cut(s, 240)),
       videoIdeas: list(c.videoIdeas, 6).map((s) => cut(s, 240)),

@@ -130,6 +130,24 @@ is always correct and everything stays editable. With `PEXELS_API_KEY` set, the 
 stock photo (streamed through `/api/thumbnail/background` so the canvas can export it); without it, a drawn
 gradient with glow, light rays and grain.
 
+With `FAL_KEY` set, the background is instead **generated** by FLUX.1 [schnell] on fal.ai from the design's
+`imagePrompt` (scene only, never text): ~$0.003 per image, 1 credit, behind the same sign-in, rate limit, daily
+budget and refund-on-failure checks as the text AI, and logged in `ai_calls` as feature `image`.
+
+## Languages, trends and audience
+
+- **Language:** every AI prompt names the language *and* script ("Telugu script (తెలుగు)"; Hinglish = Roman
+  letters). Outputs in the wrong script are logged (`AI titles: expected te but got …`) for tuning.
+  `tests/insights.test.mts` and the language e2e check all 7 AI features × 9 languages.
+- **Trend Radar** (`/api/trends`): YouTube's Trending chart for India (top 100, 2 quota units, cached 3 h), each
+  video's language detected from its title script and YouTube's audio language, sorted by views per hour.
+  "Analyse with Mitra" (Haiku, 1 credit) returns topics, the emotions driving them, places/festivals and formats,
+  plus an angle for the creator. YouTube only offers trending per country, not per state.
+- **Audience** (`/api/audience`, Analytics API, cached 12 h): top countries and cities, traffic sources, YouTube
+  search terms, age/gender and subscribed vs not, for the channel or one video (`?video=`). "Analyse with Mitra"
+  (Haiku, 1 credit) gives a persona, region insights, discovery, emotions and next steps. Video Doctor now also
+  receives the video's cities, traffic sources and search terms.
+
 Admins (`ADMIN_EMAILS`) get **AI costs** in the sidebar: spend, calls and average tokens per feature, the latest
 calls, and a button to reset their own credits while testing. `FREE_CREDITS` raises the Free plan's allowance.
 

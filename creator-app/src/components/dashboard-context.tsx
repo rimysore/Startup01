@@ -17,7 +17,7 @@ export interface Me {
   /** In ADMIN_EMAILS: can see AI costs and reset their own credits. */
   admin?: boolean;
   youtube?: { channelTitle: string | null; needsReconnect?: boolean } | null;
-  config: { google: boolean; ai: boolean; billing: boolean; devLogin: boolean; simulateBilling: boolean };
+  config: { google: boolean; ai: boolean; billing: boolean; devLogin: boolean; simulateBilling: boolean; images?: boolean; stockPhotos?: boolean };
 }
 
 interface DashboardState {

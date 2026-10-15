@@ -4,6 +4,7 @@ import { liveSubscription, simulateBillingEnabled } from "@/lib/billing";
 import { creditLimit, planOf } from "@/lib/plans";
 import { razorpayConfigured } from "@/lib/razorpay";
 import { creditsUsed, monthKey } from "@/lib/usage";
+import { imageGenerationConfigured } from "@/lib/images";
 import { googleConfigured, youtubeConnection } from "@/lib/youtube";
 
 export async function GET() {
@@ -13,6 +14,8 @@ export async function GET() {
     billing: razorpayConfigured(),
     devLogin: devLoginEnabled(),
     simulateBilling: simulateBillingEnabled(),
+    images: imageGenerationConfigured(),
+    stockPhotos: Boolean(process.env.PEXELS_API_KEY),
   };
   const user = await currentUser();
   if (!user) return Response.json({ user: null, config });

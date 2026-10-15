@@ -33,7 +33,7 @@ export async function overDailyBudget(): Promise<boolean> {
   return over;
 }
 
-export async function logCall(userId: string, feature: Feature, usage: Usage, latencyMs: number): Promise<void> {
+export async function logCall(userId: string, feature: Feature | "image", usage: Usage, latencyMs: number): Promise<void> {
   await (await db()).insert(schema.aiCalls).values({ userId, feature, latencyMs, ...usage });
 }
 
