@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx tests/billing.test.mts",
+    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {

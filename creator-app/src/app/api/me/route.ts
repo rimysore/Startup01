@@ -24,7 +24,7 @@ export async function GET() {
     plan: { id: plan.id, name: plan.name, renewsAt: user.planRenewsAt },
     subscription: sub ? { status: sub.status, cancelAtCycleEnd: Boolean(sub.cancelAtCycleEnd), currentEnd: sub.currentEnd } : null,
     usage: { month: monthKey(), used, limit: plan.credits },
-    youtube: yt ? { channelTitle: yt.channelTitle } : null,
+    youtube: yt ? { channelTitle: yt.channelTitle, needsReconnect: Boolean(yt.needsReconnectAt) } : null,
     config,
   });
 }

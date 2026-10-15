@@ -1,14 +1,15 @@
 import { currentUser } from "@/lib/auth";
 import { demoSummary } from "@/lib/demo";
-import { memo } from "@/lib/memo";
-import { fetchSummary, youtubeTokens } from "@/lib/youtube";
+import { fetchSummary } from "@/lib/youtube";
+import { FRESH_MS, loadYouTube, RECONNECT_MESSAGE, staleNote } from "@/lib/youtube-data";
 
 export async function GET() {
   const user = await currentUser();
-  const tokens = user ? await youtubeTokens(user.id).catch(() => null) : null;
-  if (!tokens) return Response.json(demoSummary());
   try {
-    return Response.json(await memo(`${user!.id}:summary`, 10 * 60_000, () => fetchSummary(tokens)));
+    const r = await loadYouTube(user?.id, "summary", FRESH_MS.summary, fetchSummary);
+    if (r.kind === "demo") return Response.json(demoSummary());
+    if (r.kind === "reconnect") return Response.json({ ...demoSummary(), error: RECONNECT_MESSAGE });
+    return Response.json(r.stale ? { ...r.value, error: staleNote(r.fetchedAt) } : r.value);
   } catch (err) {
     console.error(err);
     return Response.json({ ...demoSummary(), error: "Couldn't load your channel, showing demo data." });

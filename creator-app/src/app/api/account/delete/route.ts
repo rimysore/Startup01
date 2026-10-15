@@ -39,7 +39,7 @@ export async function POST(request: Request) {
 
   // Sessions, YouTube tokens, subscriptions records and usage are removed by ON DELETE CASCADE.
   await d.delete(schema.users).where(eq(schema.users.id, user.id));
-  forgetUser(user.id);
+  await forgetUser(user.id);
   await endSession();
   return Response.json({ ok: true });
 }

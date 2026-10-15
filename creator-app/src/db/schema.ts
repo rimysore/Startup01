@@ -31,6 +31,8 @@ export const youtubeConnections = pgTable("youtube_connections", {
   accessToken: text("access_token").notNull(),
   refreshToken: text("refresh_token"),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  /** Set when Google rejects the refresh token (user revoked access, or it expired). Cleared on reconnect. */
+  needsReconnectAt: timestamp("needs_reconnect_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -100,4 +102,25 @@ export const aiCache = pgTable(
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (t) => [index("ai_cache_expires").on(t.expiresAt)],
+);
+
+/**
+ * Recent YouTube API responses, encrypted, shared by every server instance. Saves YouTube quota and lets us show
+ * the last good data when YouTube is down or our quota is used up. Deleted with the user or on disconnect.
+ */
+export const youtubeCache = pgTable(
+  "youtube_cache",
+  {
+    key: text("key").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** AES-256-GCM encrypted JSON. */
+    value: text("value").notNull(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull(),
+    /** Fresh until this time; after it we refetch, but keep the row as a fallback until keepUntil. */
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    keepUntil: timestamp("keep_until", { withTimezone: true }).notNull(),
+  },
+  (t) => [index("youtube_cache_user").on(t.userId), index("youtube_cache_keep").on(t.keepUntil)],
 );

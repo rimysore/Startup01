@@ -114,11 +114,31 @@ Real usage mixes features and repeats (cache hits are free), so typical cost is 
 (video titles, comments, channel data) is wrapped in `<untrusted>` tags the model is told never to obey; chat is
 limited to creator topics; Sonnet requests use Anthropic's server-side refusal fallback.
 
+**Comment clean-up before AI** (`src/lib/comment-filter.ts`, plain code, free): link/phone spam and duplicates
+dropped, emoji and one-word reactions folded into one count line, the 40 most-liked comments kept, each trimmed
+to 300 chars. About a third fewer input tokens on a typical batch of 60.
+
 `tests/ai-pipeline.e2e.py` checks all of this against a local mock of the Anthropic API (`tests/mock-anthropic.mjs`).
+
+## YouTube quota and caching
+
+Google gives a project 10,000 YouTube Data API units a day. Mitra uses only 1-unit calls (no `search.list`, which
+costs 100): a dashboard load is 3 units plus 2 Analytics API calls (separate quota), comments are 1 unit.
+
+`src/lib/memo.ts` caches every YouTube response in two levels: server memory, then Postgres (encrypted, shared by
+all instances). Fresh for 1 h (channel summary), 6 h (comments) and 24 h (retention; YouTube Analytics only
+updates about daily). Requests arriving together share one call. If YouTube fails or the quota runs out, the last
+good copy (up to 7 days old) is shown with a notice instead of demo data. On a cache hit no token is decrypted
+or refreshed.
+
+Tokens refresh 5 minutes before expiry, with concurrent requests sharing one refresh. If Google answers
+`invalid_grant` (the user revoked access), the connection is flagged, Google is not called again, and
+Connections shows **Reconnect YouTube**.
 
 ## Tests
 
-`npm test` runs the credit-limit and plan-entitlement tests against an in-memory database. See the AI section above for the end-to-end pipeline test.
+`npm test` runs the credit-limit, plan-entitlement, YouTube cache, token-refresh and comment-filter tests against
+an in-memory database. See the AI section above for the end-to-end pipeline test.
 
 ## Architecture
 

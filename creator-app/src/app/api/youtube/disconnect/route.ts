@@ -6,6 +6,6 @@ export async function POST() {
   const user = await currentUser();
   if (!user) return unauthorized();
   await removeYouTubeConnection(user.id);
-  forgetUser(user.id);
+  await forgetUser(user.id);
   return Response.json({ ok: true });
 }

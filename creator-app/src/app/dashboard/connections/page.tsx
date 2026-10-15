@@ -59,6 +59,14 @@ export default function ConnectionsPage() {
               <Link href="/login?next=/dashboard/connections" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
                 Sign in to connect
               </Link>
+            ) : me.youtube?.needsReconnect ? (
+              <>
+                <StatusPill on={false} label={`Access expired · ${me.youtube.channelTitle ?? "your channel"}`} />
+                <a href="/api/auth/youtube/start" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+                  Reconnect YouTube
+                </a>
+                <Button variant="ghost" onClick={disconnect} disabled={busy}>Disconnect</Button>
+              </>
             ) : me.youtube ? (
               <>
                 <StatusPill on label={`Connected · ${me.youtube.channelTitle ?? "your channel"}`} />

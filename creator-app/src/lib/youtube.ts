@@ -43,6 +43,13 @@ export function authUrl(origin: string, state: string, scopes: string[], loginHi
   return `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
 }
 
+/** `revoked` means Google will never accept this refresh token again: the user must reconnect. */
+export class GoogleTokenError extends Error {
+  constructor(readonly status: number, readonly revoked: boolean, message: string) {
+    super(message);
+  }
+}
+
 async function tokenRequest(body: Record<string, string>): Promise<GoogleTokens> {
   const res = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST",
@@ -53,7 +60,10 @@ async function tokenRequest(body: Record<string, string>): Promise<GoogleTokens>
       ...body,
     }),
   });
-  if (!res.ok) throw new Error(`Google token request failed: ${res.status} ${await res.text()}`);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new GoogleTokenError(res.status, /invalid_grant/.test(text), `Google token request failed: ${res.status} ${text}`);
+  }
   const json = (await res.json()) as { access_token: string; refresh_token?: string; expires_in: number };
   return {
     accessToken: json.access_token,
@@ -82,6 +92,7 @@ export async function saveYouTubeConnection(userId: string, tokens: GoogleTokens
     accessToken: encrypt(tokens.accessToken),
     refreshToken: tokens.refreshToken ? encrypt(tokens.refreshToken) : null,
     expiresAt: new Date(tokens.expiresAt),
+    needsReconnectAt: null,
     updatedAt: new Date(),
     ...(channel ? { channelId: channel.id, channelTitle: channel.title } : {}),
   };
@@ -100,19 +111,47 @@ export async function youtubeConnection(userId: string) {
   return row ?? null;
 }
 
-/** Usable tokens for the user's connected channel, refreshed (and re-saved) when close to expiry. */
+const refreshing = new Map<string, Promise<GoogleTokens | null>>();
+
+/**
+ * Usable tokens for the user's connected channel, refreshed (and re-saved) when within 5 minutes of expiry.
+ * Concurrent requests share one refresh. If Google says the refresh token is revoked, the connection is flagged
+ * so the dashboard can ask the user to reconnect, and we stop retrying.
+ */
 export async function youtubeTokens(userId: string): Promise<GoogleTokens | null> {
   const row = await youtubeConnection(userId);
-  if (!row) return null;
+  if (!row || row.needsReconnectAt) return null;
   const accessToken = decrypt(row.accessToken);
   const refreshToken = row.refreshToken ? decrypt(row.refreshToken) ?? undefined : undefined;
   if (!accessToken) return null;
   const tokens: GoogleTokens = { accessToken, refreshToken, expiresAt: row.expiresAt.getTime() };
-  if (tokens.expiresAt - Date.now() > 60_000) return tokens;
+  if (tokens.expiresAt - Date.now() > 5 * 60_000) return tokens;
   if (!refreshToken || !googleConfigured()) return null;
-  const fresh = await tokenRequest({ refresh_token: refreshToken, grant_type: "refresh_token" });
-  await saveYouTubeConnection(userId, fresh);
-  return fresh;
+
+  const running = refreshing.get(userId);
+  if (running) return running;
+  const task = (async () => {
+    try {
+      const fresh = await tokenRequest({ refresh_token: refreshToken, grant_type: "refresh_token" });
+      await saveYouTubeConnection(userId, fresh);
+      return fresh;
+    } catch (err) {
+      if (err instanceof GoogleTokenError && err.revoked) {
+        await (await db())
+          .update(schema.youtubeConnections)
+          .set({ needsReconnectAt: new Date() })
+          .where(eq(schema.youtubeConnections.userId, userId));
+        return null;
+      }
+      throw err;
+    }
+  })();
+  refreshing.set(userId, task);
+  try {
+    return await task;
+  } finally {
+    refreshing.delete(userId);
+  }
 }
 
 async function api<T>(tokens: GoogleTokens, url: string): Promise<T> {
