@@ -3,10 +3,28 @@ import { chat } from "@/lib/ai";
 import { aiRoute } from "@/lib/ai-route";
 import { DEMO_CHAT_REPLY } from "@/lib/demo-ai";
 
-const Message = z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(4000) });
+const Message = z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(2000) });
+
+/** Keeps the most recent messages that fit the budget, starting on a user turn. Older turns cost tokens on every reply. */
+function recent(messages: z.infer<typeof Message>[], maxChars = 8000, maxTurns = 12) {
+  const kept: typeof messages = [];
+  let chars = 0;
+  for (const m of [...messages].reverse()) {
+    if (kept.length >= maxTurns || chars + m.content.length > maxChars) break;
+    kept.unshift(m);
+    chars += m.content.length;
+  }
+  while (kept.length && kept[0].role !== "user") kept.shift();
+  return kept;
+}
 
 export const POST = aiRoute(
-  { context: z.string().max(8000), messages: z.array(Message).min(1).max(40) },
+  "chat",
+  { context: z.string().max(6000), messages: z.array(Message).min(1).max(40) },
   DEMO_CHAT_REPLY,
-  ({ language, context, messages }) => chat(language, context, messages),
+  ({ language, context, messages }) => {
+    const turns = recent(messages);
+    if (!turns.length) throw new Error("No user message to answer");
+    return chat(language, context, turns);
+  },
 );

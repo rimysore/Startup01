@@ -19,6 +19,12 @@ assert(!(await reserveCredit(u)), "then blocked again");
 const results = await Promise.all(Array.from({ length: 20 }, () => reserveCredit({ ...u, plan: "pro" })));
 assert(results.filter(Boolean).length === 20 && (await creditsUsed(u.id)) === 30, "20 concurrent reserves on pro all counted");
 
+const [w] = await d.insert(schema.users).values({ id: "u2", email: "w@b.c" }).returning();
+assert((await reserveCredit(w, 3)) && (await reserveCredit(w, 3)) && (await reserveCredit(w, 3)), "three 3-credit diagnoses fit in 10 free credits");
+assert(!(await reserveCredit(w, 3)) && (await creditsUsed(w.id)) === 9, "a 4th 3-credit diagnosis is refused and nothing is taken");
+assert(await reserveCredit(w, 1), "the last single credit is still usable");
+assert(!(await reserveCredit(w, 11)), "a charge bigger than the whole plan is refused");
+
 const end = Math.floor(Date.now() / 1000) + 30 * 86400;
 await applySubscription({ id: "sub_1", plan_id: "", status: "active", current_end: end, notes: { userId: "u1", plan: "pro" } });
 let [row] = await d.select().from(schema.users).where(eq(schema.users.id, "u1"));

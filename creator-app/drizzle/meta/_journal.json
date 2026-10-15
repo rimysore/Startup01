@@ -8,6 +8,13 @@
       "when": 1792039019982,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792074622324,
+      "tag": "0001_ai_costs_and_cache",
+      "breakpoints": true
     }
   ]
 }

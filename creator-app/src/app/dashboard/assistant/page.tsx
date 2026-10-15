@@ -66,7 +66,7 @@ export default function AssistantPage() {
     setInput("");
     setSending(true);
     setError(null);
-    const res = await postAi<string>("/api/ai/chat", { language, context: context(summary), messages: next.slice(-20) });
+    const res = await postAi<string>("/api/ai/chat", { language, context: context(summary), messages: next.slice(-12).map((m) => ({ ...m, content: m.content.slice(0, 2000) })) });
     setSending(false);
     if (res.result) setMessages([...next, { role: "assistant", content: res.result }]);
     else setError(res.error ?? { message: "Something went wrong." });
@@ -125,6 +125,7 @@ export default function AssistantPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type in Hindi, Hinglish, Telugu, English…"
+            maxLength={2000}
             className="min-w-0 flex-1 rounded-full border border-line bg-surface px-4 py-2.5 text-sm outline-none focus:border-accent"
           />
           <Button type="submit" disabled={sending || !input.trim()}>Send</Button>

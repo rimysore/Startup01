@@ -2,6 +2,7 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { currentUser, endSession, unauthorized } from "@/lib/auth";
+import { forgetUser } from "@/lib/memo";
 import { cancelSubscription, razorpayConfigured } from "@/lib/razorpay";
 
 const Body = z.object({ confirm: z.literal("DELETE") });
@@ -38,6 +39,7 @@ export async function POST(request: Request) {
 
   // Sessions, YouTube tokens, subscriptions records and usage are removed by ON DELETE CASCADE.
   await d.delete(schema.users).where(eq(schema.users.id, user.id));
+  forgetUser(user.id);
   await endSession();
   return Response.json({ ok: true });
 }

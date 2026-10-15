@@ -45,6 +45,7 @@ export default function StudioPage() {
               onChange={(e) => setTopic(e.target.value)}
               rows={3}
               placeholder="e.g. Testing 3 phones under ₹20,000 for night photography in Lucknow"
+              maxLength={500}
               className="rounded-xl border border-line bg-surface px-3 py-2 text-base text-ink outline-none focus:border-accent"
             />
           </label>

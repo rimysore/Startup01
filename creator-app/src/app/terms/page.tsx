@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Ext, LegalPage, type LegalSection } from "@/components/Legal";
 import { COMPANY } from "@/lib/company";
-import { PLANS, rupees } from "@/lib/plans";
+import { FEATURE_CREDITS, PLANS, rupees } from "@/lib/plans";
 
 export const metadata: Metadata = { title: "Terms of Service — Mitra" };
 
@@ -108,8 +108,10 @@ const sections: LegalSection[] = [
             <Link href="/dashboard/billing">billing page</Link>. Applicable taxes are shown at checkout.
           </li>
           <li>
-            Each plan includes a number of <strong>AI credits per calendar month</strong>. One credit is used each time you receive an AI answer
-            (a diagnosis, a set of titles, a comment summary or a chat reply). Unused credits don&apos;t roll over. If an AI request fails, the credit is returned.
+            Each plan includes a number of <strong>AI credits per calendar month</strong>. Each AI answer uses credits: a Video Doctor diagnosis
+            uses {FEATURE_CREDITS.doctor}; a set of titles, a comment summary or a chat reply uses {FEATURE_CREDITS.chat}. Asking the exact same
+            question again within a few hours is answered from cache at no charge. Unused credits don&apos;t roll over. If an AI request fails,
+            its credits are returned.
           </li>
           <li>
             Paid plans <strong>renew automatically every month</strong> until you cancel. Payments are processed by Razorpay Software Private Limited

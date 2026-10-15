@@ -1,11 +1,17 @@
 export type PlanId = "free" | "pro" | "creator";
 
+/**
+ * AI credits each answer costs. Video Doctor runs on a larger model, so it costs more; this keeps every plan's
+ * worst-case AI bill below its price. Shared by the server (charging) and the UI (labels).
+ */
+export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1 } as const;
+
 export interface Plan {
   id: PlanId;
   name: string;
   /** Monthly price in paise (₹1 = 100 paise). */
   pricePaise: number;
-  /** AI credits per calendar month. Each diagnosis, title set, comment summary or chat reply uses one. */
+  /** AI credits per calendar month; see FEATURE_CREDITS for what each answer costs. */
   credits: number;
   points: string[];
 }
@@ -16,14 +22,14 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Free",
     pricePaise: 0,
     credits: 10,
-    points: ["10 AI credits / month", "Channel overview", "Trend Radar preview"],
+    points: ["10 AI credits / month (≈3 video diagnoses)", "Channel overview", "Trend Radar preview"],
   },
   pro: {
     id: "pro",
     name: "Pro",
     pricePaise: 39_900,
     credits: 300,
-    points: ["300 AI credits / month", "Video Doctor", "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"],
+    points: ["300 AI credits / month", "Video Doctor (3 credits each)", "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"],
   },
   creator: {
     id: "creator",

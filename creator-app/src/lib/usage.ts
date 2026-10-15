@@ -15,26 +15,26 @@ export async function creditsUsed(userId: string): Promise<number> {
   return row?.credits ?? 0;
 }
 
-/** Atomically takes one credit if the user is under their monthly limit. Returns false when they're out. */
-export async function reserveCredit(user: User): Promise<boolean> {
+/** Atomically takes `amount` credits if the user stays within their monthly limit. Returns false when they can't. */
+export async function reserveCredit(user: User, amount = 1): Promise<boolean> {
   const limit = planOf(user.plan).credits;
-  if (limit <= 0) return false;
+  if (amount > limit) return false;
   const rows = await (await db())
     .insert(schema.usage)
-    .values({ userId: user.id, month: monthKey(), credits: 1 })
+    .values({ userId: user.id, month: monthKey(), credits: amount })
     .onConflictDoUpdate({
       target: [schema.usage.userId, schema.usage.month],
-      set: { credits: sql`${schema.usage.credits} + 1` },
-      setWhere: sql`${schema.usage.credits} < ${limit}`,
+      set: { credits: sql`${schema.usage.credits} + ${amount}` },
+      setWhere: sql`${schema.usage.credits} + ${amount} <= ${limit}`,
     })
     .returning({ credits: schema.usage.credits });
   return rows.length > 0;
 }
 
-/** Gives a credit back when the AI call it was reserved for failed. */
-export async function refundCredit(userId: string, month: string): Promise<void> {
+/** Gives credits back when the AI call they were reserved for failed. */
+export async function refundCredit(userId: string, month: string, amount = 1): Promise<void> {
   await (await db())
     .update(schema.usage)
-    .set({ credits: sql`greatest(${schema.usage.credits} - 1, 0)` })
+    .set({ credits: sql`greatest(${schema.usage.credits} - ${amount}, 0)` })
     .where(and(eq(schema.usage.userId, userId), eq(schema.usage.month, month)));
 }

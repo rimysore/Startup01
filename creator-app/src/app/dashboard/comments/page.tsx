@@ -70,7 +70,7 @@ export default function CommentsPage() {
     setError(null);
     const res = await postAi<CommentInsights>("/api/ai/comments", {
       language,
-      comments: comments.comments.map(({ author, text, likes }) => ({ author, text: text.slice(0, 2000), likes })),
+      comments: comments.comments.slice(0, 60).map(({ author, text, likes }) => ({ author: author.slice(0, 100), text: text.slice(0, 1000), likes })),
     });
     setRunning(false);
     refreshMe();

@@ -7,6 +7,7 @@ import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, PageHeader, Spinner } 
 import { VideoThumb } from "@/components/VideoThumb";
 import type { Doctor } from "@/lib/ai";
 import { compact } from "@/lib/format";
+import { FEATURE_CREDITS } from "@/lib/plans";
 import { fmtTime, introDrop, keyMoments } from "@/lib/retention";
 import type { RetentionPoint } from "@/lib/types";
 
@@ -121,7 +122,7 @@ export default function DoctorPage() {
                   </p>
                 </div>
                 <Button onClick={run} disabled={running || !retention}>
-                  {running ? "Diagnosing…" : result ? "Re-run diagnosis" : "Diagnose with Mitra"}
+                  {running ? "Diagnosing…" : result ? "Re-run diagnosis" : `Diagnose with Mitra · ${FEATURE_CREDITS.doctor} credits`}
                 </Button>
               </div>
 

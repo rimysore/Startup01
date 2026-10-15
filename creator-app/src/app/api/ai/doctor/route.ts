@@ -7,6 +7,7 @@ import { fmtTime, keyMoments } from "@/lib/retention";
 const Point = z.object({ t: z.number(), watching: z.number() });
 
 export const POST = aiRoute(
+  "doctor",
   {
     channel: z.string().max(200),
     channelAvgViewPct: z.number().nullable(),
@@ -28,13 +29,13 @@ export const POST = aiRoute(
     const moments = keyMoments(retention)
       .map((m) => `${m.kind} at ${fmtTime(m.t * video.durationSec)} (${Math.round(m.delta * 100)} pts)`)
       .join("; ");
-    const context = [
-      `Channel: ${channel}. Channel average % viewed: ${channelAvgViewPct ?? "unknown"}.`,
-      `Video: "${video.title}" published ${video.publishedAt}, length ${fmtTime(video.durationSec)}.`,
+    const facts = [
+      `Channel average % viewed: ${channelAvgViewPct ?? "unknown"}.`,
+      `Video published ${video.publishedAt}, length ${fmtTime(video.durationSec)}.`,
       `Views ${video.views}, likes ${video.likes}, comments ${video.comments}, average % viewed ${video.avgViewPct ?? "unknown"}.`,
       curve ? `Retention curve (time: % still watching): ${curve}` : "No retention data available.",
       moments ? `Key moments: ${moments}` : "",
-    ].join("\n");
-    return diagnoseVideo(language, context);
+    ].filter(Boolean).join("\n");
+    return diagnoseVideo(language, facts, `${video.title} (channel: ${channel})`);
   },
 );

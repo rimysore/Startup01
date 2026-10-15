@@ -57,8 +57,7 @@ The output language (top bar) controls what language the AI writes in.
    automatically on first request from the SQL in `drizzle/`. After changing `src/db/schema.ts`, run
    `npm run db:generate` to add a migration. Locally, an embedded Postgres in `.data/` is used instead.
 2. **Secrets:** set `SESSION_SECRET` (≥32 random characters).
-3. **AI:** set `ANTHROPIC_API_KEY`. Calls use `claude-opus-5-5` with structured outputs
-   (`src/lib/ai.ts`) and server-side refusal fallbacks enabled.
+3. **AI:** set `ANTHROPIC_API_KEY` and `AI_DAILY_BUDGET_USD`. See "AI costs and guardrails" below.
 4. **Google:** in Google Cloud, enable *YouTube Data API v3* and *YouTube Analytics API*, create an
    OAuth client (Web application) and add `<your-url>/api/auth/google/callback` as a redirect URI.
    Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
@@ -84,9 +83,42 @@ Limited Use, cookies, credits, auto-renewal, cancellation and refunds, grievance
 Users can delete their account from Plan & billing; this cancels any live Razorpay subscription first and
 then removes all their data.
 
+## AI costs and guardrails
+
+Every AI endpoint goes through one pipeline (`src/lib/ai-route.ts`), cheapest checks first:
+
+| Step | What it does | Response |
+|---|---|---|
+| Validate input | Zod schemas cap every field (topic 500 chars, 60 comments × 1,000 chars, 12 chat turns / 8,000 chars) | 400 |
+| Sample answers | Signed-out visitors (and servers without a key) get free sample answers — the public demo costs nothing | 200 |
+| Rate limit | Max `AI_RATE_PER_MINUTE` (8) real calls per user per minute | 429 |
+| Answer cache | Same user + same input within 6–24 h returns the stored answer: no model call, no credits | 200 |
+| Daily budget | Once today's spend reaches `AI_DAILY_BUDGET_USD`, AI pauses until 00:00 UTC | 503 |
+| Credits | Reserved atomically per plan; Video Doctor costs 3, everything else 1 | 402 |
+| Model call | Routed model (below); refusals and cut-off answers refund the credits | 422 / 502 |
+| Clean-up | Scores, percentages and list lengths clamped; text trimmed before display | — |
+| Logging | Tokens, cost and latency per call in `ai_calls` (no content); `GET /api/admin/costs` for admins | — |
+
+**Model routing** (`src/lib/ai.ts`, overridable per feature with `AI_MODEL_<FEATURE>` / `AI_EFFORT_<FEATURE>`):
+
+| Feature | Model | Effort | ≈ cost per answer* |
+|---|---|---|---|
+| Video Doctor | Claude Sonnet 5.5 | medium | $0.034 (₹3) |
+| Titles, Comments, Ask Mitra | Claude Haiku 5.5 | low | $0.002 (₹0.15) |
+
+*2,000 input + 3,000 output tokens at ₹88/$. Worst case per plan if every credit is spent on Video Doctor:
+Free ≈ ₹9, Pro ≈ ₹300 of ₹399, Creator+ ≈ ₹1,000 of ₹999 (break-even — consider 750 credits for Creator+).
+Real usage mixes features and repeats (cache hits are free), so typical cost is far lower; check `/api/admin/costs`.
+
+**Prompt safety:** a fixed system prompt carries YouTube Community Guidelines rules; text from other people
+(video titles, comments, channel data) is wrapped in `<untrusted>` tags the model is told never to obey; chat is
+limited to creator topics; Sonnet requests use Anthropic's server-side refusal fallback.
+
+`tests/ai-pipeline.e2e.py` checks all of this against a local mock of the Anthropic API (`tests/mock-anthropic.mjs`).
+
 ## Tests
 
-`npm test` runs the credit-limit and plan-entitlement tests against an in-memory database.
+`npm test` runs the credit-limit and plan-entitlement tests against an in-memory database. See the AI section above for the end-to-end pipeline test.
 
 ## Architecture
 
