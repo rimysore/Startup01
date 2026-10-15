@@ -35,8 +35,8 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "creator",
     name: "Creator+",
     pricePaise: 99_900,
-    credits: 1_000,
-    points: ["1,000 AI credits / month", "Everything in Pro", "Priority AI", "WhatsApp weekly reports (soon)"],
+    credits: 750,
+    points: ["750 AI credits / month", "Everything in Pro", "Priority AI", "WhatsApp weekly reports (soon)"],
   },
 };
 

@@ -8,7 +8,8 @@ const MIGRATIONS = path.join(process.cwd(), "drizzle");
 
 /**
  * Production: Postgres via DATABASE_URL. Local development without DATABASE_URL: an embedded
- * Postgres (PGlite) stored in .data/, so the app runs with zero setup. Migrations apply on first use.
+ * Postgres (PGlite) stored in .data/, so the app runs with zero setup. Migrations apply on first use, except
+ * against a production DATABASE_URL, where the deploy runs them.
  */
 async function connect(): Promise<Db> {
   const url = process.env.DATABASE_URL;
@@ -16,8 +17,12 @@ async function connect(): Promise<Db> {
     const { default: postgres } = await import("postgres");
     const { drizzle } = await import("drizzle-orm/postgres-js");
     const { migrate } = await import("drizzle-orm/postgres-js/migrator");
-    const db = drizzle(postgres(url, { max: 10, prepare: false }), { schema });
-    await migrate(db, { migrationsFolder: MIGRATIONS });
+    // Serverless instances each hold their own pool, so keep it small; use the provider's pooled URL.
+    const db = drizzle(postgres(url, { max: Number(process.env.DATABASE_POOL_MAX ?? 3), prepare: false }), { schema });
+    // In production, migrations run once per deploy (`npm run db:migrate` in the build), not on every cold start.
+    if (process.env.NODE_ENV !== "production" || process.env.RUN_MIGRATIONS_ON_START === "1") {
+      await migrate(db, { migrationsFolder: MIGRATIONS });
+    }
     return db as unknown as Db;
   }
   if (process.env.NODE_ENV === "production" && process.env.ALLOW_EMBEDDED_DB !== "1") {

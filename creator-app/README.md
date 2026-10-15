@@ -40,7 +40,7 @@ The output language (top bar) controls what language the AI writes in.
   (disabled in production unless `ALLOW_DEV_LOGIN=1`).
 - **YouTube** is connected separately, after sign-in, with read-only scopes. Tokens are stored per user,
   encrypted (AES-256-GCM, key from `SESSION_SECRET`), and refreshed automatically.
-- **Plans** (`src/lib/plans.ts`): Free (10 AI credits / month), Pro ₹399 (300), Creator+ ₹999 (1,000).
+- **Plans** (`src/lib/plans.ts`): Free (10 AI credits / month), Pro ₹399 (300), Creator+ ₹999 (750).
   One credit = one AI answer. Credits are reserved atomically before the AI call and refunded if it fails.
   Signed-out visitors get sample answers only, so the public demo costs nothing.
 - **Payments:** Razorpay Subscriptions (UPI Autopay, cards, netbanking).
@@ -107,7 +107,7 @@ Every AI endpoint goes through one pipeline (`src/lib/ai-route.ts`), cheapest ch
 | Titles, Comments, Ask Mitra | Claude Haiku 5.5 | low | $0.002 (₹0.15) |
 
 *2,000 input + 3,000 output tokens at ₹88/$. Worst case per plan if every credit is spent on Video Doctor:
-Free ≈ ₹9, Pro ≈ ₹300 of ₹399, Creator+ ≈ ₹1,000 of ₹999 (break-even — consider 750 credits for Creator+).
+Free ≈ ₹9, Pro ≈ ₹300 of ₹399, Creator+ ≈ ₹750 of ₹999.
 Real usage mixes features and repeats (cache hits are free), so typical cost is far lower; check `/api/admin/costs`.
 
 **Prompt safety:** a fixed system prompt carries YouTube Community Guidelines rules; text from other people
@@ -134,6 +134,26 @@ or refreshed.
 Tokens refresh 5 minutes before expiry, with concurrent requests sharing one refresh. If Google answers
 `invalid_grant` (the user revoked access), the connection is flagged, Google is not called again, and
 Connections shows **Reconnect YouTube**.
+
+## Branches and deploying
+
+| Branch | Purpose | Deploys to |
+|---|---|---|
+| `dev` | Day-to-day work; feature branches merge here | Vercel preview URL (staging database) |
+| `prod` | Only what's live; updated by merging `dev` → `prod` | Production domain (production database) |
+
+Vercel setup (once): import the GitHub repo, **Root Directory** `creator-app`, **Production Branch** `prod`.
+`vercel.json` runs `npm run db:migrate` before every build, so give Preview and Production different
+`DATABASE_URL`s (e.g. two Neon branches) or a `dev` deploy would migrate the live database.
+Region `bom1` (Mumbai) keeps the app close to Indian users; put the database in the same region.
+
+Before the first production deploy, with the production values exported in your shell:
+
+```bash
+npm run check:env -- --live   # every setting present and accepted; prints no secret values
+```
+
+`GET /api/health` returns 200 when the app can reach its database, for an uptime monitor.
 
 ## Tests
 

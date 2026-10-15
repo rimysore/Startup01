@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx scripts/migrate.mts",
+    "check:env": "tsx scripts/check-env.mts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.134.0",
