@@ -145,7 +145,8 @@ Connections shows **Reconnect YouTube**.
 Vercel setup (once): import the GitHub repo, **Root Directory** `creator-app`, **Production Branch** `prod`.
 `vercel.json` runs `npm run db:migrate` before every build, so give Preview and Production different
 `DATABASE_URL`s (e.g. two Neon branches) or a `dev` deploy would migrate the live database.
-Region `bom1` (Mumbai) keeps the app close to Indian users; put the database in the same region.
+Region `sin1` (Singapore) matches the Neon database region (Neon has no Mumbai region). The app talks to
+the database several times per page, so keeping the two together matters more than being in India itself.
 
 Before the first production deploy, with the production values exported in your shell:
 
