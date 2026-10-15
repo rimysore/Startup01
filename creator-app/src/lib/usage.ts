@@ -1,7 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { User } from "./auth";
-import { planOf } from "./plans";
+import { creditLimit } from "./plans";
 
 export function monthKey(d = new Date()): string {
   return d.toISOString().slice(0, 7);
@@ -17,7 +17,7 @@ export async function creditsUsed(userId: string): Promise<number> {
 
 /** Atomically takes `amount` credits if the user stays within their monthly limit. Returns false when they can't. */
 export async function reserveCredit(user: User, amount = 1): Promise<boolean> {
-  const limit = planOf(user.plan).credits;
+  const limit = creditLimit(user.plan);
   if (amount > limit) return false;
   const rows = await (await db())
     .insert(schema.usage)

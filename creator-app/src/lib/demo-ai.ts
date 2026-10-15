@@ -1,4 +1,4 @@
-import type { CommentInsights, Doctor, Titles } from "./ai";
+import type { CommentInsights, Doctor, ThumbnailDesign, Titles } from "./ai";
 
 // Sample answers shown when no Anthropic API key is configured, so the product can be demoed offline.
 
@@ -70,3 +70,16 @@ export const DEMO_CHAT_REPLY =
   "• **Is hafte ka plan:** Tuesday 7 PM long video (₹20k camera test), Thursday + Saturday 2 Shorts uske clips se.\n" +
   "• **Sabse bada fix:** Pichhle 3 videos me pehle 30 sec me ~30% log chhod rahe hain. Verdict pehle dikhao.\n" +
   "• **Quick win:** UPI Fraud wale video (2.1L views) ka Part 2 banao — comments me 40+ log maang rahe hain.";
+
+export const DEMO_THUMBNAIL: ThumbnailDesign = {
+  headline: "₹20K में कौन जीता?",
+  highlight: "जीता?",
+  badge: "NIGHT TEST",
+  layout: "subject-right",
+  images: [],
+  palette: { accent: "#ffd23f", text: "#ffffff", stroke: "#000000", glow: "#ff7a1a", bgFrom: "#1b1446", bgTo: "#e2620b" },
+  backgroundQuery: "city night lights",
+  emoji: "🌙",
+  arrow: false,
+  why: "A price and a question in big Hindi text make viewers want the answer.",
+};

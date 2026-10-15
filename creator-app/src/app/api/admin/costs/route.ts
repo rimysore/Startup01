@@ -1,4 +1,4 @@
-import { gte, sql } from "drizzle-orm";
+import { desc, gte, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { currentUser, isAdmin } from "@/lib/auth";
 
@@ -25,9 +25,34 @@ export async function GET(request: Request) {
     .where(gte(c.createdAt, since))
     .groupBy(c.feature, c.model);
 
+  const recent = await (await db())
+    .select({
+      feature: c.feature,
+      model: c.model,
+      inputTokens: c.inputTokens,
+      outputTokens: c.outputTokens,
+      costMicros: c.costMicros,
+      latencyMs: c.latencyMs,
+      createdAt: c.createdAt,
+    })
+    .from(c)
+    .where(gte(c.createdAt, since))
+    .orderBy(desc(c.createdAt))
+    .limit(25);
+
   const byRoute = rows.map((r) => {
     const usd = Number(r.costMicros) / 1e6;
-    return { ...r, inputTokens: Number(r.inputTokens), outputTokens: Number(r.outputTokens), costUsd: +usd.toFixed(4), usdPerCall: +(usd / r.calls).toFixed(5) };
+    const inputTokens = Number(r.inputTokens);
+    const outputTokens = Number(r.outputTokens);
+    return {
+      ...r,
+      inputTokens,
+      outputTokens,
+      avgInputTokens: Math.round(inputTokens / r.calls),
+      avgOutputTokens: Math.round(outputTokens / r.calls),
+      costUsd: +usd.toFixed(4),
+      usdPerCall: +(usd / r.calls).toFixed(5),
+    };
   });
   const totalUsd = byRoute.reduce((a, r) => a + r.costUsd, 0);
   return Response.json({
@@ -35,5 +60,6 @@ export async function GET(request: Request) {
     totalUsd: +totalUsd.toFixed(4),
     dailyBudgetUsd: Number(process.env.AI_DAILY_BUDGET_USD) || null,
     byRoute: byRoute.sort((a, b) => b.costUsd - a.costUsd),
+    recent: recent.map((r) => ({ ...r, costUsd: r.costMicros / 1e6 })),
   });
 }

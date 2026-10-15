@@ -4,7 +4,7 @@ export type PlanId = "free" | "pro" | "creator";
  * AI credits each answer costs. Video Doctor runs on a larger model, so it costs more; this keeps every plan's
  * worst-case AI bill below its price. Shared by the server (charging) and the UI (labels).
  */
-export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1 } as const;
+export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1, thumbnail: 1 } as const;
 
 export interface Plan {
   id: PlanId;
@@ -48,6 +48,16 @@ export function isPlanId(v: unknown): v is PlanId {
 
 export function planOf(v: string | null | undefined): Plan {
   return isPlanId(v) ? PLANS[v] : PLANS.free;
+}
+
+/**
+ * Monthly credits for a plan. Server-side, FREE_CREDITS overrides the Free plan's allowance (e.g. 20 for beta
+ * testers) without a code change.
+ */
+export function creditLimit(v: string | null | undefined): number {
+  const plan = planOf(v);
+  const free = Number(process.env.FREE_CREDITS);
+  return plan.id === "free" && free > 0 ? Math.floor(free) : plan.credits;
 }
 
 export function rupees(paise: number): string {

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { postAi, useDashboard, useQueryParam, type AiError } from "@/components/dashboard-context";
-import { ThumbnailMaker } from "@/components/ThumbnailMaker";
+import { defaultDesign, ThumbnailMaker, type Photo } from "@/components/ThumbnailMaker";
 import { AiDemoNote, AiErrorNote, Button, Card, PageHeader, Select, Spinner } from "@/components/ui";
-import type { Titles } from "@/lib/ai";
+import type { ThumbnailDesign, Titles } from "@/lib/ai";
+import { FEATURE_CREDITS } from "@/lib/plans";
 import { languageLabel } from "@/lib/languages";
 
 const TONES = ["Energetic", "Honest & trustworthy", "Funny", "Educational", "Dramatic"];
@@ -18,7 +19,46 @@ export default function StudioPage() {
   const [result, setResult] = useState<{ demo?: boolean; demoReason?: "signin" | "nokey"; data: Titles } | null>(null);
   const [error, setError] = useState<AiError | null>(null);
   const [running, setRunning] = useState(false);
-  const [thumbText, setThumbText] = useState("कौन जीता?");
+  const [design, setDesign] = useState<ThumbnailDesign>(() => defaultDesign("कौन जीता?"));
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [background, setBackground] = useState<{ img: HTMLImageElement; credit: string | null; query: string; n: number; count: number } | null>(null);
+  const [designing, setDesigning] = useState(false);
+  const [designNote, setDesignNote] = useState<{ demo?: boolean; demoReason?: "signin" | "nokey"; error?: AiError } | null>(null);
+  const setThumbText = (t: string) => setDesign((d) => ({ ...d, headline: t }));
+
+  /** Fetches a stock photo for the AI's search words. Quietly keeps the drawn background if none is available. */
+  async function loadBackground(query: string, n: number) {
+    if (!query) return setBackground(null);
+    const res = await fetch(`/api/thumbnail/background?${new URLSearchParams({ q: query, n: String(n) })}`).catch(() => null);
+    if (!res?.ok) return setBackground(null);
+    const url = URL.createObjectURL(await res.blob());
+    const img = new Image();
+    img.onload = () => {
+      const credit = res.headers.get("X-Photo-Credit");
+      setBackground({ img, credit: credit && decodeURIComponent(credit), query, n, count: Number(res.headers.get("X-Photo-Count")) || 1 });
+    };
+    img.src = url;
+  }
+
+  async function designWithMitra() {
+    setDesigning(true);
+    setDesignNote(null);
+    const res = await postAi<ThumbnailDesign>("/api/ai/thumbnail", {
+      language,
+      title: topic.trim() || design.headline,
+      text: design.headline,
+      images: photos.map((p) => ({ mediaType: "image/jpeg", data: p.data })),
+    });
+    setDesigning(false);
+    refreshMe();
+    if (!res.result) return setDesignNote({ error: res.error ?? { message: "Something went wrong." } });
+    const d = res.result;
+    setDesign(d);
+    setDesignNote({ demo: res.demo, demoReason: res.demoReason });
+    // A stock photo only when the creator's own photos don't already fill the background.
+    const ownBackground = d.images.some((im) => im.role === "background") || (d.layout === "full-bleed" && photos.length > 0) || (d.layout === "split" && photos.length > 1);
+    await loadBackground(ownBackground || res.demo ? "" : d.backgroundQuery, 0);
+  }
 
   async function generate() {
     setRunning(true);
@@ -109,9 +149,38 @@ export default function StudioPage() {
       )}
 
       <Card className="mt-6">
-        <h2 className="mb-1 font-semibold">Thumbnail maker</h2>
-        <p className="mb-4 text-sm text-muted">Hindi, Telugu and other scripts render correctly here. Add your photo, pick a style, download.</p>
-        <ThumbnailMaker text={thumbText} onTextChange={setThumbText} />
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="font-semibold">Thumbnail maker</h2>
+            <p className="mt-1 max-w-xl text-sm text-muted">
+              Add your photos (optional), then let Mitra design it: layout, crop, colours, text and a matching background photo. Everything stays
+              editable, and Hindi, Telugu and other scripts render correctly.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {background && background.count > 1 && (
+              <Button variant="ghost" onClick={() => loadBackground(background.query, (background.n + 1) % background.count)}>
+                Another background
+              </Button>
+            )}
+            <Button onClick={designWithMitra} disabled={designing || (topic.trim().length < 3 && design.headline.trim().length < 3)}>
+              {designing ? "Designing…" : `Design with Mitra · ${FEATURE_CREDITS.thumbnail} credit`}
+            </Button>
+          </div>
+        </div>
+        {designNote?.error && <div className="mb-4"><AiErrorNote error={designNote.error} /></div>}
+        {designNote?.demo && <div className="mb-4"><AiDemoNote reason={designNote.demoReason} what="thumbnail design" /></div>}
+        <ThumbnailMaker
+          design={design}
+          onDesignChange={setDesign}
+          photos={photos}
+          onPhotosChange={setPhotos}
+          background={background?.img ?? null}
+          credit={background?.credit ?? null}
+        />
+        <p className="mt-3 text-xs text-muted">
+          Photos stay in your browser until you press Design with Mitra; then a small copy is sent to our AI provider to plan the layout and isn&apos;t kept.
+        </p>
       </Card>
     </div>
   );

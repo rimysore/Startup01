@@ -104,7 +104,7 @@ Every AI endpoint goes through one pipeline (`src/lib/ai-route.ts`), cheapest ch
 | Feature | Model | Effort | ≈ cost per answer* |
 |---|---|---|---|
 | Video Doctor | Claude Sonnet 5.5 | medium | $0.034 (₹3) |
-| Titles, Comments, Ask Mitra | Claude Haiku 5.5 | low | $0.002 (₹0.15) |
+| Titles, Comments, Ask Mitra, Thumbnail design | Claude Haiku 5.5 | low | $0.002 (₹0.15) |
 
 *2,000 input + 3,000 output tokens at ₹88/$. Worst case per plan if every credit is spent on Video Doctor:
 Free ≈ ₹9, Pro ≈ ₹300 of ₹399, Creator+ ≈ ₹750 of ₹999.
@@ -119,6 +119,19 @@ dropped, emoji and one-word reactions folded into one count line, the 40 most-li
 to 300 chars. About a third fewer input tokens on a typical batch of 60.
 
 `tests/ai-pipeline.e2e.py` checks all of this against a local mock of the Anthropic API (`tests/mock-anthropic.mjs`).
+
+## Thumbnails
+
+Mitra plans, the browser draws. "Design with Mitra" sends the topic, the current text and up to 3 of the
+creator's photos (shrunk in the browser to ≤768px JPEG, a few hundred image tokens each) to Haiku, which returns
+a layout: which photo is the subject, crop focus, headline and highlight word, colours, badge, emoji, arrow and
+English search words for a background. The canvas then renders it at 1280×720, so Devanagari/Telugu/Tamil text
+is always correct and everything stays editable. With `PEXELS_API_KEY` set, the background is a matching free
+stock photo (streamed through `/api/thumbnail/background` so the canvas can export it); without it, a drawn
+gradient with glow, light rays and grain.
+
+Admins (`ADMIN_EMAILS`) get **AI costs** in the sidebar: spend, calls and average tokens per feature, the latest
+calls, and a button to reset their own credits while testing. `FREE_CREDITS` raises the Free plan's allowance.
 
 ## YouTube quota and caching
 

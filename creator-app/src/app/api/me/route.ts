@@ -1,7 +1,7 @@
 import { aiConfigured } from "@/lib/ai";
-import { currentUser, devLoginEnabled } from "@/lib/auth";
+import { currentUser, devLoginEnabled, isAdmin } from "@/lib/auth";
 import { liveSubscription, simulateBillingEnabled } from "@/lib/billing";
-import { planOf } from "@/lib/plans";
+import { creditLimit, planOf } from "@/lib/plans";
 import { razorpayConfigured } from "@/lib/razorpay";
 import { creditsUsed, monthKey } from "@/lib/usage";
 import { googleConfigured, youtubeConnection } from "@/lib/youtube";
@@ -23,7 +23,8 @@ export async function GET() {
     user: { id: user.id, email: user.email, name: user.name, avatar: user.avatar },
     plan: { id: plan.id, name: plan.name, renewsAt: user.planRenewsAt },
     subscription: sub ? { status: sub.status, cancelAtCycleEnd: Boolean(sub.cancelAtCycleEnd), currentEnd: sub.currentEnd } : null,
-    usage: { month: monthKey(), used, limit: plan.credits },
+    usage: { month: monthKey(), used, limit: creditLimit(plan.id) },
+    admin: isAdmin(user),
     youtube: yt ? { channelTitle: yt.channelTitle, needsReconnect: Boolean(yt.needsReconnectAt) } : null,
     config,
   });

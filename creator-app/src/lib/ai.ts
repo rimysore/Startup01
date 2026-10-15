@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -30,6 +30,8 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   titles: { model: "claude-haiku-5-5", effort: "low", maxTokens: 4000, cacheHours: 6, credits: FEATURE_CREDITS.titles },
   comments: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 12, credits: FEATURE_CREDITS.comments },
   chat: { model: "claude-haiku-5-5", effort: "low", maxTokens: 2000, cacheHours: 0, credits: FEATURE_CREDITS.chat },
+  // Looks at the creator's photos (sent small) and returns a layout; the browser draws the thumbnail itself.
+  thumbnail: { model: "claude-haiku-5-5", effort: "low", maxTokens: 3000, cacheHours: 6, credits: FEATURE_CREDITS.thumbnail },
 };
 
 export function route(feature: Feature): Route {
@@ -142,13 +144,32 @@ function untrusted(text: string): string {
   return `<untrusted>\n${text.replace(/<\/?untrusted>/gi, "")}\n</untrusted>`;
 }
 
-async function structured<S extends z.ZodType>(feature: Feature, schema: S, language: string, prompt: string): Promise<AiResult<z.infer<S>>> {
+export interface InputImage {
+  mediaType: "image/jpeg" | "image/png" | "image/webp";
+  /** Base64, no data: prefix. */
+  data: string;
+}
+
+async function structured<S extends z.ZodType>(
+  feature: Feature,
+  schema: S,
+  language: string,
+  prompt: string,
+  images: InputImage[] = [],
+): Promise<AiResult<z.infer<S>>> {
   const r = route(feature);
+  const content: Anthropic.Beta.BetaContentBlockParam[] = [
+    ...images.map((img, i): Anthropic.Beta.BetaContentBlockParam[] => [
+      { type: "text", text: `Image ${i}:` },
+      { type: "image", source: { type: "base64", media_type: img.mediaType, data: img.data } },
+    ]).flat(),
+    { type: "text", text: prompt },
+  ];
   const res = await anthropic().beta.messages.parse({
     ...requestOptions(r),
     output_config: { effort: r.effort, format: betaZodOutputFormat(schema) },
     system: system(language),
-    messages: [{ role: "user", content: prompt }],
+    messages: [{ role: "user", content }],
   });
   checkStop(res.stop_reason);
   if (!res.parsed_output) throw new Error(`No structured output (stop_reason: ${res.stop_reason})`);
@@ -219,6 +240,98 @@ export async function generateTitles(language: string, topic: string, tone: stri
       titles: list(t.titles, 6).map((x) => ({ title: cut(x.title, 100), why: cut(x.why, 240), strength: Math.round(clamp(x.strength, 1, 10)) })),
       thumbnailText: list(t.thumbnailText, 6).map((s) => cut(s, 40)),
       hook: cut(t.hook, 600),
+    },
+  };
+}
+
+// ---- Thumbnail designer ---------------------------------------------------------
+// The model plans the thumbnail; the browser draws it, so Indian scripts render correctly and the creator can edit.
+
+export const THUMB_LAYOUTS = ["subject-right", "subject-left", "full-bleed", "split"] as const;
+export const THUMB_ROLES = ["subject", "background", "inset", "skip"] as const;
+
+export const ThumbnailSchema = z.object({
+  headline: z.string().describe("2-5 words for the thumbnail, in the target language's own script; not the title repeated"),
+  highlight: z.string().describe("One word from the headline to colour with the accent"),
+  badge: z.string().describe("Optional corner badge up to 12 characters, e.g. a price or 'PART 2'; empty if none"),
+  layout: z.enum(THUMB_LAYOUTS).describe("subject-right/left: person or product on one side, text on the other; full-bleed: one photo fills the frame; split: two images side by side, e.g. a comparison"),
+  images: z
+    .array(
+      z.object({
+        index: z.number().describe("Which uploaded image (0-based)"),
+        role: z.enum(THUMB_ROLES),
+        focusX: z.number().describe("0-1, horizontal position of the most important point (a face, the product)"),
+        focusY: z.number().describe("0-1, vertical position of that point"),
+        zoom: z.number().describe("1-2.5, how tightly to crop around the focus point"),
+      }),
+    )
+    .describe("One entry per uploaded image; empty when none were uploaded"),
+  palette: z
+    .object({
+      accent: z.string().describe("Hex colour for the highlight word and badge, high contrast against the background"),
+      text: z.string().describe("Hex colour for the headline"),
+      stroke: z.string().describe("Hex outline colour around the text"),
+      glow: z.string().describe("Hex colour for light behind the subject"),
+      bgFrom: z.string().describe("Hex, used if no photo covers the background"),
+      bgTo: z.string().describe("Hex, second gradient colour"),
+    })
+    .describe("Bold, saturated colours that stand out in YouTube's white and dark themes"),
+  backgroundQuery: z.string().describe("2-5 English words for a stock photo that would make a great background for this topic, e.g. 'city night bokeh'"),
+  emoji: z.string().describe("One emoji that adds emotion, or empty"),
+  arrow: z.boolean().describe("Whether an arrow pointing at the subject would help"),
+  why: z.string().describe("One sentence on why this design will get clicks"),
+});
+export type ThumbnailDesign = z.infer<typeof ThumbnailSchema>;
+
+const HEX = /^#[0-9a-f]{6}$/i;
+
+export async function designThumbnail(
+  language: string,
+  title: string,
+  preferredText: string,
+  images: InputImage[],
+): Promise<AiResult<ThumbnailDesign>> {
+  const out = await structured(
+    "thumbnail",
+    ThumbnailSchema,
+    language,
+    `Design a YouTube thumbnail for this video. ${images.length ? `The creator uploaded ${images.length} image(s) above; decide how to use each one (the most expressive face or the product should be the subject; drop blurry or irrelevant ones).` : "No images were uploaded: pick a background photo search that fits the topic."}\n` +
+      "Rules: at most 5 words of text, large and readable on a phone; one clear focal point; strong contrast; honest about what the video shows.\n\n" +
+      `Video title or topic:\n${untrusted(title)}` +
+      (preferredText.trim() ? `\nThe creator would like to use this thumbnail text if it works:\n${untrusted(preferredText)}` : ""),
+    images,
+  );
+  const d = out.result;
+  const color = (c: string, fallback: string) => (HEX.test(c.trim()) ? c.trim() : fallback);
+  const seen = new Set<number>();
+  return {
+    ...out,
+    result: {
+      headline: cut(d.headline, 60),
+      highlight: cut(d.highlight, 30),
+      badge: cut(d.badge, 14),
+      layout: THUMB_LAYOUTS.includes(d.layout) ? d.layout : "subject-right",
+      images: d.images
+        .filter((im) => Number.isInteger(im.index) && im.index >= 0 && im.index < images.length && !seen.has(im.index) && seen.add(im.index))
+        .map((im) => ({
+          index: im.index,
+          role: THUMB_ROLES.includes(im.role) ? im.role : "subject",
+          focusX: clamp(im.focusX, 0, 1),
+          focusY: clamp(im.focusY, 0, 1),
+          zoom: clamp(im.zoom, 1, 2.5),
+        })),
+      palette: {
+        accent: color(d.palette.accent, "#ffd23f"),
+        text: color(d.palette.text, "#ffffff"),
+        stroke: color(d.palette.stroke, "#000000"),
+        glow: color(d.palette.glow, "#ff7a1a"),
+        bgFrom: color(d.palette.bgFrom, "#ff7a1a"),
+        bgTo: color(d.palette.bgTo, "#2b2357"),
+      },
+      backgroundQuery: cut(d.backgroundQuery.replace(/[^\p{L}\p{N} -]/gu, " "), 60),
+      emoji: [...d.emoji.trim()].slice(0, 2).join(""),
+      arrow: Boolean(d.arrow),
+      why: cut(d.why, 240),
     },
   };
 }

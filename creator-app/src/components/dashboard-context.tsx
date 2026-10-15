@@ -14,6 +14,8 @@ export interface Me {
   plan?: { id: PlanId; name: string; renewsAt: string | null };
   subscription?: { status: string; cancelAtCycleEnd: boolean; currentEnd: string | null } | null;
   usage?: { month: string; used: number; limit: number };
+  /** In ADMIN_EMAILS: can see AI costs and reset their own credits. */
+  admin?: boolean;
   youtube?: { channelTitle: string | null; needsReconnect?: boolean } | null;
   config: { google: boolean; ai: boolean; billing: boolean; devLogin: boolean; simulateBilling: boolean };
 }

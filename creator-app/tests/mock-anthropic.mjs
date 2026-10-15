@@ -7,12 +7,14 @@ let mode = "ok"; // ok | refusal | max_tokens
 const ANSWERS = {
   doctor: { score: 150, verdict: "Intro was too long.", whatWorked: ["Good thumbnail"], whatHurt: [{ at: "0:12", issue: "Slow intro", fix: "Start with the result" }], nextVideo: ["Hook first"], titleIdeas: ["A", "B", "C"] },
   titles: { titles: [{ title: "Raat me test kiya", why: "curiosity", strength: 42 }], thumbnailText: ["कौन जीता?"], hook: "Raat ke 11 baje…" },
+  thumbnail: { headline: "रात में कौन जीता?", highlight: "जीता?", badge: "₹20K TEST", layout: "subject-right", images: [{ index: 0, role: "subject", focusX: 0.5, focusY: 0.35, zoom: 7 }, { index: 9, role: "inset", focusX: 0.5, focusY: 0.5, zoom: 1 }], palette: { accent: "#ffd23f", text: "#ffffff", stroke: "#000000", glow: "#ff7a1a", bgFrom: "#1b1446", bgTo: "not-a-colour" }, backgroundQuery: "city night <b>lights</b>", emoji: "🌙", arrow: true, why: "Price plus a question makes people click." },
   comments: { mood: { positive: 3, neutral: 1, negative: 1 }, themes: [{ theme: "Battery", share: 250, example: "battery?" }], questions: ["mic?"], videoIdeas: ["part 2"], replies: [{ to: "Mohit", reply: "Thanks!" }] },
 };
 
 function featureOf(body) {
   const props = Object.keys(body.output_config?.format?.schema?.properties ?? {});
   if (props.includes("verdict")) return "doctor";
+  if (props.includes("headline")) return "thumbnail";
   if (props.includes("hook")) return "titles";
   if (props.includes("mood")) return "comments";
   return "chat";
@@ -30,7 +32,7 @@ http
       }
       const body = JSON.parse(raw || "{}");
       const feature = featureOf(body);
-      requests.push({ feature, model: body.model, effort: body.output_config?.effort, fallbacks: body.fallbacks ?? null, betas: req.headers["anthropic-beta"] ?? null, workspace: req.headers["anthropic-workspace-id"] ?? null, max_tokens: body.max_tokens, system: body.system, prompt: JSON.stringify(body.messages) });
+      requests.push({ feature, model: body.model, effort: body.output_config?.effort, fallbacks: body.fallbacks ?? null, betas: req.headers["anthropic-beta"] ?? null, workspace: req.headers["anthropic-workspace-id"] ?? null, max_tokens: body.max_tokens, system: body.system, prompt: JSON.stringify(body.messages), images: (body.messages?.[0]?.content ?? []).filter?.((b) => b.type === "image").length ?? 0 });
       const text = feature === "chat" ? "• Is hafte 2 Shorts banao." : JSON.stringify(ANSWERS[feature]);
       res.setHeader("content-type", "application/json");
       res.end(

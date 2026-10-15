@@ -27,11 +27,14 @@ function Icon({ d }: { d: string }) {
   );
 }
 
+const ADMIN_NAV = { href: "/dashboard/admin", label: "AI costs", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" };
+
 function NavLinks({ compact }: { compact?: boolean }) {
   const path = usePathname();
+  const { me } = useDashboard();
   return (
     <>
-      {NAV.map((item) => {
+      {(me?.admin ? [...NAV, ADMIN_NAV] : NAV).map((item) => {
         const active = item.href === "/dashboard" ? path === item.href : path.startsWith(item.href);
         return (
           <Link
