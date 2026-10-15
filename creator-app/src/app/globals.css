@@ -1,0 +1,135 @@
+@import "tailwindcss";
+
+/* Mitra design tokens. Warm paper + ink, with a marigold accent. */
+:root {
+  color-scheme: light;
+  --bg: #f7f3ec;
+  --surface: #fffdf9;
+  --surface-2: #f1ebe1;
+  --ink: #17140f;
+  --ink-2: #4f493f;
+  --muted: #7a7366;
+  --line: #e4dccd;
+  --accent: #e2620b;
+  --accent-ink: #ffffff;
+  --accent-soft: #fbe3cf;
+  --peacock: #0b6e6c;
+  --good: #1f7a3a;
+  --warn: #a86500;
+  --bad: #b3261e;
+  --chart-grid: #e9e2d5;
+  --chart-compare: #9a9283;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e0d0b;
+    --surface: #17150f;
+    --surface-2: #201d16;
+    --ink: #f4efe6;
+    --ink-2: #cdc6b8;
+    --muted: #9b9486;
+    --line: #2d2920;
+    --accent: #ff8a3d;
+    --accent-ink: #1a0f05;
+    --accent-soft: #3a2413;
+    --peacock: #3fb8b2;
+    --good: #5cc27a;
+    --warn: #e2a33a;
+    --bad: #f07167;
+    --chart-grid: #2a261e;
+    --chart-compare: #7d776b;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e0d0b;
+  --surface: #17150f;
+  --surface-2: #201d16;
+  --ink: #f4efe6;
+  --ink-2: #cdc6b8;
+  --muted: #9b9486;
+  --line: #2d2920;
+  --accent: #ff8a3d;
+  --accent-ink: #1a0f05;
+  --accent-soft: #3a2413;
+  --peacock: #3fb8b2;
+  --good: #5cc27a;
+  --warn: #e2a33a;
+  --bad: #f07167;
+  --chart-grid: #2a261e;
+  --chart-compare: #7d776b;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-peacock: var(--peacock);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-bad: var(--bad);
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
+  --font-indic: var(--font-devanagari), var(--font-telugu), var(--font-body), sans-serif;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.grain {
+  background-image: radial-gradient(color-mix(in oklab, var(--ink) 7%, transparent) 1px, transparent 1px);
+  background-size: 4px 4px;
+}
+
+/* In the components layer so utilities like bg-ink can override it. */
+@layer components {
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    min-width: 0;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee {
+  animation: marquee 40s linear infinite;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+.rise {
+  animation: rise 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee, .rise { animation: none; }
+}
