@@ -87,6 +87,8 @@ export function useDashboard(): DashboardState {
 
 export interface AiError {
   message: string;
+  /** The underlying error; only sent to admins. */
+  detail?: string;
   upgrade?: boolean;
   signin?: boolean;
 }
@@ -101,8 +103,8 @@ export interface AiResponse<T> {
 export async function postAi<T>(path: string, body: unknown): Promise<AiResponse<T>> {
   try {
     const res = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-    const json = (await res.json()) as { demo?: boolean; demoReason?: "signin" | "nokey"; result?: T; error?: string; upgrade?: boolean };
-    if (json.error) return { error: { message: json.error, upgrade: json.upgrade, signin: res.status === 401 } };
+    const json = (await res.json()) as { demo?: boolean; demoReason?: "signin" | "nokey"; result?: T; error?: string; detail?: string; upgrade?: boolean };
+    if (json.error) return { error: { message: json.error, detail: json.detail, upgrade: json.upgrade, signin: res.status === 401 } };
     return { demo: json.demo, demoReason: json.demoReason, result: json.result };
   } catch {
     return { error: { message: "Network error — check your connection and try again." } };

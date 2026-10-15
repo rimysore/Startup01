@@ -1,12 +1,11 @@
 import { gte, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { currentUser } from "@/lib/auth";
+import { currentUser, isAdmin } from "@/lib/auth";
 
 /** Admins only (ADMIN_EMAILS, comma-separated): AI spend for the last N days, by feature and model. */
 export async function GET(request: Request) {
   const user = await currentUser();
-  const admins = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
-  if (!user || !admins.includes(user.email)) return Response.json({ error: "Not found" }, { status: 404 });
+  if (!isAdmin(user)) return Response.json({ error: "Not found" }, { status: 404 });
 
   const days = Math.min(90, Math.max(1, Number(new URL(request.url).searchParams.get("days")) || 30));
   const since = new Date(Date.now() - days * 86_400_000);

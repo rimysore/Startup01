@@ -150,7 +150,7 @@ export function AiDemoNote({ reason, what }: { reason?: "signin" | "nokey"; what
   );
 }
 
-export function AiErrorNote({ error }: { error: { message: string; upgrade?: boolean; signin?: boolean } }) {
+export function AiErrorNote({ error }: { error: { message: string; detail?: string; upgrade?: boolean; signin?: boolean } }) {
   return (
     <ErrorNote>
       {error.message}{" "}
@@ -164,6 +164,7 @@ export function AiErrorNote({ error }: { error: { message: string; upgrade?: boo
           Sign in →
         </Link>
       )}
+      {error.detail && <span className="mt-1 block break-words font-mono text-xs opacity-80">Admin only: {error.detail}</span>}
     </ErrorNote>
   );
 }

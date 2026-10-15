@@ -8,6 +8,13 @@ export type User = typeof schema.users.$inferSelect;
 const COOKIE = "mitra_session";
 const SESSION_DAYS = 30;
 
+/** Emails listed in ADMIN_EMAILS (comma-separated) can see cost reports and error details. */
+export function isAdmin(user: Pick<User, "email"> | null): boolean {
+  if (!user) return false;
+  const admins = (process.env.ADMIN_EMAILS ?? "").split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  return admins.includes(user.email.toLowerCase());
+}
+
 export function devLoginEnabled(): boolean {
   return process.env.NODE_ENV !== "production" || process.env.ALLOW_DEV_LOGIN === "1";
 }
