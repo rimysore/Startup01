@@ -1,4 +1,4 @@
-import type { AudienceInsights, CommentInsights, Doctor, ThumbnailDesign, TrendInsights, Titles } from "./ai";
+import type { AudienceInsights, CommentInsights, CompetitorInsights, Doctor, SlangInsights, ThumbnailDesign, TrendInsights, Titles } from "./ai";
 
 // Sample answers shown when no Anthropic API key is configured, so the product can be demoed offline.
 
@@ -114,5 +114,43 @@ export const DEMO_AUDIENCE_INSIGHTS: AudienceInsights = {
     "Upload around 7 pm IST when your core viewers are online",
     "Answer the top search term 'best camera phone under 20000' in one focused video",
     "Turn comparisons into Shorts to feed the Shorts traffic source",
+  ],
+};
+
+export const DEMO_SLANG: SlangInsights = {
+  shift: "Gen Z viewers now mix English reaction words into Hindi ('literally', 'lowkey', 'era') and use short Hinglish hype phrases; older phrases like 'ek number' still work but feel safe rather than fresh.",
+  terms: [
+    { term: "bhai ne gadar macha diya", meaning: "This creator absolutely nailed it", generation: "genz", freshness: "rising", source: "comments", example: "₹15k phone ne gadar macha diya? Night test 🔥" },
+    { term: "lowkey", meaning: "Secretly / honestly (as in 'lowkey best')", generation: "genz", freshness: "rising", source: "trending", example: "Ye phone lowkey sabse best hai" },
+    { term: "paisa vasool", meaning: "Worth every rupee", generation: "everyone", freshness: "steady", source: "comments", example: "Paisa vasool ya paisa barbaad? ₹20k camera test" },
+    { term: "OP", meaning: "Overpowered, amazing (from gaming)", generation: "genz", freshness: "steady", source: "trending", example: "Is phone ka night mode OP hai 😳" },
+    { term: "jugaad", meaning: "A clever cheap fix", generation: "millennial", freshness: "steady", source: "knowledge", example: "₹500 ka jugaad jo ₹5000 ka kaam kare" },
+    { term: "era", meaning: "Phase of life ('my gym era')", generation: "genz", freshness: "rising", source: "trending", example: "Budget phone era is back?" },
+  ],
+  avoid: [
+    { term: "jhakaas", why: "Reads as dated with under-25 viewers" },
+    { term: "Uncle-style 'dear friends'", why: "Feels formal and old-fashioned for Gen Z" },
+  ],
+  tips: ["Use one slang word per title, not three", "Copy the exact spelling your commenters use", "Keep slang out of serious money or health advice"],
+};
+
+export const DEMO_COMPETITOR_INSIGHTS: CompetitorInsights = {
+  verdict: "You get more views per subscriber than Gadget Guru, but they post 3 Shorts a week and you post none — Shorts are where their subscribers come from.",
+  theyDoBetter: [
+    { channel: "Gadget Guru Hindi", what: "Warning-style Shorts", evidence: "'Mat lena ye phone!' (52s) has 1.3M views, 3x their long-form average" },
+    { channel: "Techno Telugu", what: "Telugu titles with prices", evidence: "₹ in 4 of 5 titles; 'ఈ ఫోన్ కొనకండి!' is their top video" },
+  ],
+  gaps: [
+    { idea: "Hindi version of 'don't buy' warnings for ₹10-15k phones", why: "Both rivals' top videos are warnings; you have none" },
+    { idea: "Festival sale buying guides", why: "Techno Telugu's sale video beat their average by 50%" },
+  ],
+  titlePatterns: ["Price in the first 3 words", "Direct warnings: 'mat lena', 'కొనకండి'", "One emoji at the end, not the start", "Under 45 characters for Shorts"],
+  emotions: [{ emotion: "fear", share: 35 }, { emotion: "curiosity", share: 35 }, { emotion: "surprise", share: 20 }, { emotion: "joy", share: 10 }],
+  moves: [
+    "Post 2 Shorts a week cut from your long videos",
+    "Make one 'don't buy this' video with honest reasons",
+    "Put the price in the first three words of every phone title",
+    "Do a Dasara/Diwali sale guide before the sales start",
+    "Reply to the top 5 comments within an hour of upload",
   ],
 };

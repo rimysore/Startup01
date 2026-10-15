@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useCallback, useState } from "react";
+import { burstConfetti, CelebrationToast, MilestoneRing, RollingNumber, Sparkline, useLiveSubscribers, type Celebration } from "@/components/celebrate";
 import { useDashboard } from "@/components/dashboard-context";
 import { LineChart } from "@/components/LineChart";
-import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { Card, DemoNote, ErrorNote, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
 import { compact, full, pctChange, shortDate } from "@/lib/format";
 import type { ChannelSummary, Video } from "@/lib/types";
@@ -12,21 +14,48 @@ function sum(xs: number[]) {
   return xs.reduce((a, b) => a + b, 0);
 }
 
-function Kpi({ label, value, sub, change }: { label: string; value: string; sub?: string; change?: number | null }) {
+function Kpi({ label, value, sub, change, trend }: { label: string; value: React.ReactNode; sub?: string; change?: number | null; trend?: number[] }) {
   return (
-    <Card className="!p-5">
-      <p className="text-xs font-medium uppercase tracking-wider text-muted">{label}</p>
-      <p className="mt-2 font-display text-4xl leading-none tabular-nums">{value}</p>
-      <div className="mt-3 flex items-center gap-2 text-xs">
+    <Card className="group !p-5 transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)]">
+      <p className="text-xs font-medium text-muted">{label}</p>
+      <p className="mt-2 text-3xl font-semibold leading-none tracking-tight sm:text-4xl">{value}</p>
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
         {change != null && (
-          <span className={`font-semibold ${change >= 0 ? "text-good" : "text-bad"}`}>
+          <span className={`rounded-full px-2 py-0.5 font-semibold ${change >= 0 ? "bg-good/15 text-good" : "bg-bad/10 text-bad"}`}>
             {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(0)}%
           </span>
         )}
         {sub && <span className="text-muted">{sub}</span>}
       </div>
+      {trend && trend.length > 1 && (
+        <div className="mt-3">
+          <Sparkline values={trend} label={`${label}, last ${trend.length} days`} />
+        </div>
+      )}
     </Card>
   );
+}
+
+/** Small wins worth celebrating, computed from the numbers (no AI). */
+function wins(s: ChannelSummary): { emoji: string; text: string }[] {
+  const out: { emoji: string; text: string }[] = [];
+  const { daily, videos } = s;
+  if (daily.length) {
+    const best = daily.reduce((a, b) => (b.views > a.views ? b : a));
+    const recent = daily.slice(-3).some((d) => d.date === best.date);
+    out.push({ emoji: "🔥", text: recent ? `Best day of the month: ${compact(best.views)} views on ${shortDate(best.date)}` : `Best day: ${compact(best.views)} views on ${shortDate(best.date)}` });
+    let streak = 0;
+    for (let i = daily.length - 1; i >= 0 && daily[i].subscribersGained > 0; i--) streak++;
+    if (streak >= 2) out.push({ emoji: "⚡", text: `${streak}-day streak of new subscribers` });
+    const gained7 = sum(daily.slice(-7).map((d) => d.subscribersGained));
+    if (gained7 > 0) out.push({ emoji: "🙌", text: `${full(gained7)} people subscribed this week` });
+  }
+  const avg = videos.length ? sum(videos.map((v) => v.views)) / videos.length : 0;
+  const star = [...videos].sort((a, b) => b.views - a.views)[0];
+  if (star && avg > 0 && star.views >= avg * 1.5 && videos.length > 2) {
+    out.push({ emoji: "🚀", text: `“${star.title.length > 38 ? `${star.title.slice(0, 37)}…` : star.title}” is ${(star.views / avg).toFixed(1)}× your average` });
+  }
+  return out.slice(0, 4);
 }
 
 /** Rule-based weekly actions, so the overview is useful before any AI call. */
@@ -63,6 +92,24 @@ function actions(s: ChannelSummary): Array<{ title: string; body: string; href: 
 export default function Overview() {
   const { summary, refresh } = useDashboard();
   if (!summary) return <Spinner label="Loading your channel" />;
+  return <OverviewBody summary={summary} refresh={refresh} />;
+}
+
+function OverviewBody({ summary, refresh }: { summary: ChannelSummary & { error?: string }; refresh: () => void }) {
+  const [celebration, setCelebration] = useState<Celebration | null>(null);
+  const [popKey, setPopKey] = useState(0);
+  const onGain = useCallback((gain: number, since: "visit" | "now") => {
+    burstConfetti();
+    setPopKey((k) => k + 1);
+    setCelebration({
+      id: Date.now(),
+      title: `+${gain.toLocaleString("en-IN")} new subscriber${gain === 1 ? "" : "s"}!`,
+      body: since === "visit" ? "since you last checked. Your audience is growing 🙌" : "just now. Keep going!",
+    });
+  }, []);
+  const dismiss = useCallback(() => setCelebration(null), []);
+  const live = summary.mode === "live";
+  const subscribers = useLiveSubscribers(summary.channel.id, summary.channel.subscribers, live, onGain);
 
   const { channel, daily, videos } = summary;
   const views28 = sum(daily.map((d) => d.views));
@@ -73,37 +120,79 @@ export default function Overview() {
   const pcts = videos.map((v) => v.avgViewPct).filter((p): p is number => p != null);
   const avgPct = pcts.length ? sum(pcts) / pcts.length : null;
 
+  const perDay = daily.length ? subs28 / daily.length : 0;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const winList = wins(summary);
+
   return (
     <div className="rise">
-      <PageHeader eyebrow="Overview" title={`Namaste, ${channel.title} 👋`}>
-        {summary.mode === "demo" ? (
-          <Link href="/dashboard/connections" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
-            Connect your YouTube
-          </Link>
-        ) : (
-          <div className="flex items-center gap-3">
-            {summary.fetchedAt && (
-              <span className="text-xs text-muted">
-                Updated {new Date(summary.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
-              </span>
-            )}
-            <Button variant="ghost" onClick={refresh} title="Fetch the latest numbers from YouTube">
-              Refresh
-            </Button>
-          </div>
-        )}
-      </PageHeader>
+      <CelebrationToast celebration={celebration} onDone={dismiss} />
       {summary.error && <div className="mb-4"><ErrorNote>{summary.error}</ErrorNote></div>}
+
+      <section className="relative overflow-hidden rounded-[28px] bg-ink p-6 text-bg sm:p-8" aria-label="Your channel right now">
+        <div className="glow-blob pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-accent/40 blur-3xl" aria-hidden />
+        <div className="glow-blob pointer-events-none absolute -bottom-40 left-10 h-72 w-72 rounded-full bg-peacock/30 blur-3xl" style={{ animationDelay: "-7s" }} aria-hidden />
+        <div className="relative flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-bg/75">
+            {greeting}, <span className="font-semibold text-bg">{channel.title}</span> 👋
+          </p>
+          <div className="flex items-center gap-2 text-xs">
+            {live ? (
+              <span className="inline-flex items-center gap-2 rounded-full bg-bg/10 px-3 py-1.5">
+                <span className="live-dot h-2 w-2 rounded-full bg-good" /> Live
+                {summary.fetchedAt && <span className="text-bg/60">· {new Date(summary.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>}
+              </span>
+            ) : (
+              <span className="rounded-full bg-accent/25 px-3 py-1.5 font-semibold text-accent">Demo channel</span>
+            )}
+            {live ? (
+              <button onClick={refresh} className="rounded-full bg-bg/10 px-3 py-1.5 font-semibold hover:bg-bg/20" title="Fetch the latest numbers from YouTube">
+                Refresh
+              </button>
+            ) : (
+              <Link href="/dashboard/connections" className="rounded-full bg-accent px-3 py-1.5 font-semibold text-accent-ink">
+                Connect YouTube
+              </Link>
+            )}
+          </div>
+        </div>
+        <div className="relative mt-6 grid items-end gap-8 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Subscribers</p>
+            <p key={popKey} className={`mt-2 text-6xl font-semibold leading-none tracking-tight sm:text-7xl lg:text-8xl ${popKey ? "pop" : ""}`}>
+              <RollingNumber value={subscribers} />
+            </p>
+            <p className="mt-3 text-sm text-bg/75">
+              <span className="font-semibold text-good">+{full(subs28)}</span> in the last 28 days
+              {perDay >= 1 && <> · about {Math.round(perDay).toLocaleString("en-IN")} a day</>}
+            </p>
+            {live && subscribers >= 1000 && (
+              <p className="mt-1 text-xs text-bg/50">YouTube rounds counts above 1,000 to 3 digits, so the live number moves in steps; daily gains are exact.</p>
+            )}
+          </div>
+          <MilestoneRing subscribers={subscribers} perDay={perDay} />
+        </div>
+        {winList.length > 0 && (
+          <ul className="relative mt-6 flex flex-wrap gap-2" aria-label="Recent wins">
+            {winList.map((w) => (
+              <li key={w.text} className="rounded-full bg-bg/10 px-3 py-1.5 text-sm backdrop-blur">
+                <span aria-hidden>{w.emoji}</span> {w.text}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
       {summary.mode === "demo" && (
-        <div className="mb-6">
-          <DemoNote>You&apos;re exploring a demo channel. Connect your account to see your own numbers.</DemoNote>
+        <div className="mt-4">
+          <DemoNote>You&apos;re exploring a demo channel: the counter ticks up on its own so you can see the celebrations. Connect YouTube to see your own numbers, live.</DemoNote>
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <Kpi label="Subscribers" value={compact(channel.subscribers)} sub={`+${full(subs28)} in 28 days`} />
-        <Kpi label="Views · 28 days" value={compact(views28)} change={viewsChange} sub="vs previous 2 weeks" />
-        <Kpi label="Watch hours · 28 days" value={compact(hours28)} sub={`${full(channel.videoCount)} videos total`} />
+      <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Kpi label="Views · 28 days" value={<RollingNumber value={Math.round(views28)} format={compact} />} change={viewsChange} sub="vs previous 2 weeks" trend={daily.map((d) => d.views)} />
+        <Kpi label="Watch hours · 28 days" value={<RollingNumber value={Math.round(hours28)} format={compact} />} sub={`${full(channel.videoCount)} videos total`} trend={daily.map((d) => d.watchMinutes)} />
+        <Kpi label="New subscribers · 28 days" value={<RollingNumber value={subs28} format={full} />} trend={daily.map((d) => d.subscribersGained)} />
         <Kpi label="Avg. % viewed" value={avgPct == null ? "—" : `${avgPct.toFixed(0)}%`} sub="recent uploads" />
       </div>
 

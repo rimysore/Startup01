@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -35,6 +35,9 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   // Reading lists of titles and numbers: the small model is enough. Cached because trends change slowly.
   trends: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 6, credits: FEATURE_CREDITS.trends },
   audience: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 24, credits: FEATURE_CREDITS.audience },
+  slang: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 24, credits: FEATURE_CREDITS.slang },
+  // Comparing several channels' strategies is real reasoning: medium effort on the small model.
+  competitors: { model: "claude-haiku-5-5", effort: "medium", maxTokens: 8000, cacheHours: 12, credits: FEATURE_CREDITS.competitors },
 };
 
 export function route(feature: Feature): Route {
@@ -449,6 +452,99 @@ export async function analyseAudience(language: string, data: string): Promise<A
       searchIntent: list(a.searchIntent, 6).map((s) => cut(s, 200)),
       emotions: emotionShares(a.emotions),
       actions: list(a.actions, 6).map((s) => cut(s, 300)),
+    },
+  };
+}
+
+// ---- Slang by generation -------------------------------------------------------------------
+// Grounded in real text the creator's audience writes and watches (trending titles, their comments), so it
+// isn't only the model's memory, which can be out of date for fast-moving slang.
+
+export const GENERATIONS = ["genz", "millennial", "everyone"] as const;
+export const FRESHNESS = ["rising", "steady", "fading"] as const;
+export const SLANG_SOURCES = ["comments", "trending", "knowledge"] as const;
+
+export const SlangSchema = z.object({
+  shift: z.string().describe("Two sentences on how the target viewers' slang has been shifting recently, as visible in the samples"),
+  terms: z
+    .array(
+      z.object({
+        term: z.string().describe("The word or phrase as viewers actually write it"),
+        meaning: z.string(),
+        generation: z.enum(GENERATIONS).describe("genz = roughly 13-27, millennial = 28-43"),
+        freshness: z.enum(FRESHNESS),
+        source: z.enum(SLANG_SOURCES).describe("comments/trending if it appears in the samples given; knowledge only if from general knowledge"),
+        example: z.string().describe("A natural title or hook line for this creator using it"),
+      }),
+    )
+    .describe("10-14 terms, most useful first; prefer terms that appear in the samples"),
+  avoid: z.array(z.object({ term: z.string(), why: z.string() })).describe("Up to 4 terms that now sound dated, cringe or risky with this audience"),
+  tips: z.array(z.string()).describe("Three tips for sounding natural, not forced"),
+});
+export type SlangInsights = z.infer<typeof SlangSchema>;
+
+export async function analyseSlang(language: string, audience: string, samples: string): Promise<AiResult<SlangInsights>> {
+  const out = await structured(
+    "slang",
+    SlangSchema,
+    language,
+    "Find the slang, catchphrases and code-mixed expressions this creator's viewers use, split by generation, for use in titles, hooks and replies. " +
+      "Use the samples as evidence and mark each term's source honestly. Skip anything abusive, casteist, communal or sexual. " +
+      "Write the terms exactly as viewers type them (their script or Roman letters); write meanings, examples and tips in the requested language.\n\n" +
+      `Audience:\n${untrusted(audience)}\n\nSamples of what they write and watch:\n${untrusted(samples)}`,
+  );
+  const sl = out.result;
+  return {
+    ...out,
+    result: {
+      shift: cut(sl.shift, 500),
+      terms: list(sl.terms, 16).map((t) => ({
+        term: cut(t.term, 60),
+        meaning: cut(t.meaning, 200),
+        generation: GENERATIONS.includes(t.generation) ? t.generation : "everyone",
+        freshness: FRESHNESS.includes(t.freshness) ? t.freshness : "steady",
+        source: SLANG_SOURCES.includes(t.source) ? t.source : "knowledge",
+        example: cut(t.example, 160),
+      })),
+      avoid: list(sl.avoid, 4).map((x) => ({ term: cut(x.term, 60), why: cut(x.why, 200) })),
+      tips: list(sl.tips, 4).map((x) => cut(x, 240)),
+    },
+  };
+}
+
+// ---- Competitor comparison --------------------------------------------------------------------
+
+export const CompetitorSchema = z.object({
+  verdict: z.string().describe("Two sentences: where this creator stands against these channels and the single biggest lever"),
+  theyDoBetter: z.array(z.object({ channel: z.string(), what: z.string(), evidence: z.string().describe("Numbers or titles from the data that show it") })),
+  gaps: z.array(z.object({ idea: z.string(), why: z.string() })).describe("Topics or formats the rivals' audiences clearly want that this creator hasn't covered"),
+  titlePatterns: z.array(z.string()).describe("Patterns in the rivals' best-performing titles (length, numbers, questions, language mix, emotional words)"),
+  emotions: z.array(EmotionShare).describe("Emotions the rivals' top videos lean on"),
+  moves: z.array(z.string()).describe("Five specific moves for the next month, honest and within YouTube's rules (no copying content)"),
+});
+export type CompetitorInsights = z.infer<typeof CompetitorSchema>;
+
+export async function compareCompetitors(language: string, data: string): Promise<AiResult<CompetitorInsights>> {
+  const out = await structured(
+    "competitors",
+    CompetitorSchema,
+    language,
+    "Compare this creator's channel (marked YOU) with competitor channels using only the numbers and titles given. " +
+      "Explain what the competitors do better, which audience wants are unserved, what makes their best titles work, and what to do next. " +
+      "Learn from patterns; never suggest copying videos, thumbnails or titles word for word.\n\n" +
+      untrusted(data),
+  );
+  const c = out.result;
+  checkLanguage("competitors", language, [c.verdict, ...c.moves]);
+  return {
+    ...out,
+    result: {
+      verdict: cut(c.verdict, 500),
+      theyDoBetter: list(c.theyDoBetter, 6).map((x) => ({ channel: cut(x.channel, 80), what: cut(x.what, 300), evidence: cut(x.evidence, 300) })),
+      gaps: list(c.gaps, 6).map((x) => ({ idea: cut(x.idea, 200), why: cut(x.why, 300) })),
+      titlePatterns: list(c.titlePatterns, 6).map((x) => cut(x, 240)),
+      emotions: emotionShares(c.emotions),
+      moves: list(c.moves, 6).map((x) => cut(x, 300)),
     },
   };
 }

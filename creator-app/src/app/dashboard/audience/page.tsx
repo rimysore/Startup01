@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
 import { audienceRows, BarList, EmotionBars } from "@/components/insights";
+import { SlangCard } from "@/components/SlangCard";
 import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
 import type { AudienceInsights } from "@/lib/ai";
 import { compact } from "@/lib/format";
@@ -113,6 +114,8 @@ export default function AudiencePage() {
               <BarList rows={rows.subscribed} format={compact} />
             </Card>
           </div>
+
+          <SlangCard report={data.report} />
 
           <Card className="bg-ink text-bg !border-ink">
             <div className="flex flex-wrap items-center justify-between gap-4">

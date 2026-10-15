@@ -148,6 +148,21 @@ budget and refund-on-failure checks as the text AI, and logged in `ai_calls` as 
   (Haiku, 1 credit) gives a persona, region insights, discovery, emotions and next steps. Video Doctor now also
   receives the video's cities, traffic sources and search terms.
 
+## Growth features
+
+- **Live dashboard:** the hero subscriber count rolls like an odometer, polls `/api/channel/live` (1 quota unit,
+  cached 2 min) every 3 minutes while the tab is visible, and celebrates gains with confetti and a toast —
+  including "+N since you last looked" (last count kept in localStorage). Milestone ring to the next 1K/10K/
+  Silver/Gold award with an ETA from the 28-day pace, automatic "wins" chips, sparkline KPI tiles. All motion
+  respects `prefers-reduced-motion`. YouTube rounds counts above 1,000 to 3 significant digits, so large
+  channels see the live number move in steps; daily gains from Analytics are exact. The demo channel ticks up
+  on its own so the celebration can be tried signed out.
+- **Slang** (Audience page, Haiku, 1 credit): current slang by generation in the chosen language, grounded in
+  trending titles in that language and the channel's latest comments; each term says where it was seen.
+- **Competitors** (`/api/competitors`, table `competitors`, max 5): add by @handle or channel URL (names are
+  refused: YouTube search costs 100 units). Each channel's last 15 uploads (3 units, cached 6 h) give
+  comparable metrics; "Compare with Mitra" (Haiku, medium effort, 1 credit) explains gaps and moves.
+
 Admins (`ADMIN_EMAILS`) get **AI costs** in the sidebar: spend, calls and average tokens per feature, the latest
 calls, and a button to reset their own credits while testing. `FREE_CREDITS` raises the Free plan's allowance.
 

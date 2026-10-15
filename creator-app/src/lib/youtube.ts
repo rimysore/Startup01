@@ -415,3 +415,89 @@ export async function fetchTrending(tokens: GoogleTokens, regionCode = "IN", pag
   }
   return out;
 }
+
+// ---- Competitors (public channel data) ------------------------------------------------------------
+
+export interface ChannelRef {
+  id: string;
+  title: string;
+  handle: string | null;
+  avatar: string | null;
+}
+
+export interface ChannelSnapshot extends ChannelRef {
+  subscribers: number;
+  totalViews: number;
+  videoCount: number;
+  recent: { id: string; title: string; publishedAt: string; durationSec: number; views: number; likes: number; comments: number }[];
+}
+
+/**
+ * Reads "@handle", a channel URL (youtube.com/@handle or /channel/UC…) or a "UC…" id. Plain names are refused:
+ * finding a channel by name needs YouTube search, which costs 100 quota units per call.
+ */
+export function parseChannelInput(input: string): { handle: string } | { id: string } | null {
+  const s = input.trim();
+  const url = /youtube\.com\/(?:(@[\w.\-]+)|channel\/(UC[\w-]{22}))/i.exec(s);
+  if (url) return url[1] ? { handle: url[1] } : { id: url[2] };
+  if (/^@[\w.\-]{3,100}$/.test(s)) return { handle: s };
+  if (/^UC[\w-]{22}$/.test(s)) return { id: s };
+  return null;
+}
+
+type ChannelsRes = {
+  items?: Array<{
+    id: string;
+    snippet: { title: string; customUrl?: string; thumbnails?: { default?: { url: string } } };
+    statistics: { subscriberCount?: string; viewCount?: string; videoCount?: string };
+    contentDetails: { relatedPlaylists: { uploads: string } };
+  }>;
+};
+
+/** Finds a channel from a handle or id (1 quota unit). Null if it doesn't exist. */
+export async function resolveChannel(tokens: GoogleTokens, ref: { handle: string } | { id: string }): Promise<ChannelRef | null> {
+  const q = new URLSearchParams({ part: "snippet", ...("handle" in ref ? { forHandle: ref.handle } : { id: ref.id }) });
+  const res = await api<ChannelsRes>(tokens, `${DATA}/channels?${q}`);
+  const ch = res.items?.[0];
+  if (!ch) return null;
+  return { id: ch.id, title: ch.snippet.title, handle: ch.snippet.customUrl ?? null, avatar: ch.snippet.thumbnails?.default?.url ?? null };
+}
+
+/** Public stats and the latest 15 uploads of any channel (3 quota units). */
+export async function fetchChannelSnapshot(tokens: GoogleTokens, channelId: string): Promise<ChannelSnapshot> {
+  const res = await api<ChannelsRes>(tokens, `${DATA}/channels?part=snippet,statistics,contentDetails&id=${encodeURIComponent(channelId)}`);
+  const ch = res.items?.[0];
+  if (!ch) throw new Error(`Channel ${channelId} not found`);
+  type PlaylistRes = { items?: Array<{ contentDetails: { videoId: string } }> };
+  const uploads = await api<PlaylistRes>(tokens, `${DATA}/playlistItems?part=contentDetails&maxResults=15&playlistId=${ch.contentDetails.relatedPlaylists.uploads}`).catch(() => ({ items: [] }) as PlaylistRes);
+  const ids = (uploads.items ?? []).map((i) => i.contentDetails.videoId);
+  type VideosRes = { items?: Array<{ id: string; snippet: { title: string; publishedAt: string }; statistics: { viewCount?: string; likeCount?: string; commentCount?: string }; contentDetails: { duration: string } }> };
+  const videos = ids.length ? (await api<VideosRes>(tokens, `${DATA}/videos?part=snippet,statistics,contentDetails&id=${ids.join(",")}`)).items ?? [] : [];
+  return {
+    id: ch.id,
+    title: ch.snippet.title,
+    handle: ch.snippet.customUrl ?? null,
+    avatar: ch.snippet.thumbnails?.default?.url ?? null,
+    subscribers: Number(ch.statistics.subscriberCount ?? 0),
+    totalViews: Number(ch.statistics.viewCount ?? 0),
+    videoCount: Number(ch.statistics.videoCount ?? 0),
+    recent: videos.map((v) => ({
+      id: v.id,
+      title: v.snippet.title,
+      publishedAt: v.snippet.publishedAt,
+      durationSec: parseDuration(v.contentDetails.duration),
+      views: Number(v.statistics.viewCount ?? 0),
+      likes: Number(v.statistics.likeCount ?? 0),
+      comments: Number(v.statistics.commentCount ?? 0),
+    })),
+  };
+}
+
+/** Just the subscriber count (1 quota unit), for the live counter on the dashboard. */
+export async function fetchSubscriberCount(tokens: GoogleTokens): Promise<{ subscribers: number; views: number; hidden: boolean }> {
+  type Res = { items?: Array<{ statistics: { subscriberCount?: string; viewCount?: string; hiddenSubscriberCount?: boolean } }> };
+  const res = await api<Res>(tokens, `${DATA}/channels?part=statistics&mine=true`);
+  const st = res.items?.[0]?.statistics;
+  if (!st) throw new Error("No channel");
+  return { subscribers: Number(st.subscriberCount ?? 0), views: Number(st.viewCount ?? 0), hidden: Boolean(st.hiddenSubscriberCount) };
+}

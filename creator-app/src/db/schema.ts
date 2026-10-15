@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgTable, primaryKey, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -123,4 +123,21 @@ export const youtubeCache = pgTable(
     keepUntil: timestamp("keep_until", { withTimezone: true }).notNull(),
   },
   (t) => [index("youtube_cache_user").on(t.userId), index("youtube_cache_keep").on(t.keepUntil)],
+);
+
+/** Channels a creator follows to compare against (max 5 each). */
+export const competitors = pgTable(
+  "competitors",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    channelId: text("channel_id").notNull(),
+    title: text("title").notNull(),
+    handle: text("handle"),
+    avatar: text("avatar"),
+    addedAt: timestamp("added_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("competitors_user_channel").on(t.userId, t.channelId)],
 );

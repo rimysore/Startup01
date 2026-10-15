@@ -19,6 +19,7 @@
   --bad: #b3261e;
   --chart-grid: #e9e2d5;
   --chart-compare: #9a9283;
+  --ring-track: #f6d3b6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,6 +41,7 @@
     --bad: #f07167;
     --chart-grid: #2a261e;
     --chart-compare: #7d776b;
+    --ring-track: #4a2c15;
   }
 }
 
@@ -61,6 +63,7 @@
   --bad: #f07167;
   --chart-grid: #2a261e;
   --chart-compare: #7d776b;
+  --ring-track: #4a2c15;
 }
 
 @theme inline {
@@ -130,8 +133,42 @@ body {
   animation: rise 0.5s ease-out both;
 }
 
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.toast-in {
+  animation: toast-in 0.45s cubic-bezier(.2, .9, .2, 1.1) both;
+}
+
+/* A slow, warm glow behind hero cards. */
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-6%, 4%) scale(1.08); }
+}
+.glow-blob {
+  animation: drift 14s ease-in-out infinite;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.pop {
+  animation: pop 0.6s ease-out;
+}
+
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--good) 60%, transparent); }
+  100% { box-shadow: 0 0 0 10px transparent; }
+}
+.live-dot {
+  animation: pulse-dot 1.8s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .rise { animation: none; }
+  .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot { animation: none; }
 }
 
 .legal-body ul {

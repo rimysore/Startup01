@@ -1,5 +1,5 @@
 import type { ChannelSummary, Comment, DailyPoint, RetentionPoint, Trend, Video } from "./types";
-import type { AudienceReport, TrendingVideo } from "./youtube";
+import type { AudienceReport, ChannelSnapshot, TrendingVideo } from "./youtube";
 
 // Deterministic PRNG so the demo looks the same on every load.
 function rng(seed: number) {
@@ -196,3 +196,36 @@ export const DEMO_AUDIENCE: AudienceReport = {
     { status: "SUBSCRIBED", views: 117_000 },
   ],
 };
+
+/** The demo channel and two made-up rivals, for the Competitors page without a connected account. */
+export function demoCompetitors(): { me: ChannelSnapshot; rivals: ChannelSnapshot[] } {
+  const s = demoSummary();
+  const me: ChannelSnapshot = {
+    id: "demo",
+    title: s.channel.title,
+    handle: s.channel.handle,
+    avatar: null,
+    subscribers: s.channel.subscribers,
+    totalViews: s.channel.totalViews,
+    videoCount: s.channel.videoCount,
+    recent: s.videos.map((v) => ({ id: v.id, title: v.title, publishedAt: v.publishedAt, durationSec: v.durationSec, views: v.views, likes: v.likes, comments: v.comments })),
+  };
+  const make = (id: string, title: string, handle: string, subs: number, rows: [string, number, number, number][]): ChannelSnapshot => ({
+    id, title, handle, avatar: null, subscribers: subs, totalViews: subs * 120, videoCount: 400,
+    recent: rows.map(([t, days, dur, views], i) => ({ id: `${id}-${i}`, title: t, publishedAt: new Date(Date.now() - days * 86_400_000).toISOString(), durationSec: dur, views, likes: Math.round(views * 0.05), comments: Math.round(views * 0.006) })),
+  });
+  return {
+    me,
+    rivals: [
+      make("demo-r1", "Gadget Guru Hindi", "@gadgetgurudemo", 1_200_000, [
+        ["₹10,000 vs ₹20,000 phone — कौन सा लें?", 2, 720, 410_000], ["iPhone ka sach 😳", 3, 45, 980_000], ["Best phone under 15000 (Oct)", 6, 840, 350_000],
+        ["Mat lena ye phone!", 8, 52, 1_300_000], ["Camera test raat me 🌙", 10, 660, 290_000], ["5 hidden Android tricks", 12, 58, 760_000],
+        ["Unboxing: naya budget king?", 15, 900, 240_000], ["Battery drain fix 100%", 17, 49, 640_000],
+      ]),
+      make("demo-r2", "Techno Telugu", "@technotelugudemo", 480_000, [
+        ["₹15K లో బెస్ట్ ఫోన్ ఏది?", 4, 780, 120_000], ["ఈ ఫోన్ కొనకండి!", 9, 600, 210_000], ["Camera test night 🔥", 13, 55, 330_000],
+        ["Dasara sale lo best deals", 16, 520, 150_000], ["5G ఫోన్ under 12K", 21, 700, 95_000],
+      ]),
+    ],
+  };
+}

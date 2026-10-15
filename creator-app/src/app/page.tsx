@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LandingCounter } from "@/components/LandingCounter";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Logo, ThemeToggle } from "@/components/ui";
 import { COMPANY } from "@/lib/company";
@@ -6,10 +7,13 @@ import { LANGUAGES } from "@/lib/languages";
 import { PLANS, rupees } from "@/lib/plans";
 
 const FEATURES = [
-  { title: "Video Doctor", body: "See exactly where viewers left and why — then get three fixes for your next upload.", tag: "Retention" },
-  { title: "Title & Thumbnail Studio", body: "Titles in Hinglish or your language, plus thumbnails where Hindi and Telugu text actually render right.", tag: "Packaging" },
-  { title: "Trend Radar", body: "What's rising in Telugu tech, Bhojpuri comedy or Marathi food — before it peaks.", tag: "Ideas" },
-  { title: "Comment Insights", body: "Thousands of mixed-language comments turned into requests, questions and reply drafts.", tag: "Audience" },
+  { title: "Live growth dashboard", body: "Your subscriber count rolls up live. Every new subscriber, best day and milestone gets celebrated.", tag: "Motivation" },
+  { title: "Video Doctor", body: "See exactly where viewers left, which cities they came from and what they searched — then three fixes.", tag: "Retention" },
+  { title: "Title & Thumbnail Studio", body: "Titles in your language and AI-designed thumbnails where Hindi and Telugu text actually render right.", tag: "Packaging" },
+  { title: "Trend Radar", body: "What's trending in India right now, sorted by language, with the emotions and festivals driving it.", tag: "Ideas" },
+  { title: "Audience & slang", body: "Your top cities, how people find you, and the slang your Gen Z and millennial viewers really use.", tag: "Audience" },
+  { title: "Competitor compare", body: "Line up your channel against up to 5 rivals: views, upload rhythm, Shorts mix, title patterns, gaps to own.", tag: "Strategy" },
+  { title: "Comment Insights", body: "Mixed-language comments turned into mood, emotions, requests and reply drafts.", tag: "Community" },
   { title: "Ask Mitra", body: "A manager who knows your numbers. Ask anything, in any language, any time.", tag: "Assistant" },
   { title: "WhatsApp Reports", body: "Every Monday: your 3 wins, 3 fixes and what to post this week.", tag: "Coming soon" },
 ];
@@ -122,7 +126,7 @@ export default function Home() {
           </div>
           <p className="mt-4 text-xs text-muted">Read-only access. Free to start. No credit card.</p>
         </div>
-        <HeroPreview />
+        <LandingCounter />
       </section>
 
       <section id="languages" className="border-y border-line bg-surface py-6" aria-label="Supported languages">
@@ -150,6 +154,29 @@ export default function Home() {
               <p className="mt-2 text-ink-2">{f.body}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
+          <HeroPreview />
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Know why, not just what</p>
+            <h2 className="mt-2 font-display text-5xl leading-tight sm:text-6xl">Every drop explained. Every win celebrated.</h2>
+            <ul className="mt-6 space-y-4 text-ink-2">
+              {[
+                ["🎉", "Confetti for every new subscriber, and a running count of what you gained since you last looked."],
+                ["🏆", "Milestone ring to your next 1K, 10K or Silver Creator Award, with an honest ETA at your current pace."],
+                ["🩺", "Retention drops pinned to the second, explained in your language, with the fix."],
+                ["📍", "Which cities watched, what they searched, and which emotions keep them coming back."],
+              ].map(([e, t]) => (
+                <li key={t} className="flex gap-3">
+                  <span className="text-2xl" aria-hidden>{e}</span>
+                  <span>{t}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
 
