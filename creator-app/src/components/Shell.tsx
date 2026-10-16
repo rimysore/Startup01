@@ -17,6 +17,7 @@ const NAV = [
   { href: "/dashboard/competitors", label: "Competitors", icon: "M3 3v18h18M7 15l4-4 3 3 5-6" },
   { href: "/dashboard/comments", label: "Comments", icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
   { href: "/dashboard/assistant", label: "Ask Mitra", icon: "M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z" },
+  { href: "/dashboard/whatsapp", label: "WhatsApp & reports", icon: "M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3zM9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z" },
   { href: "/dashboard/connections", label: "Connections", icon: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" },
   { href: "/dashboard/billing", label: "Plan & billing", icon: "M2 7h20v12H2zM2 11h20M6 15h4" },
 ];
@@ -187,10 +188,11 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <nav className="mt-8 flex flex-col gap-1">
             <NavLinks />
           </nav>
-          <div className="mt-auto rounded-2xl bg-ink p-4 text-bg">
-            <p className="font-display text-xl leading-snug">Weekly report on WhatsApp</p>
-            <p className="mt-1 text-xs opacity-70">Every Monday, your 3 biggest wins and fixes. Coming soon.</p>
-          </div>
+          <Link href="/dashboard/whatsapp" className="mt-auto block rounded-2xl bg-ink p-4 text-bg transition hover:-translate-y-0.5">
+            <p className="font-display text-xl leading-snug">Your report on WhatsApp</p>
+            <p className="mt-1 text-xs opacity-70">Every Monday, your wins, fixes and what to post. Plus a check on every new video.</p>
+            <p className="mt-2 text-xs font-semibold text-[#25D366]">Connect →</p>
+          </Link>
           <nav className="mt-4 flex flex-wrap gap-x-3 gap-y-1 px-3 text-[11px] text-muted" aria-label="Legal">
             {LEGAL_LINKS.map((l) => (
               <Link key={l.href} href={l.href} className="hover:text-ink">

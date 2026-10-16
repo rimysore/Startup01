@@ -22,7 +22,6 @@ function StatusPill({ on, label }: { on: boolean; label: string }) {
 
 const SOON = [
   { name: "Instagram Reels", body: "Cross-post Shorts and compare performance." },
-  { name: "WhatsApp reports", body: "A Monday summary of wins, drops and what to post next." },
   { name: "Brand deals inbox", body: "Track sponsor offers, rates and payments." },
 ];
 

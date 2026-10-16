@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "outreach";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "outreach" | "report";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -40,6 +40,8 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   competitors: { model: "claude-haiku-5-5", effort: "medium", maxTokens: 8000, cacheHours: 12, credits: FEATURE_CREDITS.competitors },
   // Admin prospecting: short personal openers, batched. Not charged to anyone's credits.
   outreach: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: 0 },
+  // Monday report and 48-hour check: Mitra pays (about ₹0.05 each), the creator is never charged.
+  report: { model: "claude-haiku-5-5", effort: "low", maxTokens: 3000, cacheHours: 0, credits: 0 },
 };
 
 export function route(feature: Feature): Route {
@@ -638,4 +640,57 @@ export async function chat(
   const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
   if (!text) throw new Error("Empty reply");
   return { result: cut(text, 4000), usage: usageOf(res) };
+}
+
+// ---- Reports (Monday report, 48-hour check) ------------------------------------------------------------
+// Short, warm, specific: read on a phone in WhatsApp. The numbers come from our own calculations; the model only
+// turns them into words in the creator's language, so it can't get a number wrong.
+
+export const WeeklyCoachSchema = z.object({
+  headline: z.string().describe("One short, warm sentence summing up the week, like a manager's WhatsApp opener"),
+  wins: z.array(z.string()).describe("Up to 3 specific wins from the data, each one short sentence"),
+  fixes: z.array(z.string()).describe("Up to 3 specific, doable fixes for this week, each one short sentence"),
+  nextVideo: z.object({ idea: z.string().describe("A concrete next video idea based on what worked"), why: z.string().describe("One sentence: why, from the data") }),
+});
+export type WeeklyCoach = z.infer<typeof WeeklyCoachSchema>;
+
+export async function coachWeekly(language: string, facts: string): Promise<AiResult<WeeklyCoach>> {
+  const out = await structured(
+    "report",
+    WeeklyCoachSchema,
+    language,
+    `This week's numbers for a creator's channel (video titles are the creator's own):\n${untrusted(facts)}\n\n` +
+      "Write their Monday report. Use only these facts and numbers. Wins first, celebrate real progress; fixes must be small and doable this week. " +
+      "No markdown, no hashtags, plain sentences of at most 20 words.",
+  );
+  const r = out.result;
+  checkLanguage("report", language, [r.headline, ...r.wins]);
+  return {
+    ...out,
+    result: {
+      headline: cut(r.headline, 160),
+      wins: list(r.wins, 3).map((x) => cut(x, 180)),
+      fixes: list(r.fixes, 3).map((x) => cut(x, 180)),
+      nextVideo: { idea: cut(r.nextVideo.idea, 160), why: cut(r.nextVideo.why, 180) },
+    },
+  };
+}
+
+export const VideoCoachSchema = z.object({
+  verdict: z.string().describe("One sentence on how the video is doing so far versus the channel's usual, encouraging but honest"),
+  actions: z.array(z.string()).describe("2 or 3 things to do in the next 48 hours to help this video, most useful first, each one short sentence"),
+});
+export type VideoCoach = z.infer<typeof VideoCoachSchema>;
+
+export async function coachVideo(language: string, facts: string): Promise<AiResult<VideoCoach>> {
+  const out = await structured(
+    "report",
+    VideoCoachSchema,
+    language,
+    `A creator's new video, about two days after upload:\n${untrusted(facts)}\n\n` +
+      "Tell them how it's doing and what to do now (e.g. test a new title or thumbnail with YouTube's Test & compare, pin a comment with a question, " +
+      "cut a Short from the best moment, share it in their community tab). Use only these facts. No markdown, at most 20 words per sentence.",
+  );
+  checkLanguage("report", language, [out.result.verdict]);
+  return { ...out, result: { verdict: cut(out.result.verdict, 200), actions: list(out.result.actions, 3).map((x) => cut(x, 180)) } };
 }

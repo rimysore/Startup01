@@ -12,6 +12,8 @@ const ANSWERS = {
   doctor: { score: 150, verdict: "Intro was too long.", traffic: "Mostly search from Lucknow.", whatWorked: ["Good thumbnail"], whatHurt: [{ at: "0:12", issue: "Slow intro", fix: "Start with the result" }], nextVideo: ["Hook first"], titleIdeas: ["A", "B", "C"] },
   titles: { titles: [{ title: "Raat me test kiya", why: "curiosity", strength: 42 }], thumbnailText: ["कौन जीता?"], hook: "Raat ke 11 baje…" },
   thumbnail: { headline: "रात में कौन जीता?", highlight: "जीता?", badge: "₹20K TEST", layout: "subject-right", images: [{ index: 0, role: "subject", focusX: 0.5, focusY: 0.35, zoom: 7 }, { index: 9, role: "inset", focusX: 0.5, focusY: 0.5, zoom: 1 }], palette: { accent: "#ffd23f", text: "#ffffff", stroke: "#000000", glow: "#ff7a1a", bgFrom: "#1b1446", bgTo: "not-a-colour" }, backgroundQuery: "city night <b>lights</b>", imagePrompt: "Rainy <city> street at night", emoji: "🌙", arrow: true, why: "Price plus a question makes people click." },
+  weekly: { headline: "Badhiya hafta raha!", wins: ["140 naye subscribers aaye.", "Street food video 2.6x chala."], fixes: ["Pehle 10 second mein result dikhao."], nextVideo: { idea: "Street food part 2", why: "Sabse zyada chala." } },
+  videocheck: { verdict: "Ye video usual se aage chal raha hai.", actions: ["Ek comment pin karo.", "Short banao.", "Community post karo.", "extra"] },
   comments: { mood: { positive: 3, neutral: 1, negative: 1 }, emotions: [{ emotion: "joy", share: 2 }, { emotion: "anger", share: 2 }], themes: [{ theme: "Battery", share: 250, example: "battery?" }], questions: ["mic?"], videoIdeas: ["part 2"], replies: [{ to: "Mohit", reply: "Thanks!" }] },
 };
 
@@ -19,6 +21,8 @@ function featureOf(body) {
   const props = Object.keys(body.output_config?.format?.schema?.properties ?? {});
   if (props.includes("messages")) return "outreach";
   if (props.includes("theyDoBetter")) return "competitors";
+  if (props.includes("wins")) return "weekly";
+  if (props.includes("verdict") && props.includes("actions")) return "videocheck";
   if (props.includes("verdict")) return "doctor";
   if (props.includes("headline")) return "thumbnail";
   if (props.includes("regional")) return "trends";

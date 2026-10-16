@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
+import { channelContext } from "@/lib/channel-context";
 import { AiErrorNote, Button, Card, PageHeader } from "@/components/ui";
 import { compact } from "@/lib/format";
-import type { ChannelSummary } from "@/lib/types";
 
 interface Msg {
   role: "user" | "assistant";
@@ -17,15 +17,6 @@ const SUGGESTIONS = [
   "Plan a 4-week Shorts series from my best video",
   "Sponsor ko kitna charge karun?",
 ];
-
-function context(s: ChannelSummary): string {
-  const views = s.daily.reduce((a, d) => a + d.views, 0);
-  const subs = s.daily.reduce((a, d) => a + d.subscribersGained, 0);
-  const vids = s.videos
-    .map((v) => `- "${v.title}" (${v.publishedAt}): ${v.views} views, ${v.likes} likes, ${v.comments} comments, ${v.avgViewPct ?? "?"}% viewed, ${Math.round(v.durationSec / 60)} min`)
-    .join("\n");
-  return `${s.channel.title} (${s.channel.handle}), ${s.channel.subscribers} subscribers, ${s.channel.videoCount} videos.\nLast 28 days: ${views} views, ${subs} new subscribers.\nRecent uploads:\n${vids}`;
-}
 
 /** Minimal formatting for replies: **bold** and bullet lines. */
 function Rich({ text }: { text: string }) {
@@ -66,7 +57,7 @@ export default function AssistantPage() {
     setInput("");
     setSending(true);
     setError(null);
-    const res = await postAi<string>("/api/ai/chat", { language, context: context(summary), messages: next.slice(-12).map((m) => ({ ...m, content: m.content.slice(0, 2000) })) });
+    const res = await postAi<string>("/api/ai/chat", { language, context: channelContext(summary), messages: next.slice(-12).map((m) => ({ ...m, content: m.content.slice(0, 2000) })) });
     setSending(false);
     if (res.result) setMessages([...next, { role: "assistant", content: res.result }]);
     else setError(res.error ?? { message: "Something went wrong." });

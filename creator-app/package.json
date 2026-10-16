@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts && tsx tests/insights.test.mts && tsx tests/growth.test.mts && tsx tests/founders.test.mts && tsx tests/prospects.test.mts",
+    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts && tsx tests/insights.test.mts && tsx tests/growth.test.mts && tsx tests/founders.test.mts && tsx tests/prospects.test.mts && tsx tests/whatsapp.test.mts && tsx tests/whatsapp-ai.test.mts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.mts",
     "check:env": "tsx scripts/check-env.mts"
@@ -17,6 +17,7 @@
     "@electric-sql/pglite": "^0.5.10",
     "drizzle-orm": "^0.45.4",
     "next": "16.4.1",
+    "nodemailer": "^10.1.2",
     "postgres": "^3.4.9",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.11",

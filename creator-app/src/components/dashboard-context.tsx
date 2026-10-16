@@ -46,7 +46,7 @@ function getJson<T>(url: string): Promise<T> {
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [summary, setSummary] = useState<DashboardState["summary"]>(null);
   const [me, setMe] = useState<Me | null>(null);
-  const [stored, setLanguage] = useStoredString("mitra-language", "hinglish");
+  const [stored, storeLanguage] = useStoredString("mitra-language", "hinglish");
   const language: LanguageCode = isLanguageCode(stored) ? stored : "hinglish";
   const [version, setVersion] = useState(0);
   const [meVersion, setMeVersion] = useState(0);
@@ -57,6 +57,15 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setVersion((v) => v + 1);
   }, []);
   const refreshMe = useCallback(() => setMeVersion((v) => v + 1), []);
+  // Saved on the account too, so the Monday report and WhatsApp replies use the same language.
+  const signedIn = Boolean(me?.user);
+  const setLanguage = useCallback(
+    (l: LanguageCode) => {
+      storeLanguage(l);
+      if (signedIn) fetch("/api/whatsapp", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ language: l }) }).catch(() => {});
+    },
+    [storeLanguage, signedIn],
+  );
 
   useEffect(() => {
     let live = true;

@@ -21,6 +21,8 @@ export interface Video {
   id: string;
   title: string;
   publishedAt: string;
+  /** Exact upload time (ISO); missing in data cached before it was added. */
+  publishedAtIso?: string;
   thumbnail: string | null;
   durationSec: number;
   views: number;

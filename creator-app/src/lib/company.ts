@@ -3,7 +3,7 @@
  * when a company is registered, change legalName/operatorType/address (and the governing law in the Terms).
  * The legal pages show a warning banner while any [bracketed] placeholder remains.
  */
-const OPERATOR = "[Your full legal name]";
+const OPERATOR = "Rithvik Mysore Suresh";
 
 /** The public site address: APP_URL, else Vercel's production URL (e.g. mitra.vercel.app), else the planned domain. */
 export const SITE_URL =
@@ -37,7 +37,7 @@ export const COMPANY = {
 };
 
 /** Date the current versions of the legal pages take effect. Update whenever the text changes. */
-export const LEGAL_EFFECTIVE_DATE = "15 October 2026";
+export const LEGAL_EFFECTIVE_DATE = "16 October 2026";
 
 export function hasPlaceholders(): boolean {
   return Object.values(COMPANY).some((v) => v.includes("["));

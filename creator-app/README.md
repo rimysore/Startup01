@@ -72,6 +72,12 @@ The output language (top bar) controls what language the AI writes in.
    Before charging real customers you'll also need Razorpay account activation (KYC) and published
    terms, privacy and refund policies.
 
+## WhatsApp and email reports
+
+Every Monday ~8:45 IST creators get a weekly report (wins, fixes, what to post next), and ~2 days after each upload
+a check on how it's doing, on WhatsApp (or email). On WhatsApp they can also ask questions, get titles and ideas,
+change language and stop reports. Architecture, costs and the Meta setup steps: **docs/WHATSAPP.md**.
+
 ## Legal pages
 
 `/terms`, `/privacy`, `/refunds` and `/contact` describe what the app actually does (data collected, YouTube

@@ -50,6 +50,13 @@
       "when": 1792166154937,
       "tag": "0006_founder_pass",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792170566621,
+      "tag": "0007_whatsapp_reports",
+      "breakpoints": true
     }
   ]
 }

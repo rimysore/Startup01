@@ -3,5 +3,13 @@
   "framework": "nextjs",
   "installCommand": "npm ci",
   "buildCommand": "npm run db:migrate && npm run build",
-  "regions": ["sin1"]
+  "regions": [
+    "sin1"
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/daily",
+      "schedule": "15 3 * * *"
+    }
+  ]
 }

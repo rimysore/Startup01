@@ -14,7 +14,7 @@ console.log("Required");
 line(has("DATABASE_URL") && /^postgres(ql)?:\/\//.test(env.DATABASE_URL!), "DATABASE_URL", "postgres:// connection string");
 line((env.SESSION_SECRET ?? "").length >= 32, "SESSION_SECRET", "at least 32 characters (openssl rand -base64 48)");
 line(!has("APP_URL") ? "warn" : /^https:\/\/[^/]+$/.test(env.APP_URL!), "APP_URL", has("APP_URL") ? "https://your-domain, no trailing slash" : "not set: using the address visitors arrive on (fine on Vercel)");
-line(/^[^@\s]+@[^@\s]+\.[a-z]+$/i.test(env.NEXT_PUBLIC_CONTACT_EMAIL ?? ""), "NEXT_PUBLIC_CONTACT_EMAIL", "inbox shown on the legal pages");
+line(!has("NEXT_PUBLIC_CONTACT_EMAIL") ? "warn" : /^[^@\s]+@[^@\s]+\.[a-z]+$/i.test(env.NEXT_PUBLIC_CONTACT_EMAIL!), "NEXT_PUBLIC_CONTACT_EMAIL", has("NEXT_PUBLIC_CONTACT_EMAIL") ? "inbox shown on the legal pages" : "not set: using mitracontentsupport@gmail.com");
 line(/\.apps\.googleusercontent\.com$/.test(env.GOOGLE_CLIENT_ID ?? ""), "GOOGLE_CLIENT_ID", "ends with .apps.googleusercontent.com");
 line(has("GOOGLE_CLIENT_SECRET"), "GOOGLE_CLIENT_SECRET");
 line((env.ANTHROPIC_API_KEY ?? "").startsWith("sk-ant-"), "ANTHROPIC_API_KEY", "starts with sk-ant-");
@@ -24,6 +24,14 @@ console.log("\nPayments (needed before charging users)");
 const rzp = ["RAZORPAY_KEY_ID", "RAZORPAY_KEY_SECRET", "RAZORPAY_PLAN_PRO", "RAZORPAY_PLAN_CREATOR", "RAZORPAY_WEBHOOK_SECRET"];
 for (const k of rzp) line(has(k) || "warn", k, has(k) ? "" : "not set: upgrades are disabled");
 if (env.RAZORPAY_KEY_ID?.startsWith("rzp_test_")) line("warn", "RAZORPAY_KEY_ID", "test-mode key: no real money is charged");
+
+console.log("\nReports (WhatsApp + email)");
+line(has("CRON_SECRET") || "warn", "CRON_SECRET", has("CRON_SECRET") ? "" : "not set: the daily reports job won't run");
+const wa = ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_NUMBER_ID", "WHATSAPP_APP_SECRET", "WHATSAPP_VERIFY_TOKEN", "WHATSAPP_NUMBER"];
+for (const k of wa) line(has(k) || "warn", k, has(k) ? "" : "not set: WhatsApp is off");
+line(has("WHATSAPP_TEMPLATE_LANGS") || "warn", "WHATSAPP_TEMPLATE_LANGS", has("WHATSAPP_TEMPLATE_LANGS") ? env.WHATSAPP_TEMPLATE_LANGS : "not set: English templates only");
+for (const k of ["SMTP_USER", "SMTP_PASS"]) line(has(k) || "warn", k, has(k) ? "" : "not set: no email reports");
+if (has("WHATSAPP_FAKE") || has("EMAIL_FAKE")) line(false, "WHATSAPP_FAKE / EMAIL_FAKE", "test switches: remove in production");
 
 console.log("\nMust be off in production");
 for (const k of ["ALLOW_DEV_LOGIN", "ALLOW_BILLING_SIMULATION", "ALLOW_EMBEDDED_DB"]) line(!has(k), k, has(k) ? "remove it" : "off");

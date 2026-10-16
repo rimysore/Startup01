@@ -217,6 +217,7 @@ export async function fetchSummary(tokens: GoogleTokens): Promise<ChannelSummary
           id: v.id,
           title: v.snippet.title,
           publishedAt: v.snippet.publishedAt.slice(0, 10),
+          publishedAtIso: v.snippet.publishedAt,
           thumbnail: v.snippet.thumbnails?.medium?.url ?? null,
           durationSec: parseDuration(v.contentDetails.duration),
           views: Number(v.statistics.viewCount ?? 0),
@@ -278,6 +279,21 @@ export async function fetchSummary(tokens: GoogleTokens): Promise<ChannelSummary
     daily,
     videos,
   };
+}
+
+/**
+ * Views a video got on its upload day and the day after, from YouTube Analytics: the baseline for the 48-hour
+ * check. Only meaningful for videos at least ~4 days old (Analytics lags by a day or two).
+ */
+export async function fetchEarlyViews(tokens: GoogleTokens, videoId: string, publishedDate: string): Promise<number> {
+  const start = new Date(`${publishedDate}T00:00:00Z`);
+  const r = await report(tokens, {
+    startDate: ymd(start),
+    endDate: ymd(new Date(start.getTime() + 86_400_000)),
+    metrics: "views",
+    filters: `video==${videoId}`,
+  });
+  return Number(r.rows?.[0]?.[0] ?? 0);
 }
 
 export async function fetchRetention(tokens: GoogleTokens, videoId: string): Promise<RetentionPoint[]> {

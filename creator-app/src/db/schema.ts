@@ -1,4 +1,4 @@
-import { index, integer, jsonb, pgTable, primaryKey, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean, index, integer, jsonb, pgTable, primaryKey, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -10,6 +10,13 @@ export const users = pgTable("users", {
   planRenewsAt: timestamp("plan_renews_at", { withTimezone: true }),
   /** 1-100 for the founding creators (first to connect a channel); null for everyone else. */
   founderNumber: integer("founder_number").unique(),
+  /** Language Mitra writes in (reports, WhatsApp, answers). The dashboard keeps it in sync. */
+  language: text("language").notNull().default("hinglish"),
+  /** Monday report and the check two days after each upload. */
+  notifyWeekly: boolean("notify_weekly").notNull().default(true),
+  notifyVideoCheck: boolean("notify_video_check").notNull().default(true),
+  /** Send reports by email when WhatsApp isn't connected. */
+  notifyEmail: boolean("notify_email").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -192,4 +199,59 @@ export const prospectRuns = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("prospect_runs_time").on(t.createdAt)],
+);
+
+/**
+ * A creator's WhatsApp number. Linked only by the creator messaging Mitra a one-time code from that number, so
+ * the number is proven and the message itself is the opt-in. `optedOutAt` is set by STOP and honoured everywhere.
+ */
+export const whatsappContacts = pgTable("whatsapp_contacts", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  /** Digits only, with country code (WhatsApp's wa_id), e.g. 919876543210. */
+  phone: text("phone").notNull().unique(),
+  optedInAt: timestamp("opted_in_at", { withTimezone: true }).notNull().defaultNow(),
+  optedOutAt: timestamp("opted_out_at", { withTimezone: true }),
+  /** Last message from the creator: free-form replies are allowed for 24 hours after it. */
+  lastInboundAt: timestamp("last_inbound_at", { withTimezone: true }),
+  /** What the bot is waiting for (e.g. a topic for titles), with an expiry. */
+  state: jsonb("state").$type<{ awaiting: string; until: number } | null>(),
+});
+
+/** One-time codes for linking WhatsApp ("JOIN 4821"), valid for 30 minutes. */
+export const whatsappLinkCodes = pgTable("whatsapp_link_codes", {
+  code: text("code").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+});
+
+/**
+ * Every report sent (or attempted), one row per user + kind + key (ISO week for the Monday report, video id for
+ * the 48-hour check). The unique key makes sending idempotent: a retried cron can never send twice. The
+ * rendered report is kept so "Full report" can be answered without recomputing.
+ */
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** weekly | video_check */
+    kind: text("kind").notNull(),
+    key: text("key").notNull(),
+    /** whatsapp | email | none */
+    channel: text("channel").notNull().default("none"),
+    /** pending | sent | failed | skipped */
+    status: text("status").notNull().default("pending"),
+    attempts: integer("attempts").notNull().default(0),
+    payload: jsonb("payload").$type<Record<string, unknown>>(),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+  },
+  (t) => [uniqueIndex("notifications_unique").on(t.userId, t.kind, t.key), index("notifications_status").on(t.status, t.createdAt)],
 );
