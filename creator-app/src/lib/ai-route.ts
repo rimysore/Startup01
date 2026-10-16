@@ -17,7 +17,7 @@ export type DemoReason = "signin" | "nokey";
  *   3. per-user rate limit          → 429
  *   4. answer cache                 → cached answer, no model call, no credits
  *   5. daily spend circuit breaker  → 503
- *   6. reserve credits atomically   → 402 when the month's credits are used up
+ *   6. reserve atomically (Founder Pass first, then credits) → 402 when the month's credits are used up
  *   7. call the routed model; refund the credits if it fails or refuses
  *   8. log tokens + cost, store in cache
  */
@@ -53,7 +53,8 @@ export function aiRoute<B extends z.ZodRawShape, R>(
     }
 
     const month = monthKey();
-    if (!(await reserveCredit(user, r.credits))) {
+    const pool = await reserveCredit(user, r.credits, feature);
+    if (!pool) {
       return Response.json({ error: "You've used all your AI credits for this month.", upgrade: true }, { status: 402 });
     }
 
@@ -62,7 +63,7 @@ export function aiRoute<B extends z.ZodRawShape, R>(
     try {
       out = await run(input);
     } catch (err) {
-      await refundCredit(user.id, month, r.credits);
+      await refundCredit(user.id, month, r.credits, pool);
       if (err instanceof AiRefusal) return Response.json({ error: "Mitra can't help with that request." }, { status: 422 });
       const detail = describeError(err);
       console.error(`AI ${feature} failed: ${detail}`);
@@ -78,7 +79,7 @@ export function aiRoute<B extends z.ZodRawShape, R>(
       key ? writeCache(key, user.id, feature, out.result, r.cacheHours) : null,
     ]).catch((err) => console.error("AI bookkeeping failed", err));
 
-    return Response.json({ demo: false, result: out.result });
+    return Response.json({ demo: false, result: out.result, ...(pool === "founder" ? { founderPass: true } : {}) });
   };
 }
 

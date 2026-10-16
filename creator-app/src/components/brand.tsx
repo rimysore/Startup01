@@ -1,35 +1,26 @@
-import Link from "next/link";
+/** Brand colours, shared by the mark, the app icons and the share image. */
+export const BRAND = { saffron: "#FF8A1F", fuchsia: "#D946EF", violet: "#6C47FF", sun: "#FFD23F" } as const;
+
+/** The white "m" with a taller second hump (growth), drawn as one rounded stroke. */
+export const MARK_M = "M12.5 34V27.5a4.25 4.25 0 0 1 8.5 0V34M21 34V19.5a4.25 4.25 0 0 1 8.5 0V34";
 
 /**
- * The Mitra mark: a speech bubble (a manager who talks to you, in your language) holding a play button
- * (YouTube), with a spark for the growth and AI. Saffron → rose → violet gradient.
+ * The Mitra mark: a round badge in a saffron → fuchsia → violet sunrise, a white "m" whose second hump stands
+ * taller (your channel growing), and a sun dot that turns it into "mi". Deliberately nothing like a play button.
  */
 export function MitraMark({ size = 32, className = "", id = "mitra-mark" }: { size?: number; className?: string; id?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 48 48" className={className} aria-hidden>
       <defs>
-        <linearGradient id={`${id}-g`} x1="4" y1="2" x2="44" y2="46" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#FF8A1F" />
-          <stop offset="0.55" stopColor="#FF3D6E" />
-          <stop offset="1" stopColor="#8B5CF6" />
+        <linearGradient id={`${id}-g`} x1="6" y1="44" x2="42" y2="4" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor={BRAND.saffron} />
+          <stop offset="0.5" stopColor={BRAND.fuchsia} />
+          <stop offset="1" stopColor={BRAND.violet} />
         </linearGradient>
       </defs>
-      <path
-        d="M15 3h18a13 13 0 0 1 13 13v11a13 13 0 0 1-13 13H21.5l-8.6 6.2c-1 .7-2.3-.2-2-1.4l1.2-5.4A13 13 0 0 1 2 27V16A13 13 0 0 1 15 3z"
-        fill={`url(#${id}-g)`}
-      />
-      <path d="M19.5 14.6v12.8c0 1.1 1.2 1.8 2.2 1.2l10.4-6.4c.9-.6.9-1.9 0-2.4l-10.4-6.4c-1-.6-2.2.1-2.2 1.2z" fill="#fff" />
-      <path d="M38.5 1.5l1.3 3.4 3.4 1.3-3.4 1.3-1.3 3.4-1.3-3.4-3.4-1.3 3.4-1.3z" fill="#FFD23F" stroke="#fff" strokeWidth="1.2" strokeLinejoin="round" />
+      <circle cx="24" cy="24" r="22.5" fill={`url(#${id}-g)`} />
+      <path d={MARK_M} fill="none" stroke="#fff" strokeWidth="4.6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="35.5" cy="15" r="3.6" fill={BRAND.sun} />
     </svg>
-  );
-}
-
-/** Mark + lowercase wordmark, linking home. */
-export function Logo({ className = "", size = 30 }: { className?: string; size?: number }) {
-  return (
-    <Link href="/" className={`group flex items-center gap-2 ${className}`} aria-label="Mitra home">
-      <MitraMark size={size} className="transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-105" />
-      <span className="font-display text-[1.6rem] font-extrabold leading-none tracking-[-0.04em]">mitra</span>
-    </Link>
   );
 }

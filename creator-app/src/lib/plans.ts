@@ -35,9 +35,10 @@ export const PLANS: Record<PlanId, Plan> = {
   creator: {
     id: "creator",
     name: "Creator+",
-    pricePaise: 99_900,
-    credits: 750,
-    points: ["750 AI credits / month", "Everything in Pro", "Priority AI", "WhatsApp weekly reports (soon)"],
+    // 250 credits keeps even all-Video-Doctor use around break-even at ₹249.
+    pricePaise: 24_900,
+    credits: 250,
+    points: ["250 AI credits / month", "Everything in Pro", "Priority AI", "WhatsApp weekly reports (soon)"],
   },
 };
 
@@ -55,21 +56,38 @@ export function planOf(v: string | null | undefined): Plan {
  * Monthly credits for a plan. Server-side, FREE_CREDITS overrides the Free plan's allowance (e.g. 20 for beta
  * testers) without a code change.
  */
-export function creditLimit(v: string | null | undefined, founder = false): number {
+export function creditLimit(v: string | null | undefined): number {
   const plan = planOf(v);
   const free = Number(process.env.FREE_CREDITS);
-  const base = plan.id === "free" && free > 0 ? Math.floor(free) : plan.credits;
-  // Founding creators get a lifetime floor of FOUNDER_CREDITS on any plan.
-  return founder ? Math.max(base, FOUNDER_CREDITS) : base;
+  return plan.id === "free" && free > 0 ? Math.floor(free) : plan.credits;
 }
 
-/** The first FOUNDING_SPOTS creators to connect a YouTube channel become founding creators, for life. */
+/** Sold by conversation for now (multi-channel and team seats are being built), so it isn't a checkout plan. */
+export const AGENCY = {
+  name: "Agency",
+  pricePaise: 1_99_900,
+  points: ["Up to 10 channels", "2,000 AI credits / month, shared", "Team seats", "Client-ready reports"],
+};
+
+/**
+ * The first FOUNDING_SPOTS creators to connect a YouTube channel get a Founder Pass, for life: the features that
+ * run on the small model at low effort (each answer costs us well under ₹1) are free up to FOUNDER_FREE_USES a
+ * month, on any plan, without touching their credits. Video Doctor (larger model) and AI images still use credits,
+ * so 100 founders cost at most a couple of thousand rupees a month.
+ */
 export const FOUNDING_SPOTS = 100;
-export const FOUNDER_CREDITS = 30;
+export const FOUNDER_FREE_USES = 50;
+export const FOUNDER_FREE_FEATURES = ["titles", "thumbnail", "trends", "audience", "slang", "comments", "chat"] as const;
+export type FounderFreeFeature = (typeof FOUNDER_FREE_FEATURES)[number];
+export function founderFree(feature: string): feature is FounderFreeFeature {
+  return (FOUNDER_FREE_FEATURES as readonly string[]).includes(feature);
+}
+/** What founders get free, in plain words, for the UI. */
+export const FOUNDER_FREE_LABELS = ["Titles", "Thumbnail design", "Trends", "Audience", "Slang", "Comment insights", "Ask Mitra"];
 export const FOUNDER_PERKS = [
   "Founding Creator badge with your number (#1–100)",
-  `${FOUNDER_CREDITS} AI credits every month, free, for life`,
-  "Live dashboard, Trend Radar, Audience and Competitor data free for life",
+  `${FOUNDER_FREE_USES} free uses a month, for life: titles, thumbnails, trends, audience, slang, comments and Ask Mitra`,
+  "Live dashboard, subscriber celebrations and competitor tracking free for life",
   "First access to brand deals and collabs",
 ];
 

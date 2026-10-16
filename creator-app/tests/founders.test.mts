@@ -2,8 +2,8 @@
 process.env.PGLITE_DIR = "memory://";
 const { db, schema } = await import("@/db");
 const { claimFounderSpot, foundingSpotsLeft } = await import("@/lib/founders");
-const { creditLimit, FOUNDER_CREDITS, PLANS } = await import("@/lib/plans");
-const { reserveCredit } = await import("@/lib/usage");
+const { creditLimit, FOUNDER_FREE_USES, PLANS } = await import("@/lib/plans");
+const { monthKey, refundCredit, reserveCredit, usageThisMonth } = await import("@/lib/usage");
 const { eq } = await import("drizzle-orm");
 const assert = (c: unknown, m: string) => { if (!c) { console.error("FAIL", m); process.exit(1); } console.log("ok", m); };
 
@@ -32,11 +32,22 @@ const [u101] = await d.select().from(schema.users).where(eq(schema.users.id, "u1
 assert(u100.founderNumber === 100 && u101.founderNumber === null, "#100 is the last spot; #101 gets none");
 assert((await foundingSpotsLeft()) === 0, "no spots left");
 
-assert(creditLimit("free", true) === FOUNDER_CREDITS && creditLimit("free", false) === PLANS.free.credits, "founders get 30 free credits a month");
-assert(creditLimit("creator", true) === PLANS.creator.credits, "founder floor doesn't lower a bigger plan");
+// Founder Pass: cheap features are free up to FOUNDER_FREE_USES a month, then fall back to credits.
+const pools: string[] = [];
+for (let i = 0; i < FOUNDER_FREE_USES + 3; i++) pools.push(String(await reserveCredit(u100, 1, "titles")));
+assert(pools.slice(0, FOUNDER_FREE_USES).every((p) => p === "founder") && pools.slice(FOUNDER_FREE_USES).every((p) => p === "credits"), `${FOUNDER_FREE_USES} free uses, then credits`);
+assert((await reserveCredit(u100, 3, "doctor")) === "credits", "Video Doctor always uses credits");
+let u = await usageThisMonth("u100");
+assert(u.founderUses === FOUNDER_FREE_USES && u.credits === 6, `pass and credits counted apart (got ${JSON.stringify(u)})`);
+await refundCredit("u100", monthKey(), 1, "founder");
+assert((await usageThisMonth("u100")).founderUses === FOUNDER_FREE_USES - 1, "a failed call gives the free use back");
+assert((await reserveCredit(u101, 1, "titles")) === "credits", "non-founders pay credits for everything");
 let granted = 0;
-for (let i = 0; i < 40; i++) if (await reserveCredit(u100)) granted++;
-assert(granted === FOUNDER_CREDITS, `founder can use exactly ${FOUNDER_CREDITS} credits on Free (got ${granted})`);
+for (let i = 0; i < 20; i++) if (await reserveCredit(u101, 1, "chat")) granted++;
+assert(granted === PLANS.free.credits - 1 && creditLimit("free") === PLANS.free.credits, "Free plan stops at its credits");
+u = await usageThisMonth("u101");
+assert(u.founderUses === 0, "non-founders never touch the pass");
+assert(PLANS.creator.pricePaise === 24_900 && PLANS.creator.credits === 250, "Creator+ is ₹249 with 250 credits");
 assert(PLANS.pro.pricePaise === 9_900 && PLANS.pro.credits === 100, "Pro is ₹99 with 100 credits");
 console.log("all founder tests passed");
 process.exit(0);

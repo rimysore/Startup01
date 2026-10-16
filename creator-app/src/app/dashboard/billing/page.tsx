@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
-import { PLANS, rupees, type PlanId } from "@/lib/plans";
+import { AGENCY, PLANS, rupees, type PlanId } from "@/lib/plans";
 
 interface RazorpayCheckoutResponse {
   razorpay_payment_id: string;
@@ -263,10 +263,10 @@ export default function BillingPage() {
           );
         })}
         <div className="card flex flex-col p-6">
-          <p className="font-semibold">Agency</p>
-          <p className="mt-4 font-display text-5xl">₹9,999<span className="font-sans text-sm text-muted">/month</span></p>
+          <p className="font-semibold">{AGENCY.name}</p>
+          <p className="mt-4 font-display text-5xl">{rupees(AGENCY.pricePaise)}<span className="font-sans text-sm text-muted">/month</span></p>
           <ul className="mt-5 flex-1 space-y-2 text-sm text-ink-2">
-            {["Up to 25 channels", "Team seats", "Client-ready reports", "API access"].map((pt) => (
+            {AGENCY.points.map((pt) => (
               <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>
             ))}
           </ul>

@@ -43,6 +43,13 @@
       "when": 1792117570700,
       "tag": "0005_prospects",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792166154937,
+      "tag": "0006_founder_pass",
+      "breakpoints": true
     }
   ]
 }

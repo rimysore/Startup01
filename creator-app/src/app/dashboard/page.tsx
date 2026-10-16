@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { burstConfetti, CelebrationToast, MilestoneRing, RollingNumber, Sparkline, useLiveSubscribers, type Celebration } from "@/components/celebrate";
-import { useDashboard, useQueryParam } from "@/components/dashboard-context";
-import { FounderBadge } from "@/components/Founding";
+import { useDashboard, useQueryParam, type Me } from "@/components/dashboard-context";
+import { FounderBadge, FounderPassCard } from "@/components/Founding";
 import { LineChart } from "@/components/LineChart";
 import { Card, DemoNote, ErrorNote, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
@@ -94,17 +94,19 @@ export default function Overview() {
   const { summary, refresh, me } = useDashboard();
   const newFounder = useQueryParam("founder");
   if (!summary) return <Spinner label="Loading your channel" />;
-  return <OverviewBody summary={summary} refresh={refresh} founder={me?.founderNumber ?? null} newFounder={newFounder} />;
+  return <OverviewBody summary={summary} refresh={refresh} me={me} founder={me?.founderNumber ?? null} newFounder={newFounder} />;
 }
 
 function OverviewBody({
   summary,
   refresh,
+  me,
   founder,
   newFounder,
 }: {
   summary: ChannelSummary & { error?: string };
   refresh: () => void;
+  me: Me | null;
   founder: number | null;
   newFounder: string | null;
 }) {
@@ -212,6 +214,8 @@ function OverviewBody({
           <DemoNote>You&apos;re exploring a demo channel: the counter ticks up on its own so you can see the celebrations. Connect YouTube to see your own numbers, live.</DemoNote>
         </div>
       )}
+
+      <FounderPassCard me={me} />
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Views · 28 days" value={<RollingNumber value={Math.round(views28)} format={compact} />} change={viewsChange} sub="vs previous 2 weeks" trend={daily.map((d) => d.views)} />

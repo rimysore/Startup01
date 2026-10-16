@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "./hooks";
 
-export { Logo } from "./brand";
+export { Logo } from "./logo";
 
 export function ThemeToggle() {
   const theme = useTheme();

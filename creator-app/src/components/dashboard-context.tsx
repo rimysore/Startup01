@@ -16,6 +16,8 @@ export interface Me {
   usage?: { month: string; used: number; limit: number };
   /** 1-100 for founding creators. */
   founderNumber?: number | null;
+  /** Founder Pass free uses this month (founders only). */
+  founderPass?: { used: number; limit: number } | null;
   /** In ADMIN_EMAILS: can see AI costs and reset their own credits. */
   admin?: boolean;
   youtube?: { channelTitle: string | null; needsReconnect?: boolean } | null;

@@ -12,6 +12,10 @@ Agreed build order (October 2026). Retention first: value that compounds, never 
 5. **Churn-risk list on the admin page** — no login 14d, no upload 21d, credits unused, YouTube
    disconnected, payment failed; founder messages them personally.
 
+## Alongside: make it simple
+See docs/SIMPLE_UX.md: bottom tabs on phones, a "Today" card, plain words, the app in their language,
+WhatsApp-first, lite mode for low-end phones.
+
 ## Later
 - Speech-to-text pre-publish check (Sarvam, ~₹30/hour of audio), transcript-aligned retention.
 - Brand deals: deal tracker → collab matchmaking → brand marketplace (see docs/BRAND_DEALS.md).

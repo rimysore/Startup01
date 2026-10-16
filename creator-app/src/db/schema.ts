@@ -61,6 +61,8 @@ export const usage = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     month: text("month").notNull(), // YYYY-MM (UTC)
     credits: integer("credits").notNull().default(0),
+    /** Founder Pass uses this month (free features for founding creators; separate from credits). */
+    founderUses: integer("founder_uses").notNull().default(0),
   },
   (t) => [primaryKey({ columns: [t.userId, t.month] })],
 );

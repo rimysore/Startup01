@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { FoundingBanner } from "@/components/Founding";
+import { FounderOfferPopup, FoundingBanner } from "@/components/Founding";
 import { LandingCounter } from "@/components/LandingCounter";
 import { LanguageShowcase, RotatingLanguage } from "@/components/landing";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Logo, ThemeToggle } from "@/components/ui";
 import { COMPANY } from "@/lib/company";
 import { LANGUAGES } from "@/lib/languages";
-import { PLANS, rupees } from "@/lib/plans";
+import { AGENCY, FOUNDER_FREE_USES, PLANS, rupees } from "@/lib/plans";
 
 const PRICING = [
   ...Object.values(PLANS).map((p) => ({
@@ -19,10 +19,10 @@ const PRICING = [
     featured: p.id === "pro",
   })),
   {
-    name: "Agency",
-    price: "₹9,999",
+    name: AGENCY.name,
+    price: rupees(AGENCY.pricePaise),
     per: "/month",
-    points: ["Up to 25 channels", "Team seats", "Client-ready reports", "API access"],
+    points: AGENCY.points,
     cta: "Talk to us",
     href: `mailto:${COMPANY.supportEmail}?subject=Mitra%20Agency%20plan`,
     featured: false,
@@ -33,7 +33,7 @@ const FAQ = [
   ["Is my channel safe?", "Mitra only gets read-only access to your YouTube analytics. It can never upload, delete or change anything on your channel, and you can disconnect in one click."],
   ["Which languages does it speak?", "Hindi, Hinglish, Telugu, Tamil, Marathi, Bengali, Kannada, Malayalam and English. Pick one in the top bar and every answer, title and report comes back in it."],
   ["How is this different from YouTube Studio?", "Studio shows numbers. Mitra explains them in your language and tells you what to do: why a video dipped at 0:42, what your viewers are searching, which trend to ride and how your competitors are winning."],
-  ["What does it cost?", "Free to start with 10 AI credits a month. Pro is ₹99/month for 100 credits. The first 100 creators to connect a channel keep founding perks for life."],
+  ["What does it cost?", `Free to start with ${PLANS.free.credits} AI credits a month. Pro is ${rupees(PLANS.pro.pricePaise)}/month, Creator+ ${rupees(PLANS.creator.pricePaise)}/month. The first 100 creators to connect a channel get a Founder Pass: ${FOUNDER_FREE_USES} free uses a month of titles, thumbnails, trends and more, for life.`],
   ["Can I cancel any time?", "Yes, in one click from Plan & billing. You keep your plan until the end of the period you paid for."],
   ["What happens to my data?", "Your analytics stay yours. We don't sell data or show ads, and deleting your account removes everything from Mitra."],
 ] as const;
@@ -72,6 +72,7 @@ export default function Home() {
   const marquee = [...LANGUAGES, ...LANGUAGES];
   return (
     <div className="overflow-x-hidden">
+      <FounderOfferPopup />
       {/* ---- Nav ---- */}
       <header className="sticky top-0 z-40 border-b border-transparent bg-bg/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-4 sm:px-8">
@@ -98,8 +99,8 @@ export default function Home() {
       <section className="relative">
         <div className="pointer-events-none absolute inset-x-0 -top-40 -z-10 h-[640px] opacity-60 [mask-image:radial-gradient(60%_60%_at_50%_30%,black,transparent)]" aria-hidden>
           <div className="glow-blob absolute left-[8%] top-24 h-80 w-80 rounded-full bg-[#ff8a1f]/40 blur-3xl" />
-          <div className="glow-blob absolute right-[10%] top-10 h-96 w-96 rounded-full bg-[#ff3d6e]/30 blur-3xl" style={{ animationDelay: "-5s" }} />
-          <div className="glow-blob absolute left-[40%] top-64 h-72 w-72 rounded-full bg-[#8b5cf6]/25 blur-3xl" style={{ animationDelay: "-9s" }} />
+          <div className="glow-blob absolute right-[10%] top-10 h-96 w-96 rounded-full bg-[#d946ef]/30 blur-3xl" style={{ animationDelay: "-5s" }} />
+          <div className="glow-blob absolute left-[40%] top-64 h-72 w-72 rounded-full bg-[#6c47ff]/25 blur-3xl" style={{ animationDelay: "-9s" }} />
         </div>
         <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
           <div className="rise">
@@ -114,7 +115,7 @@ export default function Home() {
               and what to post next. Then it celebrates every new subscriber with you.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/dashboard" className="bg-brand rounded-full px-7 py-4 text-base font-semibold text-white shadow-[0_14px_40px_-12px_#ff3d6e] transition hover:brightness-110">
+              <Link href="/dashboard" className="bg-brand rounded-full px-7 py-4 text-base font-semibold text-white shadow-[0_14px_40px_-12px_#d946ef] transition hover:brightness-110">
                 Try the live demo →
               </Link>
               <Link href="/dashboard/connections" className="rounded-full border border-line bg-surface px-7 py-4 text-base font-semibold hover:bg-surface-2">
@@ -189,7 +190,7 @@ export default function Home() {
             <p className="text-sm opacity-70">subscribers since you last looked 🎉</p>
           </Bento>
           <Bento className="md:col-span-2" tag="Packaging" title="Title & Thumbnail Studio" body="Titles in your language and AI-designed thumbnails where Hindi and Telugu text render right.">
-            <div className="grid aspect-video place-items-center rounded-2xl bg-gradient-to-br from-[#1b1446] via-[#7a1f5c] to-[#ff8a1f] p-4">
+            <div className="grid aspect-video place-items-center rounded-2xl bg-gradient-to-br from-[#1b1446] via-[#7a1f8c] to-[#ff8a1f] p-4">
               <p className="text-center font-indic text-3xl font-extrabold leading-tight text-white [text-shadow:0_3px_0_#000]">
                 ₹20K में <span className="text-[#ffd23f]">कौन जीता?</span>
               </p>
@@ -251,7 +252,7 @@ export default function Home() {
           {PRICING.map((p) => (
             <div
               key={p.name}
-              className={`relative flex flex-col rounded-[28px] border p-6 ${p.featured ? "border-transparent bg-ink text-bg shadow-[0_30px_70px_-30px_#ff3d6e]" : "border-line bg-surface"}`}
+              className={`relative flex flex-col rounded-[28px] border p-6 ${p.featured ? "border-transparent bg-ink text-bg shadow-[0_30px_70px_-30px_#d946ef]" : "border-line bg-surface"}`}
             >
               {p.featured && <span className="bg-brand absolute -top-3 left-6 rounded-full px-3 py-1 text-xs font-bold text-white">Launch price</span>}
               <p className="font-semibold">{p.name}</p>

@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { BRAND, MitraMark } from "@/components/brand";
 
 export const alt = "Mitra: grow your channel in your language";
 export const size = { width: 1200, height: 630 };
@@ -10,18 +11,7 @@ export default function OpenGraphImage() {
     (
       <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: 72, background: "#0e0d0b", color: "#f4efe6" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg width="76" height="76" viewBox="0 0 48 48">
-            <defs>
-              <linearGradient id="g" x1="4" y1="2" x2="44" y2="46" gradientUnits="userSpaceOnUse">
-                <stop offset="0" stopColor="#FF8A1F" />
-                <stop offset="0.55" stopColor="#FF3D6E" />
-                <stop offset="1" stopColor="#8B5CF6" />
-              </linearGradient>
-            </defs>
-            <path d="M15 3h18a13 13 0 0 1 13 13v11a13 13 0 0 1-13 13H21.5l-8.6 6.2c-1 .7-2.3-.2-2-1.4l1.2-5.4A13 13 0 0 1 2 27V16A13 13 0 0 1 15 3z" fill="url(#g)" />
-            <path d="M19.5 14.6v12.8c0 1.1 1.2 1.8 2.2 1.2l10.4-6.4c.9-.6.9-1.9 0-2.4l-10.4-6.4c-1-.6-2.2.1-2.2 1.2z" fill="#fff" />
-            <path d="M38.5 1.5l1.3 3.4 3.4 1.3-3.4 1.3-1.3 3.4-1.3-3.4-3.4-1.3 3.4-1.3z" fill="#FFD23F" />
-          </svg>
+          <MitraMark size={80} id="og" />
           <span style={{ fontSize: 64, fontWeight: 800, letterSpacing: -3 }}>mitra</span>
         </div>
         <div style={{ display: "flex", flexDirection: "column" }}>
@@ -32,7 +22,7 @@ export default function OpenGraphImage() {
               fontWeight: 800,
               lineHeight: 1.1,
               letterSpacing: -3,
-              backgroundImage: "linear-gradient(100deg, #ff8a1f, #ff3d6e 55%, #8b5cf6)",
+              backgroundImage: `linear-gradient(100deg, ${BRAND.saffron}, ${BRAND.fuchsia} 50%, ${BRAND.violet})`,
               backgroundClip: "text",
               color: "transparent",
             }}
