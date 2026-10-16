@@ -22,7 +22,10 @@ export function GET(request: Request) {
  */
 export async function POST(request: Request) {
   const raw = await request.text();
-  if (!validSignature(raw, request.headers.get("x-hub-signature-256"))) return new Response("Bad signature", { status: 401 });
+  if (!validSignature(raw, request.headers.get("x-hub-signature-256"))) {
+    console.warn(`WhatsApp webhook: signature check failed (${request.headers.get("x-hub-signature-256") ? "WHATSAPP_APP_SECRET doesn't match the app's secret" : "no signature header"})`);
+    return new Response("Bad signature", { status: 401 });
+  }
   let body: unknown;
   try {
     body = JSON.parse(raw);
@@ -31,6 +34,7 @@ export async function POST(request: Request) {
   }
   const { messages, failures } = parseWebhook(body);
   const unsupported = unsupportedSenders(body);
+  console.log(`WhatsApp webhook: ${messages.length} message(s), ${failures.length} failed deliveries, ${unsupported.length} unsupported`);
   for (const f of failures) console.error(`WhatsApp delivery to ${f.to} failed: ${f.error}`);
   after(async () => {
     // One sender's messages in order; different senders in parallel.
