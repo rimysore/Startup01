@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDashboard } from "@/components/dashboard-context";
 import { Button, Card, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { COMPANY } from "@/lib/company";
 import { compact } from "@/lib/format";
 import { LANGUAGES, type LanguageCode } from "@/lib/languages";
 import { outreachBody, STATUSES, type ProspectStatus } from "@/lib/outreach";
@@ -61,8 +62,9 @@ const ago = (iso: string | null) => {
   return d <= 0 ? "today" : `${d}d ago`;
 };
 
+/** Opens Gmail's compose window in Mitra's official account (authuser picks it when you're signed in to several). */
 function gmailLink(to: string, subject: string, body: string) {
-  return `https://mail.google.com/mail/?${new URLSearchParams({ view: "cm", fs: "1", to, su: subject, body })}`;
+  return `https://mail.google.com/mail/?${new URLSearchParams({ authuser: COMPANY.outreachEmail, view: "cm", fs: "1", to, su: subject, body })}`;
 }
 
 /** Admins only: find regional creators to invite, write personal openers, and track outreach. */
@@ -281,7 +283,7 @@ export default function ProspectsPage() {
             {shown.map((p) => {
               const email = p.emails[0];
               const subject = p.subject ?? `Quick idea for ${p.title}`;
-              const body = outreachBody(p.opener ?? `Hi ${p.title} team, I came across your channel${p.latestVideoTitle ? ` and your video "${p.latestVideoTitle}"` : ""}.`, appUrl, data?.spotsLeft ?? null, sender);
+              const body = outreachBody(p.opener ?? `Hi ${p.title} team, I came across your channel${p.latestVideoTitle ? ` and your video "${p.latestVideoTitle}"` : ""}.`, appUrl, data?.spotsLeft ?? null, sender, COMPANY.outreachEmail);
               return (
                 <li key={p.id} className="px-4 py-3">
                   <div className="flex flex-wrap items-center gap-3">

@@ -63,6 +63,9 @@ The output language (top bar) controls what language the AI writes in.
    Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
    - The YouTube scopes are *sensitive*: while the Google app is in "Testing", only test users you add
      can connect. Public launch needs Google's OAuth verification, so start that early.
+   - Use Mitra's official account, **mitracontentsupport@gmail.com**, as the Google Cloud project owner,
+     the consent screen's *User support email* and *Developer contact*. Add it to `ADMIN_EMAILS` so it
+     sees AI costs and the creator finder.
 5. **Razorpay:** in Test Mode first. Create two monthly plans (₹99, ₹249) and set `RAZORPAY_PLAN_PRO` /
    `RAZORPAY_PLAN_CREATOR`; set `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`; add a webhook to
    `<your-url>/api/billing/webhook` for the `subscription.*` events and set `RAZORPAY_WEBHOOK_SECRET`.
@@ -73,6 +76,9 @@ The output language (top bar) controls what language the AI writes in.
 
 `/terms`, `/privacy`, `/refunds` and `/contact` describe what the app actually does (data collected, YouTube
 Limited Use, cookies, credits, auto-renewal, cancellation and refunds, grievance officer). Before launch:
+
+The official contact address is **mitracontentsupport@gmail.com** (`OFFICIAL_EMAIL` in
+`src/lib/company.ts`), used for support, privacy, grievances and creator outreach.
 
 1. Fill in every `[bracketed]` value in `src/lib/company.ts` — the pages show a "Draft" banner until you do.
 2. Fill in your hosting and database providers in the Privacy Policy's provider table.

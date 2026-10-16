@@ -33,3 +33,8 @@
 ## Automate later
 A scheduled job (daily) runs steps 2–6 within a fixed quota budget (e.g. 3,000 units/day so the product's
 own users keep 7,000), stores new prospects, and posts a summary to the admin page.
+
+## Sending account
+Outreach goes out from **mitracontentsupport@gmail.com**. The Gmail button opens compose in that account
+(`authuser`), and the email signs off with it. Stay under ~30–50 personal emails a day from a new Gmail
+account so it isn't flagged as spam.

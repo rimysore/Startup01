@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { COMPANY } from "@/lib/company";
 import { AGENCY, PLANS, rupees, type PlanId } from "@/lib/plans";
 
 interface RazorpayCheckoutResponse {
@@ -270,7 +271,7 @@ export default function BillingPage() {
               <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>
             ))}
           </ul>
-          <a href={`mailto:${process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? ""}?subject=Mitra%20Agency%20plan`} className="mt-6 rounded-full border border-line px-4 py-2.5 text-center text-sm font-semibold hover:bg-surface-2">
+          <a href={`mailto:${COMPANY.supportEmail}?subject=Mitra%20Agency%20plan`} className="mt-6 rounded-full border border-line px-4 py-2.5 text-center text-sm font-semibold hover:bg-surface-2">
             Talk to us
           </a>
         </div>

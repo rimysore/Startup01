@@ -4,7 +4,7 @@ export const STATUSES = ["new", "approved", "contacted", "replied", "joined", "n
 export type ProspectStatus = (typeof STATUSES)[number];
 
 /** The fixed part of every outreach email: what Mitra is, the offer, and an easy opt-out. */
-export function outreachBody(opener: string, appUrl: string, spotsLeft: number | null, sender: string): string {
+export function outreachBody(opener: string, appUrl: string, spotsLeft: number | null, sender: string, replyTo?: string): string {
   return [
     opener.trim(),
     "",
@@ -14,7 +14,8 @@ export function outreachBody(opener: string, appUrl: string, spotsLeft: number |
       : "It's free to start.",
     `Have a look: ${appUrl}`,
     "",
-    `— ${sender}`,
+    `— ${sender}, Mitra`,
+    ...(replyTo ? [replyTo] : []),
     "",
     "Not interested? Just reply \"stop\" and I won't write again.",
   ].join("\n");

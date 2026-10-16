@@ -10,8 +10,12 @@ export const SITE_URL =
   process.env.APP_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://mitracreators.com");
 
-/** One inbox for support, privacy and grievance mail until the domain's own addresses exist. */
-const EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || "[contact email]";
+/**
+ * Mitra's official inbox: support, privacy, grievance and creator outreach all use it until the domain's own
+ * addresses exist. NEXT_PUBLIC_CONTACT_EMAIL can override it without a code change.
+ */
+export const OFFICIAL_EMAIL = "mitracontentsupport@gmail.com";
+const EMAIL = process.env.NEXT_PUBLIC_CONTACT_EMAIL || OFFICIAL_EMAIL;
 
 export const COMPANY = {
   product: "Mitra",
@@ -25,6 +29,8 @@ export const COMPANY = {
   phone: "",
   grievanceOfficer: OPERATOR,
   grievanceEmail: EMAIL,
+  /** Outreach to creators is sent from this account. */
+  outreachEmail: EMAIL,
   governingLaw: "the State of Indiana, United States",
   jurisdictionCity: "Monroe County, Indiana",
   website: SITE_URL,
