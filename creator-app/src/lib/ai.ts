@@ -27,11 +27,13 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   // Reasoning over a retention curve: worth the stronger model.
   doctor: { model: "claude-sonnet-5-5", effort: "medium", maxTokens: 8000, cacheHours: 24, credits: FEATURE_CREDITS.doctor },
   // Short creative writing and summarising: the small model is good and ~20x cheaper.
-  titles: { model: "claude-haiku-5-5", effort: "low", maxTokens: 4000, cacheHours: 6, credits: FEATURE_CREDITS.titles },
+  titles: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 6, credits: FEATURE_CREDITS.titles },
   comments: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 12, credits: FEATURE_CREDITS.comments },
-  chat: { model: "claude-haiku-5-5", effort: "low", maxTokens: 2000, cacheHours: 0, credits: FEATURE_CREDITS.chat },
+  // Haiku 5.5 always thinks, and thinking counts toward max_tokens: leave plenty of room or the answer gets cut
+  // off before it starts (only tokens actually used are billed).
+  chat: { model: "claude-haiku-5-5", effort: "low", maxTokens: 8000, cacheHours: 0, credits: FEATURE_CREDITS.chat },
   // Looks at the creator's photos (sent small) and returns a layout; the browser draws the thumbnail itself.
-  thumbnail: { model: "claude-haiku-5-5", effort: "low", maxTokens: 3000, cacheHours: 6, credits: FEATURE_CREDITS.thumbnail },
+  thumbnail: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 6, credits: FEATURE_CREDITS.thumbnail },
   // Reading lists of titles and numbers: the small model is enough. Cached because trends change slowly.
   trends: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 6, credits: FEATURE_CREDITS.trends },
   audience: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 24, credits: FEATURE_CREDITS.audience },
@@ -41,7 +43,7 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   // Admin prospecting: short personal openers, batched. Not charged to anyone's credits.
   outreach: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: 0 },
   // Monday report and 48-hour check: Mitra pays (about ₹0.05 each), the creator is never charged.
-  report: { model: "claude-haiku-5-5", effort: "low", maxTokens: 3000, cacheHours: 0, credits: 0 },
+  report: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: 0 },
 };
 
 export function route(feature: Feature): Route {
@@ -636,9 +638,10 @@ export async function chat(
       `\n\nChannel data:\n${untrusted(channelContext)}`,
     messages,
   });
-  checkStop(res.stop_reason);
   const text = res.content.map((b) => (b.type === "text" ? b.text : "")).join("").trim();
-  if (!text) throw new Error("Empty reply");
+  // A reply that ran long is still worth showing; only fail if there's nothing to show.
+  if (!(res.stop_reason === "max_tokens" && text)) checkStop(res.stop_reason);
+  if (!text) throw new Error(`Empty reply (stop_reason: ${res.stop_reason})`);
   return { result: cut(text, 4000), usage: usageOf(res) };
 }
 

@@ -86,6 +86,13 @@ const titles = (outbox()[0].out as { text: string }).text;
 assert(titles.includes("Rs 500 street food") && titles.includes("1. Raat me test kiya") && titles.includes("🎙️"), "titles for the video, with thumbnail text and hook");
 assert((await usageThisMonth("u")).credits === 2, "titles use 1 credit");
 
+// A reply that hits max_tokens (Haiku thinks first) is still delivered, not turned into "busy".
+await fetch("http://127.0.0.1:4010/__mode", { method: "POST", body: JSON.stringify({ mode: "max_tokens" }) });
+outbox().length = 0;
+await handleInbound({ id: "a2b", from: "919800000001", name: null, text: "ek lamba sawaal", action: null, at: NOW }, NOW);
+await fetch("http://127.0.0.1:4010/__mode", { method: "POST", body: JSON.stringify({ mode: "ok" }) });
+assert((outbox()[0].out as { text: string }).text.startsWith("• Is hafte 2 Shorts"), "a long Ask Mitra answer is still delivered");
+
 // Founders: the same request comes from the Founder Pass.
 await handleInbound({ id: "a4", from: "919800000002", name: null, text: "next video kya banau?", action: null, at: NOW }, NOW);
 const fu = await usageThisMonth("f");
