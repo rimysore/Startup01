@@ -8,7 +8,13 @@ process.env.ANTHROPIC_API_KEY = "sk-ant-test";
 process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:4010";
 
 const mock = spawn(process.execPath, ["tests/mock-anthropic.mjs"], { stdio: ["ignore", "pipe", "inherit"] });
-await new Promise<void>((resolve) => mock.stdout!.once("data", () => resolve()));
+await new Promise<void>((resolve) => {
+  mock.stdout!.once("data", () => resolve());
+  mock.once("exit", () => {
+    console.error("FAIL the Anthropic stand-in couldn't start (is port 4010 already in use?)");
+    process.exit(1);
+  });
+});
 const finish = (code: number) => {
   mock.kill();
   process.exit(code);

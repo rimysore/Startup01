@@ -188,6 +188,12 @@ const [linked] = await d.select().from(schema.whatsappContacts).where(eq(schema.
 assert(linked?.phone === "919811111111" && outbox().length === 2 && outbox()[1].out.type === "list", "JOIN code links the number, welcomes and shows the menu");
 await handleInbound(msg("l2", "919822222222", "JOIN 482913"), NOW);
 assert((last().out as { text: string }).text === t("en").linkExpired, "a used code doesn't work twice");
+// Guessing codes: 5 wrong tries an hour, then even a right code is ignored.
+await d.insert(schema.whatsappLinkCodes).values({ code: "777777", userId: "off", expiresAt: new Date(NOW + 60_000) });
+for (let i = 0; i < 5; i++) await handleInbound(msg(`g${i}`, "919844444444", `JOIN 10000${i}`), NOW);
+await handleInbound(msg("g5", "919844444444", "JOIN 777777"), NOW);
+const [guessed] = await d.select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.userId, "off"));
+assert(!guessed, "after 5 wrong codes, a number can't link for an hour");
 await handleInbound(msg("l3", "919833333333", "hello"), NOW);
 assert(last().out.type === "link", "unknown numbers get a link to connect");
 

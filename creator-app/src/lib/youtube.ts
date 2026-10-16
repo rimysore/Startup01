@@ -102,7 +102,21 @@ export async function saveYouTubeConnection(userId: string, tokens: GoogleTokens
     .onConflictDoUpdate({ target: schema.youtubeConnections.userId, set: values });
 }
 
+/**
+ * Disconnects YouTube: tells Google to revoke Mitra's access (so the grant disappears from the creator's Google
+ * account too), then forgets the tokens. Revocation is best effort; the tokens are deleted either way.
+ */
 export async function removeYouTubeConnection(userId: string) {
+  const row = await youtubeConnection(userId);
+  const token = row ? ((row.refreshToken && decrypt(row.refreshToken)) || decrypt(row.accessToken)) : null;
+  if (token && googleConfigured()) {
+    await fetch("https://oauth2.googleapis.com/revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ token }),
+      signal: AbortSignal.timeout(5000),
+    }).catch((err) => console.warn("Google token revoke failed", err instanceof Error ? err.message : err));
+  }
   await (await db()).delete(schema.youtubeConnections).where(eq(schema.youtubeConnections.userId, userId));
 }
 

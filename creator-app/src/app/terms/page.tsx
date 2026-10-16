@@ -203,8 +203,8 @@ const sections: LegalSection[] = [
       <>
         <p>
           If you connect WhatsApp (by sending {COMPANY.product} a one-time code from your number), you agree to receive the reports you turn on: a
-          weekly report on Mondays and a check about two days after each upload. Without WhatsApp, the same reports can come by email. Reports are
-          included free on every plan.
+          weekly report on Mondays (also as a PDF you can download) and a check about two days after each upload. Without WhatsApp, the same
+          reports can come by email. Reports are included free on every plan.
         </p>
         <p>
           Reply <strong>STOP</strong> on WhatsApp to pause reports and <strong>START</strong> to resume, or change them any time under WhatsApp &amp;

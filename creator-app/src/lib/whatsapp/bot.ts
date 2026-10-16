@@ -1,4 +1,4 @@
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, like, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { aiConfigured, chat, generateTitles } from "../ai";
 import { runPaidAi } from "../ai-route";
@@ -22,6 +22,15 @@ import { MENU_WORDS, START_WORDS, STOP_WORDS, t } from "./strings";
 
 const LINK_CODE = /\b(?:join|mitra)\s*[-:#]?\s*(\d{6})\b/i;
 const STATE_MS = 30 * 60_000;
+const MAX_WRONG_CODES = 5;
+
+async function wrongCodes(phone: string, now: number): Promise<number> {
+  const [row] = await (await db())
+    .select({ n: sql<number>`count(*)::int` })
+    .from(schema.webhookEvents)
+    .where(and(like(schema.webhookEvents.id, `wajoin:${phone}:%`), gt(schema.webhookEvents.receivedAt, new Date(now - 3_600_000))));
+  return row?.n ?? 0;
+}
 
 /** WhatsApp formatting: **bold** → *bold*, no markdown headings. */
 export function toWhatsApp(text: string): string {
@@ -204,8 +213,11 @@ export async function handleInbound(m: Inbound, now = Date.now()): Promise<void>
   const [contact] = await d.select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.phone, m.from));
   const code = LINK_CODE.exec(m.text)?.[1];
   if (code) {
+    // Guessing codes would link a stranger's number to someone else's account: 5 wrong tries an hour, then ignore.
+    if ((await wrongCodes(m.from, now)) >= MAX_WRONG_CODES) return;
     const user = await linkByCode(m, code, now);
     if (user === "expired") {
+      await d.insert(schema.webhookEvents).values({ id: `wajoin:${m.from}:${m.id}`, receivedAt: new Date(now) }).onConflictDoNothing();
       await send(m.from, { type: "text", text: t(contact ? "hinglish" : "en").linkExpired });
       return;
     }

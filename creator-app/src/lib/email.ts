@@ -55,7 +55,7 @@ export function mailHtml(m: Mail): string {
 <p style="font-size:22px;font-weight:800;margin:0 0 18px;letter-spacing:-0.5px">mitra</p>
 <div style="background:#fff;border-radius:18px;padding:22px 20px;font-size:15px">${body}${button}</div>
 <p style="font-size:12px;color:#7a7268;margin:16px 4px;line-height:1.5">You get this because reports are on in your Mitra account. Turn them off any time in
-<a href="${esc(SITE_URL)}/dashboard/whatsapp" style="color:#7a7268">WhatsApp &amp; reports</a>. Questions: ${esc(COMPANY.supportEmail)}</p>
+<a href="${esc(SITE_URL)}/dashboard/whatsapp" style="color:#7a7268">WhatsApp &amp; reports</a>. Questions: ${esc(COMPANY.supportEmail)}<br>${esc(COMPANY.product)} · ${esc(COMPANY.address)}</p>
 </div></body></html>`;
 }
 

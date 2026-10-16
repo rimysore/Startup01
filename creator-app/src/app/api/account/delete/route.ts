@@ -4,6 +4,7 @@ import { db, schema } from "@/db";
 import { currentUser, endSession, unauthorized } from "@/lib/auth";
 import { forgetUser } from "@/lib/memo";
 import { cancelSubscription, razorpayConfigured } from "@/lib/razorpay";
+import { removeYouTubeConnection } from "@/lib/youtube";
 
 const Body = z.object({ confirm: z.literal("DELETE") });
 
@@ -37,7 +38,9 @@ export async function POST(request: Request) {
     }
   }
 
-  // Sessions, YouTube tokens, subscriptions records and usage are removed by ON DELETE CASCADE.
+  // Revoke Google access first; everything else (sessions, tokens, usage, WhatsApp number, reports) is removed by
+  // ON DELETE CASCADE.
+  await removeYouTubeConnection(user.id);
   await d.delete(schema.users).where(eq(schema.users.id, user.id));
   await forgetUser(user.id);
   await endSession();

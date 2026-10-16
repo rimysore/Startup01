@@ -283,7 +283,7 @@ export default function ProspectsPage() {
             {shown.map((p) => {
               const email = p.emails[0];
               const subject = p.subject ?? `Quick idea for ${p.title}`;
-              const body = outreachBody(p.opener ?? `Hi ${p.title} team, I came across your channel${p.latestVideoTitle ? ` and your video "${p.latestVideoTitle}"` : ""}.`, appUrl, data?.spotsLeft ?? null, sender, COMPANY.outreachEmail);
+              const body = outreachBody(p.opener ?? `Hi ${p.title} team, I came across your channel${p.latestVideoTitle ? ` and your video "${p.latestVideoTitle}"` : ""}.`, appUrl, data?.spotsLeft ?? null, sender, COMPANY.outreachEmail, `${COMPANY.product} · ${COMPANY.address}`);
               return (
                 <li key={p.id} className="px-4 py-3">
                   <div className="flex flex-wrap items-center gap-3">

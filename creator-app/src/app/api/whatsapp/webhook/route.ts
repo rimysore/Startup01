@@ -35,7 +35,8 @@ export async function POST(request: Request) {
   const { messages, failures } = parseWebhook(body);
   const unsupported = unsupportedSenders(body);
   console.log(`WhatsApp webhook: ${messages.length} message(s), ${failures.length} failed deliveries, ${unsupported.length} unsupported`);
-  for (const f of failures) console.error(`WhatsApp delivery to ${f.to} failed: ${f.error}`);
+  // Last 4 digits only: phone numbers don't belong in logs.
+  for (const f of failures) console.error(`WhatsApp delivery to …${f.to.slice(-4)} failed: ${f.error}`);
   after(async () => {
     // One sender's messages in order; different senders in parallel.
     const bySender = new Map<string, typeof messages>();
