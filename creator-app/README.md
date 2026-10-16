@@ -72,6 +72,12 @@ The output language (top bar) controls what language the AI writes in.
    Before charging real customers you'll also need Razorpay account activation (KYC) and published
    terms, privacy and refund policies.
 
+## Private beta (waitlist)
+
+Until Google verifies the app, only test users added in Google Cloud can connect YouTube, so the site is
+invite-only by default: visitors join a waitlist, admins invite them from **Waitlist** (copy emails into Google's
+test users, then press Invite). Set `NEXT_PUBLIC_INVITE_ONLY=0` to open sign-ups. Plan: docs/LAUNCH_AND_GROWTH.md.
+
 ## WhatsApp and email reports
 
 Every Monday ~8:45 IST creators get a weekly report (wins, fixes, what to post next), and ~2 days after each upload

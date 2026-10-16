@@ -36,6 +36,12 @@ export const COMPANY = {
   website: SITE_URL,
 };
 
+/**
+ * Private beta: until Google verifies the app, only creators added as test users can connect YouTube, so the site
+ * offers a waitlist instead of open sign-up. Set NEXT_PUBLIC_INVITE_ONLY=0 once verification is approved.
+ */
+export const INVITE_ONLY = process.env.NEXT_PUBLIC_INVITE_ONLY !== "0";
+
 /** Date the current versions of the legal pages take effect. Update whenever the text changes. */
 export const LEGAL_EFFECTIVE_DATE = "16 October 2026";
 

@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { INVITE_ONLY } from "@/lib/company";
 import { FOUNDER_FREE_LABELS, FOUNDER_FREE_USES, FOUNDER_PERKS, FOUNDING_SPOTS } from "@/lib/plans";
+
+/** Where "claim your spot" goes: the waitlist during the private beta, otherwise straight to connecting YouTube. */
+const CLAIM_HREF = INVITE_ONLY ? "/#waitlist" : "/login?next=/dashboard/connections";
 import type { Me } from "./dashboard-context";
 
 /** Live number of Founder Passes still open (null while loading or if the count can't be read). */
@@ -39,8 +43,8 @@ export function FoundingBanner() {
           <li key={p}>✓ {p}</li>
         ))}
       </ul>
-      <Link href="/login?next=/dashboard/connections" className="mt-3 inline-block text-sm font-semibold text-accent hover:underline">
-        Claim yours: connect YouTube →
+      <Link href={CLAIM_HREF} className="mt-3 inline-block text-sm font-semibold text-accent hover:underline">
+        {INVITE_ONLY ? "Get early access →" : "Claim yours: connect YouTube →"}
       </Link>
     </div>
   );
@@ -100,8 +104,8 @@ export function FounderOfferPopup() {
           {FOUNDER_FREE_USES} free uses every month of titles, thumbnails, trends and more. No card needed.
         </p>
         <p className="relative mt-3"><SpotsPill left={left} /></p>
-        <Link href="/login?next=/dashboard/connections" onClick={close} className="bg-brand relative mt-4 block rounded-full px-5 py-3.5 text-center font-semibold text-white">
-          Claim my free spot
+        <Link href={CLAIM_HREF} onClick={close} className="bg-brand relative mt-4 block rounded-full px-5 py-3.5 text-center font-semibold text-white">
+          {INVITE_ONLY ? "Get early access" : "Claim my free spot"}
         </Link>
       </div>
     </div>

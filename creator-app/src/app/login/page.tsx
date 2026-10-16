@@ -4,10 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useQueryParam } from "@/components/hooks";
 import { Button, ErrorNote, Logo, ThemeToggle } from "@/components/ui";
+import { INVITE_ONLY } from "@/lib/company";
 
 const ERRORS: Record<string, string> = {
   not_configured: "Google sign-in isn't set up on this server yet.",
-  denied: "Sign-in was cancelled.",
+  denied: "Sign-in was cancelled, or Google blocked it because your account isn't invited to the beta yet. Join the waitlist below and we'll invite you.",
   state: "That sign-in link expired. Please try again.",
   exchange: "Google didn't accept the sign-in. Please try again.",
   unverified: "Your Google email address isn't verified.",
@@ -69,6 +70,16 @@ export default function LoginPage() {
           <p className="mt-2 text-ink-2">Sign in to connect your channel and get real answers from Mitra.</p>
 
           {error && ERRORS[error] && <div className="mt-6"><ErrorNote>{ERRORS[error]}</ErrorNote></div>}
+
+          {INVITE_ONLY && (
+            <div className="mt-6 rounded-2xl border border-accent/40 bg-accent-soft p-4 text-sm">
+              <p className="font-semibold">🔒 Private beta</p>
+              <p className="mt-1 text-ink-2">
+                Sign-in works for creators we&apos;ve invited (Google shows &quot;Access blocked&quot; for everyone else until we open up).{" "}
+                <Link href="/#waitlist" className="font-semibold text-accent underline underline-offset-2">Join the waitlist →</Link>
+              </p>
+            </div>
+          )}
 
           <div className="mt-8 space-y-4">
             {config?.google && (

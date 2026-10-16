@@ -257,3 +257,25 @@ export const notifications = pgTable(
   },
   (t) => [uniqueIndex("notifications_unique").on(t.userId, t.kind, t.key), index("notifications_status").on(t.status, t.createdAt)],
 );
+
+/**
+ * Early-access list while the beta is invite-only (Google lets an unverified app connect only test users you add
+ * by hand). Admins invite people from the waitlist page; joining is matched by email.
+ */
+export const waitlist = pgTable(
+  "waitlist",
+  {
+    id: serial("id").primaryKey(),
+    email: text("email").notNull().unique(),
+    name: text("name"),
+    channel: text("channel"),
+    language: text("language"),
+    whatsapp: text("whatsapp"),
+    /** waiting | invited */
+    status: text("status").notNull().default("waiting"),
+    source: text("source"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    invitedAt: timestamp("invited_at", { withTimezone: true }),
+  },
+  (t) => [index("waitlist_status").on(t.status, t.createdAt)],
+);

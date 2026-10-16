@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { FounderOfferPopup, FoundingBanner } from "@/components/Founding";
+import { WaitlistForm } from "@/components/Waitlist";
 import { LandingCounter } from "@/components/LandingCounter";
 import { LanguageShowcase, RotatingLanguage } from "@/components/landing";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Logo, ThemeToggle } from "@/components/ui";
-import { COMPANY } from "@/lib/company";
+import { COMPANY, INVITE_ONLY } from "@/lib/company";
 import { LANGUAGES } from "@/lib/languages";
 import { AGENCY, FOUNDER_FREE_USES, PLANS, rupees } from "@/lib/plans";
 
@@ -118,8 +119,8 @@ export default function Home() {
               <Link href="/dashboard" className="bg-brand rounded-full px-7 py-4 text-base font-semibold text-white shadow-[0_14px_40px_-12px_#d946ef] transition hover:brightness-110">
                 Try the live demo →
               </Link>
-              <Link href="/dashboard/connections" className="rounded-full border border-line bg-surface px-7 py-4 text-base font-semibold hover:bg-surface-2">
-                Connect YouTube
+              <Link href={INVITE_ONLY ? "#waitlist" : "/dashboard/connections"} className="rounded-full border border-line bg-surface px-7 py-4 text-base font-semibold hover:bg-surface-2">
+                {INVITE_ONLY ? "Get early access" : "Connect YouTube"}
               </Link>
             </div>
             <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
@@ -244,6 +245,28 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---- Waitlist (private beta) ---- */}
+      {INVITE_ONLY && (
+        <section id="waitlist" className="scroll-mt-20 mx-auto max-w-6xl px-4 py-20 sm:px-8">
+          <div className="grid gap-10 rounded-[36px] border border-line bg-surface p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Private beta</p>
+              <h2 className="mt-3 font-display text-5xl leading-tight">Get early access</h2>
+              <p className="mt-4 text-lg text-ink-2">
+                We&apos;re letting creators in a few at a time, so every one of them gets real help (and we can fix things fast). Join the list and
+                we&apos;ll message you when your spot opens.
+              </p>
+              <ul className="mt-6 space-y-2 text-ink-2">
+                <li>🏅 The first 100 creators get a Founder Pass, free for life</li>
+                <li>📲 Your weekly report on WhatsApp, in your language</li>
+                <li>🔒 Read-only YouTube access. Mitra never posts for you</li>
+              </ul>
+            </div>
+            <WaitlistForm />
+          </div>
+        </section>
+      )}
+
       {/* ---- Pricing ---- */}
       <section id="pricing" className="mx-auto max-w-6xl px-4 py-24 sm:px-8">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Pricing</p>
@@ -302,8 +325,8 @@ export default function Home() {
             <Link href="/dashboard" className="rounded-full bg-white px-7 py-4 font-semibold text-[#1a0f05] transition hover:bg-white/90">
               Try the live demo →
             </Link>
-            <Link href="/dashboard/connections" className="rounded-full border border-white/50 px-7 py-4 font-semibold text-white hover:bg-white/10">
-              Connect YouTube
+            <Link href={INVITE_ONLY ? "#waitlist" : "/dashboard/connections"} className="rounded-full border border-white/50 px-7 py-4 font-semibold text-white hover:bg-white/10">
+              {INVITE_ONLY ? "Get early access" : "Connect YouTube"}
             </Link>
           </div>
         </div>

@@ -3,7 +3,10 @@
 Agreed build order (October 2026). Retention first: value that compounds, never dark patterns
 (India's CCPA dark-pattern guidelines ban subscription traps, confirm-shaming, nagging).
 
+See docs/LAUNCH_AND_GROWTH.md for the beta plan, the ViewStats comparison and the video-analysis plan.
+
 ## Next up, in order
+0. **Private beta** (built: waitlist + invites); start Google verification; 3 waves of creators.
 1. ~~**Monday report (WhatsApp, email fallback) + 48-hour post-upload check**~~ — built (docs/WHATSAPP.md).
    Next on WhatsApp: voice notes (speech-to-text), Telugu/Tamil bot strings, monthly receipt on WhatsApp.
 2. **Monthly "Mitra receipt"** — track which suggestions were used and how those videos did vs the

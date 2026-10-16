@@ -33,6 +33,7 @@ function Icon({ d }: { d: string }) {
 const ADMIN_NAV = [
   { href: "/dashboard/admin", label: "AI costs", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
   { href: "/dashboard/prospects", label: "Find creators", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" },
+  { href: "/dashboard/waitlist", label: "Waitlist", icon: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6" },
 ];
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
