@@ -12,6 +12,8 @@ export const users = pgTable("users", {
   founderNumber: integer("founder_number").unique(),
   /** Language Mitra writes in (reports, WhatsApp, answers). The dashboard keeps it in sync. */
   language: text("language").notNull().default("hinglish"),
+  /** When the creator picked their language (first sign-in asks once). */
+  languageSetAt: timestamp("language_set_at", { withTimezone: true }),
   /** Monday report and the check two days after each upload. */
   notifyWeekly: boolean("notify_weekly").notNull().default(true),
   notifyVideoCheck: boolean("notify_video_check").notNull().default(true),

@@ -34,6 +34,7 @@ type Strings = {
   btnUpgrade: string;
   openDashboard: string;
   footer: string;
+  pdfCaption: string;
 };
 
 const en: Strings = {
@@ -78,6 +79,7 @@ const en: Strings = {
   btnUpgrade: "See plans",
   openDashboard: "Open your Mitra dashboard",
   footer: "Mitra · reply STOP to stop reports",
+  pdfCaption: "📄 Your report as a PDF: save it, print it or share it.",
 };
 
 const hinglish: Strings = {
@@ -123,6 +125,7 @@ const hinglish: Strings = {
   btnUpgrade: "Plans dekho",
   openDashboard: "Apna Mitra dashboard kholo",
   footer: "Mitra · reports band karne ko STOP",
+  pdfCaption: "📄 Aapki report PDF mein: save karo, print karo ya share karo.",
 };
 
 const hi: Strings = {
@@ -159,6 +162,7 @@ const hi: Strings = {
   btnIdeas: "वीडियो आइडिया",
   btnUpgrade: "प्लान देखें",
   openDashboard: "अपना मित्र डैशबोर्ड खोलें",
+  pdfCaption: "📄 आपकी रिपोर्ट PDF में: सेव करें, प्रिंट करें या शेयर करें।",
 };
 
 export function t(language: string): Strings {

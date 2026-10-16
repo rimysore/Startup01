@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { currentUser, unauthorized } from "@/lib/auth";
 import { emailConfigured } from "@/lib/email";
@@ -15,7 +15,15 @@ export async function GET() {
   const d = await db();
   const [contact] = await d.select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.userId, user.id));
   const recent = await d
-    .select({ kind: schema.notifications.kind, key: schema.notifications.key, channel: schema.notifications.channel, status: schema.notifications.status, at: schema.notifications.createdAt })
+    .select({
+      id: schema.notifications.id,
+      kind: schema.notifications.kind,
+      key: schema.notifications.key,
+      channel: schema.notifications.channel,
+      status: schema.notifications.status,
+      at: schema.notifications.createdAt,
+      hasPdf: sql<boolean>`(${schema.notifications.payload} -> 'data') is not null`,
+    })
     .from(schema.notifications)
     .where(eq(schema.notifications.userId, user.id))
     .orderBy(desc(schema.notifications.createdAt))
@@ -51,7 +59,7 @@ export async function PATCH(request: Request) {
     ...(p.data.weekly != null ? { notifyWeekly: p.data.weekly } : {}),
     ...(p.data.videoCheck != null ? { notifyVideoCheck: p.data.videoCheck } : {}),
     ...(p.data.email != null ? { notifyEmail: p.data.email } : {}),
-    ...(p.data.language ? { language: p.data.language } : {}),
+    ...(p.data.language ? { language: p.data.language, languageSetAt: new Date() } : {}),
   };
   if (Object.keys(set).length) await d.update(schema.users).set(set).where(eq(schema.users.id, user.id));
   if (p.data.resume) await d.update(schema.whatsappContacts).set({ optedOutAt: null }).where(eq(schema.whatsappContacts.userId, user.id));

@@ -28,6 +28,8 @@ export async function GET() {
     subscription: sub ? { status: sub.status, cancelAtCycleEnd: Boolean(sub.cancelAtCycleEnd), currentEnd: sub.currentEnd } : null,
     usage: { month: monthKey(), used: used.credits, limit: creditLimit(plan.id) },
     founderNumber: user.founderNumber,
+    language: user.language,
+    languageChosen: user.languageSetAt != null,
     founderPass: user.founderNumber != null ? { used: used.founderUses, limit: FOUNDER_FREE_USES } : null,
     admin: isAdmin(user),
     youtube: yt ? { channelTitle: yt.channelTitle, needsReconnect: Boolean(yt.needsReconnectAt) } : null,

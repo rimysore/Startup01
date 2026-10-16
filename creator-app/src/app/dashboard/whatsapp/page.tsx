@@ -15,7 +15,7 @@ interface Status {
   contact: { phone: string; optedOut: boolean; since: string } | null;
   prefs: { weekly: boolean; videoCheck: boolean; email: boolean; language: string };
   email: string;
-  recent: { kind: string; key: string; channel: string; status: string; at: string }[];
+  recent: { id: number; kind: string; key: string; channel: string; status: string; at: string; hasPdf: boolean }[];
 }
 
 const WA_GREEN = "#25D366";
@@ -96,7 +96,7 @@ export default function WhatsAppPage() {
   const [error, setError] = useState<string | null>(null);
   const [code, setCode] = useState<{ code: string; link: string } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
-  const [sample, setSample] = useState<{ text: string; note: string } | null>(null);
+  const [sample, setSample] = useState<{ text: string; note: string; pdf: string | null } | null>(null);
 
   const load = useCallback(async () => {
     const r = await fetch("/api/whatsapp", { cache: "no-store" });
@@ -158,11 +158,11 @@ export default function WhatsAppPage() {
     setBusy(kind);
     setError(null);
     const r = await fetch("/api/notifications/test", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind }) });
-    const d = (await r.json()) as { channel?: string; preview?: string; error?: string };
+    const d = (await r.json()) as { channel?: string; preview?: string; pdf?: string | null; error?: string };
     setBusy(null);
     if (!r.ok || !d.preview) return setError(d.error ?? "Couldn't make a sample right now.");
     const where = d.channel === "whatsapp" ? "Sent to your WhatsApp ✅" : d.channel === "email" ? `Sent to ${s?.email} ✅` : "Here's how it looks (connect WhatsApp to receive it).";
-    setSample({ text: d.preview, note: where });
+    setSample({ text: d.preview, note: where, pdf: d.pdf ?? null });
     setS(await load());
   }
 
@@ -276,16 +276,35 @@ export default function WhatsAppPage() {
                 <Button onClick={() => sendSample("weekly")} disabled={busy !== null}>{busy === "weekly" ? "Making it…" : "Send my weekly report"}</Button>
                 <Button variant="ghost" onClick={() => sendSample("video_check")} disabled={busy !== null}>{busy === "video_check" ? "Checking…" : "Check my latest video"}</Button>
               </div>
-              {sample && <p className="mt-3 text-sm font-semibold text-good">{sample.note}</p>}
+              {sample && (
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <p className="text-sm font-semibold text-good">{sample.note}</p>
+                  {sample.pdf && (
+                    <a href={sample.pdf} className="rounded-full border border-line px-4 py-2 text-sm font-semibold hover:bg-surface-2">
+                      📄 Download PDF
+                    </a>
+                  )}
+                </div>
+              )}
               {s.recent.length > 0 && (
-                <ul className="mt-5 space-y-1.5 text-sm text-ink-2">
+                <ul className="mt-5 text-sm text-ink-2">
                   {s.recent.map((r) => (
-                    <li key={`${r.kind}-${r.key}`} className="flex flex-wrap justify-between gap-2">
-                      <span>{r.kind === "weekly" ? "📊 Weekly report" : "🎬 Video check"}{r.key.startsWith("sample:") ? " (sample)" : ""}</span>
-                      <span className="text-muted">
-                        {r.status === "sent" ? `${r.channel === "whatsapp" ? "WhatsApp" : "Email"} · ` : `${r.status} · `}
-                        {new Date(r.at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                    <li key={r.id} className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-0">
+                      <span className="min-w-0">
+                        <span className="block font-medium text-ink">
+                          {r.kind === "weekly" ? "📊 Weekly report" : "🎬 Video check"}
+                          {r.key.includes(":") ? <span className="font-normal text-muted"> · on request</span> : null}
+                        </span>
+                        <span className="block text-xs text-muted">
+                          {r.status === "sent" ? (r.channel === "whatsapp" ? "WhatsApp" : r.channel === "email" ? "Email" : "Saved") : r.status} ·{" "}
+                          {new Date(r.at).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                        </span>
                       </span>
+                      {r.hasPdf && (
+                        <a href={`/api/reports/pdf?id=${r.id}`} className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-semibold hover:bg-surface-2" aria-label="Download PDF">
+                          📄 PDF
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -303,6 +322,7 @@ export default function WhatsAppPage() {
               <li>✍️ <b className="text-ink">Get 5 titles</b> for any topic</li>
               <li>💡 <b className="text-ink">Next video ideas</b> from what&apos;s working</li>
               <li>🎬 <b className="text-ink">Check your latest video</b> any time</li>
+              <li>📄 <b className="text-ink">Weekly report as a PDF</b> in your language, to save or share</li>
               <li>🌐 <b className="text-ink">Switch language</b> in two taps</li>
               <li>🔕 <b className="text-ink">STOP</b> to pause reports, <b className="text-ink">START</b> to resume</li>
             </ul>

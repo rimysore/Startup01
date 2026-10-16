@@ -2,15 +2,16 @@ import { and, eq, gt, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { currentUser, unauthorized } from "@/lib/auth";
 import { buildVideoCheck, buildWeekly, loadSummary } from "@/lib/reports/build";
-import { deliver } from "@/lib/reports/deliver";
+import { deliver, finish, saveOnDemand } from "@/lib/reports/deliver";
+import { pdfFilename, pdfLink } from "@/lib/reports/link";
 import { t } from "@/lib/whatsapp/strings";
 import { z } from "zod";
 
 const Body = z.object({ kind: z.enum(["weekly", "video_check"]).default("weekly") });
 
 /**
- * "Send me a sample now": builds the real report from the creator's channel and delivers it the normal way.
- * Limited to 3 an hour (each may cost a WhatsApp template and a small AI call).
+ * "Send me a sample now": builds the real report from the creator's channel and delivers it the normal way
+ * (with the PDF for weekly reports). Limited to 3 an hour (each may cost a WhatsApp template and a small AI call).
  */
 export async function POST(request: Request) {
   const user = await currentUser();
@@ -32,16 +33,10 @@ export async function POST(request: Request) {
     kind === "weekly"
       ? await buildWeekly(user, loaded.summary, { ideas: w.btnIdeas, menu: w.btnMenu })
       : await buildVideoCheck(user, loaded.summary, video, { titles: w.btnTitles, menu: w.btnMenu });
-  const delivery = await deliver(user, report, Date.now(), w.footer);
-  await d.insert(schema.notifications).values({
-    userId: user.id,
-    kind,
-    key: `sample:${Date.now()}`,
-    channel: delivery.channel,
-    status: delivery.channel === "none" ? "skipped" : "sent",
-    payload: { text: report.text, subject: report.subject },
-    error: delivery.error ?? null,
-    sentAt: delivery.channel === "none" ? null : new Date(),
-  });
-  return Response.json({ channel: delivery.channel, preview: report.text, error: delivery.error ?? null });
+  const now = Date.now();
+  const id = await saveOnDemand(user.id, report, now, "sample");
+  const pdf = id && report.data ? { link: pdfLink(id, now), filename: pdfFilename(report.key), caption: w.pdfCaption } : undefined;
+  const delivery = await deliver(user, report, now, w.footer, pdf);
+  if (id) await finish(id, report, delivery);
+  return Response.json({ channel: delivery.channel, preview: report.text, pdf: id && report.data ? `/api/reports/pdf?id=${id}` : null, error: delivery.error ?? null });
 }

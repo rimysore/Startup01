@@ -1,4 +1,4 @@
-import { coachVideo, coachWeekly } from "../ai";
+import { coachVideo, coachWeekly, type WeeklyCoach } from "../ai";
 import { runFreeAi } from "../ai-route";
 import type { User } from "../auth";
 import { SITE_URL } from "../company";
@@ -18,6 +18,7 @@ import {
   weeklyFacts,
   weeklyFactsText,
   weeklyText,
+  type WeeklyFacts,
 } from "./facts";
 
 /** A report ready to send on any channel: the full text, the template version, and the email version. */
@@ -32,6 +33,8 @@ export interface BuiltReport {
   buttons: { id: string; title: string }[];
   subject: string;
   link: string;
+  /** Weekly only: the numbers and words behind the report, kept so the PDF can be drawn later. */
+  data?: { facts: WeeklyFacts; coach: WeeklyCoach };
 }
 
 export type SummaryResult = { ok: true; summary: ChannelSummary } | { ok: false; reason: "nochannel" | "reconnect" | "error" };
@@ -57,6 +60,7 @@ export async function buildWeekly(user: User, s: ChannelSummary, labels: { ideas
     kind: "weekly",
     key: weekKey(now),
     text: weeklyText(f, coach),
+    data: { facts: f, coach },
     template: {
       name: "mitra_weekly_report",
       params: [firstName(user, s), f.period, statsLine(f), coach.wins[0] ?? coach.headline, coach.fixes[0] ?? coach.nextVideo.idea],

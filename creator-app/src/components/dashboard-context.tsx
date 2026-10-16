@@ -16,6 +16,9 @@ export interface Me {
   usage?: { month: string; used: number; limit: number };
   /** 1-100 for founding creators. */
   founderNumber?: number | null;
+  /** The account's language, and whether the creator has picked it yet (first sign-in asks). */
+  language?: string;
+  languageChosen?: boolean;
   /** Founder Pass free uses this month (founders only). */
   founderPass?: { used: number; limit: number } | null;
   /** In ADMIN_EMAILS: can see AI costs and reset their own credits. */
@@ -88,6 +91,14 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       live = false;
     };
   }, [version, meVersion]);
+
+  // The account is the source of truth once a language was picked (it may have been changed on WhatsApp).
+  const serverLanguage = me?.languageChosen ? me.language : undefined;
+  useEffect(() => {
+    if (serverLanguage && isLanguageCode(serverLanguage) && serverLanguage !== stored) storeLanguage(serverLanguage);
+    // Only when the account's value changes, not on every local change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverLanguage]);
 
   return (
     <Ctx.Provider value={{ summary, me, language, setLanguage, reload, refresh, refreshMe }}>{children}</Ctx.Provider>

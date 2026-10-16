@@ -45,6 +45,8 @@ export interface WeeklyFacts {
   /** A recent video people stopped watching early. */
   dropOff: { title: string; avgViewPct: number } | null;
   nextMilestone: { at: number; left: number } | null;
+  /** Daily views for the last 14 days of analytics (the chart in the PDF). */
+  days: { date: string; views: number }[];
 }
 
 export function weeklyFacts(s: ChannelSummary, now = Date.now()): WeeklyFacts {
@@ -74,6 +76,7 @@ export function weeklyFacts(s: ChannelSummary, now = Date.now()): WeeklyFacts {
     star: star && avg > 0 && star.views >= avg * 1.3 ? { title: star.title, views: star.views, times: Math.round((star.views / avg) * 10) / 10 } : null,
     dropOff: dropOff ? { title: dropOff.title, avgViewPct: Math.round(dropOff.avgViewPct ?? 0) } : null,
     nextMilestone: next ? { at: next, left: next - s.channel.subscribers } : null,
+    days: s.daily.slice(-14).map((d) => ({ date: d.date, views: d.views })),
   };
 }
 

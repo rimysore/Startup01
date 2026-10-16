@@ -8,7 +8,8 @@ import { SITE_URL } from "../company";
 import { isLanguageCode, LANGUAGES, languageLabel } from "../languages";
 import { creditLimit, FOUNDER_FREE_USES, planOf } from "../plans";
 import { buildVideoCheck, buildWeekly, loadSummary } from "../reports/build";
-import { latestReport, reportMessages, type Contact } from "../reports/deliver";
+import { latestReport, reportMessages, saveOnDemand, type Contact } from "../reports/deliver";
+import { pdfFilename, pdfLink } from "../reports/link";
 import { usageThisMonth } from "../usage";
 import { markRead, send, sendAll, type Inbound, type Out } from "./api";
 import { MENU_WORDS, START_WORDS, STOP_WORDS, t } from "./strings";
@@ -107,7 +108,7 @@ export async function respond(user: User, contact: Contact, m: Inbound, now = Da
     case "lang": {
       const code = action!.split(":")[1];
       if (!code || !isLanguageCode(code)) return [languageMenu(lang)];
-      await d.update(schema.users).set({ language: code }).where(eq(schema.users.id, user.id));
+      await d.update(schema.users).set({ language: code, languageSetAt: new Date(now) }).where(eq(schema.users.id, user.id));
       return [{ type: "text", text: t(code).languageSet(languageLabel(code)) }, menu(code, Boolean(contact.optedOutAt))];
     }
     case "plan": {
@@ -137,16 +138,22 @@ export async function respond(user: User, contact: Contact, m: Inbound, now = Da
     }
     case "report": {
       const saved = await latestReport(user.id, "weekly");
-      if (saved) return [menuButton(lang, saved, [{ id: "ideas", title: w.btnIdeas }])];
+      if (saved) {
+        const pdf = saved.hasPdf ? { link: pdfLink(saved.id, now), filename: pdfFilename(saved.key), caption: w.pdfCaption } : undefined;
+        return reportMessages({ text: saved.text, buttons: [{ id: "ideas", title: w.btnIdeas }, { id: "menu", title: w.btnMenu }] }, undefined, pdf);
+      }
       const loaded = await loadSummary(user.id);
       if (!loaded.ok) return [{ type: "text", text: loaded.reason === "reconnect" ? w.reconnect : w.noChannel }];
-      return reportMessages(await buildWeekly(user, loaded.summary, { ideas: w.btnIdeas, menu: w.btnMenu }, now));
+      // Not sent this week yet: build it now and keep it, so the PDF can be downloaded too.
+      const report = await buildWeekly(user, loaded.summary, { ideas: w.btnIdeas, menu: w.btnMenu }, now);
+      const id = await saveOnDemand(user.id, report, now);
+      return reportMessages(report, undefined, id ? { link: pdfLink(id, now), filename: pdfFilename(report.key), caption: w.pdfCaption } : undefined);
     }
     case "check": {
       const videoId = action!.split(":")[1];
       if (videoId) {
         const saved = await latestReport(user.id, "video_check", videoId, 30);
-        if (saved) return [menuButton(lang, saved, [{ id: `titles:${videoId}`, title: w.btnTitles }])];
+        if (saved) return [menuButton(lang, saved.text, [{ id: `titles:${videoId}`, title: w.btnTitles }])];
       }
       const loaded = await loadSummary(user.id);
       if (!loaded.ok) return [{ type: "text", text: loaded.reason === "reconnect" ? w.reconnect : w.noChannel }];

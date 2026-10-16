@@ -21,6 +21,8 @@ export type Out =
   | { type: "list"; text: string; button: string; rows: Row[]; footer?: string }
   /** One button that opens a link. */
   | { type: "link"; text: string; label: string; url: string }
+  /** A file (the PDF report), fetched by WhatsApp from `link`. */
+  | { type: "document"; link: string; filename: string; caption?: string }
   /** A pre-approved template: the only kind allowed outside the 24-hour window. */
   | { type: "template"; name: string; language: string; params: string[]; buttons?: string[] };
 
@@ -115,6 +117,8 @@ export function toPayload(to: string, out: Out): Record<string, unknown> {
         type: "interactive",
         interactive: { type: "cta_url", body: { text: clip(out.text, 1024) }, action: { name: "cta_url", parameters: { display_text: clip(out.label, 20), url: out.url } } },
       };
+    case "document":
+      return { ...base, type: "document", document: { link: out.link, filename: out.filename, ...(out.caption ? { caption: clip(out.caption, 1024) } : {}) } };
     case "template":
       return {
         ...base,

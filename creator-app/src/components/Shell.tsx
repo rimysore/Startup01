@@ -5,8 +5,8 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { DashboardProvider, useDashboard } from "./dashboard-context";
 import { LEGAL_LINKS } from "./SiteFooter";
+import { LanguageButton, LanguageOnboarding } from "./language-picker";
 import { Logo, ThemeToggle } from "./ui";
-import { LANGUAGES, type LanguageCode } from "@/lib/languages";
 
 const NAV = [
   { href: "/dashboard", label: "Overview", icon: "M3 13h8V3H3zM13 21h8V11h-8zM3 21h8v-6H3zM13 3v6h8V3z" },
@@ -35,7 +35,7 @@ const ADMIN_NAV = [
   { href: "/dashboard/prospects", label: "Find creators", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" },
 ];
 
-function NavLinks({ compact }: { compact?: boolean }) {
+function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
   const { me } = useDashboard();
   return (
@@ -46,9 +46,10 @@ function NavLinks({ compact }: { compact?: boolean }) {
           <Link
             key={item.href}
             href={item.href}
+            onClick={onNavigate}
             className={`flex shrink-0 items-center gap-3 rounded-full px-4 py-2.5 text-sm transition ${
               active ? "bg-ink text-bg" : "text-ink-2 hover:bg-surface-2 hover:text-ink"
-            } ${compact ? "py-2" : ""}`}
+            }`}
           >
             <Icon d={item.icon} />
             {item.label}
@@ -115,6 +116,9 @@ function AccountMenu() {
           <Link href="/dashboard/billing" onClick={() => setOpen(false)} className="mt-4 block rounded-xl px-3 py-2 text-sm hover:bg-surface-2">
             Plan & billing
           </Link>
+          <div className="flex items-center justify-between rounded-xl px-3 py-1 text-sm sm:hidden">
+            Dark mode <ThemeToggle />
+          </div>
           <button onClick={signOut} className="block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-surface-2">
             Sign out
           </button>
@@ -124,11 +128,67 @@ function AccountMenu() {
   );
 }
 
+/** The things creators use most, under the thumb. Everything else is one tap away in "More". */
+const TABS = [
+  { href: "/dashboard", label: "Home", icon: NAV[0].icon },
+  { href: "/dashboard/doctor", label: "Videos", icon: NAV[1].icon },
+  { href: "/dashboard/studio", label: "Titles", icon: NAV[2].icon },
+  { href: "/dashboard/whatsapp", label: "WhatsApp", icon: NAV[8].icon },
+];
+
+function BottomTabs() {
+  const path = usePathname();
+  const [more, setMore] = useState(false);
+  const isActive = (href: string) => (href === "/dashboard" ? path === href : path.startsWith(href));
+  const inTabs = TABS.some((t) => isActive(t.href));
+  const tab = (active: boolean) => `flex flex-col items-center gap-1 py-2 text-[11px] font-semibold ${active ? "text-accent" : "text-muted"}`;
+  const pill = (active: boolean) => `grid h-8 w-12 place-items-center rounded-full ${active ? "bg-accent-soft" : ""}`;
+  return (
+    <>
+      <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden" aria-label="Main">
+        <div className="mx-auto grid max-w-md grid-cols-5">
+          {TABS.map((t) => (
+            <Link key={t.href} href={t.href} className={tab(isActive(t.href))} aria-current={isActive(t.href) ? "page" : undefined}>
+              <span className={pill(isActive(t.href))}>
+                <Icon d={t.icon} />
+              </span>
+              {t.label}
+            </Link>
+          ))}
+          <button onClick={() => setMore(true)} className={tab(!inTabs)} aria-haspopup="dialog">
+            <span className={pill(!inTabs)}>
+              <Icon d="M4 6h16M4 12h16M4 18h16" />
+            </span>
+            More
+          </button>
+        </div>
+      </nav>
+      {more && (
+        <div className="fixed inset-0 z-40 flex items-end bg-black/50 lg:hidden" role="dialog" aria-modal="true" aria-label="All pages" onClick={() => setMore(false)}>
+          <div className="toast-in max-h-[85dvh] w-full overflow-y-auto rounded-t-[28px] bg-bg p-4 pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
+            <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-line" aria-hidden />
+            <nav className="grid gap-1">
+              <NavLinks onNavigate={() => setMore(false)} />
+            </nav>
+            <nav className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-line px-4 pt-3 text-xs text-muted" aria-label="Legal">
+              {LEGAL_LINKS.map((l) => (
+                <Link key={l.href} href={l.href} onClick={() => setMore(false)}>
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
 function TopBar() {
-  const { summary, language, setLanguage } = useDashboard();
+  const { summary } = useDashboard();
   const live = summary?.mode === "live";
   return (
-    <header className="sticky top-0 z-20 flex items-center gap-3 border-b border-line bg-bg/85 px-4 py-3 backdrop-blur sm:px-8">
+    <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-bg/85 px-3 py-2.5 backdrop-blur sm:gap-3 sm:px-8 sm:py-3">
       <div className="lg:hidden">
         <Logo />
       </div>
@@ -156,23 +216,10 @@ function TopBar() {
         )}
       </div>
       <div className="ml-auto flex min-w-0 items-center gap-2">
-        <label className="sr-only" htmlFor="lang">
-          Output language
-        </label>
-        <select
-          id="lang"
-          value={language}
-          onChange={(e) => setLanguage(e.target.value as LanguageCode)}
-          className="min-w-0 max-w-[8.5rem] rounded-full border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent sm:max-w-none"
-          title="Language Mitra writes in"
-        >
-          {LANGUAGES.map((l) => (
-            <option key={l.code} value={l.code}>
-              {l.native === l.label ? l.label : `${l.native} · ${l.label}`}
-            </option>
-          ))}
-        </select>
-        <ThemeToggle />
+        <LanguageButton />
+        <span className="hidden sm:block">
+          <ThemeToggle />
+        </span>
         <AccountMenu />
       </div>
     </header>
@@ -203,10 +250,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </aside>
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
-          <nav className="flex gap-1 overflow-x-auto border-b border-line px-4 py-2 lg:hidden">
-            <NavLinks compact />
-          </nav>
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-8">{children}</main>
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-8 sm:py-8 lg:pb-8">{children}</main>
+          <BottomTabs />
+          <LanguageOnboarding />
         </div>
       </div>
     </DashboardProvider>

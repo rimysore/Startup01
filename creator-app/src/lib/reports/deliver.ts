@@ -18,11 +18,17 @@ export function windowOpen(c: Pick<Contact, "lastInboundAt">, now = Date.now()):
   return Boolean(c.lastInboundAt && now - c.lastInboundAt.getTime() < 23 * 3_600_000);
 }
 
-/** The full report as WhatsApp messages: the text (split if long), then reply buttons. */
-export function reportMessages(r: BuiltReport, footer?: string): Out[] {
+export type PdfFile = { link: string; filename: string; caption?: string };
+
+/** The full report as WhatsApp messages: the text (split if long), reply buttons, then the PDF if there is one. */
+export function reportMessages(r: Pick<BuiltReport, "text" | "buttons">, footer?: string, pdf?: PdfFile): Out[] {
   const parts = splitText(r.text, 1000);
   const last = parts.pop() ?? r.text;
-  return [...parts.map((text): Out => ({ type: "text", text })), { type: "buttons", text: last, buttons: r.buttons, footer }];
+  return [
+    ...parts.map((text): Out => ({ type: "text", text })),
+    { type: "buttons", text: last, buttons: r.buttons, footer },
+    ...(pdf ? [{ type: "document", ...pdf } satisfies Out] : []),
+  ];
 }
 
 export type Delivery = { channel: "whatsapp" | "email" | "none"; error?: string };
@@ -34,12 +40,12 @@ export type Delivery = { channel: "whatsapp" | "email" | "none"; error?: string 
  *   no WhatsApp             → email, if they kept email reports on
  * If WhatsApp fails, falls back to email.
  */
-export async function deliver(user: User, r: BuiltReport, now = Date.now(), footer?: string): Promise<Delivery> {
+export async function deliver(user: User, r: BuiltReport, now = Date.now(), footer?: string, pdf?: PdfFile): Promise<Delivery> {
   const contact = whatsappConfigured() ? await activeContact(user.id) : null;
   let waError: string | undefined;
   if (contact) {
     try {
-      if (windowOpen(contact, now)) await sendAll(contact.phone, reportMessages(r, footer));
+      if (windowOpen(contact, now)) await sendAll(contact.phone, reportMessages(r, footer, pdf));
       else await send(contact.phone, { type: "template", name: r.template.name, language: templateLanguage(user.language), params: r.template.params, buttons: r.template.buttons });
       return { channel: "whatsapp" };
     } catch (err) {
@@ -49,7 +55,12 @@ export async function deliver(user: User, r: BuiltReport, now = Date.now(), foot
   }
   if (user.notifyEmail && emailConfigured()) {
     try {
-      await sendMail({ to: user.email, subject: r.subject, text: r.text, link: { label: "Open Mitra", url: r.link } });
+      await sendMail({
+        to: user.email,
+        subject: r.subject,
+        text: pdf ? `${r.text}\n\n📄 Download this report as a PDF: ${pdf.link}` : r.text,
+        link: { label: "Open Mitra", url: r.link },
+      });
       return { channel: "email", ...(waError ? { error: waError } : {}) };
     } catch (err) {
       return { channel: "none", error: [waError, err instanceof Error ? err.message : String(err)].filter(Boolean).join("; ") };
@@ -101,15 +112,15 @@ export async function finish(id: number, r: BuiltReport | null, d: Delivery & { 
       channel: d.channel,
       error: d.error?.slice(0, 500) ?? null,
       sentAt: status === "sent" ? new Date() : null,
-      ...(r ? { payload: { text: r.text, subject: r.subject } } : {}),
+      ...(r ? { payload: { text: r.text, subject: r.subject, ...(r.data ? { data: r.data } : {}) } } : {}),
     })
     .where(eq(schema.notifications.id, id));
 }
 
 /** The most recent report of a kind (for "Full report" / "More tips" taps), if sent in the last `days`. */
-export async function latestReport(userId: string, kind: BuiltReport["kind"], key?: string, days = 8): Promise<string | null> {
+export async function latestReport(userId: string, kind: BuiltReport["kind"], key?: string, days = 8): Promise<{ id: number; key: string; text: string; hasPdf: boolean } | null> {
   const rows = await (await db())
-    .select({ payload: schema.notifications.payload })
+    .select({ id: schema.notifications.id, key: schema.notifications.key, payload: schema.notifications.payload })
     .from(schema.notifications)
     .where(
       and(
@@ -122,6 +133,25 @@ export async function latestReport(userId: string, kind: BuiltReport["kind"], ke
     )
     .orderBy(sql`${schema.notifications.createdAt} desc`)
     .limit(1);
-  const text = rows[0]?.payload?.text;
-  return typeof text === "string" ? text : null;
+  const row = rows[0];
+  const text = row?.payload?.text;
+  return row && typeof text === "string" ? { id: row.id, key: row.key, text, hasPdf: Boolean(row.payload?.data) } : null;
+}
+
+/** Keeps a report built on request (WhatsApp "report", the website's sample) so its PDF can be fetched. */
+export async function saveOnDemand(userId: string, r: BuiltReport, now = Date.now(), prefix = "ondemand", channel: Delivery["channel"] = "whatsapp"): Promise<number | null> {
+  const [row] = await (await db())
+    .insert(schema.notifications)
+    .values({
+      userId,
+      kind: r.kind,
+      key: `${prefix}:${now}`,
+      channel,
+      status: "sent",
+      payload: { text: r.text, subject: r.subject, ...(r.data ? { data: r.data } : {}) },
+      createdAt: new Date(now),
+      sentAt: new Date(now),
+    })
+    .returning({ id: schema.notifications.id });
+  return row?.id ?? null;
 }

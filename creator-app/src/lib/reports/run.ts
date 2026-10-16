@@ -4,6 +4,7 @@ import type { User } from "../auth";
 import { t } from "../whatsapp/strings";
 import { buildVideoCheck, buildWeekly, loadSummary } from "./build";
 import { claim, deliver, finish, reachable } from "./deliver";
+import { pdfFilename, pdfLink } from "./link";
 import { isMondayInIndia, videosDueForCheck, weekKey } from "./facts";
 
 /**
@@ -51,7 +52,8 @@ async function forUser(user: User, now: number, tally: RunResult): Promise<void>
     if (id == null) continue;
     try {
       const report = await job.build();
-      const d = await deliver(user, report, now, words.footer);
+      const pdf = report.data ? { link: pdfLink(id, now), filename: pdfFilename(report.key), caption: words.pdfCaption } : undefined;
+      const d = await deliver(user, report, now, words.footer, pdf);
       await finish(id, report, d);
       if (d.channel !== "none") tally.sent++;
       else if (d.error) tally.failed++;

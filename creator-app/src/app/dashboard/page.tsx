@@ -266,7 +266,7 @@ function OverviewBody({
         <div className="divide-y divide-line">
           {videos.map((v) => (
             <div key={v.id} className="flex items-center gap-3 py-3 sm:gap-4">
-              <VideoThumb video={v} className="w-24 sm:w-36" />
+              <VideoThumb video={v} className="w-20 shrink-0 sm:w-36" />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 font-medium">{v.title}</p>
                 <p className="mt-1 text-xs text-muted">
@@ -285,9 +285,11 @@ function OverviewBody({
               </div>
               <Link
                 href={`/dashboard/doctor?v=${v.id}`}
-                className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-semibold hover:bg-surface-2"
+                className="grid h-9 min-w-9 shrink-0 place-items-center rounded-full border border-line text-xs font-semibold hover:bg-surface-2 sm:px-3"
+                aria-label={`Diagnose ${v.title}`}
               >
-                Diagnose
+                <span className="hidden sm:inline">Diagnose</span>
+                <span className="sm:hidden" aria-hidden>→</span>
               </Link>
             </div>
           ))}

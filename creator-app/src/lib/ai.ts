@@ -651,6 +651,19 @@ export const WeeklyCoachSchema = z.object({
   wins: z.array(z.string()).describe("Up to 3 specific wins from the data, each one short sentence"),
   fixes: z.array(z.string()).describe("Up to 3 specific, doable fixes for this week, each one short sentence"),
   nextVideo: z.object({ idea: z.string().describe("A concrete next video idea based on what worked"), why: z.string().describe("One sentence: why, from the data") }),
+  labels: z
+    .object({
+      report: z.string().describe("'Weekly report'"),
+      views: z.string().describe("'Views'"),
+      watchTime: z.string().describe("'Watch hours'"),
+      subscribers: z.string().describe("'New subscribers'"),
+      wins: z.string().describe("'What went well'"),
+      fixes: z.string().describe("'Fix this week'"),
+      next: z.string().describe("'Your next video'"),
+      milestone: z.string().describe("'to your next milestone'"),
+    })
+    .optional()
+    .describe("These short headings for the printable report, translated into the target language as creators would say them"),
 });
 export type WeeklyCoach = z.infer<typeof WeeklyCoachSchema>;
 
@@ -672,6 +685,7 @@ export async function coachWeekly(language: string, facts: string): Promise<AiRe
       wins: list(r.wins, 3).map((x) => cut(x, 180)),
       fixes: list(r.fixes, 3).map((x) => cut(x, 180)),
       nextVideo: { idea: cut(r.nextVideo.idea, 160), why: cut(r.nextVideo.why, 180) },
+      ...(r.labels ? { labels: Object.fromEntries(Object.entries(r.labels).map(([k, v]) => [k, cut(v, 40)])) as NonNullable<WeeklyCoach["labels"]> } : {}),
     },
   };
 }

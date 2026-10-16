@@ -38,7 +38,7 @@ export const PLANS: Record<PlanId, Plan> = {
     // 250 credits keeps even all-Video-Doctor use around break-even at ₹249.
     pricePaise: 24_900,
     credits: 250,
-    points: ["250 AI credits / month", "Everything in Pro", "Priority AI", "WhatsApp weekly reports (soon)"],
+    points: ["250 AI credits / month", "Everything in Pro", "Priority AI", "Priority support on WhatsApp"],
   },
 };
 

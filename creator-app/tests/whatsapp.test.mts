@@ -18,6 +18,8 @@ const { handleInbound, toWhatsApp, menu } = await import("@/lib/whatsapp/bot");
 const { t } = await import("@/lib/whatsapp/strings");
 const { LANGUAGES } = await import("@/lib/languages");
 const { TEMPLATES } = await import("@/lib/whatsapp/templates");
+const { validPdfLink } = await import("@/lib/reports/link");
+const { weeklyPdf, runs } = await import("@/lib/reports/pdf");
 type Out = import("@/lib/whatsapp/api").Out;
 type Summary = import("@/lib/types").ChannelSummary;
 
@@ -51,6 +53,12 @@ assert(plain.wins.length > 0 && plain.fixes.length > 0, "plain report has wins a
 const text = F.weeklyText(wf, plain);
 assert(text.includes("▲50%") && text.includes("600 more to 10K"), `report text has stats and milestone`);
 
+assert(runs("Views 50% बढ़े aur").map((r) => r.indic).join() === "false,true,false", "PDF text splits into script runs");
+for (const lang of ["en", "hi", "te", "ta", "ml", "bn", "kn"]) {
+  const pdf = await weeklyPdf(wf, { ...plain, headline: lang === "te" ? "ప్రేక్షకులు మంచి వారం" : lang === "ml" ? "നമുക്ക് കാഴ്ചകൾ" : plain.headline }, lang);
+  assert(pdf.subarray(0, 5).toString() === "%PDF-" && pdf.length > 5000, `weekly PDF renders in ${lang} (${Math.round(pdf.length / 1024)} KB)`);
+  assert((pdf.toString("latin1").match(/\/Type \/Page\b/g) ?? []).length === 1, `${lang} PDF is one page`);
+}
 assert(F.videosDueForCheck(summary.videos, NOW).map((v) => v.id).join() === "new", "only the ~2-day-old video is due");
 assert(F.videosDueForCheck([vid("x", 35, 1)], NOW).length === 0 && F.videosDueForCheck([vid("y", 59, 1)], NOW).length === 1, "36-60h window");
 assert(F.median([5, 1, 3]) === 3 && F.median([4, 1, 3, 2]) === 2.5 && F.median([]) === null, "median");
@@ -132,7 +140,14 @@ const [c1] = await d.select().from(schema.whatsappContacts).where(eq(schema.what
 assert(c1.lastInboundAt?.getTime() === NOW, "a message opens the 24-hour window");
 
 await handleInbound(msg("b2", "919800000001", "Full report", "report"), NOW);
-assert(last().out.type === "buttons" && (last().out as { text: string }).text.includes("📊"), "'Full report' sends the saved weekly report");
+const fullReport = outbox().slice(-2);
+assert(fullReport[0].out.type === "buttons" && (fullReport[0].out as { text: string }).text.includes("📊"), "'Full report' sends the saved weekly report");
+const doc = fullReport[1].out as Extract<Out, { type: "document" }>;
+assert(doc.type === "document" && /\/api\/reports\/pdf\?id=\d+&exp=\d+&sig=[0-9a-f]{32}$/.test(doc.link) && doc.filename === "Mitra-weekly-report-2026-W43.pdf", "…followed by its PDF (signed link)");
+const u = new URL(doc.link);
+assert(validPdfLink(Number(u.searchParams.get("id")), Number(u.searchParams.get("exp")), u.searchParams.get("sig")!, NOW), "the PDF link verifies");
+assert(!validPdfLink(Number(u.searchParams.get("id")) + 1, Number(u.searchParams.get("exp")), u.searchParams.get("sig")!, NOW), "…and can't be reused for another report");
+assert(!validPdfLink(Number(u.searchParams.get("id")), Number(u.searchParams.get("exp")), u.searchParams.get("sig")!, NOW + 31 * 86_400_000), "…and expires after 30 days");
 
 // Inside the window, reports go out as normal messages, not templates.
 await d.delete(schema.notifications).where(eq(schema.notifications.userId, "wa"));
