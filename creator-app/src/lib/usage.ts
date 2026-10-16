@@ -17,7 +17,7 @@ export async function creditsUsed(userId: string): Promise<number> {
 
 /** Atomically takes `amount` credits if the user stays within their monthly limit. Returns false when they can't. */
 export async function reserveCredit(user: User, amount = 1): Promise<boolean> {
-  const limit = creditLimit(user.plan);
+  const limit = creditLimit(user.plan, user.founderNumber != null);
   if (amount > limit) return false;
   const rows = await (await db())
     .insert(schema.usage)

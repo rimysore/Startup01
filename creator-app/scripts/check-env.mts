@@ -75,7 +75,7 @@ if (live) {
         const res = await fetch(`https://api.razorpay.com/v1/plans/${env[k]}`, { headers: { Authorization: auth } });
         if (!res.ok) throw new Error(`${k}: HTTP ${res.status}`);
         const plan = (await res.json()) as { item: { amount: number } };
-        const want = k === "RAZORPAY_PLAN_PRO" ? 39_900 : 99_900;
+        const want = k === "RAZORPAY_PLAN_PRO" ? 9_900 : 99_900;
         if (plan.item.amount !== want) throw new Error(`${k} charges ${plan.item.amount / 100} INR, expected ${want / 100}`);
       }
     });

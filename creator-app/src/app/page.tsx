@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FoundingBanner } from "@/components/Founding";
 import { LandingCounter } from "@/components/LandingCounter";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Logo, ThemeToggle } from "@/components/ui";
@@ -125,6 +126,7 @@ export default function Home() {
             </Link>
           </div>
           <p className="mt-4 text-xs text-muted">Read-only access. Free to start. No credit card.</p>
+          <FoundingBanner />
         </div>
         <LandingCounter />
       </section>

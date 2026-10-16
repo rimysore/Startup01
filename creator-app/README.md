@@ -40,7 +40,7 @@ The output language (top bar) controls what language the AI writes in.
   (disabled in production unless `ALLOW_DEV_LOGIN=1`).
 - **YouTube** is connected separately, after sign-in, with read-only scopes. Tokens are stored per user,
   encrypted (AES-256-GCM, key from `SESSION_SECRET`), and refreshed automatically.
-- **Plans** (`src/lib/plans.ts`): Free (10 AI credits / month), Pro ₹399 (300), Creator+ ₹999 (750).
+- **Plans** (`src/lib/plans.ts`): Free (10 AI credits / month), Pro ₹99 launch price (100), Creator+ ₹999 (750). The first 100 creators to connect a channel become **Founding Creators** (`users.founder_number`): 30 credits/month for life plus the non-AI features free.
   One credit = one AI answer. Credits are reserved atomically before the AI call and refunded if it fails.
   Signed-out visitors get sample answers only, so the public demo costs nothing.
 - **Payments:** Razorpay Subscriptions (UPI Autopay, cards, netbanking).
@@ -63,7 +63,7 @@ The output language (top bar) controls what language the AI writes in.
    Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`.
    - The YouTube scopes are *sensitive*: while the Google app is in "Testing", only test users you add
      can connect. Public launch needs Google's OAuth verification, so start that early.
-5. **Razorpay:** in Test Mode first. Create two monthly plans (₹399, ₹999) and set `RAZORPAY_PLAN_PRO` /
+5. **Razorpay:** in Test Mode first. Create two monthly plans (₹99, ₹999) and set `RAZORPAY_PLAN_PRO` /
    `RAZORPAY_PLAN_CREATOR`; set `RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET`; add a webhook to
    `<your-url>/api/billing/webhook` for the `subscription.*` events and set `RAZORPAY_WEBHOOK_SECRET`.
    Before charging real customers you'll also need Razorpay account activation (KYC) and published
@@ -107,7 +107,7 @@ Every AI endpoint goes through one pipeline (`src/lib/ai-route.ts`), cheapest ch
 | Titles, Comments, Ask Mitra, Thumbnail design | Claude Haiku 5.5 | low | $0.002 (₹0.15) |
 
 *2,000 input + 3,000 output tokens at ₹88/$. Worst case per plan if every credit is spent on Video Doctor:
-Free ≈ ₹9, Pro ≈ ₹300 of ₹399, Creator+ ≈ ₹750 of ₹999.
+Free ≈ ₹9, Pro ≈ ₹100 of ₹99 (break-even at the launch price; typical use ≈ ₹20), Creator+ ≈ ₹750 of ₹999.
 Real usage mixes features and repeats (cache hits are free), so typical cost is far lower; check `/api/admin/costs`.
 
 **Prompt safety:** a fixed system prompt carries YouTube Community Guidelines rules; text from other people

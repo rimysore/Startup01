@@ -8,6 +8,8 @@ export const users = pgTable("users", {
   /** free | pro | creator — kept in sync with the active subscription by the billing webhook. */
   plan: text("plan").notNull().default("free"),
   planRenewsAt: timestamp("plan_renews_at", { withTimezone: true }),
+  /** 1-100 for the founding creators (first to connect a channel); null for everyone else. */
+  founderNumber: integer("founder_number").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

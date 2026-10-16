@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Ext, LegalPage, type LegalSection } from "@/components/Legal";
 import { COMPANY } from "@/lib/company";
-import { FEATURE_CREDITS, PLANS, rupees } from "@/lib/plans";
+import { FEATURE_CREDITS, FOUNDER_PERKS, FOUNDING_SPOTS, PLANS, rupees } from "@/lib/plans";
 
 export const metadata: Metadata = { title: "Terms of Service — Mitra" };
 
@@ -194,6 +194,27 @@ const sections: LegalSection[] = [
         You agree to compensate us for reasonable losses and costs arising from content you publish using the Service or from your breach of
         these Terms or of YouTube&apos;s terms, except to the extent caused by us.
       </p>
+    ),
+  },
+  {
+    id: "founding",
+    title: "Founding creators",
+    body: (
+      <>
+        <p>
+          The first {FOUNDING_SPOTS} people to connect a YouTube channel to {COMPANY.product} become founding creators (one spot per channel). For as long as{" "}
+          {COMPANY.product} operates, a founding creator keeps, at no charge:
+        </p>
+        <ul>
+          {FOUNDER_PERKS.map((p) => (
+            <li key={p}>{p}</li>
+          ))}
+        </ul>
+        <p>
+          The perks are personal and can&apos;t be transferred or sold. We may end them for an account that breaks these Terms. If {COMPANY.product} is
+          discontinued, we&apos;ll give founding creators at least 30 days&apos; notice.
+        </p>
+      </>
     ),
   },
   {

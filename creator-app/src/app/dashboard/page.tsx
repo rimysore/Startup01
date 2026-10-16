@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { burstConfetti, CelebrationToast, MilestoneRing, RollingNumber, Sparkline, useLiveSubscribers, type Celebration } from "@/components/celebrate";
-import { useDashboard } from "@/components/dashboard-context";
+import { useDashboard, useQueryParam } from "@/components/dashboard-context";
+import { FounderBadge } from "@/components/Founding";
 import { LineChart } from "@/components/LineChart";
 import { Card, DemoNote, ErrorNote, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
@@ -90,12 +91,23 @@ function actions(s: ChannelSummary): Array<{ title: string; body: string; href: 
 }
 
 export default function Overview() {
-  const { summary, refresh } = useDashboard();
+  const { summary, refresh, me } = useDashboard();
+  const newFounder = useQueryParam("founder");
   if (!summary) return <Spinner label="Loading your channel" />;
-  return <OverviewBody summary={summary} refresh={refresh} />;
+  return <OverviewBody summary={summary} refresh={refresh} founder={me?.founderNumber ?? null} newFounder={newFounder} />;
 }
 
-function OverviewBody({ summary, refresh }: { summary: ChannelSummary & { error?: string }; refresh: () => void }) {
+function OverviewBody({
+  summary,
+  refresh,
+  founder,
+  newFounder,
+}: {
+  summary: ChannelSummary & { error?: string };
+  refresh: () => void;
+  founder: number | null;
+  newFounder: string | null;
+}) {
   const [celebration, setCelebration] = useState<Celebration | null>(null);
   const [popKey, setPopKey] = useState(0);
   const onGain = useCallback((gain: number, since: "visit" | "now") => {
@@ -108,6 +120,15 @@ function OverviewBody({ summary, refresh }: { summary: ChannelSummary & { error?
     });
   }, []);
   const dismiss = useCallback(() => setCelebration(null), []);
+  // Just became a founding creator (redirect from connecting YouTube): the biggest celebration we have.
+  useEffect(() => {
+    if (!newFounder || !/^\d+$/.test(newFounder)) return;
+    const t = setTimeout(() => {
+      burstConfetti(undefined, 220);
+      setCelebration({ id: Date.now(), title: `You're Founding Creator #${newFounder}! 🏅`, body: "Lifetime perks unlocked: free credits every month and early brand deals." });
+    }, 600);
+    return () => clearTimeout(t);
+  }, [newFounder]);
   const live = summary.mode === "live";
   const subscribers = useLiveSubscribers(summary.channel.id, summary.channel.subscribers, live, onGain);
 
@@ -134,9 +155,12 @@ function OverviewBody({ summary, refresh }: { summary: ChannelSummary & { error?
         <div className="glow-blob pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-accent/40 blur-3xl" aria-hidden />
         <div className="glow-blob pointer-events-none absolute -bottom-40 left-10 h-72 w-72 rounded-full bg-peacock/30 blur-3xl" style={{ animationDelay: "-7s" }} aria-hidden />
         <div className="relative flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-bg/75">
-            {greeting}, <span className="font-semibold text-bg">{channel.title}</span> 👋
-          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <p className="text-sm text-bg/75">
+              {greeting}, <span className="font-semibold text-bg">{channel.title}</span> 👋
+            </p>
+            {founder != null && <FounderBadge n={founder} />}
+          </div>
           <div className="flex items-center gap-2 text-xs">
             {live ? (
               <span className="inline-flex items-center gap-2 rounded-full bg-bg/10 px-3 py-1.5">

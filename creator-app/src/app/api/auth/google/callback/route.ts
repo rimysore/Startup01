@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { currentUser, startSession, upsertUser } from "@/lib/auth";
+import { claimFounderSpot } from "@/lib/founders";
 import { finishOAuth } from "@/lib/oauth-state";
 import { exchangeCode, fetchSummary, googleProfile, saveYouTubeConnection } from "@/lib/youtube";
 
@@ -35,7 +36,10 @@ export async function GET(request: NextRequest) {
       return fail(failPath, "no_channel");
     }
     await saveYouTubeConnection(user.id, tokens, channel);
-    return NextResponse.redirect(new URL(intent.next, origin));
+    const founder = await claimFounderSpot(user.id, channel.id).catch((err: unknown) => (console.error("Founder spot failed", err), null));
+    const next = new URL(intent.next, origin);
+    if (founder) next.searchParams.set("founder", String(founder));
+    return NextResponse.redirect(next);
   } catch (err) {
     console.error(err);
     return fail(failPath, "exchange");

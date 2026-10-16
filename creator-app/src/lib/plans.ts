@@ -27,9 +27,10 @@ export const PLANS: Record<PlanId, Plan> = {
   pro: {
     id: "pro",
     name: "Pro",
-    pricePaise: 39_900,
-    credits: 300,
-    points: ["300 AI credits / month", "Video Doctor (3 credits each)", "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"],
+    // Launch price. 100 credits keeps even all-Video-Doctor use (~₹3 each) around break-even; typical use costs ~₹20.
+    pricePaise: 9_900,
+    credits: 100,
+    points: ["100 AI credits / month", "Video Doctor (3 credits each)", "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"],
   },
   creator: {
     id: "creator",
@@ -54,11 +55,23 @@ export function planOf(v: string | null | undefined): Plan {
  * Monthly credits for a plan. Server-side, FREE_CREDITS overrides the Free plan's allowance (e.g. 20 for beta
  * testers) without a code change.
  */
-export function creditLimit(v: string | null | undefined): number {
+export function creditLimit(v: string | null | undefined, founder = false): number {
   const plan = planOf(v);
   const free = Number(process.env.FREE_CREDITS);
-  return plan.id === "free" && free > 0 ? Math.floor(free) : plan.credits;
+  const base = plan.id === "free" && free > 0 ? Math.floor(free) : plan.credits;
+  // Founding creators get a lifetime floor of FOUNDER_CREDITS on any plan.
+  return founder ? Math.max(base, FOUNDER_CREDITS) : base;
 }
+
+/** The first FOUNDING_SPOTS creators to connect a YouTube channel become founding creators, for life. */
+export const FOUNDING_SPOTS = 100;
+export const FOUNDER_CREDITS = 30;
+export const FOUNDER_PERKS = [
+  "Founding Creator badge with your number (#1–100)",
+  `${FOUNDER_CREDITS} AI credits every month, free, for life`,
+  "Live dashboard, Trend Radar, Audience and Competitor data free for life",
+  "First access to brand deals and collabs",
+];
 
 export function rupees(paise: number): string {
   return `₹${(paise / 100).toLocaleString("en-IN")}`;

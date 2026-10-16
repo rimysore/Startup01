@@ -29,6 +29,13 @@
       "when": 1792107253368,
       "tag": "0003_competitors",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792116485650,
+      "tag": "0004_founders",
+      "breakpoints": true
     }
   ]
 }
