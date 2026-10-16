@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import { SITE_URL } from "@/lib/company";
-import { Inter, Instrument_Serif, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
+import { Bricolage_Grotesque, Inter, Noto_Sans_Devanagari, Noto_Sans_Telugu } from "next/font/google";
 import "./globals.css";
 
 const body = Inter({ variable: "--font-body", subsets: ["latin"] });
-const display = Instrument_Serif({
-  variable: "--font-display-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-});
+// Display face: a friendly, characterful grotesque for headlines and the wordmark.
+const display = Bricolage_Grotesque({ variable: "--font-display-face", subsets: ["latin"] });
 const devanagari = Noto_Sans_Devanagari({
   variable: "--font-devanagari",
   subsets: ["devanagari"],

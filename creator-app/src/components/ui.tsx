@@ -3,17 +3,7 @@
 import Link from "next/link";
 import { useTheme } from "./hooks";
 
-export function Logo({ className = "" }: { className?: string }) {
-  return (
-    <Link href="/" className={`flex items-center gap-2 ${className}`} aria-label="Mitra home">
-      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden>
-        <circle cx="16" cy="16" r="15" fill="var(--accent)" />
-        <path d="M9 21V11l7 7 7-7v10" fill="none" stroke="var(--accent-ink)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span className="font-display text-2xl leading-none tracking-tight">Mitra</span>
-    </Link>
-  );
-}
+export { Logo } from "./brand";
 
 export function ThemeToggle() {
   const theme = useTheme();

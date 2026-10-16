@@ -82,7 +82,7 @@
   --color-warn: var(--warn);
   --color-bad: var(--bad);
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
+  --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-indic: var(--font-devanagari), var(--font-telugu), var(--font-body), sans-serif;
 }
 
@@ -95,6 +95,25 @@ body {
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headlines: the display face is set bold and tight by default; utilities (e.g. font-semibold) still win. */
+@layer base {
+  .font-display {
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+}
+
+/* Brand gradient (logo colours): saffron → rose → violet. */
+.text-brand {
+  background: linear-gradient(100deg, #ff8a1f 0%, #ff3d6e 55%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.bg-brand {
+  background: linear-gradient(110deg, #ff8a1f 0%, #ff3d6e 55%, #8b5cf6 100%);
 }
 
 ::selection {
@@ -133,6 +152,22 @@ body {
   animation: rise 0.5s ease-out both;
 }
 
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.35em); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.word-in {
+  animation: word-in 0.5s cubic-bezier(.2, .9, .2, 1) both;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+
 @keyframes toast-in {
   from { opacity: 0; transform: translateY(24px) scale(0.96); }
   to { opacity: 1; transform: none; }
@@ -168,7 +203,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot { animation: none; }
+  .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot, .word-in, .float-y { animation: none; }
 }
 
 .legal-body ul {
