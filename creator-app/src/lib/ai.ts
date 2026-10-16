@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "outreach";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -38,6 +38,8 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   slang: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 24, credits: FEATURE_CREDITS.slang },
   // Comparing several channels' strategies is real reasoning: medium effort on the small model.
   competitors: { model: "claude-haiku-5-5", effort: "medium", maxTokens: 8000, cacheHours: 12, credits: FEATURE_CREDITS.competitors },
+  // Admin prospecting: short personal openers, batched. Not charged to anyone's credits.
+  outreach: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: 0 },
 };
 
 export function route(feature: Feature): Route {
@@ -546,6 +548,36 @@ export async function compareCompetitors(language: string, data: string): Promis
       emotions: emotionShares(c.emotions),
       moves: list(c.moves, 6).map((x) => cut(x, 300)),
     },
+  };
+}
+
+// ---- Outreach openers (admin prospecting) -------------------------------------------------------------
+
+export const OutreachSchema = z.object({
+  messages: z.array(
+    z.object({
+      id: z.number(),
+      subject: z.string().describe("Under 60 characters, specific to them, no clickbait or ALL CAPS"),
+      opener: z.string().describe("Two sentences: a specific, genuine observation about their latest video or channel, then why you're writing"),
+    }),
+  ),
+});
+export type Outreach = z.infer<typeof OutreachSchema>;
+
+/** Personal first lines for outreach emails, one per creator. Honest: no invented praise, numbers or promises. */
+export async function writeOutreach(language: string, creators: string): Promise<AiResult<Outreach>> {
+  const out = await structured(
+    "outreach",
+    OutreachSchema,
+    language,
+    "Write a short, personal subject line and opening for an email to each YouTube creator below, from the founder of Mitra (an AI growth manager for regional-language creators). " +
+      "Refer to something specific from their latest video title or channel. Sound like one creator-friendly person writing, not marketing. " +
+      "Don't invent facts, numbers, praise you can't see in the data, or urgency. Return one message per id.\n\n" +
+      untrusted(creators),
+  );
+  return {
+    ...out,
+    result: { messages: out.result.messages.map((m) => ({ id: m.id, subject: cut(m.subject.replace(/\s+/g, " "), 80), opener: cut(m.opener, 500) })) },
   };
 }
 

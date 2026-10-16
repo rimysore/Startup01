@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts && tsx tests/insights.test.mts && tsx tests/growth.test.mts && tsx tests/founders.test.mts",
+    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts && tsx tests/insights.test.mts && tsx tests/growth.test.mts && tsx tests/founders.test.mts && tsx tests/prospects.test.mts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.mts",
     "check:env": "tsx scripts/check-env.mts"

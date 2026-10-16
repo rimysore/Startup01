@@ -163,6 +163,18 @@ budget and refund-on-failure checks as the text AI, and logged in `ai_calls` as 
   refused: YouTube search costs 100 units). Each channel's last 15 uploads (3 units, cached 6 h) give
   comparable metrics; "Compare with Mitra" (Haiku, medium effort, 1 credit) explains gaps and moves.
 
+## Finding creators (admin)
+
+**Find creators** (`/dashboard/prospects`, admins only) searches YouTube for videos uploaded in the last 7–30
+days in India matching keywords and a language, keeps channels in a subscriber range (default 1K–1L) that
+aren't already Mitra users, and scores them (size sweet spot ≈ 12K, recent uploads, language, views per video,
+a public way to reach them). Emails come only from the channel description (including "name [at] gmail
+[dot] com"); scraping YouTube's "View email address" is against its Terms. Quota: 100 units per 50 videos
+searched + 1 per 50 channels, capped at `PROSPECT_DAILY_UNITS` (3,000) a day. Uses `YOUTUBE_API_KEY`, or the
+admin's own YouTube connection. Haiku writes personal subjects/openers 10 per call; "Open in Gmail" opens a
+pre-filled compose window and marks the creator contacted; "Do not contact" is permanent; CSV export.
+Plan and rules: `docs/PROSPECTING.md`.
+
 Admins (`ADMIN_EMAILS`) get **AI costs** in the sidebar: spend, calls and average tokens per feature, the latest
 calls, and a button to reset their own credits while testing. `FREE_CREDITS` raises the Free plan's allowance.
 

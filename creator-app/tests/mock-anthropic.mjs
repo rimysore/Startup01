@@ -17,6 +17,7 @@ const ANSWERS = {
 
 function featureOf(body) {
   const props = Object.keys(body.output_config?.format?.schema?.properties ?? {});
+  if (props.includes("messages")) return "outreach";
   if (props.includes("theyDoBetter")) return "competitors";
   if (props.includes("verdict")) return "doctor";
   if (props.includes("headline")) return "thumbnail";
@@ -41,7 +42,9 @@ http
       const body = JSON.parse(raw || "{}");
       const feature = featureOf(body);
       requests.push({ feature, model: body.model, effort: body.output_config?.effort, fallbacks: body.fallbacks ?? null, betas: req.headers["anthropic-beta"] ?? null, workspace: req.headers["anthropic-workspace-id"] ?? null, max_tokens: body.max_tokens, system: body.system, prompt: JSON.stringify(body.messages), images: (body.messages?.[0]?.content ?? []).filter?.((b) => b.type === "image").length ?? 0 });
-      const text = feature === "chat" ? "• Is hafte 2 Shorts banao." : JSON.stringify(ANSWERS[feature]);
+      const ids = [...JSON.stringify(body.messages).matchAll(/id (\d+):/g)].map((m) => Number(m[1]));
+      const answer = feature === "outreach" ? { messages: ids.map((id) => ({ id, subject: `Your night test, ${id}`, opener: `Hi! Loved your latest video (${id}).` })) } : ANSWERS[feature];
+      const text = feature === "chat" ? "• Is hafte 2 Shorts banao." : JSON.stringify(answer);
       res.setHeader("content-type", "application/json");
       res.end(
         JSON.stringify({

@@ -188,6 +188,19 @@ const sections: LegalSection[] = [
     ),
   },
   {
+    id: "outreach",
+    title: "Creators we invite",
+    body: (
+      <p>
+        To invite creators to {COMPANY.product}, we look up public YouTube channel information through YouTube&apos;s official API: channel
+        name, public statistics, recent video titles, and any business email or link the creator published in their channel description. We
+        use it only to send a small number of personal invitations. If you don&apos;t want to hear from us, reply &ldquo;stop&rdquo; or email{" "}
+        <a href={`mailto:${COMPANY.privacyEmail}`}>{COMPANY.privacyEmail}</a>: we&apos;ll mark you as do-not-contact and won&apos;t write again.
+        We never buy contact lists.
+      </p>
+    ),
+  },
+  {
     id: "children",
     title: "Children",
     body: <p>{COMPANY.product} is for people aged 18 and over. We don&apos;t knowingly process children&apos;s data; if you believe a child has signed up, contact us and we&apos;ll delete the account.</p>,

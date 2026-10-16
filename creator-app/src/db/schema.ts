@@ -143,3 +143,51 @@ export const competitors = pgTable(
   },
   (t) => [uniqueIndex("competitors_user_channel").on(t.userId, t.channelId)],
 );
+
+/** Creators found for outreach (admin tool). Public channel data only; emails only if the creator published them. */
+export const prospects = pgTable(
+  "prospects",
+  {
+    id: serial("id").primaryKey(),
+    channelId: text("channel_id").notNull().unique(),
+    title: text("title").notNull(),
+    handle: text("handle"),
+    avatar: text("avatar"),
+    country: text("country"),
+    language: text("language"),
+    subscribers: integer("subscribers").notNull().default(0),
+    views: text("views").notNull().default("0"), // can exceed int range
+    videoCount: integer("video_count").notNull().default(0),
+    lastUploadAt: timestamp("last_upload_at", { withTimezone: true }),
+    latestVideoTitle: text("latest_video_title"),
+    description: text("description"),
+    emails: jsonb("emails").$type<string[]>().notNull().default([]),
+    links: jsonb("links").$type<string[]>().notNull().default([]),
+    score: integer("score").notNull().default(0),
+    seed: text("seed").notNull(),
+    subject: text("subject"),
+    opener: text("opener"),
+    /** new | approved | contacted | replied | joined | not_interested | do_not_contact */
+    status: text("status").notNull().default("new"),
+    notes: text("notes"),
+    contactedAt: timestamp("contacted_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("prospects_status").on(t.status), index("prospects_score").on(t.score)],
+);
+
+/** Each discovery run, so YouTube quota spent on prospecting stays inside its daily budget. */
+export const prospectRuns = pgTable(
+  "prospect_runs",
+  {
+    id: serial("id").primaryKey(),
+    seed: text("seed").notNull(),
+    language: text("language"),
+    units: integer("units").notNull(),
+    found: integer("found").notNull(),
+    added: integer("added").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("prospect_runs_time").on(t.createdAt)],
+);

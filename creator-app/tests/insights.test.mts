@@ -21,6 +21,8 @@ const cases: [string, string | null, string | null][] = [
   ["অষ্টমীর ভোগ রেসিপি", null, "bn"],
   ["മഴക്കാലത്ത് മൂന്നാർ യാത്ര", null, "ml"],
   ["🔥🔥🔥", "te", "te"],
+  ["சென்னை vlog with my friends", null, "ta"],
+  ["Samsung S25 review తెలుగులో", null, "te"],
 ];
 for (const [title, audio, want] of cases) assert(detectLanguage(title, audio) === want, `detect ${want}: ${title.slice(0, 30)}`);
 assert(matchesLanguage("te", "ఈ ఫోన్ చాలా బాగుంది, CTR పెరిగింది"), "Telugu text with English terms passes the Telugu check");

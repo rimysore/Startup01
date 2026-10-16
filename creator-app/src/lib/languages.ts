@@ -66,8 +66,12 @@ const AUDIO_CODES: Record<string, LanguageCode> = { hi: "hi", te: "te", ta: "ta"
 export function detectLanguage(title: string, audioLanguage?: string | null): LanguageCode | null {
   const audio = audioLanguage ? AUDIO_CODES[audioLanguage.toLowerCase().split("-")[0]] : undefined;
   const counts = scriptCounts(title);
-  const [top] = (Object.entries(counts) as [Script, number][]).sort((a, b) => b[1] - a[1]);
-  if (!top || top[1] === 0) return audio ?? null;
+  const total = Object.values(counts).reduce((x, y) => x + y, 0);
+  if (total === 0) return audio ?? null;
+  // Titles mix in English words ("సరికొత్త phone review"), so a meaningful share of an Indian script wins
+  // even when Latin letters outnumber it.
+  const [indic] = (Object.entries(counts) as [Script, number][]).filter(([sc]) => sc !== "Latin").sort((a, b) => b[1] - a[1]);
+  const top: [Script, number] = indic && indic[1] >= 2 && indic[1] / total >= 0.15 ? indic : ["Latin", counts.Latin];
   const byScript: Partial<Record<Script, LanguageCode>> = { Telugu: "te", Tamil: "ta", Bengali: "bn", Kannada: "kn", Malayalam: "ml" };
   if (byScript[top[0]]) return byScript[top[0]]!;
   if (top[0] === "Devanagari") return audio === "mr" ? "mr" : "hi";
