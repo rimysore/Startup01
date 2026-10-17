@@ -272,8 +272,8 @@ export async function generateTitles(language: string, topic: string, tone: stri
   return {
     ...out,
     result: {
-      titles: list(t.titles, 6).map((x) => ({ title: cut(x.title, 100), why: cut(x.why, 240), strength: Math.round(clamp(x.strength, 1, 10)), pattern: cut(x.pattern ?? "", 40) })),
-      thumbnailText: list(t.thumbnailText, 6).map((s) => cut(s, 40)),
+      titles: list(t.titles.filter((x) => x.title.trim()), 6).map((x) => ({ title: cut(x.title, 100), why: cut(x.why, 240), strength: Math.round(clamp(x.strength, 1, 10)), pattern: cut(x.pattern ?? "", 40) })),
+      thumbnailText: list(t.thumbnailText.filter((x) => x.trim()), 6).map((s) => cut(s, 40)),
       hook: cut(t.hook, 600),
     },
   };
@@ -315,7 +315,7 @@ export const ThumbnailSchema = z.object({
   imagePrompt: z
     .string()
     .describe(
-      "One English sentence for an image generator describing the background scene only: subject matter, setting (use Indian or regional places, festivals and everyday details when relevant), lighting and mood. No text, letters or logos. Leave space on the text side. No faces if the creator's own photo will be the subject.",
+      "One English sentence for an image generator describing the background scene only: what is in it, the setting (use Indian or regional places, festivals and everyday details when relevant), lighting, colours and camera angle. Describe only things that can be seen: never quote the title or any words, never mention signs, posters, screens, banners, captions or writing (image models turn those into garbled letters). Leave space on the text side. No faces if the creator's own photo will be the subject.",
     ),
   emoji: z.string().describe("One emoji that adds emotion, or empty"),
   arrow: z.boolean().describe("Whether an arrow pointing at the subject would help"),
@@ -334,8 +334,9 @@ export async function designThumbnail(
   blend = false,
 ): Promise<AiResult<ThumbnailDesign>> {
   const refs = references.length
-    ? `Images ${images.length} to ${images.length + references.length - 1} are NOT the creator's: they are thumbnails of videos on this topic that went viral on YouTube in India. ` +
-      "Learn what made them work (face and emotion, colours, text size and amount, focal point, contrast) and apply it; never copy their layout, people, text or logos, and never use them as images in the design.\n"
+    ? `Images ${images.length} to ${images.length + references.length - 1} are NOT the creator's: they are thumbnails of videos on this topic that went viral on YouTube in India, the most-viewed first. ` +
+      "Look at the most-viewed one first. If its style is a common, reusable format (for example: a big expressive face on one side with 2-4 huge words on the other; a scenic location shot with bold text; a before/after split; a product close-up with a price), follow that style closely: the same side for the person, a similar amount and size of text, similar colours, badge and mood, and an imagePrompt for a similar kind of scene. " +
+      "If it is unique to that creator (their own artwork, mascot, branding, recurring characters or a one-off visual), learn only the general lessons instead. Either way never copy their people, logos, exact words or pictures, and never use them as images in the design. Say in 'why' which reference style you followed.\n"
     : "";
   const out = await structured(
     "thumbnail",

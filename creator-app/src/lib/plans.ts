@@ -4,7 +4,7 @@ export type PlanId = "free" | "pro" | "creator";
  * AI credits each answer costs. Video Doctor runs on a larger model, so it costs more; this keeps every plan's
  * worst-case AI bill below its price. Shared by the server (charging) and the UI (labels).
  */
-export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1, thumbnail: 1, image: 1, trends: 1, audience: 1, slang: 1, competitors: 1, breakouts: 1, outreach: 0, report: 0 } as const;
+export const FEATURE_CREDITS = { doctor: 5, titles: 1, comments: 1, chat: 1, thumbnail: 1, image: 1, trends: 1, audience: 1, slang: 1, competitors: 1, breakouts: 1, outreach: 0, report: 0 } as const;
 
 export interface Plan {
   id: PlanId;
@@ -22,7 +22,7 @@ export const PLANS: Record<PlanId, Plan> = {
     name: "Free",
     pricePaise: 0,
     credits: 10,
-    points: ["10 AI credits / month (≈3 video diagnoses)", "Channel overview", "Trend Radar preview"],
+    points: ["10 AI credits / month (2 video diagnoses)", "Channel overview", "Trend Radar preview"],
   },
   pro: {
     id: "pro",
@@ -30,7 +30,7 @@ export const PLANS: Record<PlanId, Plan> = {
     // Launch price. 100 credits keeps even all-Video-Doctor use (~₹3 each) around break-even; typical use costs ~₹20.
     pricePaise: 9_900,
     credits: 100,
-    points: ["100 AI credits / month", "Video Doctor (3 credits each)", "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"],
+    points: ["100 AI credits / month", `Video Doctor (${FEATURE_CREDITS.doctor} credits each)`, "Title & Thumbnail Studio", "Comment insights", "Ask Mitra"],
   },
   creator: {
     id: "creator",

@@ -164,7 +164,8 @@ export default function StudioPage() {
       title: (chosen ?? topic).trim() || design.headline,
       text: design.headline,
       images: photos.map((p) => ({ mediaType: "image/jpeg", data: p.data })),
-      references: research?.mode === "live" ? refs : [],
+      // Most-viewed first: the designer follows that one's style when it's a common format.
+      references: research?.mode === "live" ? research.videos.filter((v) => refs.includes(v.id)).sort((a, b) => b.views - a.views).map((v) => v.id) : [],
       blend: mode === "blend",
     });
     setDesigning(false);
@@ -448,8 +449,10 @@ export default function StudioPage() {
             </button>
             {mode === "ai" && canAi && (
               <button
-                onClick={() => paintBackground(design.imagePrompt || design.backgroundQuery || chosen || topic)}
-                disabled={painting || !(design.imagePrompt || design.backgroundQuery || chosen || topic).trim()}
+                // Only ever paint a scene description: a raw title makes the image model draw garbled letters.
+                // No scene yet → let Mitra design first (which paints the background too).
+                onClick={() => (design.imagePrompt ? paintBackground(design.imagePrompt) : designWithMitra())}
+                disabled={painting || designing || (!design.imagePrompt && (chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
                 className="w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 disabled:opacity-50"
               >
                 {painting ? "Painting…" : `🎨 New AI background · ${FEATURE_CREDITS.image}`}

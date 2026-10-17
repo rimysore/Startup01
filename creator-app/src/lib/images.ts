@@ -29,7 +29,22 @@ export function imageCostUsd(): number {
 
 export class UnsafeImage extends Error {}
 
-const STYLE = "YouTube thumbnail background, vivid colours, high contrast, cinematic lighting, sharp detail, empty space for big text. No text, no letters, no logos, no watermark.";
+/** Image models garble any writing they're asked for, so the scene is described purely visually. */
+const STYLE = "A clean background photograph for a YouTube thumbnail, vivid colours, high contrast, cinematic lighting, sharp detail, open empty sky or wall on one side. Purely visual: plain surfaces, no typography, no lettering, no signage, no logos, no watermark.";
+
+/**
+ * Keeps writing out of the prompt: quoted phrases and anything that reads like a title (a colon, "|", lines of
+ * capitalised words) are what image models try to render as text.
+ */
+export function scenePrompt(prompt: string): string {
+  return prompt
+    .replace(/["“”][^"“”]{0,80}["“”]|‘[^’]{0,80}’/g, " ")
+    .replace(/\b(saying|says|reads|reading|written|with the words?)\b[^,.;]*/gi, " ")
+    .replace(/\b(text|title|caption|headline|words?|letters?|written|saying|says|logo|sign(?:board)?s?|poster|banner)\b/gi, " ")
+    .replace(/[:|#@]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 export interface GeneratedImage {
   body: BodyInit;
@@ -38,7 +53,7 @@ export interface GeneratedImage {
 }
 
 export async function generateBackground(prompt: string, seed = Math.floor(Math.random() * 2 ** 31)): Promise<GeneratedImage> {
-  const full = `${prompt}. ${STYLE}`;
+  const full = `${scenePrompt(prompt)}. ${STYLE}`;
   if (imageProvider() !== "cloudflare") return fal(full, seed);
   try {
     return await cloudflareHD(full, seed);

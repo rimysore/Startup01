@@ -17,19 +17,19 @@ shows the actual cost of every AI call, per feature.
 | WhatsApp report outside the 24-hour window | Meta utility template, India | ~₹0.14 each incl. GST |
 | PDF report, email, YouTube data | Our servers, Gmail, YouTube API | ₹0 |
 
-One Haiku credit costs us about ₹0.10. One Video Doctor (3 credits) costs about ₹3.3, i.e. ₹1.1 per credit:
-**Video Doctor is where the money goes.**
+One Haiku credit costs us about ₹0.10. One Video Doctor (5 credits since October 2026) costs about ₹3.3, i.e.
+₹0.66 per credit: **Video Doctor is where the money goes.**
 
 ## Per creator, per month
 
 What a plan brings in after GST (18%, inside the price) and Razorpay (~2% + GST on the fee):
 
-| Plan | Price | We keep | Typical use | Typical cost | Margin (typical) | Worst case (all credits on Video Doctor) |
+| Plan | Price | We keep | Typical use | Typical cost | Margin (typical) | Worst case (all credits on Video Doctor, 5 each) |
 | --- | --- | --- | --- | --- | --- | --- |
-| Free | ₹0 | ₹0 | 1 Doctor + 5 Haiku uses + reports | ~₹6 | −₹6 | ~₹13 |
+| Free | ₹0 | ₹0 | 1 Doctor + 5 Haiku uses + reports | ~₹6 | −₹6 | ~₹9 |
 | Founder Pass (100 creators) | ₹0 | ₹0 | 50 free Haiku uses + reports | ~₹7 | −₹7 | ~₹7 + Free plan |
-| Pro | ₹99 | ~₹82 | 4 Doctors + 40 Haiku uses + 15 HD images + reports | ~₹24 | **~₹58 (70%)** | ~₹112 → **−₹30** |
-| Creator+ | ₹249 | ~₹206 | 10 Doctors + 80 Haiku uses + 40 HD images + reports | ~₹55 | **~₹150 (73%)** | ~₹280 → **−₹74** |
+| Pro | ₹99 | ~₹82 | 4 Doctors + 30 Haiku uses + 15 HD images + reports | ~₹23 | **~₹59 (72%)** | ~₹68 → **+₹14** |
+| Creator+ | ₹249 | ~₹206 | 10 Doctors + 75 Haiku uses + 40 HD images + reports | ~₹55 | **~₹150 (73%)** | ~₹167 → **+₹39** |
 | Agency | ₹1,999+ | ~₹1,650 | custom | priced per deal | — | — |
 
 "Typical" assumes creators use about half their credits. Reports (4 weekly + ~6 video checks) cost ~₹2 a creator.
@@ -47,14 +47,10 @@ What a plan brings in after GST (18%, inside the price) and Razorpay (~2% + GST 
 **Break-even:** about 35–70 Pro creators (at ~₹58 margin each), before the founders' time.
 100 Founder Pass holders cost about ₹700 a month: a good price for 100 testimonials and referrals.
 
-## Recommendation: protect the worst case
+## Decision: Video Doctor costs 5 credits (October 2026)
 
-A Pro creator who spends all 100 credits on Video Doctor costs ~₹112 against ₹82 kept. Before paid plans open,
-pick one:
+At 3 credits, a Pro creator who spent all 100 credits on Video Doctor cost ~₹112 against ₹82 kept. At 5 credits the
+worst case is 20 diagnoses ≈ ₹68, so every plan stays profitable even at full use. Free plan: 2 diagnoses a month.
 
-1. **Video Doctor = 5 credits** (from 3): worst case Pro = 20 diagnoses ≈ ₹68 → still profitable. Simplest.
-2. **Run Video Doctor on Haiku 5.5 at medium effort** (~₹0.4 each), keeping Sonnet for a "Deep diagnosis"
-   option. Test quality on 20 real videos first.
-3. Keep 3 credits but cap Video Doctor at 15 a month on Pro, 40 on Creator+.
-
-Everything else is cheap enough that credits could even be more generous: 100 Haiku credits cost us ~₹10.
+Next, once real creators are on it: raise Pro's price based on traction and demand, and consider running Video
+Doctor on Haiku 5.5 at medium effort (~₹0.4 each) with Sonnet kept for a "Deep diagnosis".

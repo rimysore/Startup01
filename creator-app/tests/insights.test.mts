@@ -92,7 +92,7 @@ globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
 const img = await generateBackground("Rainy Hyderabad street at night");
 assert(falAuth === "Key test-fal-key", "fal auth header is 'Key <FAL_KEY>'");
 assert(falBody.image_size === "landscape_16_9" && falBody.num_inference_steps === 4 && falBody.enable_safety_checker === true, "16:9, 4 steps, safety checker on");
-assert(String(falBody.prompt).includes("No text"), "prompt asks for no text (the canvas draws the words)");
+assert(String(falBody.prompt).includes("no lettering"), "prompt asks for no writing (the canvas draws the words)");
 assert(img.seed === 42 && img.contentType === "image/jpeg", "image streamed back with its seed");
 flagged = true;
 let unsafe = false;

@@ -121,7 +121,9 @@ assert(tomorrow.videos.length === 1, "research opens again the next day");
 // ---- Free image model (Cloudflare Workers AI) -------------------------------------------------------------
 process.env.CLOUDFLARE_ACCOUNT_ID = "acc";
 process.env.CLOUDFLARE_AI_TOKEN = "tok";
-const { generateBackground, imageProvider } = await import("@/lib/images");
+const { generateBackground, imageProvider, scenePrompt } = await import("@/lib/images");
+const scene = scenePrompt('My First International Trip: Bali "SHOCKED ME" | sunset over rice terraces with a sign saying Welcome');
+assert(!/shocked|welcome|sign|:|\|/i.test(scene) && /sunset over rice terraces/.test(scene) && scenePrompt("a vendor's cart near the city's lake") === "a vendor's cart near the city's lake", `no writing reaches the image model (got "${scene}")`);
 let cfBody: { prompt?: string; steps?: number; seed?: number } = {};
 let hdForm: FormData | null = null;
 let hdFails = false;
@@ -138,7 +140,7 @@ globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
 }) as typeof fetch;
 const hd = await generateBackground("rainy street", 7);
 assert(
-  imageProvider() === "cloudflare" && Buffer.from(hd.body as Uint8Array).toString() === "hdbytes" && hdForm!.get("width") === "1920" && hdForm!.get("height") === "1088" && /No text/.test(String(hdForm!.get("prompt"))),
+  imageProvider() === "cloudflare" && Buffer.from(hd.body as Uint8Array).toString() === "hdbytes" && hdForm!.get("width") === "1920" && hdForm!.get("height") === "1088" && /no lettering/.test(String(hdForm!.get("prompt"))),
   "full-HD FLUX.2 klein first: 1920×1088 as multipart form, no text asked for",
 );
 hdFails = true;
