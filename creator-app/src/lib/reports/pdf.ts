@@ -4,6 +4,7 @@ import PDFDocument from "pdfkit";
 import type { WeeklyCoach } from "../ai";
 import { compact, full, shortDate } from "../format";
 import type { WeeklyFacts } from "./facts";
+import { SITE_URL } from "../company";
 
 /**
  * The Monday report as a one-page PDF a creator can save, print or forward. Big numbers, three short lists and a
@@ -191,7 +192,7 @@ export function weeklyPdf(f: WeeklyFacts, coach: WeeklyCoach, language: string, 
   doc.page.margins.bottom = 0;
   const fy = doc.page.height - 48;
   doc.moveTo(M, fy - 8).lineTo(W - M, fy - 8).lineWidth(0.5).strokeColor(C.line).stroke();
-  doc.fillColor(C.muted).font("latin").fontSize(8).text(`Mitra · ${opts.site ?? "mitra-creators.vercel.app"} · Numbers from YouTube Analytics (latest 7 days available)`, M, fy, { width: CW, align: "center" });
+  doc.fillColor(C.muted).font("latin").fontSize(8).text(`Mitra · ${opts.site ?? new URL(SITE_URL).host} · Numbers from YouTube Analytics (latest 7 days available)`, M, fy, { width: CW, align: "center" });
 
   doc.end();
   return done;

@@ -37,7 +37,7 @@ testimonials. Then set `NEXT_PUBLIC_INVITE_ONLY=0` and the waitlist turns into o
 
 **Start Google verification now** (Google Auth Platform → Branding/Data access → Publish app → Prepare for
 verification): home page, privacy policy and terms links (done), domain ownership (needs our own domain, a
-reason to buy `mitracreators.com` soon), a short demo video showing the consent screen and how each YouTube scope
+bought: `trymitraapp.com`), a short demo video showing the consent screen and how each YouTube scope
 is used, and a written justification per scope.
 
 ## 2. ViewStats (MrBeast) vs Mitra

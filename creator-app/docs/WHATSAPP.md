@@ -67,7 +67,7 @@ STOP pauses reports (they can still chat); START resumes. Disconnect on the webs
    `WHATSAPP_APP_SECRET` (App settings → Basic), `WHATSAPP_VERIFY_TOKEN` (make one up), `CRON_SECRET`
    (make one up). Redeploy.
 6. **Webhook:** app → WhatsApp → Configuration → Callback URL
-   `https://mitra-creators.vercel.app/api/whatsapp/webhook`, Verify token = your `WHATSAPP_VERIFY_TOKEN`,
+   `https://trymitraapp.com/api/whatsapp/webhook`, Verify token = your `WHATSAPP_VERIFY_TOKEN`,
    then subscribe to the **messages** field.
 7. **Templates:** `WHATSAPP_TOKEN=… WHATSAPP_WABA_ID=… npx tsx scripts/whatsapp-templates.mts`. When they're
    approved, set `WHATSAPP_TEMPLATE_LANGS=en,hi`. If Meta files one as MARKETING instead of UTILITY, it costs

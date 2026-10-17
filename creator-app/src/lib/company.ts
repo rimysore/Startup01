@@ -5,10 +5,10 @@
  */
 const OPERATOR = "Rithvik Mysore Suresh";
 
-/** The public site address: APP_URL, else Vercel's production URL (e.g. mitra.vercel.app), else the planned domain. */
+/** The public site address: APP_URL, else Vercel's production URL (e.g. mitra.vercel.app), else our domain. */
 export const SITE_URL =
   process.env.APP_URL ??
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://mitracreators.com");
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://trymitraapp.com");
 
 /**
  * Mitra's official inbox: support, privacy, grievance and creator outreach all use it until the domain's own
