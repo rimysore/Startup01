@@ -225,11 +225,11 @@ export function AssistantWidget() {
       {state === "closed" && (
         <button
           onClick={() => setState("open")}
-          className="fixed bottom-24 right-4 z-40 flex items-center gap-2 rounded-full border border-line bg-surface p-3.5 text-ink shadow-lg shadow-black/10 transition hover:bg-surface-2 lg:bottom-6 lg:right-6 lg:px-4 lg:py-2.5"
+          className="ask-attention fixed bottom-24 right-4 z-40 flex items-center gap-2 rounded-full bg-accent p-3.5 text-accent-ink shadow-lg shadow-accent/30 transition hover:-translate-y-0.5 hover:brightness-105 lg:bottom-6 lg:right-6 lg:px-5 lg:py-3"
           aria-label="Ask Mitra"
           aria-haspopup="dialog"
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-accent" aria-hidden>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <path d={SPARK} />
           </svg>
           <span className="hidden text-sm font-semibold lg:inline">Ask Mitra</span>

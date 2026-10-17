@@ -9,6 +9,7 @@ import { LEGAL_LINKS } from "./SiteFooter";
 import { AssistantWidget } from "./Assistant";
 import { LanguageButton, LanguageOnboarding } from "./language-picker";
 import { Logo, ThemeToggle } from "./ui";
+import { WHATSAPP_LOCKED } from "@/lib/company";
 
 /** Grouped so the sidebar reads as three short lists instead of one long one. */
 const NAV = [
@@ -27,7 +28,7 @@ const NAV = [
 
 function Icon({ d }: { d: string }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="shrink-0" aria-hidden>
       <path d={d} />
     </svg>
   );
@@ -130,13 +131,32 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
     <>
       {NAV.map((item, i) => {
         const active = item.href === "/dashboard" ? path === item.href : path.startsWith(item.href);
+        const locked = item.href === "/dashboard/whatsapp" && WHATSAPP_LOCKED && !me?.admin;
         return (
           <div key={item.href} className="contents">
             {item.group !== NAV[i - 1]?.group && <p className={`px-3 pb-1 text-[11px] font-medium text-muted ${i ? "pt-4" : ""}`}>{item.group}</p>}
-            <Link href={item.href} onClick={onNavigate} className={navItem(active)} aria-current={active ? "page" : undefined}>
-              <Icon d={item.icon} />
-              {item.label}
-            </Link>
+            {locked ? (
+              <span
+                aria-disabled="true"
+                title="Coming soon. Until then, your Monday report comes by email."
+                className="flex w-full shrink-0 cursor-not-allowed items-center gap-3 whitespace-nowrap rounded-lg px-3 py-2 text-sm text-muted opacity-60"
+              >
+                <Icon d={item.icon} />
+                <span className="min-w-0 truncate">WhatsApp</span>
+                <span className="ml-auto flex shrink-0 items-center gap-0.5 rounded bg-surface-2 px-1 py-0.5 text-[10px] font-semibold">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+                    <rect x="4" y="11" width="16" height="10" rx="2" />
+                    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  </svg>
+                  Soon
+                </span>
+              </span>
+            ) : (
+              <Link href={item.href} onClick={onNavigate} className={navItem(active)} aria-current={active ? "page" : undefined}>
+                <Icon d={item.icon} />
+                {item.label}
+              </Link>
+            )}
           </div>
         );
       })}
@@ -224,7 +244,8 @@ const TABS = [
   { href: "/dashboard", label: "Home", icon: icon("/dashboard") },
   { href: "/dashboard/doctor", label: "Videos", icon: icon("/dashboard/doctor") },
   { href: "/dashboard/studio", label: "Titles", icon: icon("/dashboard/studio") },
-  { href: "/dashboard/whatsapp", label: "WhatsApp", icon: icon("/dashboard/whatsapp") },
+  // Breakout ideas holds WhatsApp's place until WhatsApp opens.
+  WHATSAPP_LOCKED ? { href: "/dashboard/ideas", label: "Ideas", icon: icon("/dashboard/ideas") } : { href: "/dashboard/whatsapp", label: "WhatsApp", icon: icon("/dashboard/whatsapp") },
 ];
 
 function BottomTabs() {

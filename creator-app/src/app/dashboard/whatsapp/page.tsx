@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { MitraMark } from "@/components/brand";
 import { burstConfetti } from "@/components/celebrate";
 import { useDashboard } from "@/components/dashboard-context";
+import { WHATSAPP_LOCKED } from "@/lib/company";
 import { Button, Card, ErrorNote, PageHeader, Spinner } from "@/components/ui";
 import { languageLabel } from "@/lib/languages";
 
@@ -194,10 +195,12 @@ export default function WhatsAppPage() {
           <section className="card relative p-5 sm:p-6" aria-label="WhatsApp connection">
             {!s ? (
               <Spinner label="Checking" />
-            ) : !s.configured ? (
+            ) : !s.configured || (WHATSAPP_LOCKED && !me?.admin) ? (
               <div className="relative">
-                <p className="font-display text-xl">WhatsApp is almost ready</p>
-                <p className="mt-2 text-ink-2">We&apos;re finishing Mitra&apos;s WhatsApp number. Until then, reports come by email{s.prefs.email ? ` to ${s.email}` : ""}.</p>
+                <p className="flex items-center gap-2 font-display text-xl">
+                  WhatsApp is coming soon <span className="rounded-md bg-surface-2 px-1.5 py-0.5 font-sans text-xs font-semibold text-muted">Soon</span>
+                </p>
+                <p className="mt-2 text-ink-2">We&apos;re setting up Mitra&apos;s WhatsApp number. Until then, your Monday report comes by email{s.prefs.email ? ` to ${s.email}` : ""}.</p>
               </div>
             ) : linked ? (
               <div className="relative">

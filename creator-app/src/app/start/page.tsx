@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { SiteFooter } from "@/components/SiteFooter";
-import { COMPANY } from "@/lib/company";
+import { COMPANY, WHATSAPP_LOCKED } from "@/lib/company";
 
 export const metadata: Metadata = {
   title: "Get started — Mitra",
@@ -40,9 +40,14 @@ const STEPS: { title: string; time: string; body: React.ReactNode }[] = [
     ),
   },
   {
-    title: "Get your report on WhatsApp",
-    time: "1 minute",
-    body: (
+    title: WHATSAPP_LOCKED ? "Get your Monday report" : "Get your report on WhatsApp",
+    time: WHATSAPP_LOCKED ? "nothing to do" : "1 minute",
+    body: WHATSAPP_LOCKED ? (
+      <>
+        Your <b>weekly report arrives by email every Monday morning</b>, in your language, with a PDF you can save. Reports on WhatsApp are
+        coming soon; we&apos;ll let you know when you can connect.
+      </>
+    ) : (
       <>
         Open <b>WhatsApp &amp; reports</b> and tap <b>Connect WhatsApp</b>. WhatsApp opens with a message like <code>JOIN 123456</code>: just press send.
         Mitra replies with a menu. From then on you get your <b>weekly report every Monday morning</b> and a <b>check on every new video</b> two days
@@ -85,7 +90,7 @@ export default function StartPage() {
       <main className="mx-auto max-w-3xl px-4 pb-16 sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Get started</p>
         <h1 className="mt-2 font-display text-4xl leading-tight sm:text-5xl">Set up Mitra in about 3 minutes</h1>
-        <p className="mt-3 text-ink-2">No app to install. All you need is the Google account that owns your YouTube channel, and WhatsApp.</p>
+        <p className="mt-3 text-ink-2">No app to install. All you need is the Google account that owns your YouTube channel{WHATSAPP_LOCKED ? "" : ", and WhatsApp"}.</p>
 
         <ol className="mt-8 space-y-4">
           {STEPS.map((s, i) => (

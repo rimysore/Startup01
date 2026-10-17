@@ -42,6 +42,12 @@ export const COMPANY = {
  */
 export const INVITE_ONLY = process.env.NEXT_PUBLIC_INVITE_ONLY !== "0";
 
+/**
+ * WhatsApp stays locked for creators (admins can still test) until Mitra's real business number is live: Meta's
+ * test number only reaches a handful of registered phones. Set NEXT_PUBLIC_WHATSAPP_LIVE=1 to open it.
+ */
+export const WHATSAPP_LOCKED = process.env.NEXT_PUBLIC_WHATSAPP_LIVE !== "1";
+
 /** Date the current versions of the legal pages take effect. Update whenever the text changes. */
 export const LEGAL_EFFECTIVE_DATE = "16 October 2026";
 

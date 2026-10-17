@@ -116,6 +116,24 @@ body {
   background: linear-gradient(110deg, #ff8a1f 0%, #d946ef 55%, #6c47ff 100%);
 }
 
+/* A hand on everything clickable (Tailwind's reset leaves buttons with the arrow). */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
 ::selection {
   background: var(--accent);
   color: var(--accent-ink);
@@ -211,7 +229,17 @@ body {
   animation: pulse-dot 1.8s ease-out infinite;
 }
 
+/* Ask Mitra: a soft ring that pulses a few times after the page opens, then rests. */
+@keyframes ask-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent); }
+  100% { box-shadow: 0 0 0 14px transparent; }
+}
+.ask-attention {
+  animation: ask-ring 1.8s ease-out 1s 4;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ask-attention { animation: none; }
   .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot, .word-in, .float-y, .fade-in, .fade-out, .modal-in, .modal-out { animation: none; }
 }
 
