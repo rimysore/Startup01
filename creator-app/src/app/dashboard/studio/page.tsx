@@ -267,7 +267,7 @@ export default function StudioPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Title & Thumbnail Studio" title="Package it so people click" />
+      <PageHeader eyebrow="Title Studio" title="Titles and a thumbnail for your next video, based on what's working on YouTube." />
 
       <ol className="mb-5 flex flex-wrap items-center gap-x-5 gap-y-2" aria-label="Steps">
         <Step n={1} label="Research hits" done={Boolean(research || researchNote) && phase !== "research"} active={phase === "research"} />
@@ -276,7 +276,6 @@ export default function StudioPage() {
       </ol>
 
       <Card className="relative overflow-hidden">
-        <div className="bg-brand pointer-events-none absolute inset-x-0 top-0 h-1" aria-hidden />
         <label htmlFor="topic" className="text-sm font-semibold">
           What is your video about?
         </label>
@@ -311,7 +310,7 @@ export default function StudioPage() {
           <button
             onClick={researchAndWrite}
             disabled={busy || topic.trim().length < 3}
-            className="bg-brand shrink-0 rounded-full px-6 py-3.5 text-base font-bold text-white shadow-[0_12px_30px_-12px_rgba(217,70,239,0.6)] transition hover:brightness-110 disabled:opacity-50"
+            className="shrink-0 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink transition hover:brightness-105 disabled:opacity-50"
           >
             {phase === "research" ? "Researching YouTube…" : phase === "titles" ? "Writing titles…" : `Research & write titles · ${FEATURE_CREDITS.titles} credit`}
           </button>
@@ -368,7 +367,7 @@ export default function StudioPage() {
                           </div>
                         )}
                         {v.score != null && v.score >= 1.5 && (
-                          <span className="bg-brand absolute left-1.5 top-1.5 rounded-full px-2 py-0.5 text-[11px] font-bold text-white">{v.score >= 10 ? Math.round(v.score) : v.score.toFixed(1)}× subs</span>
+                          <span className="bg-brand absolute left-1.5 top-1.5 rounded-lg px-2 py-0.5 text-[11px] font-semibold text-white">{v.score >= 10 ? Math.round(v.score) : v.score.toFixed(1)}× subs</span>
                         )}
                         {on && <span className="absolute right-1.5 top-1.5 grid h-6 w-6 place-items-center rounded-full bg-accent text-xs font-bold text-accent-ink">✓</span>}
                       </button>
@@ -409,7 +408,7 @@ export default function StudioPage() {
                         className={`rounded-2xl border p-4 transition ${on ? "border-accent bg-accent-soft" : "border-line hover:border-ink-2/40"}`}
                       >
                         <div className="flex flex-wrap items-center gap-2">
-                          {i === 0 && <span className="bg-brand rounded-full px-2.5 py-0.5 text-[11px] font-bold text-white">Mitra&apos;s pick</span>}
+                          {i === 0 && <span className="bg-brand rounded-lg px-2.5 py-0.5 text-[11px] font-semibold text-white">Mitra&apos;s pick</span>}
                           {t.pattern && <span className="rounded-full bg-surface-2 px-2.5 py-0.5 text-[11px] font-semibold text-ink-2">{t.pattern}</span>}
                           <span className="ml-auto flex items-center gap-2 text-[11px] tabular-nums text-muted">
                             <Strength value={t.strength} /> {t.strength}/10
@@ -437,10 +436,10 @@ export default function StudioPage() {
               </ul>
             </Card>
             <div className="space-y-6">
-              <Card className="!border-ink bg-ink text-bg">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Say this in the first 15 seconds</p>
+              <Card className="border-accent/25 bg-accent-soft/30">
+                <p className="text-sm font-semibold text-accent">Say this in the first 15 seconds</p>
                 <p className="mt-3 font-indic text-xl leading-snug">{result.data.hook}</p>
-                <button onClick={() => copy(result.data.hook)} className="mt-4 rounded-full bg-bg/10 px-3.5 py-1.5 text-xs font-semibold hover:bg-bg/20">
+                <button onClick={() => copy(result.data.hook)} className="mt-4 rounded-full bg-surface px-3.5 py-1.5 text-xs font-semibold hover:bg-line">
                   {copied === result.data.hook ? "Copied!" : "Copy script"}
                 </button>
               </Card>
@@ -499,7 +498,7 @@ export default function StudioPage() {
                   <button
                     onClick={compose}
                     disabled={composing || designing}
-                    className="bg-brand mt-2 w-full rounded-full px-5 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(217,70,239,0.6)] transition hover:brightness-110 disabled:opacity-50"
+                    className="mt-2 w-full rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink transition hover:brightness-105 disabled:opacity-50"
                   >
                     {composing ? "Making your thumbnail…" : composed ? `🔁 New version · ${FEATURE_CREDITS.compose} credits` : `✨ Make my thumbnail · ${FEATURE_CREDITS.compose} credits`}
                   </button>
@@ -513,7 +512,7 @@ export default function StudioPage() {
                   <button
                     onClick={designWithMitra}
                     disabled={designing || ((chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
-                    className="bg-brand mt-2 w-full rounded-full px-5 py-3 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+                    className="bg-brand mt-2 w-full rounded-lg px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
                   >
                     {designing ? "Designing…" : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
                   </button>

@@ -103,7 +103,7 @@ export default function CompetitorsPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Competitors" title="See what's working next door" />
+      <PageHeader eyebrow="Competitors" title="Channels like yours, and what's working for them." />
       {data?.mode === "demo" && (
         <div className="mb-4">
           <DemoNote>Sample channels. Connect YouTube, then add up to 5 channels you compete with.</DemoNote>
@@ -154,7 +154,7 @@ export default function CompetitorsPage() {
 
       {data && channels.length < 2 && data.mode === "live" && (
         <Card className="grain py-12 text-center">
-          <p className="font-display text-3xl">Add your first competitor</p>
+          <p className="font-display text-xl">Add your first competitor</p>
           <p className="mt-2 text-sm text-muted">Pick 2–5 channels in your niche and language. Mitra compares their last 15 uploads with yours.</p>
         </Card>
       )}
@@ -218,11 +218,11 @@ export default function CompetitorsPage() {
             </Card>
           </div>
 
-          <Card className="bg-ink text-bg !border-ink">
+          <Card className="border-accent/25 bg-accent-soft/30">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Mitra&apos;s comparison</p>
-                <p className="mt-2 max-w-xl text-sm text-bg/80">What they do better, the gaps you can own, why their titles work and five moves for this month, in {languageLabel(language)}.</p>
+                <p className="text-sm font-semibold text-accent">Mitra&apos;s comparison</p>
+                <p className="mt-2 max-w-xl text-sm text-ink-2">What they do better, the gaps you can own, why their titles work and five moves for this month, in {languageLabel(language)}.</p>
               </div>
               <Button onClick={compare} disabled={running}>
                 {running ? "Comparing…" : `Compare with Mitra · ${FEATURE_CREDITS.competitors} credit`}
@@ -235,7 +235,7 @@ export default function CompetitorsPage() {
             <div className="rise space-y-4">
               {insights.demo && <AiDemoNote reason={insights.demoReason} what="comparison" />}
               <Card>
-                <p className="font-display text-2xl leading-snug">{insights.data.verdict}</p>
+                <p className="font-display text-lg leading-snug">{insights.data.verdict}</p>
               </Card>
               <div className="grid gap-4 lg:grid-cols-2">
                 <Card>

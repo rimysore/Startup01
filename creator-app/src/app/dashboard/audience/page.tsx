@@ -64,7 +64,7 @@ export default function AudiencePage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Audience" title="Who watches, from where, and why">
+      <PageHeader eyebrow="Audience" title="Where your viewers are, how they find you, and what they search.">
         <div className="flex items-center gap-3">
           {data?.fetchedAt && <span className="text-xs text-muted">Last 28 days · updated {new Date(data.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>}
           {data?.mode === "live" && (
@@ -117,11 +117,11 @@ export default function AudiencePage() {
 
           <SlangCard report={data.report} />
 
-          <Card className="bg-ink text-bg !border-ink">
+          <Card className="border-accent/25 bg-accent-soft/30">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Mitra&apos;s audience read</p>
-                <p className="mt-2 max-w-xl text-sm text-bg/80">
+                <p className="text-sm font-semibold text-accent">Mitra&apos;s audience read</p>
+                <p className="mt-2 max-w-xl text-sm text-ink-2">
                   Who your core viewer is, which regions to lean into, what they feel and what to do next, in {languageLabel(language)}.
                 </p>
               </div>

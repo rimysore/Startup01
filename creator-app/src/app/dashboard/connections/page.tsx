@@ -42,7 +42,7 @@ export default function ConnectionsPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Connections" title="Plug in your channels" />
+      <PageHeader eyebrow="Connections" title="Your YouTube channel and other connected accounts." />
       {error && ERRORS[error] && <div className="mb-4"><ErrorNote>{ERRORS[error]}</ErrorNote></div>}
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -58,13 +58,13 @@ export default function ConnectionsPage() {
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
             {!me ? null : !me.user ? (
-              <Link href="/login?next=/dashboard/connections" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+              <Link href="/login?next=/dashboard/connections" className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
                 Sign in to connect
               </Link>
             ) : me.youtube?.needsReconnect ? (
               <>
                 <StatusPill on={false} label={`Access expired · ${me.youtube.channelTitle ?? "your channel"}`} />
-                <a href="/api/auth/youtube/start" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+                <a href="/api/auth/youtube/start" className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
                   Reconnect YouTube
                 </a>
                 <Button variant="ghost" onClick={disconnect} disabled={busy}>Disconnect</Button>
@@ -75,7 +75,7 @@ export default function ConnectionsPage() {
                 <Button variant="ghost" onClick={disconnect} disabled={busy}>Disconnect</Button>
               </>
             ) : (
-              <a href="/api/auth/youtube/start" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+              <a href="/api/auth/youtube/start" className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
                 Connect YouTube
               </a>
             )}

@@ -8,7 +8,7 @@ export default function AssistantPage() {
   return (
     // dvh = the visible screen on phones (browser bars excluded); leave room for the bottom tab bar there.
     <div className="rise flex h-[calc(100dvh-13.5rem)] min-h-[420px] flex-col lg:h-[calc(100dvh-170px)] lg:min-h-[520px]">
-      <PageHeader eyebrow="Ask Mitra" title="Your manager, on call" />
+      <PageHeader eyebrow="Ask Mitra" title="Ask anything about your channel. Mitra answers from your own numbers." />
       <div className="card min-h-0 flex-1 overflow-hidden !p-0">
         <AssistantChat />
       </div>

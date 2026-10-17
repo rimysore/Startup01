@@ -81,7 +81,7 @@ export default function CommentsPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Comment Insights" title="What your viewers are really saying">
+      <PageHeader eyebrow="Comments" title="What viewers ask, like and complain about in your comments.">
         <Button onClick={analyse} disabled={running || !comments?.comments.length}>
           {running ? "Reading…" : "Summarise comments"}
         </Button>
@@ -128,7 +128,7 @@ export default function CommentsPage() {
           {running && <Card><Spinner label="Mitra is reading every comment…" /></Card>}
           {!result && !running && (
             <Card className="grain flex min-h-[240px] flex-col items-center justify-center text-center">
-              <p className="font-display text-3xl">Hundreds of comments, one clear picture.</p>
+              <p className="font-display text-xl">Hundreds of comments, one clear picture.</p>
               <p className="mt-2 max-w-sm text-sm text-muted">Mood, recurring requests, questions worth a video, and reply drafts — in mixed Hindi, English and regional scripts.</p>
             </Card>
           )}

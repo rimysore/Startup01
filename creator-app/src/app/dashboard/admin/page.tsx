@@ -75,17 +75,17 @@ export default function AdminPage() {
           <div className="grid gap-4 sm:grid-cols-3">
             <Card>
               <p className="text-xs uppercase tracking-wider text-muted">Spend · {report.days === 1 ? "today" : `${report.days} days`}</p>
-              <p className="mt-2 font-display text-4xl tabular-nums">{usd(report.totalUsd)}</p>
+              <p className="mt-2 font-display text-lg tabular-nums">{usd(report.totalUsd)}</p>
               <p className="mt-1 text-sm text-muted">≈ {inr(report.totalUsd)}</p>
             </Card>
             <Card>
               <p className="text-xs uppercase tracking-wider text-muted">AI calls</p>
-              <p className="mt-2 font-display text-4xl tabular-nums">{report.byRoute.reduce((a, r) => a + r.calls, 0)}</p>
+              <p className="mt-2 font-display text-lg tabular-nums">{report.byRoute.reduce((a, r) => a + r.calls, 0)}</p>
               <p className="mt-1 text-sm text-muted">Cached answers are free and not counted</p>
             </Card>
             <Card>
               <p className="text-xs uppercase tracking-wider text-muted">Daily safety cap</p>
-              <p className="mt-2 font-display text-4xl tabular-nums">{report.dailyBudgetUsd ? usd(report.dailyBudgetUsd) : "Off"}</p>
+              <p className="mt-2 font-display text-lg tabular-nums">{report.dailyBudgetUsd ? usd(report.dailyBudgetUsd) : "Off"}</p>
               <p className="mt-1 text-sm text-muted">AI_DAILY_BUDGET_USD</p>
             </Card>
           </div>

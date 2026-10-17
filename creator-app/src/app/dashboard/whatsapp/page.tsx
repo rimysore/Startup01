@@ -170,7 +170,7 @@ export default function WhatsAppPage() {
   if (!me.user) {
     return (
       <div className="rise">
-        <PageHeader eyebrow="WhatsApp & reports" title="Mitra on WhatsApp" />
+        <PageHeader eyebrow="WhatsApp & reports" title="Your Monday report and video checks, on WhatsApp or email." />
         <div className="grid items-center gap-8 lg:grid-cols-2">
           <Card>
             <p className="text-lg">Sign in and connect your channel to get your Monday report and a check on every new video, right in WhatsApp.</p>
@@ -185,29 +185,28 @@ export default function WhatsAppPage() {
   const linked = s?.contact;
   return (
     <div className="rise">
-      <PageHeader eyebrow="WhatsApp & reports" title="Mitra on WhatsApp" />
+      <PageHeader eyebrow="WhatsApp & reports" title="Your Monday report and video checks, on WhatsApp or email." />
       {error && <div className="mb-4"><ErrorNote>{error}</ErrorNote></div>}
 
       <div className="grid gap-8 lg:grid-cols-[1.15fr_1fr]">
         <div className="space-y-6">
           {/* ---- Connect ---- */}
-          <section className="relative overflow-hidden rounded-[28px] bg-ink p-6 text-bg sm:p-8" aria-label="WhatsApp connection">
-            <div className="glow-blob pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full blur-3xl" style={{ background: `${WA_GREEN}55` }} aria-hidden />
+          <section className="card relative p-5 sm:p-6" aria-label="WhatsApp connection">
             {!s ? (
               <Spinner label="Checking" />
             ) : !s.configured ? (
               <div className="relative">
-                <p className="font-display text-3xl">WhatsApp is almost ready</p>
-                <p className="mt-2 text-bg/75">We&apos;re finishing Mitra&apos;s WhatsApp number. Until then, reports come by email{s.prefs.email ? ` to ${s.email}` : ""}.</p>
+                <p className="font-display text-xl">WhatsApp is almost ready</p>
+                <p className="mt-2 text-ink-2">We&apos;re finishing Mitra&apos;s WhatsApp number. Until then, reports come by email{s.prefs.email ? ` to ${s.email}` : ""}.</p>
               </div>
             ) : linked ? (
               <div className="relative">
                 <p className="text-sm font-semibold" style={{ color: WA_GREEN }}>● Connected</p>
-                <p className="mt-1 font-display text-3xl">{linked.phone}</p>
+                <p className="mt-1 font-display text-xl">{linked.phone}</p>
                 {linked.optedOut ? (
-                  <p className="mt-2 text-bg/75">Reports are paused because you sent STOP. You can still chat with Mitra.</p>
+                  <p className="mt-2 text-ink-2">Reports are paused because you sent STOP. You can still chat with Mitra.</p>
                 ) : (
-                  <p className="mt-2 text-bg/75">Your report arrives every Monday morning, and a check 2 days after each upload.</p>
+                  <p className="mt-2 text-ink-2">Your report arrives every Monday morning, and a check 2 days after each upload.</p>
                 )}
                 <div className="mt-5 flex flex-wrap gap-2">
                   {s.chat && (
@@ -220,7 +219,7 @@ export default function WhatsAppPage() {
                       Turn reports back on
                     </button>
                   )}
-                  <button onClick={disconnect} disabled={busy !== null} className="rounded-full px-5 py-3 font-semibold text-bg/80 hover:bg-bg/10">
+                  <button onClick={disconnect} disabled={busy !== null} className="rounded-full px-5 py-3 font-semibold text-ink-2 hover:bg-surface">
                     Disconnect
                   </button>
                 </div>
@@ -228,15 +227,15 @@ export default function WhatsAppPage() {
             ) : (
               <div className="relative">
                 <p className="font-display text-3xl leading-tight sm:text-4xl">Get Mitra on WhatsApp</p>
-                <p className="mt-2 text-bg/75">No app to install. Your report, video checks and answers, right where you already are.</p>
+                <p className="mt-2 text-ink-2">No app to install. Your report, video checks and answers, right where you already are.</p>
                 <ol className="mt-5 space-y-2 text-sm">
                   <li><b>1.</b> Tap <b>Connect WhatsApp</b> below</li>
                   <li><b>2.</b> WhatsApp opens with a message ready</li>
                   <li><b>3.</b> Press <b>Send</b>. That&apos;s it.</li>
                 </ol>
                 {code ? (
-                  <div className="mt-5 rounded-2xl bg-bg/10 p-4">
-                    <p className="text-sm text-bg/75">Waiting for your message…</p>
+                  <div className="mt-5 rounded-2xl bg-surface p-4">
+                    <p className="text-sm text-ink-2">Waiting for your message…</p>
                     <p className="mt-1 text-sm">
                       Didn&apos;t open? Send <b className="font-mono text-lg">JOIN {code.code}</b> to <b>+{s.number}</b> on WhatsApp.
                     </p>
@@ -249,7 +248,7 @@ export default function WhatsAppPage() {
                     {busy === "connect" ? "Opening…" : "Connect WhatsApp"}
                   </button>
                 )}
-                <p className="mt-4 text-xs text-bg/50">By connecting you agree to get reports from Mitra on WhatsApp. Reply STOP any time.</p>
+                <p className="mt-4 text-xs text-muted">By connecting you agree to get reports from Mitra on WhatsApp. Reply STOP any time.</p>
               </div>
             )}
           </section>
@@ -257,11 +256,11 @@ export default function WhatsAppPage() {
           {/* ---- Preferences ---- */}
           {s && (
             <Card>
-              <h2 className="font-display text-2xl">What Mitra sends</h2>
+              <h2 className="font-display text-lg">What Mitra sends</h2>
               <div className="divide-y divide-line">
-                <Toggle on={s.prefs.weekly} onChange={(v) => save({ weekly: v })} label="📊 Monday report" sub="Every Monday ~8:45 am: wins, fixes and what to post next" />
-                <Toggle on={s.prefs.videoCheck} onChange={(v) => save({ videoCheck: v })} label="🎬 2-day video check" sub="Two days after each upload: how it's doing and what to do" />
-                <Toggle on={s.prefs.email} onChange={(v) => save({ email: v })} label="✉️ Email if WhatsApp isn't connected" sub={`To ${s.email}`} />
+                <Toggle on={s.prefs.weekly} onChange={(v) => save({ weekly: v })} label="Monday report" sub="Every Monday ~8:45 am: wins, fixes and what to post next" />
+                <Toggle on={s.prefs.videoCheck} onChange={(v) => save({ videoCheck: v })} label="2-day video check" sub="Two days after each upload: how it's doing and what to do" />
+                <Toggle on={s.prefs.email} onChange={(v) => save({ email: v })} label="Email if WhatsApp isn't connected" sub={`To ${s.email}`} />
               </div>
               <p className="mt-2 text-sm text-muted">Reports are written in <b className="text-ink">{languageLabel(language)}</b>. Change it in the top bar, or send &quot;menu&quot; → Language on WhatsApp.</p>
             </Card>
@@ -270,7 +269,7 @@ export default function WhatsAppPage() {
           {/* ---- Try it ---- */}
           {s && (
             <Card>
-              <h2 className="font-display text-2xl">See it now</h2>
+              <h2 className="font-display text-lg">See it now</h2>
               <p className="mt-1 text-sm text-muted">Mitra builds a real report from your channel and sends it the way you&apos;ll get it.</p>
               <div className="mt-4 flex flex-wrap gap-2">
                 <Button onClick={() => sendSample("weekly")} disabled={busy !== null}>{busy === "weekly" ? "Making it…" : "Send my weekly report"}</Button>
@@ -292,7 +291,7 @@ export default function WhatsAppPage() {
                     <li key={r.id} className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-0">
                       <span className="min-w-0">
                         <span className="block font-medium text-ink">
-                          {r.kind === "weekly" ? "📊 Weekly report" : "🎬 Video check"}
+                          {r.kind === "weekly" ? "Weekly report" : "Video check"}
                           {r.key.includes(":") ? <span className="font-normal text-muted"> · on request</span> : null}
                         </span>
                         <span className="block text-xs text-muted">
@@ -316,7 +315,7 @@ export default function WhatsAppPage() {
         <div className="space-y-6">
           <PhonePreview text={sample?.text ?? SAMPLE} />
           <Card>
-            <h2 className="font-display text-2xl">On WhatsApp you can</h2>
+            <h2 className="font-display text-lg">On WhatsApp you can</h2>
             <ul className="mt-3 space-y-2 text-sm text-ink-2">
               <li>💬 <b className="text-ink">Ask anything</b>: &quot;is hafte kya upload karun?&quot;</li>
               <li>✍️ <b className="text-ink">Get 5 titles</b> for any topic</li>

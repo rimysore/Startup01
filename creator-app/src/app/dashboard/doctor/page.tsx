@@ -109,7 +109,7 @@ export default function DoctorPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Video Doctor" title="Why did this video do what it did?" />
+      <PageHeader eyebrow="Video Doctor" title="Pick a video to see where viewers left, and what to change next time." />
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <Card className="!p-3 lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto">
@@ -224,7 +224,7 @@ export default function DoctorPage() {
               {result.demo && <AiDemoNote reason={result.demoReason} what="diagnosis" />}
               <Card className="flex flex-wrap items-center gap-5">
                 <ScoreRing score={result.data.score} />
-                <p className="min-w-0 flex-1 font-display text-2xl leading-snug sm:text-3xl">“{result.data.verdict}”</p>
+                <p className="min-w-0 flex-1 font-display text-lg leading-snug sm:text-3xl">“{result.data.verdict}”</p>
               </Card>
               {result.data.traffic && (
                 <Card>

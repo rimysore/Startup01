@@ -109,9 +109,9 @@ export default function BillingPage() {
       <div className="rise">
         <PageHeader eyebrow="Plan & billing" title="Sign in to choose a plan" />
         <Card className="grain flex flex-col items-center py-14 text-center">
-          <p className="font-display text-3xl">Start free. Upgrade when Mitra earns it.</p>
+          <p className="font-display text-xl">Start free. Upgrade when Mitra earns it.</p>
           <p className="mt-2 text-sm text-muted">You get {PLANS.free.credits} AI credits every month on the free plan.</p>
-          <Link href={`/login?next=${encodeURIComponent(`/dashboard/billing${highlighted ? `?plan=${highlighted}` : ""}`)}`} className="mt-6 rounded-full bg-accent px-6 py-3 font-semibold text-accent-ink">
+          <Link href={`/login?next=${encodeURIComponent(`/dashboard/billing${highlighted ? `?plan=${highlighted}` : ""}`)}`} className="mt-6 rounded-lg bg-accent px-6 py-3 font-semibold text-accent-ink">
             Sign in free
           </Link>
         </Card>
@@ -187,10 +187,10 @@ export default function BillingPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Plan & billing" title="Your plan" />
+      <PageHeader eyebrow="Plan & billing" title="Your plan, credits and payments." />
       {!me.config.billing && !me.config.simulateBilling && (
         <div className="mb-4">
-          <DemoNote>Mitra is in free beta. Paid plans open soon; until then you can&apos;t be charged.</DemoNote>
+          <p className="rounded-lg bg-surface-2 px-3 py-2 text-sm text-ink-2">Mitra is in free beta. Paid plans open soon; until then you can&apos;t be charged.</p>
         </div>
       )}
       {!me.config.billing && me.config.simulateBilling && (
@@ -204,7 +204,7 @@ export default function BillingPage() {
       <Card className="grid gap-6 md:grid-cols-[1fr_1fr_auto] md:items-center">
         <div>
           <p className="text-xs font-medium uppercase tracking-wider text-muted">Current plan</p>
-          <p className="mt-1 font-display text-4xl">{PLANS[current].name}</p>
+          <p className="mt-1 font-display text-lg">{PLANS[current].name}</p>
           <p className="mt-1 text-sm text-muted">
             {current === "free"
               ? "Free forever"
@@ -250,7 +250,7 @@ export default function BillingPage() {
                 <p className="font-semibold">{p.name}</p>
                 {isCurrent && <span className="rounded-full bg-good/15 px-2.5 py-1 text-[11px] font-semibold text-good">Current</span>}
               </div>
-              <p className="mt-4 font-display text-5xl">
+              <p className="mt-4 font-display text-xl">
                 {rupees(p.pricePaise)}
                 {p.pricePaise > 0 && <span className="font-sans text-sm text-muted">/month</span>}
               </p>
@@ -269,7 +269,7 @@ export default function BillingPage() {
         })}
         <div className="card flex flex-col p-6">
           <p className="font-semibold">{AGENCY.name}</p>
-          <p className="mt-4 font-display text-5xl">{rupees(AGENCY.pricePaise)}<span className="font-sans text-sm text-muted">/month</span></p>
+          <p className="mt-4 font-display text-xl">{rupees(AGENCY.pricePaise)}<span className="font-sans text-sm text-muted">/month</span></p>
           <ul className="mt-5 flex-1 space-y-2 text-sm text-ink-2">
             {AGENCY.points.map((pt) => (
               <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>

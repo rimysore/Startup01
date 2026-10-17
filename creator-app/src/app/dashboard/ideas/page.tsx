@@ -41,7 +41,7 @@ function BreakoutRow({ v }: { v: BreakoutVideo }) {
           {v.title}
         </a>
         <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted">
-          <span className="bg-brand rounded-full px-2 py-0.5 text-[11px] font-bold text-white">
+          <span className="bg-brand rounded-lg px-2 py-0.5 text-[11px] font-semibold text-white">
             {formatScore(v.score)} {v.basis === "channel" ? "their usual" : "their subs"}
           </span>
           {v.channelTitle} · {compact(v.views)} views · {isShort(v) ? "Short" : "Long"}
@@ -132,7 +132,7 @@ export default function IdeasPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Breakout ideas" title="What's breaking out, and what to make next" />
+      <PageHeader eyebrow="Breakout ideas" title="Videos far above their channel's usual, and ideas for your next one." />
 
       <Card className="mb-6 !p-4 sm:!p-5">
         <p className="text-sm text-ink-2">
@@ -247,15 +247,15 @@ export default function IdeasPage() {
         </div>
 
         <div className="space-y-4">
-          <Card className="!border-ink bg-ink text-bg">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Mitra&apos;s ideas</p>
-            <p className="mt-2 text-sm text-bg/80">
+          <Card className="border-accent/25 bg-accent-soft/30">
+            <p className="text-sm font-semibold text-accent">Mitra&apos;s ideas</p>
+            <p className="mt-2 text-sm text-ink-2">
               Why these videos broke out, and five ideas made for your channel and audience, in {languageLabel(language)}. Learn from the pattern; never copy.
             </p>
             <Button className="mt-4" onClick={makeIdeas} disabled={running || !pool.length}>
               {running ? "Thinking…" : `Give me ideas · ${FEATURE_CREDITS.breakouts} credit`}
             </Button>
-            {!pool.length && data && <p className="mt-2 text-xs text-bg/60">Search your niche or add competitors first.</p>}
+            {!pool.length && data && <p className="mt-2 text-xs text-muted">Search your niche or add competitors first.</p>}
           </Card>
           {error && <AiErrorNote error={error} />}
           {running && (

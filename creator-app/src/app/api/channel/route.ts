@@ -14,6 +14,8 @@ export async function GET(request: Request) {
     return Response.json({ ...r.value, fetchedAt: r.fetchedAt, ...(r.stale ? { error: staleNote(r.fetchedAt) } : {}) });
   } catch (err) {
     console.error(err);
-    return Response.json({ ...demoSummary(), error: "Couldn't load your channel, showing demo data." });
+    // A signed-in creator never gets sample numbers that could pass for their own.
+    if (user) return Response.json({ unavailable: true, error: "Mitra couldn't reach YouTube just now." }, { status: 503 });
+    return Response.json(demoSummary());
   }
 }

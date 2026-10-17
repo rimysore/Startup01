@@ -29,6 +29,8 @@ export interface Me {
 
 interface DashboardState {
   summary: (ChannelSummary & { error?: string }) | null;
+  /** Set when the creator's channel couldn't be loaded at all (shown instead of the page). */
+  summaryError: string | null;
   me: Me | null;
   language: LanguageCode;
   setLanguage: (l: LanguageCode) => void;
@@ -48,6 +50,7 @@ function getJson<T>(url: string): Promise<T> {
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [summary, setSummary] = useState<DashboardState["summary"]>(null);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
   const [me, setMe] = useState<Me | null>(null);
   const [stored, storeLanguage] = useStoredString("mitra-language", "hinglish");
   const language: LanguageCode = isLanguageCode(stored) ? stored : "hinglish";
@@ -74,9 +77,17 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     let live = true;
     const url = force.current ? "/api/channel?refresh=1" : "/api/channel";
     force.current = false;
-    getJson<ChannelSummary>(url)
-      .then((s) => live && setSummary(s))
-      .catch(() => live && setSummary(null));
+    getJson<ChannelSummary & { unavailable?: boolean; error?: string }>(url)
+      .then((s) => {
+        if (!live) return;
+        setSummaryError(s.unavailable ? (s.error ?? "Couldn't load your channel.") : null);
+        setSummary(s.unavailable ? null : s);
+      })
+      .catch(() => {
+        if (!live) return;
+        setSummary(null);
+        setSummaryError("Couldn't load your channel. Check your connection.");
+      });
     return () => {
       live = false;
     };
@@ -101,7 +112,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   }, [serverLanguage]);
 
   return (
-    <Ctx.Provider value={{ summary, me, language, setLanguage, reload, refresh, refreshMe }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ summary, summaryError, me, language, setLanguage, reload, refresh, refreshMe }}>{children}</Ctx.Provider>
   );
 }
 

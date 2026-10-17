@@ -335,7 +335,7 @@ export default function ProspectsPage() {
                             target="_blank"
                             rel="noreferrer"
                             onClick={() => setStatus([p.id], "contacted")}
-                            className="rounded-full bg-accent px-4 py-2 text-center text-sm font-semibold text-accent-ink"
+                            className="rounded-lg bg-accent px-4 py-2 text-center text-sm font-semibold text-accent-ink"
                           >
                             Open in Gmail
                           </a>

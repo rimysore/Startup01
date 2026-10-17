@@ -31,7 +31,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
       <p className="text-4xl" aria-hidden>
         {stale ? "✨" : "😕"}
       </p>
-      <h1 className="mt-3 font-display text-3xl">{stale ? "Mitra just got an update" : "This page hit a problem"}</h1>
+      <h1 className="mt-3 font-display text-xl">{stale ? "Mitra just got an update" : "This page hit a problem"}</h1>
       <p className="mt-2 text-sm text-ink-2">
         {stale ? "Reloading to get the newest version…" : `Try again. If it keeps happening, send us the message below at ${OFFICIAL_EMAIL}.`}
       </p>
@@ -42,7 +42,7 @@ export default function DashboardError({ error, reset }: { error: Error & { dige
         </p>
       )}
       <div className="mt-6 flex justify-center gap-2">
-        <button onClick={() => (stale ? window.location.reload() : reset())} className="bg-brand rounded-full px-5 py-2.5 text-sm font-semibold text-white">
+        <button onClick={() => (stale ? window.location.reload() : reset())} className="bg-brand rounded-lg px-5 py-2.5 text-sm font-semibold text-white">
           {stale ? "Reload now" : "Try again"}
         </button>
         {/* A full page load, not client navigation: the client app may be the thing that broke. */}

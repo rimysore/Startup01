@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { burstConfetti, CelebrationToast, MilestoneRing, RollingNumber, Sparkline, useLiveSubscribers, type Celebration } from "@/components/celebrate";
+import { burstConfetti, CelebrationToast, nextMilestone, RollingNumber, Sparkline, useLiveSubscribers, type Celebration } from "@/components/celebrate";
 import { useDashboard, useQueryParam, type Me } from "@/components/dashboard-context";
 import { FounderBadge, FounderPassCard } from "@/components/Founding";
 import { LineChart } from "@/components/LineChart";
 import { OutlierBadge } from "@/components/outlier";
-import { Card, DemoNote, ErrorNote, Spinner } from "@/components/ui";
+import { Card, ErrorNote, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
 import { compact, full, pctChange, shortDate } from "@/lib/format";
 import { outlierScores } from "@/lib/outliers";
@@ -19,9 +19,9 @@ function sum(xs: number[]) {
 
 function Kpi({ label, value, sub, change, trend }: { label: string; value: React.ReactNode; sub?: string; change?: number | null; trend?: number[] }) {
   return (
-    <Card className="group !p-5 transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.35)]">
+    <Card className="!p-4 sm:!p-5">
       <p className="text-xs font-medium text-muted">{label}</p>
-      <p className="mt-2 text-3xl font-semibold leading-none tracking-tight sm:text-4xl">{value}</p>
+      <p className="mt-2 text-2xl font-semibold leading-none tracking-tight sm:text-3xl">{value}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
         {change != null && (
           <span className={`rounded-full px-2 py-0.5 font-semibold ${change >= 0 ? "bg-good/15 text-good" : "bg-bad/10 text-bad"}`}>
@@ -40,23 +40,23 @@ function Kpi({ label, value, sub, change, trend }: { label: string; value: React
 }
 
 /** Small wins worth celebrating, computed from the numbers (no AI). */
-function wins(s: ChannelSummary): { emoji: string; text: string }[] {
-  const out: { emoji: string; text: string }[] = [];
+function wins(s: ChannelSummary): { text: string }[] {
+  const out: { text: string }[] = [];
   const { daily, videos } = s;
   if (daily.length) {
     const best = daily.reduce((a, b) => (b.views > a.views ? b : a));
     const recent = daily.slice(-3).some((d) => d.date === best.date);
-    out.push({ emoji: "🔥", text: recent ? `Best day of the month: ${compact(best.views)} views on ${shortDate(best.date)}` : `Best day: ${compact(best.views)} views on ${shortDate(best.date)}` });
+    out.push({ text: recent ? `Best day of the month: ${compact(best.views)} views on ${shortDate(best.date)}` : `Best day: ${compact(best.views)} views on ${shortDate(best.date)}` });
     let streak = 0;
     for (let i = daily.length - 1; i >= 0 && daily[i].subscribersGained > 0; i--) streak++;
-    if (streak >= 2) out.push({ emoji: "⚡", text: `${streak}-day streak of new subscribers` });
+    if (streak >= 2) out.push({ text: `${streak}-day streak of new subscribers` });
     const gained7 = sum(daily.slice(-7).map((d) => d.subscribersGained));
-    if (gained7 > 0) out.push({ emoji: "🙌", text: `${full(gained7)} people subscribed this week` });
+    if (gained7 > 0) out.push({ text: `${full(gained7)} people subscribed this week` });
   }
   const avg = videos.length ? sum(videos.map((v) => v.views)) / videos.length : 0;
   const star = [...videos].sort((a, b) => b.views - a.views)[0];
   if (star && avg > 0 && star.views >= avg * 1.5 && videos.length > 2) {
-    out.push({ emoji: "🚀", text: `“${star.title.length > 38 ? `${star.title.slice(0, 37)}…` : star.title}” is ${(star.views / avg).toFixed(1)}× your average` });
+    out.push({ text: `“${star.title.length > 38 ? `${star.title.slice(0, 37)}…` : star.title}” is ${(star.views / avg).toFixed(1)}× your average` });
   }
   return out.slice(0, 4);
 }
@@ -92,6 +92,29 @@ function actions(s: ChannelSummary): Array<{ title: string; body: string; href: 
   return out;
 }
 
+/** Progress to the next round number, as a plain bar. */
+function Milestone({ subscribers, perDay }: { subscribers: number; perDay: number }) {
+  const m = nextMilestone(subscribers);
+  const progress = Math.min(1, Math.max(0, (subscribers - m.prev) / (m.at - m.prev)));
+  const togo = m.at - subscribers;
+  const days = perDay > 0 ? Math.ceil(togo / perDay) : null;
+  return (
+    <div className="self-center rounded-lg bg-surface-2 p-4">
+      <div className="flex items-baseline justify-between text-sm">
+        <span className="text-muted">Next milestone</span>
+        <span className="font-semibold">{m.name}</span>
+      </div>
+      <div className="mt-3 h-2 rounded-full bg-line" role="progressbar" aria-valuenow={Math.round(progress * 100)} aria-valuemin={0} aria-valuemax={100} aria-label={`Progress to ${m.name}`}>
+        <div className="h-2 rounded-full bg-accent" style={{ width: `${progress * 100}%` }} />
+      </div>
+      <p className="mt-2 text-xs text-muted">
+        {Math.round(progress * 100)}% · {togo.toLocaleString("en-IN")} to go
+        {days != null && days < 3650 ? ` · ~${days <= 1 ? "1 day" : `${days} days`} at your pace` : ""}
+      </p>
+    </div>
+  );
+}
+
 export default function Overview() {
   const { summary, refresh, me } = useDashboard();
   const newFounder = useQueryParam("founder");
@@ -115,12 +138,11 @@ function OverviewBody({
   const [celebration, setCelebration] = useState<Celebration | null>(null);
   const [popKey, setPopKey] = useState(0);
   const onGain = useCallback((gain: number, since: "visit" | "now") => {
-    burstConfetti();
     setPopKey((k) => k + 1);
     setCelebration({
       id: Date.now(),
       title: `+${gain.toLocaleString("en-IN")} new subscriber${gain === 1 ? "" : "s"}!`,
-      body: since === "visit" ? "since you last checked. Your audience is growing 🙌" : "just now. Keep going!",
+      body: since === "visit" ? "since you last checked." : "just now.",
     });
   }, []);
   const dismiss = useCallback(() => setCelebration(null), []);
@@ -152,71 +174,54 @@ function OverviewBody({
   const winList = wins(summary);
 
   return (
-    <div className="rise">
+    <div>
       <CelebrationToast celebration={celebration} onDone={dismiss} />
       {summary.error && <div className="mb-4"><ErrorNote>{summary.error}</ErrorNote></div>}
 
-      <section className="relative overflow-hidden rounded-[28px] bg-ink p-6 text-bg sm:p-8" aria-label="Your channel right now">
-        <div className="glow-blob pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-accent/40 blur-3xl" aria-hidden />
-        <div className="glow-blob pointer-events-none absolute -bottom-40 left-10 h-72 w-72 rounded-full bg-peacock/30 blur-3xl" style={{ animationDelay: "-7s" }} aria-hidden />
-        <div className="relative flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <p className="text-sm text-bg/75">
-              {greeting}, <span className="font-semibold text-bg">{channel.title}</span> 👋
-            </p>
-            {founder != null && <FounderBadge n={founder} />}
-          </div>
-          <div className="flex items-center gap-2 text-xs">
-            {live ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-bg/10 px-3 py-1.5">
-                <span className="live-dot h-2 w-2 rounded-full bg-good" /> Live
-                {summary.fetchedAt && <span className="text-bg/60">· {new Date(summary.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>}
-              </span>
-            ) : (
-              <span className="rounded-full bg-accent/25 px-3 py-1.5 font-semibold text-accent">Demo channel</span>
-            )}
-            {live ? (
-              <button onClick={refresh} className="rounded-full bg-bg/10 px-3 py-1.5 font-semibold hover:bg-bg/20" title="Fetch the latest numbers from YouTube">
-                Refresh
-              </button>
-            ) : (
-              <Link href="/dashboard/connections" className="rounded-full bg-accent px-3 py-1.5 font-semibold text-accent-ink">
-                Connect YouTube
-              </Link>
-            )}
-          </div>
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="flex flex-wrap items-center gap-2 text-2xl font-semibold tracking-tight">
+            {greeting}
+            {me?.user?.name ? `, ${me.user.name.split(" ")[0]}` : ""} {founder != null && <FounderBadge n={founder} />}
+          </h1>
+          <p className="mt-1 text-sm text-muted">How {channel.title} is doing, from YouTube.</p>
         </div>
-        <div className="relative mt-6 grid items-end gap-8 lg:grid-cols-[1fr_auto]">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Subscribers</p>
-            <p key={popKey} className={`mt-2 text-6xl font-semibold leading-none tracking-tight sm:text-7xl lg:text-8xl ${popKey ? "pop" : ""}`}>
-              <RollingNumber value={subscribers} />
-            </p>
-            <p className="mt-3 text-sm text-bg/75">
-              <span className="font-semibold text-good">+{full(subs28)}</span> in the last 28 days
-              {perDay >= 1 && <> · about {Math.round(perDay).toLocaleString("en-IN")} a day</>}
-            </p>
-            {live && subscribers >= 1000 && (
-              <p className="mt-1 text-xs text-bg/50">YouTube rounds counts above 1,000 to 3 digits, so the live number moves in steps; daily gains are exact.</p>
-            )}
+        {live && (
+          <div className="flex items-center gap-2 text-xs text-muted">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-good" /> Updated{" "}
+              {summary.fetchedAt ? new Date(summary.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "now"}
+            </span>
+            <button onClick={refresh} className="rounded-lg border border-line bg-surface px-3 py-1.5 font-medium text-ink hover:bg-surface-2" title="Fetch the latest numbers from YouTube">
+              Refresh
+            </button>
           </div>
-          <MilestoneRing subscribers={subscribers} perDay={perDay} />
-        </div>
-        {winList.length > 0 && (
-          <ul className="relative mt-6 flex flex-wrap gap-2" aria-label="Recent wins">
-            {winList.map((w) => (
-              <li key={w.text} className="rounded-full bg-bg/10 px-3 py-1.5 text-sm backdrop-blur">
-                <span aria-hidden>{w.emoji}</span> {w.text}
-              </li>
-            ))}
-          </ul>
         )}
-      </section>
-      {summary.mode === "demo" && (
-        <div className="mt-4">
-          <DemoNote>You&apos;re exploring a demo channel: the counter ticks up on its own so you can see the celebrations. Connect YouTube to see your own numbers, live.</DemoNote>
+      </div>
+
+      <section className="card grid gap-6 p-5 sm:p-6 lg:grid-cols-[1fr_320px]" aria-label="Subscribers">
+        <div>
+          <p className="text-sm text-muted">Subscribers</p>
+          <p key={popKey} className={`mt-1 text-4xl font-semibold leading-none tracking-tight sm:text-5xl ${popKey ? "pop" : ""}`}>
+            <RollingNumber value={subscribers} />
+          </p>
+          <p className="mt-2 text-sm text-ink-2">
+            <span className="font-medium text-good">+{full(subs28)}</span> in the last 28 days
+            {perDay >= 1 && <> · about {Math.round(perDay).toLocaleString("en-IN")} a day</>}
+          </p>
+          {live && subscribers >= 1000 && <p className="mt-1 text-xs text-muted">YouTube rounds counts above 1,000, so this moves in steps; daily gains are exact.</p>}
+          {winList.length > 0 && (
+            <ul className="mt-4 flex flex-wrap gap-2" aria-label="Highlights">
+              {winList.map((w) => (
+                <li key={w.text} className="rounded-md bg-surface-2 px-2.5 py-1 text-xs text-ink-2">
+                  {w.text}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      )}
+        <Milestone subscribers={subscribers} perDay={perDay} />
+      </section>
 
       <FounderPassCard me={me} />
 
@@ -245,16 +250,16 @@ function OverviewBody({
           )}
         </Card>
 
-        <Card className="bg-ink text-bg !border-ink">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">This week, Mitra suggests</p>
-          <ol className="mt-4 space-y-5">
+        <Card>
+          <h2 className="font-semibold">This week</h2>
+          <ol className="mt-4 space-y-4">
             {actions(summary).map((a, i) => (
               <li key={a.title} className="flex gap-3">
-                <span className="font-display text-3xl leading-none text-accent">{i + 1}</span>
-                <div>
-                  <p className="font-semibold">{a.title}</p>
-                  <p className="mt-1 text-sm opacity-75">{a.body}</p>
-                  <Link href={a.href} className="mt-2 inline-block text-sm font-semibold text-accent underline-offset-4 hover:underline">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-surface-2 text-xs font-semibold text-ink-2">{i + 1}</span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium">{a.title}</p>
+                  <p className="mt-0.5 text-sm text-muted">{a.body}</p>
+                  <Link href={a.href} className="mt-1.5 inline-block text-sm font-medium text-accent underline-offset-4 hover:underline">
                     {a.cta} →
                   </Link>
                 </div>
@@ -268,7 +273,7 @@ function OverviewBody({
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-semibold">Recent uploads</h2>
           <Link href="/dashboard/ideas" className="text-xs font-semibold text-accent hover:underline">
-            × = views vs your usual · Find breakout ideas →
+            × = views vs your usual
           </Link>
         </div>
         <div className="divide-y divide-line">
@@ -294,7 +299,7 @@ function OverviewBody({
               </div>
               <Link
                 href={`/dashboard/doctor?v=${v.id}`}
-                className="grid h-9 min-w-9 shrink-0 place-items-center rounded-full border border-line text-xs font-semibold hover:bg-surface-2 sm:px-3"
+                className="grid h-8 min-w-8 shrink-0 place-items-center rounded-lg border border-line text-xs font-medium hover:bg-surface-2 sm:px-3"
                 aria-label={`Diagnose ${v.title}`}
               >
                 <span className="hidden sm:inline">Diagnose</span>

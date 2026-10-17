@@ -123,20 +123,20 @@ export function FounderPassCard({ me }: { me: Me | null }) {
     const { used, limit } = me.founderPass;
     const remaining = Math.max(0, limit - used);
     return (
-      <section className="mt-6 rounded-[24px] border-2 border-[#ffd23f]/70 bg-gradient-to-br from-[#fff6d6] to-accent-soft p-5 text-[#1a0f05] dark:from-[#3a2d0a] dark:to-accent-soft dark:text-ink" aria-label="Your Founder Pass">
+      <section className="card mt-6 p-5" aria-label="Your Founder Pass">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-display text-xl">🏅 Your Founder Pass · #{me.founderNumber}</p>
-          <span className="rounded-full bg-ink px-3 py-1 text-xs font-bold text-bg">Free for life</span>
+          <p className="font-semibold">Founder Pass · #{me.founderNumber}</p>
+          <span className="rounded-md bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent">Free for life</span>
         </div>
         <p className="mt-3 text-sm">
-          <span className="text-2xl font-bold">{remaining}</span> of {limit} free uses left this month
+          <span className="font-semibold">{remaining}</span> of {limit} free uses left this month
         </p>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-black/10 dark:bg-white/10" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={remaining} aria-label="Free uses left">
-          <div className="bg-brand h-full rounded-full transition-all" style={{ width: `${(remaining / limit) * 100}%` }} />
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-surface-2" role="progressbar" aria-valuemin={0} aria-valuemax={limit} aria-valuenow={remaining} aria-label="Free uses left">
+          <div className="h-full rounded-full bg-accent transition-all" style={{ width: `${(remaining / limit) * 100}%` }} />
         </div>
-        <ul className="mt-3 flex flex-wrap gap-1.5 text-xs font-semibold">
+        <ul className="mt-3 flex flex-wrap gap-1.5 text-xs text-ink-2">
           {FOUNDER_FREE_LABELS.map((l) => (
-            <li key={l} className="rounded-full bg-white/70 px-2.5 py-1 dark:bg-black/30">✓ {l}</li>
+            <li key={l} className="rounded-md bg-surface-2 px-2 py-1">{l}</li>
           ))}
         </ul>
         <p className="mt-3 text-xs opacity-70">Resets on the 1st. Video Doctor, pro thumbnails and competitor analysis use your plan&apos;s credits.</p>
@@ -153,7 +153,7 @@ export function FounderPassCard({ me }: { me: Me | null }) {
           The first {FOUNDING_SPOTS} creators to connect a channel get {FOUNDER_FREE_USES} free uses every month, forever.
         </p>
       </div>
-      <Link href={me.user ? "/dashboard/connections" : "/login?next=/dashboard/connections"} className="bg-brand rounded-full px-5 py-3.5 text-center font-semibold text-white">
+      <Link href={me.user ? "/dashboard/connections" : "/login?next=/dashboard/connections"} className="bg-brand rounded-lg px-5 py-3.5 text-center font-semibold text-white">
         {me.user ? "Connect YouTube" : "Sign in & claim"}
       </Link>
     </section>
@@ -163,8 +163,8 @@ export function FounderPassCard({ me }: { me: Me | null }) {
 /** "Founding Creator #17" pill for the dashboard hero. */
 export function FounderBadge({ n }: { n: number }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#ffd23f] to-[#ff8a3d] px-3 py-1.5 text-xs font-bold text-[#1a0f05]" title="One of the first 100 creators on Mitra: perks for life">
-      🏅 Founding Creator #{n}
+    <span className="inline-flex items-center rounded-md bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent" title="One of the first 100 creators on Mitra: perks for life">
+      Founding Creator #{n}
     </span>
   );
 }

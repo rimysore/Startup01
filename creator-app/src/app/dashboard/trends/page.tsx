@@ -69,7 +69,7 @@ export default function TrendsPage() {
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Trend Radar" title="What India is watching right now">
+      <PageHeader eyebrow="Trend Radar" title="What's trending on YouTube in India, by language.">
         <div className="flex items-center gap-3">
           {data?.fetchedAt && (
             <span className="text-xs text-muted">Updated {new Date(data.fetchedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
@@ -82,7 +82,7 @@ export default function TrendsPage() {
         </div>
       </PageHeader>
 
-      {data?.mode === "demo" && (
+      {data?.mode === "demo" && !data.error && (
         <div className="mb-4">
           <DemoNote>Sample trends. Connect YouTube to see the live Trending chart for India, sorted by language.</DemoNote>
         </div>
@@ -158,9 +158,9 @@ export default function TrendsPage() {
           </Card>
 
           <div className="space-y-4">
-            <Card className="bg-ink text-bg !border-ink">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Mitra&apos;s read</p>
-              <p className="mt-2 text-sm text-bg/80">
+            <Card className="border-accent/25 bg-accent-soft/30">
+              <p className="text-sm font-semibold text-accent">Mitra&apos;s read</p>
+              <p className="mt-2 text-sm text-ink-2">
                 Topics, emotions, places and formats behind these trends, turned into ideas for your channel, in {languageLabel(language)}.
               </p>
               <Button className="mt-4" onClick={analyse} disabled={running || !shown.length}>
