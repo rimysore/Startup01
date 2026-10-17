@@ -20,6 +20,11 @@ export async function GET(request: Request) {
     return Response.json({ mode: "live", fetchedAt: r.fetchedAt, report: r.value, ...(r.stale ? { error: staleNote(r.fetchedAt) } : {}) });
   } catch (err) {
     console.error(err);
-    return Response.json({ ...demo, error: "Couldn't load audience data, showing a sample." });
+    // Never sample numbers for a signed-in creator: they could pass for their own.
+    if (user) {
+      const empty = { days: 28, countries: [], cities: [], sources: [], searchTerms: [], demographics: [], subscribed: [] };
+      return Response.json({ mode: "live", report: empty, error: "Couldn't load your audience data from YouTube just now. Try again in a minute." });
+    }
+    return Response.json(demo);
   }
 }

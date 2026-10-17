@@ -36,6 +36,7 @@ function Icon({ d }: { d: string }) {
 }
 
 const ADMIN_NAV = [
+  { href: "/dashboard/users", label: "Users", hint: "Who signed up and what they used", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" },
   { href: "/dashboard/admin", label: "AI costs", hint: "Spend, calls and errors by feature", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
   { href: "/dashboard/prospects", label: "Find creators", hint: "Search channels and write outreach", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" },
   { href: "/dashboard/waitlist", label: "Waitlist", hint: "Invite creators to the private beta", icon: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6" },
@@ -278,11 +279,15 @@ function BottomTabs() {
         </div>
       </nav>
       {more && (
-        <div className="app fixed inset-0 z-40 flex items-end bg-black/50 lg:hidden" role="dialog" aria-modal="true" aria-label="All pages" onClick={() => setMore(false)}>
+        <div className="app fixed inset-0 z-50 flex items-end bg-black/50 lg:hidden" role="dialog" aria-modal="true" aria-label="All pages" onClick={() => setMore(false)}>
           <div className="toast-in max-h-[85dvh] w-full overflow-y-auto rounded-t-[28px] bg-bg p-4 pb-[max(1rem,env(safe-area-inset-bottom))]" onClick={(e) => e.stopPropagation()}>
             <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-line" aria-hidden />
             <nav className="grid gap-1">
               <NavLinks onNavigate={() => setMore(false)} />
+              <FeedbackButton className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-2">
+                <Icon d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM12 7v4M12 14h.01" />
+                Help &amp; feedback
+              </FeedbackButton>
             </nav>
             <nav className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t border-line px-4 pt-3 text-xs text-muted" aria-label="Legal">
               {LEGAL_LINKS.map((l) => (
