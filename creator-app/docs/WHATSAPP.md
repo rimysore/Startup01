@@ -78,6 +78,33 @@ STOP pauses reports (they can still chat); START resumes. Disconnect on the webs
 
 `npm run check:env` lists anything missing.
 
+## Going live: real number, "Mitra" name and logo
+
+**Why the bot shows only "+1 (555) …" and no logo:** that's Meta's free *test number*. Test numbers can't have a
+business name or profile photo. It's a Meta setting, not something in our code.
+
+1. **Get a real number** (Indian is best). It must not be active on the normal WhatsApp / WhatsApp Business app
+   (delete that account first) and must receive one SMS or call. A new SIM keeps it separate from your own.
+2. **Add it:** WhatsApp Manager → Phone numbers → **Add phone number**. Display name **Mitra** (or "Mitra –
+   Creator Growth"); it must match the brand on trymitraapp.com. Approval usually takes 1–2 days.
+   Category: Education or Professional Services.
+3. **Profile** (same page → the number → Profile): photo = Mitra logo, 640×640 PNG, mark centred (WhatsApp crops
+   it to a circle); About: "Your YouTube growth manager 📈"; Description: one or two lines on what Mitra does;
+   Website https://trymitraapp.com; Email mitracontentsupport@gmail.com.
+4. **Point the app at it** in Vercel, then redeploy:
+   - `WHATSAPP_PHONE_NUMBER_ID` = the new number's ID (shown in WhatsApp Manager)
+   - `WHATSAPP_NUMBER` = the number in international format, e.g. `9198xxxxxxxx` (used for "chat on WhatsApp" links)
+   - Message templates are approved per WhatsApp account, not per number, so they keep working.
+5. **Re-link:** creators send JOIN to the new number once.
+
+**What people will see:**
+- The chat header shows the phone number unless the person saved Mitra as a contact. This is normal for most
+  businesses.
+- The name "Mitra" and the logo show in the profile and in new chats once the display name is approved.
+- "Mitra" in the header with a blue tick needs Meta **Business Verification** (business documents, Business
+  Settings → Security Centre), then a request for an **Official Business Account**, usually granted once the brand
+  is well known. Start Business Verification once the company is registered.
+
 ## Limits to know
 - Vercel Hobby runs crons once a day (±1 hour), so the video check lands 36–60 hours after upload. On Vercel
   Pro, change the schedule to hourly and narrow the window in `videosDueForCheck` for an exact 48 hours.
