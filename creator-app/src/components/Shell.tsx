@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { DashboardProvider, useDashboard } from "./dashboard-context";
 import { LEGAL_LINKS } from "./SiteFooter";
@@ -32,32 +33,110 @@ function Icon({ d }: { d: string }) {
 }
 
 const ADMIN_NAV = [
-  { href: "/dashboard/admin", label: "AI costs", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
-  { href: "/dashboard/prospects", label: "Find creators", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" },
-  { href: "/dashboard/waitlist", label: "Waitlist", icon: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6" },
+  { href: "/dashboard/admin", label: "AI costs", hint: "Spend, calls and errors by feature", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
+  { href: "/dashboard/prospects", label: "Find creators", hint: "Search channels and write outreach", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" },
+  { href: "/dashboard/waitlist", label: "Waitlist", hint: "Invite creators to the private beta", icon: "M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M19 8v6M22 11h-6" },
 ];
+const ADMIN_ICON = "M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z";
+
+const navItem = (active: boolean) =>
+  `flex w-full shrink-0 items-center gap-3 rounded-full px-4 py-2 text-sm transition ${active ? "bg-ink text-bg" : "text-ink-2 hover:bg-surface-2 hover:text-ink"}`;
+
+/**
+ * The admin pages in one place: a single "Admin" entry opens this panel instead of three more sidebar rows.
+ * Fades and scales in; Esc, the backdrop or a choice closes it (with the same animation in reverse).
+ */
+function AdminPanel({ onNavigate }: { onNavigate?: () => void }) {
+  const path = usePathname();
+  const [state, setState] = useState<"closed" | "open" | "closing">("closed");
+  const active = ADMIN_NAV.some((a) => path.startsWith(a.href));
+  const close = () => {
+    setState("closing");
+    setTimeout(() => setState("closed"), 180);
+  };
+  useEffect(() => {
+    if (state !== "open") return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [state]);
+  return (
+    <>
+      <button onClick={() => setState("open")} className={navItem(active)} aria-haspopup="dialog">
+        <Icon d={ADMIN_ICON} />
+        Admin
+        <span className="ml-auto rounded-full bg-accent-soft px-2 py-0.5 text-[10px] font-bold text-accent">{ADMIN_NAV.length}</span>
+      </button>
+      {state !== "closed" &&
+        // Rendered at the page root: inside the phone "More" sheet, its animation would trap a fixed overlay.
+        createPortal(
+        <div
+          className={`fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-sm ${state === "closing" ? "fade-out" : "fade-in"}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Admin"
+          onClick={close}
+        >
+          <div className={`card w-full max-w-md !p-5 shadow-2xl ${state === "closing" ? "modal-out" : "modal-in"}`} onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between">
+              <p className="flex items-center gap-2 font-display text-2xl">
+                <Icon d={ADMIN_ICON} /> Admin
+              </p>
+              <button onClick={close} className="grid h-9 w-9 place-items-center rounded-full text-xl hover:bg-surface-2" aria-label="Close">
+                ×
+              </button>
+            </div>
+            <ul className="mt-4 grid gap-2">
+              {ADMIN_NAV.map((a) => {
+                const on = path.startsWith(a.href);
+                return (
+                  <li key={a.href}>
+                    <Link
+                      href={a.href}
+                      onClick={() => {
+                        close();
+                        onNavigate?.();
+                      }}
+                      className={`flex items-center gap-3 rounded-2xl border p-3 transition hover:-translate-y-0.5 ${on ? "border-accent bg-accent-soft" : "border-line hover:bg-surface-2"}`}
+                    >
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface-2">
+                        <Icon d={a.icon} />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold">{a.label}</span>
+                        <span className="block truncate text-xs text-muted">{a.hint}</span>
+                      </span>
+                      <span className="ml-auto text-muted" aria-hidden>
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </>
+  );
+}
 
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
   const { me } = useDashboard();
   return (
     <>
-      {(me?.admin ? [...NAV, ...ADMIN_NAV] : NAV).map((item) => {
+      {NAV.map((item) => {
         const active = item.href === "/dashboard" ? path === item.href : path.startsWith(item.href);
         return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onNavigate}
-            className={`flex shrink-0 items-center gap-3 rounded-full px-4 py-2.5 text-sm transition ${
-              active ? "bg-ink text-bg" : "text-ink-2 hover:bg-surface-2 hover:text-ink"
-            }`}
-          >
+          <Link key={item.href} href={item.href} onClick={onNavigate} className={navItem(active)} aria-current={active ? "page" : undefined}>
             <Icon d={item.icon} />
             {item.label}
           </Link>
         );
       })}
+      {me?.admin && <AdminPanel onNavigate={onNavigate} />}
     </>
   );
 }
@@ -234,15 +313,15 @@ export function Shell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen">
         <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line px-4 py-6 lg:flex">
           <Logo className="px-3" />
-          <nav className="mt-8 flex flex-col gap-1">
+          {/* Scrolls on short screens so nothing below is ever cut off. */}
+          <nav className="-mx-1 mt-6 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-1 pb-2">
             <NavLinks />
           </nav>
-          <Link href="/dashboard/whatsapp" className="mt-auto block rounded-2xl bg-ink p-4 text-bg transition hover:-translate-y-0.5">
-            <p className="font-display text-xl leading-snug">Your report on WhatsApp</p>
-            <p className="mt-1 text-xs opacity-70">Every Monday, your wins, fixes and what to post. Plus a check on every new video.</p>
-            <p className="mt-2 text-xs font-semibold text-[#25D366]">Connect →</p>
+          <Link href="/dashboard/whatsapp" className="mt-3 block shrink-0 rounded-2xl bg-ink px-4 py-3 text-bg transition hover:-translate-y-0.5">
+            <p className="font-display text-lg leading-snug">Your report on WhatsApp</p>
+            <p className="mt-0.5 text-xs font-semibold text-[#25D366]">Every Monday · Connect →</p>
           </Link>
-          <nav className="mt-4 flex flex-wrap gap-x-3 gap-y-1 px-3 text-[11px] text-muted" aria-label="Legal">
+          <nav className="mt-3 flex shrink-0 flex-wrap gap-x-3 gap-y-1 px-3 text-[11px] text-muted" aria-label="Legal">
             {LEGAL_LINKS.map((l) => (
               <Link key={l.href} href={l.href} className="hover:text-ink">
                 {l.label}

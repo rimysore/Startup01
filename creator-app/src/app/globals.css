@@ -177,6 +177,15 @@ body {
 }
 
 /* A slow, warm glow behind hero cards. */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes modal-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(0.97); } }
+.fade-in { animation: fade-in 0.18s ease-out both; }
+.fade-out { animation: fade-out 0.18s ease-in both; }
+.modal-in { animation: modal-in 0.24s cubic-bezier(.2, .9, .3, 1) both; }
+.modal-out { animation: modal-out 0.18s ease-in both; }
+
 @keyframes drift {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(-6%, 4%) scale(1.08); }
@@ -203,7 +212,7 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot, .word-in, .float-y { animation: none; }
+  .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot, .word-in, .float-y, .fade-in, .fade-out, .modal-in, .modal-out { animation: none; }
 }
 
 .legal-body ul {
