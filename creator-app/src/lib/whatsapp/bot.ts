@@ -206,6 +206,16 @@ function failure(user: User, out: { status: number; error: string; upgrade?: boo
   return [{ type: "text", text: out.status === 429 ? out.error : w.busy }];
 }
 
+/** The language a number's linked creator chose; English for numbers we don't know yet. */
+export async function languageForPhone(phone: string): Promise<string> {
+  const [row] = await (await db())
+    .select({ language: schema.users.language })
+    .from(schema.whatsappContacts)
+    .innerJoin(schema.users, eq(schema.users.id, schema.whatsappContacts.userId))
+    .where(eq(schema.whatsappContacts.phone, phone));
+  return row?.language ?? "en";
+}
+
 /** Entry point for one incoming message. */
 export async function handleInbound(m: Inbound, now = Date.now()): Promise<void> {
   if (!(await firstTime(m.id))) return;
@@ -220,7 +230,7 @@ export async function handleInbound(m: Inbound, now = Date.now()): Promise<void>
     const user = await linkByCode(m, code, now);
     if (user === "expired") {
       await d.insert(schema.webhookEvents).values({ id: `wajoin:${m.from}:${m.id}`, receivedAt: new Date(now) }).onConflictDoNothing();
-      await send(m.from, { type: "text", text: t(contact ? "hinglish" : "en").linkExpired });
+      await send(m.from, { type: "text", text: t(await languageForPhone(m.from)).linkExpired });
       return;
     }
     const name = user.name?.split(" ")[0] || m.name || "creator";

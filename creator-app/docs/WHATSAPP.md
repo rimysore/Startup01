@@ -70,7 +70,10 @@ STOP pauses reports (they can still chat); START resumes. Disconnect on the webs
    `https://trymitraapp.com/api/whatsapp/webhook`, Verify token = your `WHATSAPP_VERIFY_TOKEN`,
    then subscribe to the **messages** field.
 7. **Templates:** `WHATSAPP_TOKEN=… WHATSAPP_WABA_ID=… npx tsx scripts/whatsapp-templates.mts`. When they're
-   approved, set `WHATSAPP_TEMPLATE_LANGS=en,hi`. If Meta files one as MARKETING instead of UTILITY, it costs
+   approved, set `WHATSAPP_TEMPLATE_LANGS=en,hi`. The six other languages (Telugu, Tamil, Marathi, Bengali,
+   Kannada, Malayalam) submit with `… npx tsx scripts/whatsapp-templates.mts te,ta,mr,bn,kn,ml`; once approved,
+   add them: `WHATSAPP_TEMPLATE_LANGS=en,hi,te,ta,mr,bn,kn,ml`. Until a language is approved, creators who chose it
+   get the English template outside the 24-hour window (everything else is already in their language). If Meta files one as MARKETING instead of UTILITY, it costs
    ~₹0.86: edit the wording to be more report-like and resubmit.
 8. **Email fallback:** on mitracontentsupport@gmail.com turn on 2-Step Verification → App passwords → create
    one for "Mitra". Set `SMTP_USER=mitracontentsupport@gmail.com` and `SMTP_PASS=<app password>`.

@@ -1,7 +1,7 @@
 import { after } from "next/server";
 import { safeEqual } from "@/lib/crypto";
 import { parseWebhook, send, unsupportedSenders, validSignature } from "@/lib/whatsapp/api";
-import { handleInbound } from "@/lib/whatsapp/bot";
+import { handleInbound, languageForPhone } from "@/lib/whatsapp/bot";
 import { t } from "@/lib/whatsapp/strings";
 
 export const maxDuration = 60;
@@ -46,7 +46,8 @@ export async function POST(request: Request) {
         for (const m of list) await handleInbound(m).catch((err) => console.error("WhatsApp message failed", err));
       }),
     );
-    for (const u of unsupported) await send(u.from, { type: "text", text: t("hinglish").unsupported }).catch(() => {});
+    // Voice notes, photos, stickers: answered in the language the creator picked (English if we don't know them).
+    for (const u of unsupported) await send(u.from, { type: "text", text: t(await languageForPhone(u.from)).unsupported }).catch(() => {});
   });
   return Response.json({ ok: true });
 }

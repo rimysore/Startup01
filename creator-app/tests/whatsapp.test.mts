@@ -15,7 +15,8 @@ const { mailOutbox } = await import("@/lib/email");
 const { claim } = await import("@/lib/reports/deliver");
 const { runDaily } = await import("@/lib/reports/run");
 const { handleInbound, toWhatsApp, menu } = await import("@/lib/whatsapp/bot");
-const { t } = await import("@/lib/whatsapp/strings");
+const { t, BOT_LANGUAGES, MENU_WORDS } = await import("@/lib/whatsapp/strings");
+const { languageForPhone } = await import("@/lib/whatsapp/bot");
 const { LANGUAGES } = await import("@/lib/languages");
 const { TEMPLATES } = await import("@/lib/whatsapp/templates");
 const { validPdfLink } = await import("@/lib/reports/link");
@@ -167,6 +168,25 @@ assert(last().out.type === "list", "language menu");
 await handleInbound(msg("b4", "919800000001", "हिन्दी", "lang:hi"), NOW);
 const [u1] = await d.select().from(schema.users).where(eq(schema.users.id, "wa"));
 assert(u1.language === "hi" && (last().out as { text: string }).text === t("hi").menuText, "language changes and the menu follows it");
+
+// Every language the website offers has its own bot words, inside WhatsApp's limits.
+assert(LANGUAGES.every((l) => BOT_LANGUAGES.includes(l.code)), "the bot speaks every language the website offers");
+for (const l of BOT_LANGUAGES) {
+  const w = t(l);
+  const buttons = [w.btnFullReport, w.btnMoreTips, w.btnTitles, w.btnMenu, w.btnIdeas, w.btnUpgrade, w.menuButton];
+  const rows = Object.values(w.rows);
+  assert(buttons.every((b) => b.length <= 20) && rows.every(([title, desc]) => title.length <= 24 && desc.length <= 72) && w.footer.length <= 60, `${l}: buttons ≤20, menu rows ≤24/72, footer ≤60`);
+}
+assert(t("te").menuText !== t("en").menuText && t("ml").welcome("Anu").includes("Anu") && t("hi").plan("Pro", 3, 100, "").includes("प्लान"), "Telugu and Malayalam have their own words; Hindi no longer borrows Hinglish");
+assert(["hi!", "Menu", "మెనూ", "வணக்கம்", "നമസ്കാരം"].every((x) => MENU_WORDS.test(x)), "'menu' and hello work in Indian scripts too");
+for (const lang of ["te", "ta", "mr", "bn", "kn", "ml"]) {
+  const tpl = TEMPLATES.filter((x) => x.language === lang);
+  assert(tpl.length === 2 && tpl.every((x) => x.buttons.every((b) => b.length <= 25) && (x.body.match(/\{\{\d\}\}/g) ?? []).length === x.example.length), `${lang}: both templates, buttons ≤25, examples match variables`);
+}
+await handleInbound(msg("b4te", "919800000001", "తెలుగు", "lang:te"), NOW);
+assert((last().out as { text: string }).text === t("te").menuText && (await languageForPhone("919800000001")) === "te", "a Telugu creator gets the Telugu menu");
+assert((await languageForPhone("910000000000")) === "en", "unknown numbers are answered in English");
+await handleInbound(msg("b4hi", "919800000001", "हिन्दी", "lang:hi"), NOW);
 
 await handleInbound(msg("b5", "919800000001", "Title ideas", "titles"), NOW);
 const [c2] = await d.select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.userId, "wa"));

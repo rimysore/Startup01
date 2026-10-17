@@ -1,6 +1,7 @@
 // Submits Mitra's WhatsApp templates to Meta for approval (usually minutes to a day).
-// Usage: WHATSAPP_TOKEN=... WHATSAPP_WABA_ID=... npx tsx scripts/whatsapp-templates.mts
-// Then set WHATSAPP_TEMPLATE_LANGS to the languages that were approved, e.g. "en,hi".
+// Usage: WHATSAPP_TOKEN=... WHATSAPP_WABA_ID=... npx tsx scripts/whatsapp-templates.mts [languages]
+//   languages: optional comma list to submit only some, e.g. "te,ta,mr,bn,kn,ml" (already-approved ones are skipped)
+// Then set WHATSAPP_TEMPLATE_LANGS to the languages that were approved, e.g. "en,hi,te,ta".
 import { TEMPLATES } from "../src/lib/whatsapp/templates";
 
 const token = process.env.WHATSAPP_TOKEN;
@@ -11,7 +12,8 @@ if (!token || !waba) {
   process.exit(1);
 }
 
-for (const t of TEMPLATES) {
+const only = process.argv[2]?.split(",").map((s) => s.trim()).filter(Boolean);
+for (const t of TEMPLATES.filter((t) => !only?.length || only.includes(t.language))) {
   const res = await fetch(`https://graph.facebook.com/${version}/${waba}/message_templates`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
