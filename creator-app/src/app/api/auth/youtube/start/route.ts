@@ -1,20 +1,15 @@
-import { randomBytes } from "node:crypto";
-import { cookies } from "next/headers";
 import { NextResponse, type NextRequest } from "next/server";
-import { authUrl, googleConfigured } from "@/lib/youtube";
+import { currentUser } from "@/lib/auth";
+import { beginOAuth } from "@/lib/oauth-state";
+import { authUrl, googleConfigured, YOUTUBE_SCOPES } from "@/lib/youtube";
 
 export async function GET(request: NextRequest) {
   const origin = request.nextUrl.origin;
+  const user = await currentUser();
+  if (!user) return NextResponse.redirect(new URL("/login?next=/dashboard/connections", origin));
   if (!googleConfigured()) {
     return NextResponse.redirect(new URL("/dashboard/connections?error=not_configured", origin));
   }
-  const state = randomBytes(16).toString("hex");
-  (await cookies()).set("mitra_oauth_state", state, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: 600,
-  });
-  return NextResponse.redirect(authUrl(origin, state));
+  const state = await beginOAuth({ intent: "youtube", next: "/dashboard?connected=1" });
+  return NextResponse.redirect(authUrl(origin, state, YOUTUBE_SCOPES, user.email));
 }

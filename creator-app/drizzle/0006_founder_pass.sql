@@ -1,0 +1,1 @@
+ALTER TABLE "usage" ADD COLUMN "founder_uses" integer DEFAULT 0 NOT NULL;

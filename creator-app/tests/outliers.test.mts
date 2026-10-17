@@ -1,0 +1,177 @@
+// Run with: npm test. Outlier scores, breakout picking, and the weekly niche-search allowance.
+process.env.PGLITE_DIR = "memory://";
+process.env.GOOGLE_CLIENT_ID = "test";
+process.env.GOOGLE_CLIENT_SECRET = "test";
+const { competitorBreakouts, outlierLabel, outlierScores, pickBreakouts, searchBreakouts, formatScore } = await import("@/lib/outliers");
+const { db, schema } = await import("@/db");
+const { nicheBreakouts, normalizeQuery, SEARCHES_PER_WEEK, SearchLimitError } = await import("@/lib/ideas");
+const { saveYouTubeConnection } = await import("@/lib/youtube");
+const { weeklyFacts } = await import("@/lib/reports/facts");
+const assert = (c: unknown, m: string) => { if (!c) { console.error("FAIL", m); process.exit(1); } console.log("ok", m); };
+
+const NOW = Date.parse("2026-10-19T06:00:00Z");
+const day = 86_400_000;
+const at = (days: number) => new Date(NOW - days * day).toISOString();
+const vid = (id: string, days: number, views: number, durationSec = 600) => ({ id, title: id, publishedAt: at(days), durationSec, views });
+
+// ---- Own channel -------------------------------------------------------------------------------------
+const mine = [vid("new", 10, 9000), vid("a", 20, 1000), vid("b", 30, 2000), vid("c", 40, 3000), vid("short", 15, 50_000, 40), vid("d", 50, 1500)];
+let s = outlierScores(mine, NOW);
+assert(s.get("new")!.score === 5.1 && s.get("new")!.label === "breakout", "9K views vs a usual of 1,750 (median of earlier long videos) is a 5.1× breakout");
+assert(s.get("new")!.usual === 1750, "a viral Short doesn't count toward long videos' usual");
+assert(s.get("d")!.score === null && s.get("c")!.score === null, "no score without 3 earlier uploads");
+assert(s.get("short")!.score === null, "a Short is only compared with earlier Shorts");
+s = outlierScores([vid("fresh", 2, 500), vid("a", 20, 1000), vid("b", 30, 1000), vid("c", 40, 1000)], NOW);
+assert(s.get("fresh")!.early && s.get("fresh")!.label === "below", "a 2-day-old video is flagged early");
+assert(s.get("a")!.score === null, "order comes from dates, not the list order");
+assert(outlierLabel(3) === "breakout" && outlierLabel(1.5) === "above" && outlierLabel(1) === "usual" && outlierLabel(0.5) === "below", "labels at the thresholds");
+assert(formatScore(12.4) === "12×" && formatScore(2.25) === "2.3×" && formatScore(null) === "–", "score formatting");
+
+// ---- Competitors and niche search ----------------------------------------------------------------------
+const rival = { id: "R", title: "Rival", recent: [vid("r-hit", 5, 30_000), vid("r-new", 1, 90_000), vid("r1", 10, 5000), vid("r2", 12, 6000), vid("r3", 14, 4000), vid("r4", 16, 5000)] };
+const tracked = competitorBreakouts([rival], NOW);
+assert(tracked.length === 1 && tracked[0].id === "r-hit" && tracked[0].score === 6, "a 6× rival video is a breakout; a 1-day-old spike isn't yet");
+
+const found = searchBreakouts(
+  [
+    { ...vid("n1", 5, 500_000), channelId: "small", channelTitle: "Small" },
+    { ...vid("n2", 5, 900_000), channelId: "huge", channelTitle: "Huge" },
+    { ...vid("n3", 5, 50_000), channelId: "tiny", channelTitle: "Tiny" },
+    { ...vid("n4", 5, 400_000), channelId: "me", channelTitle: "Me" },
+  ],
+  new Map([["small", 50_000], ["huge", 5_000_000], ["tiny", 300], ["me", 10_000]]),
+  { exclude: "me" },
+);
+assert(found.length === 1 && found[0].id === "n1" && found[0].score === 10, "views per subscriber: big channels, tiny channels and your own are left out");
+const picked = pickBreakouts([[...Array(5)].map((_, i) => ({ ...tracked[0], id: `x${i}`, score: 10 - i })), found], 4, 2);
+assert(picked.length === 3 && picked.filter((p) => p.channelId === "R").length === 2, "at most 2 picks per channel");
+
+// ---- Weekly report star uses the outlier score ------------------------------------------------------------
+const summary = {
+  mode: "live" as const,
+  channel: { id: "UC", title: "Ch", handle: "", avatar: null, subscribers: 900, totalViews: 1, videoCount: 6 },
+  daily: [],
+  videos: mine.map((v) => ({ ...v, publishedAt: v.publishedAt.slice(0, 10), publishedAtIso: v.publishedAt, thumbnail: null, likes: 0, comments: 0, avgViewPct: null })),
+};
+const wf = weeklyFacts(summary, NOW);
+assert(wf.star?.title === "new" && wf.star.times === 5.1, `weekly star is the biggest outlier, not the most-viewed video (got ${JSON.stringify(wf.star)})`);
+
+// ---- Niche search allowance ---------------------------------------------------------------------------
+assert(normalizeQuery("  Budget   PHONES ") === "budget phones" && normalizeQuery("x") === null && normalizeQuery(5) === null, "queries are normalized");
+const d = await db();
+await d.insert(schema.users).values({ id: "u1", email: "a@b.c" });
+await saveYouTubeConnection("u1", { accessToken: "t", refreshToken: "r", expiresAt: NOW + 3_600_000 * 1000 }, { id: "UCme", title: "Me" });
+
+let searches = 0;
+const realFetch = globalThis.fetch;
+globalThis.fetch = (async (input: string | URL) => {
+  const url = String(input);
+  if (url.includes("/search?")) {
+    searches++;
+    const q = new URL(url).searchParams;
+    assert(q.get("relevanceLanguage") === "hi" && q.get("regionCode") === "IN" && q.get("order") === "viewCount", "search leans to the creator's language in India");
+    return Response.json({ items: [{ id: { videoId: "v1" } }] });
+  }
+  if (url.includes("/videos?")) return Response.json({ items: [{ id: "v1", snippet: { title: "Hit", publishedAt: at(3), channelId: "c1", channelTitle: "C1" }, statistics: { viewCount: "200000" }, contentDetails: { duration: "PT9M" } }] });
+  if (url.includes("/channels?")) return Response.json({ items: [{ id: "c1", statistics: { subscriberCount: "20000" } }] });
+  throw new Error(`unexpected ${url}`);
+}) as typeof fetch;
+
+const r1 = await nicheBreakouts("u1", "UCme", "budget phones", "hinglish", NOW);
+assert(r1.breakouts[0]?.score === 10 && r1.left === SEARCHES_PER_WEEK - 1, "a search returns scored breakouts and uses one of the week's searches");
+await nicheBreakouts("u1", "UCme", "budget phones", "hinglish", NOW);
+assert(searches === 1, "repeating a search is served from cache");
+await nicheBreakouts("u1", "UCme", "cooking", "hinglish", NOW);
+await nicheBreakouts("u1", "UCme", "travel", "hinglish", NOW);
+let limited = false;
+try { await nicheBreakouts("u1", "UCme", "cricket", "hinglish", NOW); } catch (e) { limited = e instanceof SearchLimitError; }
+assert(limited && searches === SEARCHES_PER_WEEK, `the ${SEARCHES_PER_WEEK + 1}th new search in a week is refused without calling YouTube`);
+const nextWeek = await nicheBreakouts("u1", "UCme", "cricket", "hinglish", NOW + 7 * day);
+assert(nextWeek.breakouts.length === 1 && searches === SEARCHES_PER_WEEK + 1, "a new week brings new searches");
+globalThis.fetch = realFetch;
+
+// ---- Title Studio research ------------------------------------------------------------------------------
+const { researchQuery, provenVideos, rationedSearch, SEARCH_KINDS } = await import("@/lib/ideas");
+assert(researchQuery("Testing 3 phones under ₹20,000 for night photography, in Lucknow!!") === "testing 3 phones under ₹20 000 for night", "research words: first 8 words, punctuation dropped");
+assert(researchQuery("मैंने 30 दिन फोन चलाया") === "मैंने 30 दिन फोन चलाया", "Indian scripts keep their vowel signs");
+const proven = provenVideos(
+  [
+    { ...vid("big", 5, 9_000_000), channelId: "huge", channelTitle: "Huge" },
+    { ...vid("hit", 5, 400_000), channelId: "small", channelTitle: "Small" },
+    { ...vid("hit2", 6, 300_000), channelId: "small", channelTitle: "Small" },
+    { ...vid("hit3", 7, 200_000), channelId: "small", channelTitle: "Small" },
+  ],
+  new Map([["huge", 20_000_000], ["small", 40_000]]),
+);
+assert(proven[0].id === "hit" && proven[0].score === 10 && proven.at(-1)!.id === "big" && proven.length === 3, "breakouts come before plain big hits, at most 2 per channel");
+let studioCalls = 0;
+globalThis.fetch = (async (input: string | URL) => {
+  const url = String(input);
+  if (url.includes("/search?")) { studioCalls++; return Response.json({ items: [{ id: { videoId: "v9" } }] }); }
+  if (url.includes("/videos?")) return Response.json({ items: [{ id: "v9", snippet: { title: "Hit", publishedAt: at(40), channelId: "c1", channelTitle: "C1" }, statistics: { viewCount: "50000" }, contentDetails: { duration: "PT9M" } }] });
+  return Response.json({ items: [{ id: "c1", statistics: { subscriberCount: "5000" } }] });
+}) as typeof fetch;
+for (let i = 0; i < SEARCH_KINDS.studio.limit; i++) await rationedSearch("u1", "UCme", "studio", `topic ${i}`, "hi", NOW);
+let studioLimited = false;
+try { await rationedSearch("u1", "UCme", "studio", "one more", "hi", NOW); } catch (e) { studioLimited = e instanceof SearchLimitError; }
+assert(studioLimited && studioCalls === SEARCH_KINDS.studio.limit, `Title Studio research: ${SEARCH_KINDS.studio.limit} new searches a day, counted apart from niche search`);
+const tomorrow = await rationedSearch("u1", "UCme", "studio", "one more", "hi", NOW + day);
+assert(tomorrow.videos.length === 1, "research opens again the next day");
+
+// ---- Free image model (Cloudflare Workers AI) -------------------------------------------------------------
+process.env.CLOUDFLARE_ACCOUNT_ID = "acc";
+process.env.CLOUDFLARE_AI_TOKEN = "tok";
+const { generateBackground, imageProvider, scenePrompt } = await import("@/lib/images");
+const scene = scenePrompt('My First International Trip: Bali "SHOCKED ME" | sunset over rice terraces with a sign saying Welcome');
+assert(!/shocked|welcome|sign|:|\|/i.test(scene) && /sunset over rice terraces/.test(scene) && scenePrompt("a vendor's cart near the city's lake") === "a vendor's cart near the city's lake", `no writing reaches the image model (got "${scene}")`);
+let cfBody: { prompt?: string; steps?: number; seed?: number } = {};
+let hdForm: FormData | null = null;
+let hdFails = false;
+globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+  const url = String(input);
+  if (url.includes("/ai/run/@cf/black-forest-labs/flux-2-klein-4b")) {
+    hdForm = init?.body as FormData;
+    if (hdFails) return new Response(JSON.stringify({ errors: [{ message: "capacity" }] }), { status: 503 });
+    return Response.json({ result: { image: Buffer.from("hdbytes").toString("base64") }, success: true });
+  }
+  assert(url.includes("/accounts/acc/ai/run/@cf/black-forest-labs/flux-1-schnell"), "falls back to Cloudflare's FLUX.1 schnell");
+  cfBody = JSON.parse(String(init?.body));
+  return Response.json({ result: { image: Buffer.from("jpegbytes").toString("base64") }, success: true });
+}) as typeof fetch;
+const hd = await generateBackground("rainy street", 7);
+assert(
+  imageProvider() === "cloudflare" && Buffer.from(hd.body as Uint8Array).toString() === "hdbytes" && hdForm!.get("width") === "1920" && hdForm!.get("height") === "1088" && /no lettering/.test(String(hdForm!.get("prompt"))),
+  "full-HD FLUX.2 klein first: 1920×1088 as multipart form, no text asked for",
+);
+hdFails = true;
+const img = await generateBackground("rainy street", 7);
+assert(Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && Object.keys(cfBody).length === 2, "if the HD model fails, FLUX.1 schnell answers with only the fields it accepts");
+
+// ---- Pro thumbnails (Gemini Nano Banana 2.1) -----------------------------------------------------------------
+process.env.GEMINI_API_KEY = "gk";
+const { composePrompt, composeThumbnail, UnsafeCompose } = await import("@/lib/compose");
+const plan = { headline: "बाली में क्या हुआ?", highlight: "", badge: "", layout: "subject-left" as const, images: [], palette: { accent: "#ffd23f", text: "#fff", stroke: "#000", glow: "#ff7a1a", bgFrom: "#000", bgTo: "#2b2357" }, backgroundQuery: "", imagePrompt: "a Balinese water temple at dusk", emoji: "", arrow: false, why: "", look: "shocked, hand over mouth" };
+const pp = composePrompt(plan, 2, 1);
+assert(/left side/.test(pp) && /right 45%/.test(pp) && /first 2 photos/.test(pp) && /shocked, hand over mouth/.test(pp) && /no text/i.test(pp) && !pp.includes("बाली"), "the image prompt places the creator, keeps the text side clear and never includes the headline");
+let gemini: { model?: string; input?: { type: string }[]; response_format?: { aspect_ratio?: string; image_size?: string }; store?: boolean } = {};
+let geminiMode: "ok" | "refuse" = "ok";
+globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+  assert(String(input).includes("generativelanguage.googleapis.com/v1beta/interactions") && (init?.headers as Record<string, string>)["x-goog-api-key"] === "gk", "calls Gemini's Interactions API with the key");
+  gemini = JSON.parse(String(init?.body));
+  if (geminiMode === "refuse") return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: "I can't create images of that." }] }] });
+  return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: "Here you go" }, { type: "image", mime_type: "image/jpeg", data: "SU1H" }] }], usage: { total_input_tokens: 3000, total_output_tokens: 1680 } });
+}) as typeof fetch;
+const made = await composeThumbnail(pp, [{ mediaType: "image/jpeg", data: "QQ==" }, { mediaType: "image/jpeg", data: "Qg==" }]);
+assert(
+  made.data === "SU1H" && gemini.model === "gemini-nano-banana-2.1" && gemini.input?.length === 3 && gemini.response_format?.aspect_ratio === "16:9" && gemini.response_format?.image_size === "2K" && gemini.store === false,
+  "sends the prompt + photos for a 16:9 2K image, not stored by Google",
+);
+assert(Math.abs(made.costUsd - 0.0549) < 0.0005, `cost logged from token usage (got $${made.costUsd.toFixed(4)})`);
+geminiMode = "refuse";
+let refused = false;
+try { await composeThumbnail(pp, [{ mediaType: "image/jpeg", data: "QQ==" }]); } catch (e) { refused = e instanceof UnsafeCompose; }
+assert(refused, "a refusal in words becomes a friendly 'try a different photo' error");
+globalThis.fetch = realFetch;
+
+console.log("all outlier tests passed");
+process.exit(0);

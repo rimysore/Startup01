@@ -1,14 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, ErrorNote, PageHeader } from "@/components/ui";
 
+/** Set NEXT_PUBLIC_GOOGLE_VERIFIED=1 once Google approves the YouTube scopes, to hide the "unverified app" tip. */
+const GOOGLE_VERIFIED = process.env.NEXT_PUBLIC_GOOGLE_VERIFIED === "1";
+
 const ERRORS: Record<string, string> = {
   not_configured: "YouTube sign-in isn't set up on this server yet. See the setup steps below.",
   denied: "You cancelled the Google sign-in, or didn't grant access.",
-  state: "The sign-in link expired. Please try again.",
   exchange: "Google didn't accept the sign-in. Check the client ID, secret and redirect URI.",
+  no_channel: "That Google account doesn't seem to have a YouTube channel. Try a different account.",
 };
 
 function StatusPill({ on, label }: { on: boolean; label: string }) {
@@ -21,26 +25,24 @@ function StatusPill({ on, label }: { on: boolean; label: string }) {
 
 const SOON = [
   { name: "Instagram Reels", body: "Cross-post Shorts and compare performance." },
-  { name: "WhatsApp reports", body: "A Monday summary of wins, drops and what to post next." },
   { name: "Brand deals inbox", body: "Track sponsor offers, rates and payments." },
 ];
 
 export default function ConnectionsPage() {
-  const { status, summary, reload } = useDashboard();
+  const { me, reload } = useDashboard();
   const error = useQueryParam("error");
   const [busy, setBusy] = useState(false);
-  const connected = status?.connected && summary?.mode === "live";
 
   async function disconnect() {
     setBusy(true);
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/youtube/disconnect", { method: "POST" });
     setBusy(false);
     reload();
   }
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Connections" title="Plug in your channels" />
+      <PageHeader eyebrow="Connections" title="Your YouTube channel and other connected accounts." />
       {error && ERRORS[error] && <div className="mb-4"><ErrorNote>{ERRORS[error]}</ErrorNote></div>}
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -55,34 +57,51 @@ export default function ConnectionsPage() {
             </div>
           </div>
           <div className="mt-5 flex flex-wrap items-center gap-3">
-            {connected ? (
+            {!me ? null : !me.user ? (
+              <Link href="/login?next=/dashboard/connections" className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+                Sign in to connect
+              </Link>
+            ) : me.youtube?.needsReconnect ? (
               <>
-                <StatusPill on label={`Connected · ${summary?.channel.title}`} />
+                <StatusPill on={false} label={`Access expired · ${me.youtube.channelTitle ?? "your channel"}`} />
+                <a href="/api/auth/youtube/start" className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+                  Reconnect YouTube
+                </a>
+                <Button variant="ghost" onClick={disconnect} disabled={busy}>Disconnect</Button>
+              </>
+            ) : me.youtube ? (
+              <>
+                <StatusPill on label={`Connected · ${me.youtube.channelTitle ?? "your channel"}`} />
                 <Button variant="ghost" onClick={disconnect} disabled={busy}>Disconnect</Button>
               </>
             ) : (
-              <a href="/api/auth/youtube/start" className="rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
-                Connect with Google
+              <a href="/api/auth/youtube/start" className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink">
+                Connect YouTube
               </a>
             )}
           </div>
           <p className="mt-4 text-xs text-muted">
             Mitra only asks for read-only access. We never upload, delete or change anything on your channel.
           </p>
+          {!GOOGLE_VERIFIED && me?.user && !me.youtube && (
+            <p className="mt-3 rounded-xl bg-surface-2 px-3 py-2 text-xs text-ink-2">
+              While Google reviews Mitra, you may see &ldquo;Google hasn&apos;t verified this app&rdquo;. It&apos;s safe: tap <b>Advanced</b>, then{" "}
+              <b>Go to trymitraapp.com</b>. You can remove Mitra&apos;s access any time from your Google account.
+            </p>
+          )}
         </Card>
 
         <Card>
           <h2 className="font-semibold">Server setup</h2>
           <div className="mt-3 flex flex-wrap gap-2">
-            <StatusPill on={Boolean(status?.googleConfigured)} label="Google sign-in" />
-            <StatusPill on={Boolean(status?.aiConfigured)} label="Mitra AI" />
+            <StatusPill on={Boolean(me?.config.google)} label="Google sign-in" />
+            <StatusPill on={Boolean(me?.config.ai)} label="Mitra AI" />
+            <StatusPill on={Boolean(me?.config.billing)} label="Razorpay" />
           </div>
-          <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-sm text-ink-2">
-            <li>Copy <code className="rounded bg-surface-2 px-1">.env.example</code> to <code className="rounded bg-surface-2 px-1">.env.local</code>.</li>
-            <li>Create an OAuth client (Web) in Google Cloud and enable YouTube Data API v3 + YouTube Analytics API.</li>
-            <li>Add <code className="rounded bg-surface-2 px-1">{"<your-url>"}/api/auth/youtube/callback</code> as a redirect URI.</li>
-            <li>Set <code className="rounded bg-surface-2 px-1">ANTHROPIC_API_KEY</code> to switch on real AI answers.</li>
-          </ol>
+          <p className="mt-4 text-sm text-ink-2">
+            Copy <code className="rounded bg-surface-2 px-1">.env.example</code> to <code className="rounded bg-surface-2 px-1">.env.local</code> and
+            fill in the keys. The README walks through Google Cloud and Razorpay setup.
+          </p>
         </Card>
       </div>
 

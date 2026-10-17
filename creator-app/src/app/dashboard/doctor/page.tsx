@@ -1,12 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { postAi, useDashboard, useQueryParam } from "@/components/dashboard-context";
+import { postAi, useDashboard, useQueryParam, type AiError } from "@/components/dashboard-context";
+import { audienceRows, BarList } from "@/components/insights";
+import type { AudienceReport } from "@/lib/youtube";
 import { LineChart } from "@/components/LineChart";
-import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, PageHeader, Spinner } from "@/components/ui";
+import { OutlierBadge } from "@/components/outlier";
 import { VideoThumb } from "@/components/VideoThumb";
 import type { Doctor } from "@/lib/ai";
 import { compact } from "@/lib/format";
+import { outlierScores } from "@/lib/outliers";
+import { FEATURE_CREDITS } from "@/lib/plans";
 import { fmtTime, introDrop, keyMoments } from "@/lib/retention";
 import type { RetentionPoint } from "@/lib/types";
 
@@ -34,21 +39,23 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 export default function DoctorPage() {
-  const { summary, language } = useDashboard();
+  const { summary, language, refreshMe } = useDashboard();
   const requested = useQueryParam("v");
   const [picked, setPicked] = useState<string | null>(null);
   // Each piece of state remembers which video it belongs to, so switching videos never shows stale data.
   const [loaded, setLoaded] = useState<{ id: string; data: RetentionRes } | null>(null);
-  const [diagnosis, setDiagnosis] = useState<{ id: string; demo?: boolean; data: Doctor } | null>(null);
-  const [failure, setFailure] = useState<{ id: string; message: string } | null>(null);
+  const [aud, setAud] = useState<{ id: string; report: AudienceReport | null } | null>(null);
+  const [diagnosis, setDiagnosis] = useState<{ id: string; demo?: boolean; demoReason?: "signin" | "nokey"; data: Doctor } | null>(null);
+  const [failure, setFailure] = useState<{ id: string; error: AiError } | null>(null);
   const [running, setRunning] = useState(false);
 
   const videos = summary?.videos ?? [];
+  const outliers = outlierScores(videos.map((v) => ({ ...v, publishedAt: v.publishedAtIso ?? v.publishedAt })));
   const videoId = picked ?? (videos.some((v) => v.id === requested) ? requested : (videos[0]?.id ?? null));
   const video = videos.find((v) => v.id === videoId) ?? null;
   const retention = loaded?.id === videoId ? loaded.data : null;
   const result = diagnosis?.id === videoId ? diagnosis : null;
-  const error = failure?.id === videoId ? failure.message : null;
+  const error = failure?.id === videoId ? failure.error : null;
 
   useEffect(() => {
     if (!videoId) return;
@@ -56,6 +63,10 @@ export default function DoctorPage() {
     fetch(`/api/videos/${encodeURIComponent(videoId)}/retention`)
       .then((r) => r.json())
       .then((data: RetentionRes) => live && setLoaded({ id: videoId, data }));
+    fetch(`/api/audience?video=${encodeURIComponent(videoId)}`)
+      .then((r) => r.json() as Promise<{ report?: AudienceReport }>)
+      .then((d) => live && setAud({ id: videoId, report: d.report ?? null }))
+      .catch(() => live && setAud({ id: videoId, report: null }));
     return () => {
       live = false;
     };
@@ -64,6 +75,7 @@ export default function DoctorPage() {
   if (!summary) return <Spinner label="Loading your videos" />;
 
   const points = retention?.points ?? [];
+  const audience = aud?.id === videoId && aud.report ? audienceRows(aud.report) : null;
   const moments = keyMoments(points);
   const pcts = videos.map((v) => v.avgViewPct).filter((p): p is number => p != null);
   const channelAvg = pcts.length ? pcts.reduce((a, b) => a + b, 0) / pcts.length : null;
@@ -79,15 +91,25 @@ export default function DoctorPage() {
       channelAvgViewPct: channelAvg == null ? null : Math.round(channelAvg),
       video,
       retention: points,
+      ...(audience
+        ? {
+            audience: {
+              cities: audience.cities.slice(0, 8).map(({ label, value }) => ({ label, value })),
+              sources: audience.sources.slice(0, 8).map(({ label, value }) => ({ label, value })),
+              searchTerms: audience.searchTerms.slice(0, 8).map(({ label, value }) => ({ label, value })),
+            },
+          }
+        : {}),
     });
     setRunning(false);
-    if (res.result) setDiagnosis({ id, demo: res.demo, data: res.result });
-    else setFailure({ id, message: res.error ?? "Something went wrong." });
+    refreshMe();
+    if (res.result) setDiagnosis({ id, demo: res.demo, demoReason: res.demoReason, data: res.result });
+    else setFailure({ id, error: res.error ?? { message: "Something went wrong." } });
   }
 
   return (
     <div className="rise">
-      <PageHeader eyebrow="Video Doctor" title="Why did this video do what it did?" />
+      <PageHeader eyebrow="Video Doctor" title="Pick a video to see where viewers left, and what to change next time." />
 
       <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
         <Card className="!p-3 lg:max-h-[calc(100vh-180px)] lg:overflow-y-auto">
@@ -102,7 +124,10 @@ export default function DoctorPage() {
                 }`}
               >
                 <VideoThumb video={v} className="w-20" />
-                <span className="line-clamp-2 text-xs font-medium">{v.title}</span>
+                <span className="min-w-0">
+                  <span className="line-clamp-2 text-xs font-medium">{v.title}</span>
+                  <span className="mt-1 block"><OutlierBadge outlier={outliers.get(v.id)} compact /></span>
+                </span>
               </button>
             ))}
           </div>
@@ -115,12 +140,12 @@ export default function DoctorPage() {
                 <div className="min-w-0">
                   <h2 className="text-lg font-semibold">{video.title}</h2>
                   <p className="mt-1 text-sm text-muted">
-                    {compact(video.views)} views · {fmtTime(video.durationSec)} long
+                    <OutlierBadge outlier={outliers.get(video.id)} /> {compact(video.views)} views · {fmtTime(video.durationSec)} long
                     {video.avgViewPct != null && ` · ${video.avgViewPct.toFixed(0)}% viewed on average`}
                   </p>
                 </div>
                 <Button onClick={run} disabled={running || !retention}>
-                  {running ? "Diagnosing…" : result ? "Re-run diagnosis" : "Diagnose with Mitra"}
+                  {running ? "Diagnosing…" : result ? "Re-run diagnosis" : `Diagnose with Mitra · ${FEATURE_CREDITS.doctor} credits`}
                 </Button>
               </div>
 
@@ -171,16 +196,42 @@ export default function DoctorPage() {
             </Card>
           )}
 
-          {error && <ErrorNote>{error}</ErrorNote>}
+          {audience && (
+            <Card>
+              <h3 className="mb-4 font-semibold">Where this video&apos;s viewers came from · last 28 days</h3>
+              <div className="grid gap-6 md:grid-cols-3">
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">Cities</p>
+                  <BarList rows={audience.cities.slice(0, 5)} empty="Not enough views yet." />
+                </div>
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">Traffic sources</p>
+                  <BarList rows={audience.sources.slice(0, 5)} empty="Not enough views yet." />
+                </div>
+                <div>
+                  <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted">Search terms</p>
+                  <BarList rows={audience.searchTerms.slice(0, 5)} empty="No search traffic yet." />
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {error && <AiErrorNote error={error} />}
           {running && <Card><Spinner label="Mitra is watching the curve and reading the numbers…" /></Card>}
 
           {result && !running && (
             <div className="rise space-y-6">
-              {result.demo && <DemoNote>This is a sample diagnosis. Add an Anthropic API key to get a real one for your video.</DemoNote>}
+              {result.demo && <AiDemoNote reason={result.demoReason} what="diagnosis" />}
               <Card className="flex flex-wrap items-center gap-5">
                 <ScoreRing score={result.data.score} />
-                <p className="min-w-0 flex-1 font-display text-2xl leading-snug sm:text-3xl">“{result.data.verdict}”</p>
+                <p className="min-w-0 flex-1 font-display text-lg leading-snug sm:text-3xl">“{result.data.verdict}”</p>
               </Card>
+              {result.data.traffic && (
+                <Card>
+                  <h3 className="mb-2 font-semibold">📍 Who it reached</h3>
+                  <p className="font-indic text-sm">{result.data.traffic}</p>
+                </Card>
+              )}
               <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                   <h3 className="mb-3 font-semibold text-good">What worked</h3>
