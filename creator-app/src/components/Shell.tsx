@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { DashboardProvider, useDashboard } from "./dashboard-context";
 import { LEGAL_LINKS } from "./SiteFooter";
 import { AssistantWidget } from "./Assistant";
+import { FeedbackButton } from "./Feedback";
 import { LanguageButton, LanguageOnboarding } from "./language-picker";
 import { Logo, ThemeToggle } from "./ui";
 import { WHATSAPP_LOCKED } from "@/lib/company";
@@ -229,6 +230,7 @@ function AccountMenu() {
           <div className="flex items-center justify-between rounded-xl px-3 py-1 text-sm sm:hidden">
             Dark mode <ThemeToggle />
           </div>
+          <FeedbackButton className="block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-surface-2">Help &amp; feedback</FeedbackButton>
           <button onClick={signOut} className="block w-full rounded-xl px-3 py-2 text-left text-sm hover:bg-surface-2">
             Sign out
           </button>
@@ -433,6 +435,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <NavLinks />
           </nav>
           <CreditsMeter />
+          <FeedbackButton className="mt-2 flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm text-ink-2 hover:bg-surface-2 hover:text-ink">
+            <Icon d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2zM12 7v4M12 14h.01" />
+            Help &amp; feedback
+          </FeedbackButton>
           <nav className="mt-3 flex shrink-0 flex-wrap gap-x-3 gap-y-1 px-3 text-[11px] text-muted" aria-label="Legal">
             {LEGAL_LINKS.map((l) => (
               <Link key={l.href} href={l.href} className="hover:text-ink">

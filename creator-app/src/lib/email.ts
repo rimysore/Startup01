@@ -14,6 +14,10 @@ export interface Mail {
   text: string;
   /** Optional button at the bottom. */
   link?: { label: string; url: string };
+  /** Where replies go (default: Mitra support). */
+  replyTo?: string;
+  /** Mail to the Mitra team itself: no "reports are on" footer. */
+  internal?: boolean;
 }
 
 const g = globalThis as unknown as { __mailOutbox?: Mail[] };
@@ -54,8 +58,8 @@ export function mailHtml(m: Mail): string {
 <div style="max-width:560px;margin:0 auto;padding:24px 18px">
 <p style="font-size:22px;font-weight:800;margin:0 0 18px;letter-spacing:-0.5px">mitra</p>
 <div style="background:#fff;border-radius:18px;padding:22px 20px;font-size:15px">${body}${button}</div>
-<p style="font-size:12px;color:#7a7268;margin:16px 4px;line-height:1.5">You get this because reports are on in your Mitra account. Turn them off any time in
-<a href="${esc(SITE_URL)}/dashboard/whatsapp" style="color:#7a7268">WhatsApp &amp; reports</a>. Questions: ${esc(COMPANY.supportEmail)}<br>${esc(COMPANY.product)} · ${esc(COMPANY.address)}</p>
+${m.internal ? "" : `<p style="font-size:12px;color:#7a7268;margin:16px 4px;line-height:1.5">You get this because reports are on in your Mitra account. Turn them off any time in
+<a href="${esc(SITE_URL)}/dashboard/whatsapp" style="color:#7a7268">WhatsApp &amp; reports</a>. Questions: ${esc(COMPANY.supportEmail)}<br>${esc(COMPANY.product)} · ${esc(COMPANY.address)}</p>`}
 </div></body></html>`;
 }
 
@@ -68,11 +72,11 @@ export async function sendMail(m: Mail): Promise<void> {
   const text = m.link ? `${m.text}\n\n${m.link.label}: ${m.link.url}` : m.text;
   await smtp().sendMail({
     from: process.env.MAIL_FROM ?? `Mitra <${process.env.SMTP_USER}>`,
-    replyTo: COMPANY.supportEmail,
+    replyTo: m.replyTo ?? COMPANY.supportEmail,
     to: m.to,
     subject: m.subject,
     text: text.replace(/\*([^*\n]+)\*/g, "$1"),
     html: mailHtml(m),
-    headers: { "List-Unsubscribe": `<${SITE_URL}/dashboard/whatsapp>` },
+    ...(m.internal ? {} : { headers: { "List-Unsubscribe": `<${SITE_URL}/dashboard/whatsapp>` } }),
   });
 }
