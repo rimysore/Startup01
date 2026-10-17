@@ -72,6 +72,6 @@ assert(!seen[0].searchParams.get("key") && !seen[0].searchParams.get("relevanceL
 globalThis.fetch = realFetch;
 
 const body = outreachBody("Hi Ravi, loved the night test.", "https://mitra-creators.vercel.app", 93, "Rithvik");
-assert(body.includes("93 spots left") && body.includes("reply \"stop\"") && body.endsWith("I won't write again."), "email has the offer and an easy opt-out");
+assert(body.includes("93 spots left") && body.includes("design partners") && body.includes("reply \"stop\"") && body.endsWith("I won't write again."), "email is a design-partner invitation with the offer and an easy opt-out");
 console.log("all prospect tests passed");
 process.exit(0);

@@ -649,7 +649,7 @@ export const OutreachSchema = z.object({
     z.object({
       id: z.number(),
       subject: z.string().describe("Under 60 characters, specific to them, no clickbait or ALL CAPS"),
-      opener: z.string().describe("Two sentences: a specific, genuine observation about their latest video or channel, then why you're writing"),
+      opener: z.string().describe("Two or three short sentences: greet them by name, a specific, genuine observation about their latest video or channel, then why their channel stood out (the honest reason they were picked as a design partner)"),
     }),
   ),
 });
@@ -662,7 +662,10 @@ export async function writeOutreach(language: string, creators: string): Promise
     OutreachSchema,
     language,
     "Write a short, personal subject line and opening for an email to each YouTube creator below, from the founder of Mitra (an AI growth manager for regional-language creators). " +
-      "Refer to something specific from their latest video title or channel. Sound like one creator-friendly person writing, not marketing. " +
+      "The email invites them to be one of a small group of design partners who use Mitra free and shape it with their feedback; the rest of the email explains that, so the opening only has to earn the read. " +
+      "Refer to something specific from their latest video title or channel, and say plainly why their channel caught your eye (language, niche, how they connect with viewers), using only what the data shows. " +
+      "Sound like one creator-friendly person writing, not marketing: no hype words, no exclamation marks in the subject, no 'congratulations', no 'you've been selected'. " +
+      "Good subject lines are specific and low-key, e.g. 'Your Lucknow night test + a small ask'. " +
       "Don't invent facts, numbers, praise you can't see in the data, or urgency. Return one message per id.\n\n" +
       untrusted(creators),
   );
