@@ -3,7 +3,7 @@ import { db, schema } from "@/db";
 import { aiConfigured, chat, generateTitles } from "../ai";
 import { runPaidAi } from "../ai-route";
 import type { User } from "../auth";
-import { channelContext } from "../channel-context";
+import { assistantContext } from "../assistant-context";
 import { SITE_URL } from "../company";
 import { isLanguageCode, LANGUAGES, languageLabel } from "../languages";
 import { creditLimit, FOUNDER_FREE_USES, planOf } from "../plans";
@@ -183,7 +183,8 @@ async function ask(user: User, question: string): Promise<Out[]> {
   if (!aiConfigured()) return [{ type: "text", text: w.busy }];
   const loaded = await loadSummary(user.id);
   if (!loaded.ok) return [{ type: "text", text: loaded.reason === "reconnect" ? w.reconnect : w.noChannel }];
-  const out = await runPaidAi(user, "chat", { whatsapp: question }, () => chat(user.language, channelContext(loaded.summary), [{ role: "user", content: question.slice(0, 2000) }]));
+  // Same full picture as Ask Mitra on the website (channel, outliers, this week, competitors, last report).
+  const out = await runPaidAi(user, "chat", { whatsapp: question }, async () => chat(user.language, await assistantContext(user), [{ role: "user", content: question.slice(0, 2000) }]));
   if (!out.ok) return failure(user, out);
   return [menuButton(user.language, toWhatsApp(out.result).slice(0, 1024))];
 }

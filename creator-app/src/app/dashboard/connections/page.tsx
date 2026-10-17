@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, ErrorNote, PageHeader } from "@/components/ui";
 
+/** Set NEXT_PUBLIC_GOOGLE_VERIFIED=1 once Google approves the YouTube scopes, to hide the "unverified app" tip. */
+const GOOGLE_VERIFIED = process.env.NEXT_PUBLIC_GOOGLE_VERIFIED === "1";
+
 const ERRORS: Record<string, string> = {
   not_configured: "YouTube sign-in isn't set up on this server yet. See the setup steps below.",
   denied: "You cancelled the Google sign-in, or didn't grant access.",
@@ -80,6 +83,12 @@ export default function ConnectionsPage() {
           <p className="mt-4 text-xs text-muted">
             Mitra only asks for read-only access. We never upload, delete or change anything on your channel.
           </p>
+          {!GOOGLE_VERIFIED && me?.user && !me.youtube && (
+            <p className="mt-3 rounded-xl bg-surface-2 px-3 py-2 text-xs text-ink-2">
+              While Google reviews Mitra, you may see &ldquo;Google hasn&apos;t verified this app&rdquo;. It&apos;s safe: tap <b>Advanced</b>, then{" "}
+              <b>Go to trymitraapp.com</b>. You can remove Mitra&apos;s access any time from your Google account.
+            </p>
+          )}
         </Card>
 
         <Card>

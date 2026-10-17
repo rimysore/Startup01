@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { chat } from "@/lib/ai";
 import { aiRoute } from "@/lib/ai-route";
+import { assistantContext } from "@/lib/assistant-context";
 import { DEMO_CHAT_REPLY } from "@/lib/demo-ai";
 
 const Message = z.object({ role: z.enum(["user", "assistant"]), content: z.string().min(1).max(2000) });
@@ -20,11 +21,12 @@ function recent(messages: z.infer<typeof Message>[], maxChars = 8000, maxTurns =
 
 export const POST = aiRoute(
   "chat",
-  { context: z.string().max(6000), messages: z.array(Message).min(1).max(40) },
+  // The creator's data is gathered here on the server (channel, reports, competitors, plan), not sent by the page.
+  { page: z.string().max(60).optional(), messages: z.array(Message).min(1).max(40) },
   DEMO_CHAT_REPLY,
-  ({ language, context, messages }) => {
+  async ({ language, page, messages }, user) => {
     const turns = recent(messages);
     if (!turns.length) throw new Error("No user message to answer");
-    return chat(language, context, turns);
+    return chat(language, await assistantContext(user, page), turns);
   },
 );

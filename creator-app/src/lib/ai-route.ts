@@ -91,7 +91,7 @@ export function aiRoute<B extends z.ZodRawShape, R>(
   feature: Feature,
   body: B,
   demo: R,
-  run: (input: z.infer<z.ZodObject<B>> & { language: string }) => Promise<AiResult<R>>,
+  run: (input: z.infer<z.ZodObject<B>> & { language: string }, user: User) => Promise<AiResult<R>>,
 ) {
   const schema = z.object({ ...body, language: Language });
   return async (request: Request) => {
@@ -103,7 +103,7 @@ export function aiRoute<B extends z.ZodRawShape, R>(
     if (!user) return Response.json({ demo: true, demoReason: "signin" satisfies DemoReason, result: demo });
     if (!aiConfigured()) return Response.json({ demo: true, demoReason: "nokey" satisfies DemoReason, result: demo });
 
-    const out = await runPaidAi(user, feature, input, () => run(input));
+    const out = await runPaidAi(user, feature, input, () => run(input, user));
     if (!out.ok) {
       return Response.json({ error: out.error, ...(out.upgrade ? { upgrade: true } : {}), ...(out.detail ? { detail: out.detail } : {}) }, { status: out.status });
     }

@@ -6,6 +6,7 @@ import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { DashboardProvider, useDashboard } from "./dashboard-context";
 import { LEGAL_LINKS } from "./SiteFooter";
+import { AssistantWidget } from "./Assistant";
 import { LanguageButton, LanguageOnboarding } from "./language-picker";
 import { Logo, ThemeToggle } from "./ui";
 
@@ -18,7 +19,6 @@ const NAV = [
   { href: "/dashboard/audience", label: "Audience", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" },
   { href: "/dashboard/competitors", label: "Competitors", icon: "M3 3v18h18M7 15l4-4 3 3 5-6" },
   { href: "/dashboard/comments", label: "Comments", icon: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" },
-  { href: "/dashboard/assistant", label: "Ask Mitra", icon: "M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z" },
   { href: "/dashboard/whatsapp", label: "WhatsApp & reports", icon: "M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3zM9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z" },
   { href: "/dashboard/connections", label: "Connections", icon: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" },
   { href: "/dashboard/billing", label: "Plan & billing", icon: "M2 7h20v12H2zM2 11h20M6 15h4" },
@@ -210,11 +210,12 @@ function AccountMenu() {
 }
 
 /** The things creators use most, under the thumb. Everything else is one tap away in "More". */
+const icon = (href: string) => NAV.find((n) => n.href === href)!.icon;
 const TABS = [
-  { href: "/dashboard", label: "Home", icon: NAV[0].icon },
-  { href: "/dashboard/doctor", label: "Videos", icon: NAV[1].icon },
-  { href: "/dashboard/studio", label: "Titles", icon: NAV[2].icon },
-  { href: "/dashboard/whatsapp", label: "WhatsApp", icon: NAV[8].icon },
+  { href: "/dashboard", label: "Home", icon: icon("/dashboard") },
+  { href: "/dashboard/doctor", label: "Videos", icon: icon("/dashboard/doctor") },
+  { href: "/dashboard/studio", label: "Titles", icon: icon("/dashboard/studio") },
+  { href: "/dashboard/whatsapp", label: "WhatsApp", icon: icon("/dashboard/whatsapp") },
 ];
 
 function BottomTabs() {
@@ -333,6 +334,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <TopBar />
           <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-8 sm:py-8 lg:pb-8">{children}</main>
           <BottomTabs />
+          <AssistantWidget />
           <LanguageOnboarding />
         </div>
       </div>
