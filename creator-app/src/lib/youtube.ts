@@ -523,6 +523,60 @@ export async function fetchChannelSnapshot(tokens: GoogleTokens, channelId: stri
   };
 }
 
+export interface NicheVideo {
+  id: string;
+  title: string;
+  channelId: string;
+  channelTitle: string;
+  views: number;
+  publishedAt: string;
+  durationSec: number;
+  thumbnail: string | null;
+}
+
+/** YouTube's language hint for a Mitra language: Hinglish searches lean Hindi. */
+const SEARCH_LANGUAGE: Record<string, string> = { hinglish: "hi" };
+
+/**
+ * The most-watched videos of the last `days` days for a search, in India, leaning toward one language, with each
+ * channel's subscriber count so they can be scored. Costs about 102 quota units (search alone is 100), so callers
+ * must cache and ration it.
+ */
+export async function searchNiche(tokens: GoogleTokens, query: string, language: string, days = 30, now = Date.now()): Promise<{ videos: NicheVideo[]; subscribers: Record<string, number> }> {
+  const q = new URLSearchParams({
+    part: "snippet",
+    type: "video",
+    q: query,
+    order: "viewCount",
+    regionCode: "IN",
+    relevanceLanguage: SEARCH_LANGUAGE[language] ?? language,
+    publishedAfter: new Date(now - days * 86_400_000).toISOString(),
+    maxResults: "25",
+    safeSearch: "moderate",
+  });
+  type SearchRes = { items?: Array<{ id: { videoId?: string } }> };
+  const ids = ((await api<SearchRes>(tokens, `${DATA}/search?${q}`)).items ?? []).map((i) => i.id.videoId).filter((x): x is string => Boolean(x));
+  if (!ids.length) return { videos: [], subscribers: {} };
+  type VideosRes = { items?: Array<{ id: string; snippet: { title: string; publishedAt: string; channelId: string; channelTitle: string; thumbnails?: { medium?: { url: string } } }; statistics: { viewCount?: string }; contentDetails: { duration: string } }> };
+  const items = (await api<VideosRes>(tokens, `${DATA}/videos?part=snippet,statistics,contentDetails&id=${ids.join(",")}`)).items ?? [];
+  const videos = items.map((v) => ({
+    id: v.id,
+    title: v.snippet.title,
+    channelId: v.snippet.channelId,
+    channelTitle: v.snippet.channelTitle,
+    views: Number(v.statistics.viewCount ?? 0),
+    publishedAt: v.snippet.publishedAt,
+    durationSec: parseDuration(v.contentDetails.duration),
+    thumbnail: v.snippet.thumbnails?.medium?.url ?? null,
+  }));
+  const channelIds = [...new Set(videos.map((v) => v.channelId))].slice(0, 50);
+  type ChRes = { items?: Array<{ id: string; statistics: { subscriberCount?: string; hiddenSubscriberCount?: boolean } }> };
+  const chs = (await api<ChRes>(tokens, `${DATA}/channels?part=statistics&id=${channelIds.join(",")}`)).items ?? [];
+  const subscribers: Record<string, number> = {};
+  for (const c of chs) if (!c.statistics.hiddenSubscriberCount) subscribers[c.id] = Number(c.statistics.subscriberCount ?? 0);
+  return { videos, subscribers };
+}
+
 /** Just the subscriber count (1 quota unit), for the live counter on the dashboard. */
 export async function fetchSubscriberCount(tokens: GoogleTokens): Promise<{ subscribers: number; views: number; hidden: boolean }> {
   type Res = { items?: Array<{ statistics: { subscriberCount?: string; viewCount?: string; hiddenSubscriberCount?: boolean } }> };

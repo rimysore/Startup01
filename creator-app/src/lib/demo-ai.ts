@@ -1,4 +1,4 @@
-import type { AudienceInsights, CommentInsights, CompetitorInsights, Doctor, SlangInsights, ThumbnailDesign, TrendInsights, Titles } from "./ai";
+import type { AudienceInsights, BreakoutIdeas, CommentInsights, CompetitorInsights, Doctor, SlangInsights, ThumbnailDesign, TrendInsights, Titles } from "./ai";
 
 // Sample answers shown when no Anthropic API key is configured, so the product can be demoed offline.
 
@@ -152,5 +152,19 @@ export const DEMO_COMPETITOR_INSIGHTS: CompetitorInsights = {
     "Put the price in the first three words of every phone title",
     "Do a Dasara/Diwali sale guide before the sales start",
     "Reply to the top 5 comments within an hour of upload",
+  ],
+};
+
+export const DEMO_BREAKOUT_IDEAS: BreakoutIdeas = {
+  summary: "The breakouts all promise to save viewers money or warn them before they buy, with a price in the title. Your budget-phone audience wants exactly this, so lean into honest warnings.",
+  patterns: [
+    "A price in the title (₹8,000, ₹6,999): viewers judge the deal instantly",
+    "Warnings and secrets ('dukaandaar ye nahi batayega') pull more clicks than reviews",
+    "Long tests (30 days) win as long videos; one sharp warning wins as a Short",
+  ],
+  ideas: [
+    { title: "₹10,000 का फोन, 30 दिन — क्या सच में चलता है?", hook: "Show the phone's battery at day 30 and say: 'Ye result dekh ke aap shock ho jaoge'", format: "long", inspiredBy: "मैंने 30 दिन सिर्फ़ ₹6,999 वाला फोन चलाया", why: "A 30-day test got 11.7× its channel's subscribers; your viewers already search for budget phones" },
+    { title: "Phone lene se pehle ye 3 cheezein check karo", hook: "Hold up two boxes: 'Ek me dhoka hai — kaunsa?'", format: "short", inspiredBy: "Dukaandaar ye nahi batayega — phone kharidne se pehle dekho", why: "Warning Shorts did 5.9× subs; it fits your shop-test style" },
+    { title: "₹12,000 vs ₹25,000 कैमरा — फर्क दिखा?", hook: "Two photos side by side, no labels: 'Guess karo kaunsa mehenga hai'", format: "long", inspiredBy: "₹8,000 का फोन जो ₹30,000 वाले को हराता है 😱", why: "Cheap-beats-expensive got 17× subs; your night camera tests are your best-watched videos" },
   ],
 };

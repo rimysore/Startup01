@@ -6,9 +6,11 @@ import { audienceRows, BarList } from "@/components/insights";
 import type { AudienceReport } from "@/lib/youtube";
 import { LineChart } from "@/components/LineChart";
 import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, PageHeader, Spinner } from "@/components/ui";
+import { OutlierBadge } from "@/components/outlier";
 import { VideoThumb } from "@/components/VideoThumb";
 import type { Doctor } from "@/lib/ai";
 import { compact } from "@/lib/format";
+import { outlierScores } from "@/lib/outliers";
 import { FEATURE_CREDITS } from "@/lib/plans";
 import { fmtTime, introDrop, keyMoments } from "@/lib/retention";
 import type { RetentionPoint } from "@/lib/types";
@@ -48,6 +50,7 @@ export default function DoctorPage() {
   const [running, setRunning] = useState(false);
 
   const videos = summary?.videos ?? [];
+  const outliers = outlierScores(videos.map((v) => ({ ...v, publishedAt: v.publishedAtIso ?? v.publishedAt })));
   const videoId = picked ?? (videos.some((v) => v.id === requested) ? requested : (videos[0]?.id ?? null));
   const video = videos.find((v) => v.id === videoId) ?? null;
   const retention = loaded?.id === videoId ? loaded.data : null;
@@ -121,7 +124,10 @@ export default function DoctorPage() {
                 }`}
               >
                 <VideoThumb video={v} className="w-20" />
-                <span className="line-clamp-2 text-xs font-medium">{v.title}</span>
+                <span className="min-w-0">
+                  <span className="line-clamp-2 text-xs font-medium">{v.title}</span>
+                  <span className="mt-1 block"><OutlierBadge outlier={outliers.get(v.id)} compact /></span>
+                </span>
               </button>
             ))}
           </div>
@@ -134,7 +140,7 @@ export default function DoctorPage() {
                 <div className="min-w-0">
                   <h2 className="text-lg font-semibold">{video.title}</h2>
                   <p className="mt-1 text-sm text-muted">
-                    {compact(video.views)} views · {fmtTime(video.durationSec)} long
+                    <OutlierBadge outlier={outliers.get(video.id)} /> {compact(video.views)} views · {fmtTime(video.durationSec)} long
                     {video.avgViewPct != null && ` · ${video.avgViewPct.toFixed(0)}% viewed on average`}
                   </p>
                 </div>

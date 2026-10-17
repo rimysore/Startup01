@@ -97,11 +97,12 @@ export async function runDaily({ now = Date.now(), cursor = null as string | nul
   }
 }
 
-/** Housekeeping on the first page of each daily run: reports kept 90 days, expired link codes, old message ids. */
+/** Housekeeping on the first page of each daily run: reports kept 90 days, expired link codes, old message ids and search counters. */
 async function cleanUp(now: number): Promise<void> {
   const d = await db();
   await d.delete(schema.notifications).where(lt(schema.notifications.createdAt, new Date(now - 90 * 86_400_000)));
   await d.delete(schema.whatsappLinkCodes).where(lt(schema.whatsappLinkCodes.expiresAt, new Date(now)));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wa:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 7 * 86_400_000))));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wajoin:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 86_400_000))));
+  await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "niche:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 14 * 86_400_000))));
 }

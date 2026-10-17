@@ -1,5 +1,5 @@
 import type { ChannelSummary, Comment, DailyPoint, RetentionPoint, Trend, Video } from "./types";
-import type { AudienceReport, ChannelSnapshot, TrendingVideo } from "./youtube";
+import type { AudienceReport, ChannelSnapshot, NicheVideo, TrendingVideo } from "./youtube";
 
 // Deterministic PRNG so the demo looks the same on every load.
 function rng(seed: number) {
@@ -218,7 +218,7 @@ export function demoCompetitors(): { me: ChannelSnapshot; rivals: ChannelSnapsho
     me,
     rivals: [
       make("demo-r1", "Gadget Guru Hindi", "@gadgetgurudemo", 1_200_000, [
-        ["₹10,000 vs ₹20,000 phone — कौन सा लें?", 2, 720, 410_000], ["iPhone ka sach 😳", 3, 45, 980_000], ["Best phone under 15000 (Oct)", 6, 840, 350_000],
+        ["₹10,000 vs ₹20,000 phone — कौन सा लें?", 3, 720, 910_000], ["iPhone ka sach 😳", 3, 45, 980_000], ["Best phone under 15000 (Oct)", 6, 840, 350_000],
         ["Mat lena ye phone!", 8, 52, 1_300_000], ["Camera test raat me 🌙", 10, 660, 290_000], ["5 hidden Android tricks", 12, 58, 760_000],
         ["Unboxing: naya budget king?", 15, 900, 240_000], ["Battery drain fix 100%", 17, 49, 640_000],
       ]),
@@ -227,5 +227,22 @@ export function demoCompetitors(): { me: ChannelSnapshot; rivals: ChannelSnapsho
         ["Dasara sale lo best deals", 16, 520, 150_000], ["5G ఫోన్ under 12K", 21, 700, 95_000],
       ]),
     ],
+  };
+}
+
+/** Sample niche search for the Ideas page: what a "budget phone" search in Hindi might turn up. */
+export function demoNiche(): { videos: NicheVideo[]; subscribers: Record<string, number> } {
+  const day = 86_400_000;
+  const v = (id: string, title: string, channelId: string, channelTitle: string, views: number, days: number, durationSec: number): NicheVideo => ({
+    id, title, channelId, channelTitle, views, publishedAt: new Date(Date.now() - days * day).toISOString(), durationSec, thumbnail: null,
+  });
+  return {
+    videos: [
+      v("demo-n1", "₹8,000 का फोन जो ₹30,000 वाले को हराता है 😱", "demo-c1", "Sasta Tech", 1_450_000, 9, 610),
+      v("demo-n2", "Dukaandaar ye nahi batayega — phone kharidne se pehle dekho", "demo-c2", "Mobile Wale Bhaiya", 820_000, 14, 48),
+      v("demo-n3", "मैंने 30 दिन सिर्फ़ ₹6,999 वाला फोन चलाया", "demo-c3", "Ek Mahina Challenge", 610_000, 21, 940),
+      v("demo-n4", "Best phone under 15000 — honest review", "demo-c4", "Big Tech India", 900_000, 6, 780),
+    ],
+    subscribers: { "demo-c1": 85_000, "demo-c2": 140_000, "demo-c3": 52_000, "demo-c4": 4_800_000 },
   };
 }

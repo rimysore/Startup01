@@ -6,9 +6,11 @@ import { burstConfetti, CelebrationToast, MilestoneRing, RollingNumber, Sparklin
 import { useDashboard, useQueryParam, type Me } from "@/components/dashboard-context";
 import { FounderBadge, FounderPassCard } from "@/components/Founding";
 import { LineChart } from "@/components/LineChart";
+import { OutlierBadge } from "@/components/outlier";
 import { Card, DemoNote, ErrorNote, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
 import { compact, full, pctChange, shortDate } from "@/lib/format";
+import { outlierScores } from "@/lib/outliers";
 import type { ChannelSummary, Video } from "@/lib/types";
 
 function sum(xs: number[]) {
@@ -135,6 +137,7 @@ function OverviewBody({
   const subscribers = useLiveSubscribers(summary.channel.id, summary.channel.subscribers, live, onGain);
 
   const { channel, daily, videos } = summary;
+  const outliers = outlierScores(videos.map((v) => ({ ...v, publishedAt: v.publishedAtIso ?? v.publishedAt })));
   const views28 = sum(daily.map((d) => d.views));
   const half = Math.floor(daily.length / 2);
   const viewsChange = pctChange(sum(daily.slice(half).map((d) => d.views)), sum(daily.slice(0, half).map((d) => d.views)));
@@ -262,14 +265,20 @@ function OverviewBody({
       </div>
 
       <Card className="mt-6">
-        <h2 className="mb-4 font-semibold">Recent uploads</h2>
+        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="font-semibold">Recent uploads</h2>
+          <Link href="/dashboard/ideas" className="text-xs font-semibold text-accent hover:underline">
+            × = views vs your usual · Find breakout ideas →
+          </Link>
+        </div>
         <div className="divide-y divide-line">
           {videos.map((v) => (
             <div key={v.id} className="flex items-center gap-3 py-3 sm:gap-4">
               <VideoThumb video={v} className="w-20 shrink-0 sm:w-36" />
               <div className="min-w-0 flex-1">
                 <p className="line-clamp-2 font-medium">{v.title}</p>
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-1 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted">
+                  <OutlierBadge outlier={outliers.get(v.id)} />
                   {shortDate(v.publishedAt)} · {compact(v.views)} views<span className="hidden sm:inline"> · {compact(v.likes)} likes · {compact(v.comments)} comments</span>
                 </p>
               </div>

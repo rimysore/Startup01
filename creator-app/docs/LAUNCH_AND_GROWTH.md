@@ -96,11 +96,60 @@ YouTube Analytics tells us *when* viewers left; the video tells us *why*. Three 
 
 ## 5. What to build next (after the beta starts)
 
-1. **Outlier score + breakout ideas** in their niche and language (ViewStats' best feature, cheap with data we
-   have) — also in the Monday report.
+1. ~~**Outlier score + breakout ideas**~~ **Built** (October 2026): × badges on Overview and Video Doctor, the
+   Monday report's "star" is now the biggest outlier, and **Breakout ideas** (`/dashboard/ideas`) shows tracked
+   competitors' 2×+ videos and a niche search, then turns them into 5 ideas (1 credit, free on the Founder Pass).
 2. **Moment map via creator upload** (no new Google scope needed) → then captions once verified.
 3. **Competitor change tracker** (daily snapshots) + alerts on WhatsApp.
 4. **Monthly Mitra receipt** (proves our value; key for retention and pricing).
 5. **Churn-risk list** for the founder to call people personally during the beta.
 6. **Pause plan / annual plan / exit survey** before paid plans open.
 7. **Telugu and Tamil bot words and templates** reviewed by native speakers.
+
+## 6. Outlier score: how it works
+
+- **Score** = a video's views ÷ the median views of the channel's previous 9 uploads **of the same kind** (Shorts
+  vs Shorts, long vs long; never mixed, since Shorts routinely get 10× the views). Needs 3 earlier uploads.
+  Labels: ≥3× breakout, ≥1.5× above usual, 0.67–1.5× usual, below that below usual. Under 7 days old = "so far".
+- **Competitor breakouts**: the same score on tracked channels' last 15 uploads (≥2×, at least 2 days old). Uses
+  the snapshots the Competitors page already caches, so no extra YouTube quota.
+- **Niche search**: YouTube search (`order=viewCount`, last 30 days, India, the creator's language), scored by
+  views ÷ subscribers; channels under 1,000 subscribers and the creator's own channel are skipped. A search costs
+  ~102 of our 10,000 daily quota units, so each creator gets **3 new searches a week**; repeats are cached for 7
+  days and free. Kill switch: `YOUTUBE_SEARCH=0`. At 100 creators that's at most ~4,300 units/day; ask Google
+  for more quota before opening the doors.
+
+## 7. Should Mitra train its own ML model? (evaluation)
+
+**Short answer: not yet. Statistics plus Claude gets most of the value now. We start collecting the right data
+now so a model becomes possible at ~1,000 creators.**
+
+| Approach | What it needs | Verdict now |
+| --- | --- | --- |
+| **Per-channel statistics** (outlier score, medians, pace vs usual, best day) | The creator's own data | **Doing it.** Exact, explainable, free, works from video #4 |
+| **Claude on top of the numbers** (why it worked, ideas, coaching) | Good facts in the prompt | **Doing it.** Claude knows YouTube, Indian languages and culture; we feed it the numbers |
+| **Our own predictive model** (e.g. "this title will get 2.3×") | Thousands of (idea → outcome) pairs across many channels | **Later.** With <100 creators it would learn noise |
+| **Fine-tuning an LLM** | Lots of labelled good/bad advice | **No.** Prompting with examples is cheaper and moves faster |
+
+**Why AI alone isn't "learning":** Claude doesn't remember past creators or learn from our results by itself. The
+learning comes from *our* data loop: what we suggested → did they use it → what outlier score did that video get.
+That loop is the moat; the model is replaceable.
+
+**What to log next (small):** for each idea/title we generate: creator, idea text, source, date. When a later
+upload's title matches an idea, link it and store that video's outlier score after 7 days. That gives the
+"Mitra receipt" now ("your 3 Mitra ideas got 2.1× your usual") and a training set later.
+
+**Once we have the data (~1,000 creators, ~10,000 scored uploads):**
+1. A gradient-boosted model (LightGBM) predicting outlier score from title features (length, numbers, language
+   mix, emotion), format, upload hour/day and topic cluster, used to *rank* Claude's suggestions.
+2. Title embeddings to cluster topics per language and spot rising clusters early.
+3. Best time to post per channel from its own audience (statistics, no ML needed).
+4. Bandit testing of advice styles (which tips creators actually act on).
+
+**YouTube policy limits (important):** the YouTube API Developer Policies don't allow combining creators'
+*private* analytics across users (only the channel owner may see their own), estimating metrics YouTube doesn't
+provide, or keeping a creator's data more than 7 days after they disconnect. So a cross-creator model may only use
+**public** data (titles, public view counts) and our own records of suggestions and outcomes, with consent in the
+privacy policy, and it must be checked against the policies before Google's audit. Per-creator statistics on
+their own data (what we do now) are fine. Sources: developers.google.com/youtube/terms/developer-policies and
+its developer-policies-guide.

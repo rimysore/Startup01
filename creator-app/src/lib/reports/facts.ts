@@ -1,3 +1,4 @@
+import { outlierScores } from "../outliers";
 import type { WeeklyCoach, VideoCoach } from "../ai";
 import { compact, full, pctChange, shortDate } from "../format";
 import type { ChannelSummary, Video } from "../types";
@@ -57,8 +58,9 @@ export function weeklyFacts(s: ChannelSummary, now = Date.now()): WeeklyFacts {
   const best = week.length ? week.reduce((a, b) => (b.views > a.views ? b : a)) : null;
   const ages = s.videos.map((v) => (now - Date.parse(v.publishedAtIso ?? `${v.publishedAt}T12:00:00Z`)) / 86_400_000);
   const recent = s.videos.filter((_, i) => ages[i] <= 60);
-  const avg = recent.length > 1 ? sum(recent.map((v) => v.views)) / recent.length : 0;
-  const star = [...recent].sort((a, b) => b.views - a.views)[0];
+  // The star is the biggest outlier: views against the channel's usual for that kind of video (see outliers.ts).
+  const scores = outlierScores(s.videos.map((v) => ({ ...v, publishedAt: v.publishedAtIso ?? v.publishedAt })), now);
+  const scored = recent.map((v) => ({ v, score: scores.get(v.id)?.score ?? 0 })).sort((a, b) => b.score - a.score)[0];
   const dropOff = recent.filter((v) => v.avgViewPct != null && v.avgViewPct < 30 && v.durationSec > 90).sort((a, b) => (a.avgViewPct ?? 0) - (b.avgViewPct ?? 0))[0];
   const next = MILESTONES.find((m) => m > s.channel.subscribers);
   return {
@@ -73,7 +75,7 @@ export function weeklyFacts(s: ChannelSummary, now = Date.now()): WeeklyFacts {
     bestDay: best && best.views > 0 ? { date: best.date, views: best.views } : null,
     uploadsThisWeek: ages.filter((a) => a <= 7).length,
     daysSinceUpload: ages.length ? Math.floor(Math.min(...ages)) : null,
-    star: star && avg > 0 && star.views >= avg * 1.3 ? { title: star.title, views: star.views, times: Math.round((star.views / avg) * 10) / 10 } : null,
+    star: scored && scored.score >= 1.3 ? { title: scored.v.title, views: scored.v.views, times: scored.score } : null,
     dropOff: dropOff ? { title: dropOff.title, avgViewPct: Math.round(dropOff.avgViewPct ?? 0) } : null,
     nextMilestone: next ? { at: next, left: next - s.channel.subscribers } : null,
     days: s.daily.slice(-14).map((d) => ({ date: d.date, views: d.views })),
@@ -89,7 +91,7 @@ export function weeklyFactsText(f: WeeklyFacts): string {
     `New subscribers: ${f.subscribersGained} (${pct(f.subscribersChange)}). Total subscribers: ${f.subscribers}.`,
     f.bestDay ? `Best day: ${f.bestDay.date} with ${f.bestDay.views} views.` : "",
     `Uploads in the last 7 days: ${f.uploadsThisWeek}. Days since the last upload: ${f.daysSinceUpload ?? "unknown"}.`,
-    f.star ? `Best recent video: "${f.star.title}" with ${f.star.views} views, ${f.star.times}x the channel's recent average.` : "",
+    f.star ? `Best recent video: "${f.star.title}" with ${f.star.views} views, ${f.star.times}x the channel's usual views for that kind of video (an outlier score).` : "",
     f.dropOff ? `Video where viewers left early: "${f.dropOff.title}", only ${f.dropOff.avgViewPct}% watched on average.` : "",
     f.nextMilestone ? `Next milestone: ${f.nextMilestone.at} subscribers, ${f.nextMilestone.left} to go.` : "",
   ]

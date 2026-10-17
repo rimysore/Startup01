@@ -4,7 +4,7 @@ export type PlanId = "free" | "pro" | "creator";
  * AI credits each answer costs. Video Doctor runs on a larger model, so it costs more; this keeps every plan's
  * worst-case AI bill below its price. Shared by the server (charging) and the UI (labels).
  */
-export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1, thumbnail: 1, image: 1, trends: 1, audience: 1, slang: 1, competitors: 1, outreach: 0, report: 0 } as const;
+export const FEATURE_CREDITS = { doctor: 3, titles: 1, comments: 1, chat: 1, thumbnail: 1, image: 1, trends: 1, audience: 1, slang: 1, competitors: 1, breakouts: 1, outreach: 0, report: 0 } as const;
 
 export interface Plan {
   id: PlanId;
@@ -77,16 +77,16 @@ export const AGENCY = {
  */
 export const FOUNDING_SPOTS = 100;
 export const FOUNDER_FREE_USES = 50;
-export const FOUNDER_FREE_FEATURES = ["titles", "thumbnail", "trends", "audience", "slang", "comments", "chat"] as const;
+export const FOUNDER_FREE_FEATURES = ["titles", "thumbnail", "trends", "audience", "slang", "comments", "chat", "breakouts"] as const;
 export type FounderFreeFeature = (typeof FOUNDER_FREE_FEATURES)[number];
 export function founderFree(feature: string): feature is FounderFreeFeature {
   return (FOUNDER_FREE_FEATURES as readonly string[]).includes(feature);
 }
 /** What founders get free, in plain words, for the UI. */
-export const FOUNDER_FREE_LABELS = ["Titles", "Thumbnail design", "Trends", "Audience", "Slang", "Comment insights", "Ask Mitra"];
+export const FOUNDER_FREE_LABELS = ["Titles", "Thumbnail design", "Trends", "Audience", "Slang", "Comment insights", "Ask Mitra", "Breakout ideas"];
 export const FOUNDER_PERKS = [
   "Founding Creator badge with your number (#1–100)",
-  `${FOUNDER_FREE_USES} free uses a month, for life: titles, thumbnails, trends, audience, slang, comments and Ask Mitra`,
+  `${FOUNDER_FREE_USES} free uses a month, for life: titles, thumbnails, trends, audience, slang, comments, breakout ideas and Ask Mitra`,
   "Live dashboard, subscriber celebrations and competitor tracking free for life",
   "First access to brand deals and collabs",
 ];

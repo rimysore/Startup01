@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "outreach" | "report";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "breakouts" | "outreach" | "report";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -40,6 +40,8 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   slang: { model: "claude-haiku-5-5", effort: "low", maxTokens: 5000, cacheHours: 24, credits: FEATURE_CREDITS.slang },
   // Comparing several channels' strategies is real reasoning: medium effort on the small model.
   competitors: { model: "claude-haiku-5-5", effort: "medium", maxTokens: 8000, cacheHours: 12, credits: FEATURE_CREDITS.competitors },
+  // Turning a short list of breakout videos into ideas for this creator: light reading, cached for a day.
+  breakouts: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 24, credits: FEATURE_CREDITS.breakouts },
   // Admin prospecting: short personal openers, batched. Not charged to anyone's credits.
   outreach: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: 0 },
   // Monday report and 48-hour check: Mitra pays (about ₹0.05 each), the creator is never charged.
@@ -551,6 +553,53 @@ export async function compareCompetitors(language: string, data: string): Promis
       titlePatterns: list(c.titlePatterns, 6).map((x) => cut(x, 240)),
       emotions: emotionShares(c.emotions),
       moves: list(c.moves, 6).map((x) => cut(x, 300)),
+    },
+  };
+}
+
+// ---- Breakout ideas ------------------------------------------------------------------------------------
+
+export const BreakoutIdeasSchema = z.object({
+  summary: z.string().describe("Two sentences: what these breakout videos have in common and what it means for this creator"),
+  patterns: z.array(z.string()).describe("Three to five patterns behind the breakouts: topic, promise in the title, emotion, format, length"),
+  ideas: z
+    .array(
+      z.object({
+        title: z.string().describe("A ready-to-use title in the creator's language, written for their channel"),
+        hook: z.string().describe("What to say or show in the first 5 seconds"),
+        format: z.enum(["short", "long"]),
+        inspiredBy: z.string().describe("The breakout video (title) this idea comes from"),
+        why: z.string().describe("Why it should work for this creator's audience, citing the numbers"),
+      }),
+    )
+    .describe("Five ideas adapted to this creator; learn from the pattern, never copy a title or video"),
+});
+export type BreakoutIdeas = z.infer<typeof BreakoutIdeasSchema>;
+
+export async function breakoutIdeas(language: string, channel: string, breakouts: string): Promise<AiResult<BreakoutIdeas>> {
+  const out = await structured(
+    "breakouts",
+    BreakoutIdeasSchema,
+    language,
+    "These videos are outliers: each got far more views than its channel usually gets (format: title | channel | score | views | Short or long). " +
+      "Score is views ÷ the channel's usual views (\"x usual\") or views ÷ subscribers (\"x subs\"). " +
+      "Find why they broke out and turn that into ideas this creator can make with their own style and audience. Use only what the list shows.\n\n" +
+      `Creator's channel and their own best and worst recent uploads:\n${untrusted(channel)}\n\nBreakout videos:\n${untrusted(breakouts)}`,
+  );
+  const b = out.result;
+  checkLanguage("breakouts", language, [b.summary, ...b.ideas.map((i) => i.title)]);
+  return {
+    ...out,
+    result: {
+      summary: cut(b.summary, 500),
+      patterns: list(b.patterns, 5).map((x) => cut(x, 240)),
+      ideas: list(b.ideas, 5).map((i) => ({
+        title: cut(i.title, 120),
+        hook: cut(i.hook, 240),
+        format: i.format === "short" ? "short" : "long",
+        inspiredBy: cut(i.inspiredBy, 160),
+        why: cut(i.why, 300),
+      })),
     },
   };
 }
