@@ -27,6 +27,6 @@ export const POST = aiRoute(
   async ({ language, page, messages }, user) => {
     const turns = recent(messages);
     if (!turns.length) throw new Error("No user message to answer");
-    return chat(language, await assistantContext(user, page), turns);
+    return chat(language, await assistantContext(user, page, language), turns);
   },
 );

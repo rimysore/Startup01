@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { postAi, useDashboard, type AiError } from "./dashboard-context";
 import { AiErrorNote } from "./ui";
+import { LANGUAGES } from "@/lib/languages";
 import { FEATURE_CREDITS } from "@/lib/plans";
 
 interface Msg {
@@ -15,14 +16,18 @@ interface Msg {
 const STORE = "mitra-chat";
 const SPARK = "M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z";
 
-/** Starter questions, picked for the page the creator is on. */
-function suggestions(path: string): string[] {
-  if (path.startsWith("/dashboard/doctor")) return ["Why did my last video do badly?", "How do I keep people watching past 30 seconds?"];
-  if (path.startsWith("/dashboard/studio")) return ["Which of my titles worked best?", "What thumbnail style suits my channel?"];
-  if (path.startsWith("/dashboard/ideas") || path.startsWith("/dashboard/trends")) return ["What should I make next week?", "Plan a 4-week Shorts series"];
-  if (path.startsWith("/dashboard/competitors")) return ["What are my competitors doing better?", "How do I stand out from them?"];
-  return ["Is hafte kya upload karun?", "How is my channel doing this week?", "Mere subscribers kyun nahi badh rahe?", "Sponsor ko kitna charge karun?"];
-}
+/** The panel's own words in each language, so a Telugu creator isn't greeted (and nudged) in Hinglish. */
+const WORDS: Record<string, { hello: string; sub: string; asks: string[] }> = {
+  en: { hello: "Ask me anything.", sub: "Your channel, ideas, sponsors, anything about growing.", asks: ["What should I upload this week?", "How is my channel doing this week?", "Why aren't my subscribers growing?", "How much should I charge a sponsor?"] },
+  hinglish: { hello: "Kuch bhi poocho.", sub: "Aapka channel, ideas, sponsors: growth ke baare mein kuch bhi.", asks: ["Is hafte kya upload karun?", "Is hafte mera channel kaisa chal raha hai?", "Mere subscribers kyun nahi badh rahe?", "Sponsor ko kitna charge karun?"] },
+  hi: { hello: "कुछ भी पूछिए।", sub: "आपका चैनल, आइडिया, स्पॉन्सर: ग्रोथ से जुड़ा कुछ भी।", asks: ["इस हफ्ते क्या अपलोड करूँ?", "इस हफ्ते मेरा चैनल कैसा चल रहा है?", "मेरे सब्सक्राइबर क्यों नहीं बढ़ रहे?", "स्पॉन्सर से कितना चार्ज करूँ?"] },
+  te: { hello: "ఏదైనా అడగండి.", sub: "మీ ఛానల్, ఐడియాలు, స్పాన్సర్లు: గ్రోత్ గురించి ఏదైనా.", asks: ["ఈ వారం ఏ వీడియో అప్‌లోడ్ చేయాలి?", "ఈ వారం నా ఛానల్ ఎలా ఉంది?", "నా సబ్‌స్క్రైబర్లు ఎందుకు పెరగడం లేదు?", "స్పాన్సర్‌కి ఎంత చార్జ్ చేయాలి?"] },
+  ta: { hello: "எதுவும் கேளுங்கள்.", sub: "உங்கள் சேனல், ஐடியாக்கள், ஸ்பான்சர்கள்: வளர்ச்சி பற்றி எதுவும்.", asks: ["இந்த வாரம் என்ன வீடியோ போடலாம்?", "இந்த வாரம் என் சேனல் எப்படி இருக்கிறது?", "என் சப்ஸ்கிரைபர்கள் ஏன் அதிகரிக்கவில்லை?", "ஸ்பான்சரிடம் எவ்வளவு கேட்கலாம்?"] },
+  mr: { hello: "काहीही विचारा.", sub: "तुमचं चॅनल, आयडिया, स्पॉन्सर: ग्रोथबद्दल काहीही.", asks: ["या आठवड्यात काय अपलोड करू?", "या आठवड्यात माझं चॅनल कसं चाललंय?", "माझे सबस्क्रायबर का वाढत नाहीत?", "स्पॉन्सरकडून किती चार्ज करू?"] },
+  bn: { hello: "যা খুশি জিজ্ঞেস করুন।", sub: "আপনার চ্যানেল, আইডিয়া, স্পনসর: গ্রোথ নিয়ে যেকোনো কিছু।", asks: ["এই সপ্তাহে কী আপলোড করব?", "এই সপ্তাহে আমার চ্যানেল কেমন চলছে?", "আমার সাবস্ক্রাইবার কেন বাড়ছে না?", "স্পনসরের কাছে কত চার্জ করব?"] },
+  kn: { hello: "ಏನು ಬೇಕಾದರೂ ಕೇಳಿ.", sub: "ನಿಮ್ಮ ಚಾನೆಲ್, ಐಡಿಯಾಗಳು, ಸ್ಪಾನ್ಸರ್‌ಗಳು: ಗ್ರೋತ್ ಬಗ್ಗೆ ಏನಾದರೂ.", asks: ["ಈ ವಾರ ಏನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲಿ?", "ಈ ವಾರ ನನ್ನ ಚಾನೆಲ್ ಹೇಗಿದೆ?", "ನನ್ನ ಸಬ್‌ಸ್ಕ್ರೈಬರ್‌ಗಳು ಯಾಕೆ ಹೆಚ್ಚಾಗುತ್ತಿಲ್ಲ?", "ಸ್ಪಾನ್ಸರ್‌ಗೆ ಎಷ್ಟು ಚಾರ್ಜ್ ಮಾಡಲಿ?"] },
+  ml: { hello: "എന്തും ചോദിക്കൂ.", sub: "നിങ്ങളുടെ ചാനൽ, ഐഡിയകൾ, സ്പോൺസർമാർ: ഗ്രോത്തിനെക്കുറിച്ച് എന്തും.", asks: ["ഈ ആഴ്ച എന്ത് അപ്‌ലോഡ് ചെയ്യണം?", "ഈ ആഴ്ച എന്റെ ചാനൽ എങ്ങനെയുണ്ട്?", "എന്റെ സബ്സ്ക്രൈബർമാർ എന്തുകൊണ്ട് കൂടുന്നില്ല?", "സ്പോൺസറോട് എത്ര ചാർജ് ചെയ്യണം?"] },
+};
 
 /** Minimal formatting for replies: **bold** and bullet lines. */
 function Rich({ text }: { text: string }) {
@@ -95,6 +100,8 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
   }
 
   const founderFree = me?.founderNumber != null;
+  const words = WORDS[language] ?? WORDS.en;
+  const native = LANGUAGES.find((l) => l.code === language)?.native ?? "English";
   return (
     // translate="no": Chrome's page translation rewrites the text React manages and crashes the chat.
     <div translate="no" className="notranslate flex h-full min-h-0 flex-col">
@@ -106,7 +113,9 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="font-semibold leading-tight">Ask Mitra</p>
-          <p className="truncate text-[11px] text-muted">Knows your channel, reports and goals · {founderFree ? "free on your Founder Pass" : `${FEATURE_CREDITS.chat} credit a reply`}</p>
+          <p className="truncate text-[11px] text-muted">
+            Replies in <span className="font-indic font-semibold text-ink-2">{native}</span> · {founderFree ? "free on your Founder Pass" : `${FEATURE_CREDITS.chat} credit a reply`}
+          </p>
         </div>
         {messages.length > 0 && (
           <button onClick={() => setMessages([])} className="rounded-full px-2.5 py-1 text-xs text-muted hover:bg-surface-2">
@@ -123,11 +132,11 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
       <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
         {!messages.length && (
           <div className="py-4 text-center">
-            <p className="font-display text-3xl">Kuch bhi poocho.</p>
-            <p className="mt-1 text-sm text-muted">Your channel, ideas, sponsors, anything about growing.</p>
+            <p className="font-display font-indic text-3xl">{words.hello}</p>
+            <p className="mt-1 font-indic text-sm text-muted">{words.sub}</p>
             <div className="mt-4 flex flex-wrap justify-center gap-2">
-              {suggestions(path).map((s) => (
-                <button key={s} onClick={() => send(s)} className="rounded-full border border-line px-3.5 py-2 text-left text-sm hover:border-accent">
+              {words.asks.map((s) => (
+                <button key={s} onClick={() => send(s)} className="rounded-full border border-line px-3.5 py-2 text-left font-indic text-sm hover:border-accent">
                   {s}
                 </button>
               ))}
@@ -137,7 +146,7 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${m.role === "user" ? "rounded-br-md bg-ink text-bg" : "rounded-bl-md bg-surface-2"}`}>
-              {m.role === "assistant" ? <Rich text={m.content} /> : m.content}
+              <div className="font-indic">{m.role === "assistant" ? <Rich text={m.content} /> : m.content}</div>
             </div>
           </div>
         ))}
@@ -172,7 +181,7 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
             }
           }}
           rows={1}
-          placeholder="Type in Hindi, Hinglish, Telugu, English…"
+          placeholder={`Type your question (${native})…`}
           maxLength={2000}
           className="max-h-32 min-w-0 flex-1 resize-none rounded-2xl border border-line bg-surface px-4 py-2.5 text-base outline-none focus:border-accent sm:text-sm"
         />

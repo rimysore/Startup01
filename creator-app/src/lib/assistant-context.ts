@@ -31,7 +31,7 @@ const MAX = 6000;
  * quota beyond the hourly-cached summary): their account and plan, channel numbers, recent uploads with outlier
  * scores, this week's facts, tracked competitors, WhatsApp status and the latest Monday report.
  */
-export async function assistantContext(user: User, page?: string): Promise<string> {
+export async function assistantContext(user: User, page?: string, language: string = user.language): Promise<string> {
   const d = await db();
   const [loaded, usage, competitors, [contact], report] = await Promise.all([
     loadSummary(user.id),
@@ -42,7 +42,7 @@ export async function assistantContext(user: User, page?: string): Promise<strin
   ]);
   const plan = planOf(user.plan);
   const parts = [
-    `Creator: ${user.name ?? "unknown name"}. Writes in ${languageLabel(user.language)}. Plan: ${plan.name}, ${usage.credits}/${creditLimit(user.plan)} AI credits used this month${user.founderNumber != null ? `, Founding Creator #${user.founderNumber}` : ""}.`,
+    `Creator: ${user.name ?? "unknown name"}. Chosen language: ${languageLabel(language)}. Plan: ${plan.name}, ${usage.credits}/${creditLimit(user.plan)} AI credits used this month${user.founderNumber != null ? `, Founding Creator #${user.founderNumber}` : ""}.`,
     page && PAGES[page] ? `They are looking at: ${PAGES[page]}.` : "",
   ];
   if (loaded.ok) {
