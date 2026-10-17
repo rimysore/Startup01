@@ -105,7 +105,8 @@ const sections: LegalSection[] = [
           rows={[
             ["Google LLC", "Sign-in and YouTube APIs", "Your Google profile and the YouTube data you authorise"],
             ["Anthropic PBC (USA)", "Generates AI results", "The video details, analytics, comments and text needed for the request you made"],
-            ["Features & Labels Inc. (fal.ai, USA)", "Generates thumbnail background images", "Only a short scene description written by our AI (e.g. 'rainy city street at night'), never your photos or account details"],
+            ["Cloudflare, Inc. (Workers AI, USA)", "Generates thumbnail background images", "Only a short scene description written by our AI (e.g. 'rainy city street at night'), never your photos or account details"],
+            ["Features & Labels Inc. (fal.ai, USA)", "Backup provider for thumbnail background images", "Only a short scene description written by our AI (e.g. 'rainy city street at night'), never your photos or account details"],
             ["Pexels (Canva Germany GmbH)", "Stock photos for thumbnail backgrounds", "Only the short search words for a background, never your photos or account details"],
             ["Meta Platforms, Inc. (WhatsApp Business Platform)", "Delivers WhatsApp messages", "Your WhatsApp number and the messages between you and Mitra"],
             ["Google LLC (Gmail)", "Sends report emails, if you get reports by email", "Your email address and the report"],

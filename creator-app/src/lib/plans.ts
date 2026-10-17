@@ -77,16 +77,16 @@ export const AGENCY = {
  */
 export const FOUNDING_SPOTS = 100;
 export const FOUNDER_FREE_USES = 50;
-export const FOUNDER_FREE_FEATURES = ["titles", "thumbnail", "trends", "audience", "slang", "comments", "chat", "breakouts"] as const;
+export const FOUNDER_FREE_FEATURES = ["titles", "thumbnail", "trends", "audience", "slang", "comments", "chat", "breakouts", "image"] as const;
 export type FounderFreeFeature = (typeof FOUNDER_FREE_FEATURES)[number];
 export function founderFree(feature: string): feature is FounderFreeFeature {
   return (FOUNDER_FREE_FEATURES as readonly string[]).includes(feature);
 }
 /** What founders get free, in plain words, for the UI. */
-export const FOUNDER_FREE_LABELS = ["Titles", "Thumbnail design", "Trends", "Audience", "Slang", "Comment insights", "Ask Mitra", "Breakout ideas"];
+export const FOUNDER_FREE_LABELS = ["Titles", "Thumbnail design", "Trends", "Audience", "Slang", "Comment insights", "Ask Mitra", "Breakout ideas", "AI backgrounds"];
 export const FOUNDER_PERKS = [
   "Founding Creator badge with your number (#1–100)",
-  `${FOUNDER_FREE_USES} free uses a month, for life: titles, thumbnails, trends, audience, slang, comments, breakout ideas and Ask Mitra`,
+  `${FOUNDER_FREE_USES} free uses a month, for life: titles, thumbnails, trends, audience, slang, comments, breakout ideas, AI backgrounds and Ask Mitra`,
   "Live dashboard, subscriber celebrations and competitor tracking free for life",
   "First access to brand deals and collabs",
 ];

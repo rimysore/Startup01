@@ -104,5 +104,5 @@ async function cleanUp(now: number): Promise<void> {
   await d.delete(schema.whatsappLinkCodes).where(lt(schema.whatsappLinkCodes.expiresAt, new Date(now)));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wa:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 7 * 86_400_000))));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wajoin:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 86_400_000))));
-  await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "niche:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 14 * 86_400_000))));
+  for (const kind of ["niche:%", "studio:%"]) await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, kind), lt(schema.webhookEvents.receivedAt, new Date(now - 14 * 86_400_000))));
 }

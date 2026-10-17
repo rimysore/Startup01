@@ -240,18 +240,31 @@ export async function diagnoseVideo(language: string, facts: string, title: stri
 // ---- Title & thumbnail studio ---------------------------------------------
 
 export const TitlesSchema = z.object({
-  titles: z.array(z.object({ title: z.string(), why: z.string(), strength: z.number().describe("1-10 expected click strength") })),
+  titles: z.array(
+    z.object({
+      title: z.string(),
+      why: z.string(),
+      strength: z.number().describe("1-10 expected click strength"),
+      pattern: z.string().describe("The proven pattern it uses, in 2-5 plain English words (e.g. 'price + challenge', 'warning', 'question + number'); empty if none"),
+    }),
+  ),
   thumbnailText: z.array(z.string()).describe("Four options of 2-4 word thumbnail text, in the target language's own script"),
   hook: z.string().describe("A spoken script for the first 15 seconds"),
 });
 export type Titles = z.infer<typeof TitlesSchema>;
 
-export async function generateTitles(language: string, topic: string, tone: string, channel: string): Promise<AiResult<Titles>> {
+export async function generateTitles(language: string, topic: string, tone: string, channel: string, proven = ""): Promise<AiResult<Titles>> {
   const out = await structured(
     "titles",
     TitlesSchema,
     language,
     `Channel name:\n${untrusted(channel)}\nVideo topic, as described by the creator:\n${untrusted(topic)}\nTone: ${tone}\n\n` +
+      (proven
+        ? "Videos on this topic that already went viral on YouTube in India this year (title | views | views ÷ channel subscribers, when known):\n" +
+          `${untrusted(proven)}\n` +
+          "Study why they won: length, numbers and prices, the promise, curiosity gap, emotion, language mix, words in their script. " +
+          "Use those patterns for this creator's own video; never copy a title or reuse its unique wording. Name the pattern each title uses.\n\n"
+        : "") +
       "Write five title options (under 70 characters each, honest about what the video contains), thumbnail text options and a 15-second opening hook.",
   );
   const t = out.result;
@@ -259,7 +272,7 @@ export async function generateTitles(language: string, topic: string, tone: stri
   return {
     ...out,
     result: {
-      titles: list(t.titles, 6).map((x) => ({ title: cut(x.title, 100), why: cut(x.why, 240), strength: Math.round(clamp(x.strength, 1, 10)) })),
+      titles: list(t.titles, 6).map((x) => ({ title: cut(x.title, 100), why: cut(x.why, 240), strength: Math.round(clamp(x.strength, 1, 10)), pattern: cut(x.pattern ?? "", 40) })),
       thumbnailText: list(t.thumbnailText, 6).map((s) => cut(s, 40)),
       hook: cut(t.hook, 600),
     },
@@ -317,16 +330,22 @@ export async function designThumbnail(
   title: string,
   preferredText: string,
   images: InputImage[],
+  references: InputImage[] = [],
 ): Promise<AiResult<ThumbnailDesign>> {
+  const refs = references.length
+    ? `Images ${images.length} to ${images.length + references.length - 1} are NOT the creator's: they are thumbnails of videos on this topic that went viral on YouTube in India. ` +
+      "Learn what made them work (face and emotion, colours, text size and amount, focal point, contrast) and apply it; never copy their layout, people, text or logos, and never use them as images in the design.\n"
+    : "";
   const out = await structured(
     "thumbnail",
     ThumbnailSchema,
     language,
-    `Design a YouTube thumbnail for this video. ${images.length ? `The creator uploaded ${images.length} image(s) above; decide how to use each one (the most expressive face or the product should be the subject; drop blurry or irrelevant ones).` : "No images were uploaded: pick a background photo search that fits the topic."}\n` +
+    `Design a YouTube thumbnail for this video. ${images.length ? `The creator uploaded ${images.length} image(s) (Image 0${images.length > 1 ? ` to ${images.length - 1}` : ""}); decide how to use each one (the most expressive face or the product should be the subject; drop blurry or irrelevant ones).` : "The creator uploaded no images: pick a background photo search that fits the topic."}\n` +
+      refs +
       "Rules: at most 5 words of text, large and readable on a phone; one clear focal point; strong contrast; honest about what the video shows.\n\n" +
       `Video title or topic:\n${untrusted(title)}` +
       (preferredText.trim() ? `\nThe creator would like to use this thumbnail text if it works:\n${untrusted(preferredText)}` : ""),
-    images,
+    [...images, ...references],
   );
   const d = out.result;
   checkLanguage("thumbnail", language, [d.headline]);

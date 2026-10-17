@@ -148,9 +148,10 @@ is always correct and everything stays editable. With `PEXELS_API_KEY` set, the 
 stock photo (streamed through `/api/thumbnail/background` so the canvas can export it); without it, a drawn
 gradient with glow, light rays and grain.
 
-With `FAL_KEY` set, the background is instead **generated** by FLUX.1 [schnell] on fal.ai from the design's
-`imagePrompt` (scene only, never text): ~$0.003 per image, 1 credit, behind the same sign-in, rate limit, daily
-budget and refund-on-failure checks as the text AI, and logged in `ai_calls` as feature `image`.
+With `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_AI_TOKEN` set (free: Cloudflare Workers AI gives ~170 images a day at
+no cost), or `FAL_KEY` as a paid backup, the background is instead **generated** by FLUX.1 [schnell] from the
+design's `imagePrompt` (scene only, never text): 1 credit (free on the Founder Pass), behind the same sign-in, rate
+limit, daily budget and refund-on-failure checks as the text AI, and logged in `ai_calls` as feature `image`.
 
 ## Languages, trends and audience
 

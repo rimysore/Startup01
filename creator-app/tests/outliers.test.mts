@@ -90,5 +90,47 @@ const nextWeek = await nicheBreakouts("u1", "UCme", "cricket", "hinglish", NOW +
 assert(nextWeek.breakouts.length === 1 && searches === SEARCHES_PER_WEEK + 1, "a new week brings new searches");
 globalThis.fetch = realFetch;
 
+// ---- Title Studio research ------------------------------------------------------------------------------
+const { researchQuery, provenVideos, rationedSearch, SEARCH_KINDS } = await import("@/lib/ideas");
+assert(researchQuery("Testing 3 phones under ₹20,000 for night photography, in Lucknow!!") === "testing 3 phones under ₹20 000 for night", "research words: first 8 words, punctuation dropped");
+assert(researchQuery("मैंने 30 दिन फोन चलाया") === "मैंने 30 दिन फोन चलाया", "Indian scripts keep their vowel signs");
+const proven = provenVideos(
+  [
+    { ...vid("big", 5, 9_000_000), channelId: "huge", channelTitle: "Huge" },
+    { ...vid("hit", 5, 400_000), channelId: "small", channelTitle: "Small" },
+    { ...vid("hit2", 6, 300_000), channelId: "small", channelTitle: "Small" },
+    { ...vid("hit3", 7, 200_000), channelId: "small", channelTitle: "Small" },
+  ],
+  new Map([["huge", 20_000_000], ["small", 40_000]]),
+);
+assert(proven[0].id === "hit" && proven[0].score === 10 && proven.at(-1)!.id === "big" && proven.length === 3, "breakouts come before plain big hits, at most 2 per channel");
+let studioCalls = 0;
+globalThis.fetch = (async (input: string | URL) => {
+  const url = String(input);
+  if (url.includes("/search?")) { studioCalls++; return Response.json({ items: [{ id: { videoId: "v9" } }] }); }
+  if (url.includes("/videos?")) return Response.json({ items: [{ id: "v9", snippet: { title: "Hit", publishedAt: at(40), channelId: "c1", channelTitle: "C1" }, statistics: { viewCount: "50000" }, contentDetails: { duration: "PT9M" } }] });
+  return Response.json({ items: [{ id: "c1", statistics: { subscriberCount: "5000" } }] });
+}) as typeof fetch;
+for (let i = 0; i < SEARCH_KINDS.studio.limit; i++) await rationedSearch("u1", "UCme", "studio", `topic ${i}`, "hi", NOW);
+let studioLimited = false;
+try { await rationedSearch("u1", "UCme", "studio", "one more", "hi", NOW); } catch (e) { studioLimited = e instanceof SearchLimitError; }
+assert(studioLimited && studioCalls === SEARCH_KINDS.studio.limit, `Title Studio research: ${SEARCH_KINDS.studio.limit} new searches a day, counted apart from niche search`);
+const tomorrow = await rationedSearch("u1", "UCme", "studio", "one more", "hi", NOW + day);
+assert(tomorrow.videos.length === 1, "research opens again the next day");
+
+// ---- Free image model (Cloudflare Workers AI) -------------------------------------------------------------
+process.env.CLOUDFLARE_ACCOUNT_ID = "acc";
+process.env.CLOUDFLARE_AI_TOKEN = "tok";
+const { generateBackground, imageProvider } = await import("@/lib/images");
+let cfBody: { prompt?: string; steps?: number } = {};
+globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+  assert(String(input).includes("/accounts/acc/ai/run/@cf/black-forest-labs/flux-1-schnell"), "calls Cloudflare's FLUX.1 schnell");
+  cfBody = JSON.parse(String(init?.body));
+  return Response.json({ result: { image: Buffer.from("jpegbytes").toString("base64") }, success: true });
+}) as typeof fetch;
+const img = await generateBackground("rainy street", 7);
+assert(imageProvider() === "cloudflare" && Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && /No text/.test(cfBody.prompt ?? ""), "Cloudflare is used first; the image comes back decoded, with no text asked for");
+globalThis.fetch = realFetch;
+
 console.log("all outlier tests passed");
 process.exit(0);

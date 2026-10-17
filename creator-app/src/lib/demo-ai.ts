@@ -30,11 +30,11 @@ export const DEMO_DOCTOR: Doctor = {
 
 export const DEMO_TITLES: Titles = {
   titles: [
-    { title: "₹20,000 Me Best Camera Phone? Raat Me Test Kiya 🌙", why: "Price + specific test condition creates curiosity", strength: 9 },
-    { title: "In 3 Phones Ko Mat Lena — ₹20k Budget Guide", why: "Negative framing ('mat lena') pulls clicks from cautious buyers", strength: 8 },
-    { title: "Night Camera Shootout: Kaun Jeeta? (Shocking)", why: "Competition format; 'kaun jeeta' is searchable Hinglish", strength: 7 },
-    { title: "₹20k Phone vs ₹80k iPhone — Low Light Me Fark?", why: "David vs Goliath comparison drives debate in comments", strength: 8 },
-    { title: "Mera Honest Pick: Best Camera Under ₹20,000", why: "Trust-led title for returning subscribers", strength: 6 },
+    { title: "₹20,000 Me Best Camera Phone? Raat Me Test Kiya 🌙", why: "Price + specific test condition creates curiosity", strength: 9, pattern: "price + test" },
+    { title: "In 3 Phones Ko Mat Lena — ₹20k Budget Guide", why: "Negative framing ('mat lena') pulls clicks from cautious buyers", strength: 8, pattern: "warning" },
+    { title: "Night Camera Shootout: Kaun Jeeta? (Shocking)", why: "Competition format; 'kaun jeeta' is searchable Hinglish", strength: 7, pattern: "contest + question" },
+    { title: "₹20k Phone vs ₹80k iPhone — Low Light Me Fark?", why: "David vs Goliath comparison drives debate in comments", strength: 8, pattern: "cheap vs expensive" },
+    { title: "Mera Honest Pick: Best Camera Under ₹20,000", why: "Trust-led title for returning subscribers", strength: 6, pattern: "" },
   ],
   thumbnailText: ["कौन जीता?", "₹20k का KING", "रात का टेस्ट", "मत लेना!"],
   hook: "Raat ke 11 baje, Aminabad market, aur 3 phones. Sirf ek phone ne ye photo khinchi — aur wo sabse sasta tha. Kaunsa? Video ke end tak ruko, lekin pehle dekho ye pehla sample…",
