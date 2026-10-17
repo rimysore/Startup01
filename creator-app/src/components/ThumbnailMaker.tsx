@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ThumbnailDesign } from "@/lib/ai";
 import { Button } from "./ui";
 
@@ -203,12 +203,20 @@ function wrap(ctx: CanvasRenderingContext2D, words: string[], maxWidth: number, 
   return lines.slice(0, maxLines);
 }
 
-/** Big outlined headline; the highlight word gets the accent colour. */
-function headline(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, family: string, x: number, maxWidth: number, align: "left" | "center") {
+interface HeadlineLayout {
+  size: number;
+  lines: string[][];
+  top: number;
+  lineH: number;
+  x: number;
+  align: "left" | "center";
+  box: Box;
+}
+
+/** Fits the headline: as big as possible in at most 3 lines within `maxWidth`. */
+function layoutHeadline(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, family: string, x: number, maxWidth: number, align: "left" | "center", offsetY = 0): HeadlineLayout | null {
   const words = d.headline.split(/\s+/).filter(Boolean);
-  if (!words.length) return;
-  const norm = (w: string) => w.replace(/[^\p{L}\p{N}₹]/gu, "").toLowerCase();
-  const hi = norm(d.highlight);
+  if (!words.length) return null;
   let size = 200;
   let lines: string[][] = [];
   do {
@@ -219,21 +227,33 @@ function headline(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, family: str
   size += 6;
   ctx.font = `800 ${size}px ${family}`;
   const lineH = size * 1.08;
-  const top = (H - lines.length * lineH) / 2 + size * 0.82;
+  const top = (H - lines.length * lineH) / 2 + size * 0.82 + offsetY;
+  const widths = lines.map((l) => ctx.measureText(l.join(" ")).width);
+  const widest = Math.max(...widths);
+  const left = align === "center" ? x - widest / 2 : x;
+  const pad = size * 0.12;
+  return { size, lines, top, lineH, x, align, box: { x: left - pad, y: top - size * 0.95 - pad, w: widest + pad * 2, h: (lines.length - 1) * lineH + size * 1.25 + pad * 2 } };
+}
+
+/** Big outlined headline; the highlight word gets the accent colour. */
+function drawHeadline(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, family: string, l: HeadlineLayout) {
+  const norm = (w: string) => w.replace(/[^\p{L}\p{N}₹]/gu, "").toLowerCase();
+  const hi = norm(d.highlight);
+  ctx.font = `800 ${l.size}px ${family}`;
   const space = ctx.measureText(" ").width;
   ctx.lineJoin = "round";
   ctx.textBaseline = "alphabetic";
-  lines.forEach((line, i) => {
-    const y = top + i * lineH;
+  l.lines.forEach((line, i) => {
+    const y = l.top + i * l.lineH;
     const width = ctx.measureText(line.join(" ")).width;
-    let cx = align === "center" ? x - width / 2 : x;
+    let cx = l.align === "center" ? l.x - width / 2 : l.x;
     for (const word of line) {
       const ww = ctx.measureText(word).width;
       ctx.save();
       ctx.shadowColor = "rgba(0,0,0,0.6)";
       ctx.shadowBlur = 24;
       ctx.shadowOffsetY = 8;
-      ctx.lineWidth = size * 0.16;
+      ctx.lineWidth = l.size * 0.16;
       ctx.strokeStyle = d.palette.stroke;
       ctx.strokeText(word, cx, y);
       ctx.restore();
@@ -242,6 +262,11 @@ function headline(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, family: str
       cx += ww + space;
     }
   });
+}
+
+function badgeWidth(ctx: CanvasRenderingContext2D, text: string, family: string): number {
+  ctx.font = `800 52px ${family}`;
+  return ctx.measureText(text).width + 56;
 }
 
 function badge(ctx: CanvasRenderingContext2D, text: string, family: string, accent: string, stroke: string) {
@@ -263,7 +288,50 @@ function badge(ctx: CanvasRenderingContext2D, text: string, family: string, acce
   ctx.restore();
 }
 
-export function drawThumbnail(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, photos: Photo[], background: HTMLImageElement | null, family: string) {
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+/** What can be dragged and resized on the thumbnail. */
+export type LayerId = "headline" | "badge" | "emoji" | "subject" | "inset0" | "inset1";
+export interface LayerEdit {
+  dx: number;
+  dy: number;
+  scale: number;
+}
+export type LayerEdits = Partial<Record<LayerId, LayerEdit>>;
+
+const NO_EDIT: LayerEdit = { dx: 0, dy: 0, scale: 1 };
+
+/**
+ * Draws one element moved and scaled around its own centre, and records where it ended up so the editor can put
+ * a handle on it.
+ */
+function layer(ctx: CanvasRenderingContext2D, id: LayerId, box: Box, edits: LayerEdits, boxes: Partial<Record<LayerId, Box>>, draw: () => void) {
+  const e = edits[id] ?? NO_EDIT;
+  const cx = box.x + box.w / 2;
+  const cy = box.y + box.h / 2;
+  ctx.save();
+  ctx.translate(cx + e.dx, cy + e.dy);
+  ctx.scale(e.scale, e.scale);
+  ctx.translate(-cx, -cy);
+  draw();
+  ctx.restore();
+  boxes[id] = { x: cx + e.dx - (box.w * e.scale) / 2, y: cy + e.dy - (box.h * e.scale) / 2, w: box.w * e.scale, h: box.h * e.scale };
+}
+
+/** Draws the whole thumbnail and returns where each movable element is (canvas pixels). */
+export function drawThumbnail(
+  ctx: CanvasRenderingContext2D,
+  d: ThumbnailDesign,
+  photos: Photo[],
+  background: HTMLImageElement | null,
+  family: string,
+  edits: LayerEdits = {},
+): Partial<Record<LayerId, Box>> {
+  const boxes: Partial<Record<LayerId, Box>> = {};
   ctx.clearRect(0, 0, W, H);
   const role = (r: string) => d.images.filter((im) => im.role === r && photos[im.index]);
   const subjects = role("subject");
@@ -272,13 +340,14 @@ export function drawThumbnail(ctx: CanvasRenderingContext2D, d: ThumbnailDesign,
   // Without AI guidance, the first uploaded photo is the subject.
   const subject = subjects[0] ?? (photos[0] && !d.images.length ? { index: 0, role: "subject" as const, focusX: 0.5, focusY: 0.4, zoom: 1 } : undefined);
   const left = d.layout === "subject-left";
+  const text = (l: HeadlineLayout | null) => l && layer(ctx, "headline", l.box, edits, boxes, () => drawHeadline(ctx, d, family, l));
 
   if (d.layout === "full-bleed" && (subject || bgPick)) {
     const im = (subject ?? bgPick)!;
     cover(ctx, photos[im.index].img, 0, 0, W, H, im.focusX, im.focusY, im.zoom);
     textScrim(ctx, im.focusX > 0.5 ? "left" : "right");
     vignette(ctx, 0.5);
-    headline(ctx, d, family, im.focusX > 0.5 ? 64 : W * 0.45, W * 0.5, "left");
+    text(layoutHeadline(ctx, d, family, im.focusX > 0.5 ? 64 : W * 0.45, W * 0.5, "left"));
   } else if (d.layout === "split" && subjects.length >= 2) {
     subjects.slice(0, 2).forEach((im, i) => {
       ctx.save();
@@ -292,10 +361,7 @@ export function drawThumbnail(ctx: CanvasRenderingContext2D, d: ThumbnailDesign,
     ctx.fillRect(W / 2 - 6, 0, 12, H);
     textScrim(ctx, "bottom");
     vignette(ctx, 0.4);
-    ctx.save();
-    ctx.translate(0, H * 0.24);
-    headline(ctx, d, family, W / 2, W * 0.9, "center");
-    ctx.restore();
+    text(layoutHeadline(ctx, d, family, W / 2, W * 0.9, "center", H * 0.24));
   } else {
     const subjX = left ? W * 0.27 : W * 0.73;
     if (bgPick) {
@@ -312,25 +378,66 @@ export function drawThumbnail(ctx: CanvasRenderingContext2D, d: ThumbnailDesign,
       richBackground(ctx, d.palette, subject ? subjX : W * 0.8);
       vignette(ctx, 0.45);
     }
-    if (subject) subjectCard(ctx, photos[subject.index].img, subjX, d.palette, subject.focusX, subject.focusY, subject.zoom, left ? 0.035 : -0.035);
+    if (subject) {
+      const sw = W * 0.42 + 24;
+      const sh = H * 0.8 + 24;
+      layer(ctx, "subject", { x: subjX - sw / 2, y: H / 2 + 10 - sh / 2, w: sw, h: sh }, edits, boxes, () =>
+        subjectCard(ctx, photos[subject.index].img, subjX, d.palette, subject.focusX, subject.focusY, subject.zoom, left ? 0.035 : -0.035),
+      );
+    }
     const textX = subject ? (left ? W * 0.52 : 64) : 64;
-    headline(ctx, d, family, textX, subject ? W * 0.48 : W * 0.86, "left");
-    if (subject && d.arrow) arrow(ctx, left ? W * 0.62 : W * 0.4, H * 0.86, left ? W * 0.47 : W * 0.53, H * 0.66, d.palette.accent);
+    text(layoutHeadline(ctx, d, family, textX, subject ? W * 0.48 : W * 0.86, "left"));
+    // The arrow points at the subject, so it moves with it.
+    if (subject && d.arrow) {
+      const e = edits.subject ?? NO_EDIT;
+      arrow(ctx, left ? W * 0.62 : W * 0.4, H * 0.86, (left ? W * 0.47 : W * 0.53) + e.dx, H * 0.66 + e.dy, d.palette.accent);
+    }
   }
 
   insets.slice(0, 2).forEach((im, i) => {
-    inset(ctx, photos[im.index].img, left ? W - 150 - i * 210 : 150 + i * 210, H - 140, 95, d.palette.accent, im.focusX, im.focusY, im.zoom);
+    const x = left ? W - 150 - i * 210 : 150 + i * 210;
+    const r = 95;
+    layer(ctx, i ? "inset1" : "inset0", { x: x - r - 10, y: H - 140 - r - 10, w: 2 * r + 20, h: 2 * r + 20 }, edits, boxes, () =>
+      inset(ctx, photos[im.index].img, x, H - 140, r, d.palette.accent, im.focusX, im.focusY, im.zoom),
+    );
   });
   if (d.emoji) {
+    const ex = left ? 40 : W - 200;
     ctx.font = `150px ${family}`;
-    ctx.fillText(d.emoji, left ? 40 : W - 200, 180);
+    const ew = ctx.measureText(d.emoji).width;
+    layer(ctx, "emoji", { x: ex, y: 40, w: ew, h: 170 }, edits, boxes, () => {
+      ctx.font = `150px ${family}`;
+      ctx.fillText(d.emoji, ex, 180);
+    });
   }
-  badge(ctx, d.badge, family, d.palette.accent, d.palette.stroke);
+  if (d.badge.trim()) {
+    layer(ctx, "badge", { x: 40, y: 34, w: badgeWidth(ctx, d.badge, family) + 8, h: 96 }, edits, boxes, () => badge(ctx, d.badge, family, d.palette.accent, d.palette.stroke));
+  }
+  return boxes;
 }
+
+const LAYER_NAMES: Record<LayerId, string> = { headline: "Text", badge: "Badge", emoji: "Emoji", subject: "Your photo", inset0: "Small photo", inset1: "Small photo 2" };
+const NO_EDITS: LayerEdits = {};
+
+/** Fonts for the text. Indian scripts always fall back to Noto, so every font works in every language. */
+const FONTS = [
+  { id: "bold", name: "Bold", probe: "font-indic" },
+  { id: "display", name: "Display", probe: "font-display" },
+  { id: "classic", name: "Classic", probe: "font-serif" },
+] as const;
+type FontId = (typeof FONTS)[number]["id"];
+
+const TEXT_COLOURS = ["#ffffff", "#ffd23f", "#ff4d6d", "#2ee6c9", "#17140f"];
+const MIN_SCALE = 0.3;
+const MAX_SCALE = 3;
+const clampScale = (n: number) => Math.min(MAX_SCALE, Math.max(MIN_SCALE, n));
+
+type Drag = { id: LayerId; mode: "move" | "scale"; startX: number; startY: number; start: LayerEdit; cx: number; cy: number; dist: number; ratio: number };
 
 /**
  * The thumbnail canvas (1280x720). Mitra plans the design; the browser draws it, so Devanagari, Telugu,
- * Tamil etc. render correctly — which most AI image generators still get wrong.
+ * Tamil etc. render correctly — which most AI image generators still get wrong. Every element can then be dragged
+ * and resized by hand (mouse or finger), free.
  */
 export function ThumbnailMaker({
   design,
@@ -348,17 +455,107 @@ export function ThumbnailMaker({
   credit: string | null;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const fontProbe = useRef<HTMLSpanElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const probes = useRef<Partial<Record<FontId, HTMLSpanElement | null>>>({});
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [font, setFont] = useState<FontId>("bold");
+  // Hand edits belong to one design: a new design from Mitra (or new photos) starts clean.
+  const designKey = `${design.layout}|${design.why}|${photos.length}|${design.images.length}`;
+  const [edits, setEdits] = useState<{ key: string; layers: LayerEdits }>({ key: designKey, layers: {} });
+  const layers = useMemo(() => (edits.key === designKey ? edits.layers : NO_EDITS), [edits, designKey]);
+  const [boxes, setBoxes] = useState<Partial<Record<LayerId, Box>>>({});
+  const [selected, setSelected] = useState<LayerId | null>(null);
+  const drag = useRef<Drag | null>(null);
+
+  const setLayer = (id: LayerId, e: LayerEdit) => setEdits({ key: designKey, layers: { ...layers, [id]: e } });
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");
-    if (!ctx || !fontProbe.current) return;
-    const family = getComputedStyle(fontProbe.current).fontFamily;
-    const draw = () => drawThumbnail(ctx, design, photos, background, family);
+    const probe = probes.current[font] ?? probes.current.bold;
+    if (!ctx || !probe) return;
+    const indic = probes.current.bold ? getComputedStyle(probes.current.bold).fontFamily : "sans-serif";
+    // Latin from the chosen font; Indian scripts from Noto.
+    const family = font === "bold" ? indic : `${getComputedStyle(probe).fontFamily}, ${indic}`;
+    let live = true;
+    const draw = () => {
+      if (!live) return;
+      const b = drawThumbnail(ctx, design, photos, background, family, layers);
+      requestAnimationFrame(() => live && setBoxes(b));
+    };
     document.fonts.ready.then(draw);
     draw();
-  }, [design, photos, background]);
+    return () => {
+      live = false;
+    };
+  }, [design, photos, background, layers, font]);
+
+  /** Canvas pixels per screen pixel. */
+  const ratio = () => W / (stage.current?.getBoundingClientRect().width || W);
+
+  function startDrag(e: React.PointerEvent, id: LayerId, mode: Drag["mode"]) {
+    e.preventDefault();
+    e.stopPropagation();
+    setSelected(id);
+    const box = boxes[id];
+    const rect = stage.current?.getBoundingClientRect();
+    if (!box || !rect) return;
+    const r = ratio();
+    const cx = rect.left + (box.x + box.w / 2) / r;
+    const cy = rect.top + (box.y + box.h / 2) / r;
+    drag.current = { id, mode, startX: e.clientX, startY: e.clientY, start: layers[id] ?? NO_EDIT, cx, cy, dist: Math.max(8, Math.hypot(e.clientX - cx, e.clientY - cy)), ratio: r };
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    // No accidental text selection on the rest of the page while dragging.
+    document.documentElement.classList.add("select-none");
+    window.getSelection()?.removeAllRanges();
+  }
+
+  function endDrag() {
+    drag.current = null;
+    document.documentElement.classList.remove("select-none");
+  }
+
+  function onDrag(e: React.PointerEvent) {
+    const g = drag.current;
+    if (!g) return;
+    if (g.mode === "move") {
+      setLayer(g.id, { ...g.start, dx: g.start.dx + (e.clientX - g.startX) * g.ratio, dy: g.start.dy + (e.clientY - g.startY) * g.ratio });
+    } else {
+      setLayer(g.id, { ...g.start, scale: clampScale((g.start.scale * Math.hypot(e.clientX - g.cx, e.clientY - g.cy)) / g.dist) });
+    }
+  }
+
+  function resize(id: LayerId, factor: number) {
+    const cur = layers[id] ?? NO_EDIT;
+    setLayer(id, { ...cur, scale: clampScale(cur.scale * factor) });
+  }
+
+  function nudge(e: React.KeyboardEvent) {
+    if (!selected) return;
+    const cur = layers[selected] ?? NO_EDIT;
+    const step = e.shiftKey ? 40 : 8;
+    const moves: Record<string, [number, number]> = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
+    if (moves[e.key]) {
+      e.preventDefault();
+      setLayer(selected, { ...cur, dx: cur.dx + moves[e.key][0], dy: cur.dy + moves[e.key][1] });
+    } else if (e.key === "+" || e.key === "=") resize(selected, 1.08);
+    else if (e.key === "-") resize(selected, 1 / 1.08);
+    else if (e.key === "Escape") setSelected(null);
+  }
+
+  // Scroll on the selected element to resize it (a non-passive listener, so the page doesn't scroll instead).
+  useEffect(() => {
+    const el = stage.current;
+    if (!el || !selected) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      resize(selected, e.deltaY < 0 ? 1.05 : 1 / 1.05);
+    };
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  });
+
+  const edited = Object.keys(layers).length > 0;
+  const pct = (n: number, of: number) => `${(n / of) * 100}%`;
 
   async function addPhotos(files: FileList | null) {
     if (!files) return;
@@ -389,11 +586,81 @@ export function ThumbnailMaker({
 
   return (
     <div className="grid gap-5 lg:grid-cols-[1fr_280px]">
-      <div>
-        <canvas ref={canvas} width={W} height={H} className="aspect-video w-full rounded-xl border border-line" aria-label="Thumbnail preview" />
-        <span ref={fontProbe} className="pointer-events-none absolute opacity-0 font-indic" aria-hidden>
-          .
-        </span>
+      <div className="min-w-0">
+        <div
+          ref={stage}
+          className="relative select-none outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-xl"
+          tabIndex={0}
+          onKeyDown={nudge}
+          onPointerDown={() => setSelected(null)}
+          aria-label="Thumbnail editor: drag to move, drag the corner or scroll to resize"
+        >
+          <canvas ref={canvas} width={W} height={H} className="block aspect-video w-full rounded-xl border border-line" aria-label="Thumbnail preview" />
+          {(Object.keys(boxes) as LayerId[]).map((id) => {
+            const b = boxes[id]!;
+            const on = selected === id;
+            return (
+              <div
+                key={id}
+                role="button"
+                aria-label={`Move ${LAYER_NAMES[id]}`}
+                aria-pressed={on}
+                onPointerDown={(e) => startDrag(e, id, "move")}
+                onPointerMove={onDrag}
+                onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+                className={`group absolute cursor-move touch-none rounded-lg border-2 transition-colors ${on ? "border-accent" : "border-transparent hover:border-white/70 hover:border-dashed"}`}
+                style={{ left: pct(b.x, W), top: pct(b.y, H), width: pct(b.w, W), height: pct(b.h, H) }}
+              >
+                {on && (
+                  <>
+                    <span className="pointer-events-none absolute -top-6 left-0 whitespace-nowrap rounded-md bg-accent px-1.5 py-0.5 text-[10px] font-bold text-accent-ink">{LAYER_NAMES[id]}</span>
+                    <span
+                      role="button"
+                      aria-label={`Resize ${LAYER_NAMES[id]}`}
+                      onPointerDown={(e) => startDrag(e, id, "scale")}
+                      onPointerMove={onDrag}
+                      onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+                      className="absolute -bottom-2.5 -right-2.5 h-5 w-5 cursor-nwse-resize touch-none rounded-full border-2 border-white bg-accent shadow"
+                    />
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {FONTS.map((f) => (
+          <span key={f.id} ref={(el) => void (probes.current[f.id] = el)} className={`pointer-events-none absolute opacity-0 ${f.probe}`} aria-hidden>
+            .
+          </span>
+        ))}
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+          {selected ? (
+            <>
+              <span className="font-semibold">{LAYER_NAMES[selected]}:</span>
+              <button onClick={() => resize(selected, 1 / 1.12)} className="rounded-full border border-line px-3 py-1.5 font-semibold hover:bg-surface-2" aria-label="Smaller">
+                A− Smaller
+              </button>
+              <button onClick={() => resize(selected, 1.12)} className="rounded-full border border-line px-3 py-1.5 font-semibold hover:bg-surface-2" aria-label="Bigger">
+                A+ Bigger
+              </button>
+              <button onClick={() => setLayer(selected, NO_EDIT)} className="rounded-full border border-line px-3 py-1.5 hover:bg-surface-2">
+                Reset
+              </button>
+              <button onClick={() => setSelected(null)} className="rounded-full px-3 py-1.5 text-muted hover:bg-surface-2">
+                Done
+              </button>
+            </>
+          ) : (
+            <span className="text-muted">✋ Drag text and photos to move them · pull the corner dot (or scroll) to resize · arrow keys nudge</span>
+          )}
+          {edited && (
+            <button onClick={() => (setEdits({ key: designKey, layers: {} }), setSelected(null))} className="ml-auto rounded-full px-3 py-1.5 text-muted hover:bg-surface-2">
+              Undo all moves
+            </button>
+          )}
+        </div>
         {credit && <p className="mt-1.5 text-xs text-muted">Background: {credit}</p>}
         {design.why && <p className="mt-2 text-sm text-ink-2">💡 {design.why}</p>}
       </div>
@@ -446,6 +713,35 @@ export function ThumbnailMaker({
                 className={`h-9 w-9 rounded-full border-2 ${design.palette.bgFrom === s.palette.bgFrom ? "border-ink" : "border-transparent"}`}
                 style={{ background: `linear-gradient(135deg, ${s.palette.bgFrom}, ${s.palette.bgTo})` }}
                 aria-label={`${s.name} colours`}
+              />
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-muted">Font</p>
+          <div className="mt-1 flex gap-2">
+            {FONTS.map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFont(f.id)}
+                aria-pressed={font === f.id}
+                className={`flex-1 rounded-xl border px-2 py-2 text-sm font-extrabold ${f.probe} ${font === f.id ? "border-ink bg-ink text-bg" : "border-line hover:bg-surface-2"}`}
+              >
+                {f.name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p className="text-xs font-medium text-muted">Text colour</p>
+          <div className="mt-1 flex gap-2">
+            {TEXT_COLOURS.map((c) => (
+              <button
+                key={c}
+                onClick={() => onDesignChange({ ...design, palette: { ...design.palette, text: c, stroke: c === "#17140f" ? "#ffffff" : design.palette.stroke === "#ffffff" ? "#000000" : design.palette.stroke } })}
+                className={`h-8 w-8 rounded-full border-2 ${design.palette.text.toLowerCase() === c ? "border-accent" : "border-line"}`}
+                style={{ background: c }}
+                aria-label={`Text colour ${c}`}
               />
             ))}
           </div>

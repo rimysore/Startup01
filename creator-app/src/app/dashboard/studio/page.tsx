@@ -148,8 +148,8 @@ export default function StudioPage() {
     const res = await fetch("/api/thumbnail/background", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ prompt }) }).catch(() => null);
     if (res?.ok) await showImage(res, { query: prompt, n: 0, count: 1, ai: true });
     else {
-      const body = (await res?.json().catch(() => null)) as { error?: string; upgrade?: boolean } | null;
-      setDesignNote({ error: { message: body?.error ?? "Couldn't make a background right now.", upgrade: body?.upgrade } });
+      const body = (await res?.json().catch(() => null)) as { error?: string; upgrade?: boolean; detail?: string } | null;
+      setDesignNote({ error: { message: body?.error ?? "Couldn't make a background right now.", upgrade: body?.upgrade, detail: body?.detail } });
     }
     setPainting(false);
     refreshMe();

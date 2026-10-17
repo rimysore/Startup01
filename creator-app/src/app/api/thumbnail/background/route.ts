@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { logCall, overDailyBudget, overRateLimit } from "@/lib/ai-guard";
-import { currentUser } from "@/lib/auth";
+import { currentUser, isAdmin } from "@/lib/auth";
 import { generateBackground, imageCostUsd, IMAGE_MODEL, imageGenerationConfigured, UnsafeImage } from "@/lib/images";
 import { FEATURE_CREDITS } from "@/lib/plans";
 import { monthKey, refundCredit, reserveCredit } from "@/lib/usage";
@@ -36,9 +36,11 @@ export async function POST(request: Request) {
     });
   } catch (err) {
     await refundCredit(user.id, month, FEATURE_CREDITS.image, pool);
-    console.error("Image generation failed:", err instanceof Error ? err.message : err);
+    const detail = err instanceof Error ? err.message : String(err);
+    console.error("Image generation failed:", detail);
     if (err instanceof UnsafeImage) return Response.json({ error: "That background couldn't be made. Try different words." }, { status: 422 });
-    return Response.json({ error: "Couldn't make a background right now." }, { status: 502 });
+    // The provider's own message (bad token, wrong account id, quota) is shown to admins only.
+    return Response.json({ error: "Couldn't make a background right now.", ...(isAdmin(user) ? { detail } : {}) }, { status: 502 });
   }
 }
 

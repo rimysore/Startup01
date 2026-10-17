@@ -66,7 +66,9 @@ export default function AssistantPage() {
 
   return (
     // dvh = the visible screen on phones (browser bars excluded); leave room for the bottom tab bar there.
-    <div className="rise flex h-[calc(100dvh-13.5rem)] min-h-[420px] flex-col lg:h-[calc(100dvh-170px)] lg:min-h-[520px]">
+    // translate="no": Chrome offers to "translate" Hinglish replies, and its rewriting of the page's text makes
+    // React crash on the next message ("This page couldn't load").
+    <div translate="no" className="notranslate rise flex h-[calc(100dvh-13.5rem)] min-h-[420px] flex-col lg:h-[calc(100dvh-170px)] lg:min-h-[520px]">
       <PageHeader eyebrow="Ask Mitra" title="Your manager, on call" />
       <Card className="flex min-h-0 flex-1 flex-col !p-0">
         <div className="flex-1 space-y-4 overflow-y-auto p-5 sm:p-6">
