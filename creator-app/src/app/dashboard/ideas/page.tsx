@@ -22,7 +22,8 @@ interface IdeasResponse {
   error?: string;
 }
 
-const QUERY_KEY = "mitra-niche-query";
+/** Per account: re-running someone else's search on a shared browser would spend this creator's searches. */
+const queryKey = (userId: string) => `mitra-niche-query:${userId}`;
 
 function BreakoutRow({ v }: { v: BreakoutVideo }) {
   return (
@@ -51,7 +52,8 @@ function BreakoutRow({ v }: { v: BreakoutVideo }) {
 }
 
 export default function IdeasPage() {
-  const { language, summary, refreshMe } = useDashboard();
+  const { language, summary, refreshMe, me } = useDashboard();
+  const userId = me?.user?.id ?? "guest";
   const [data, setData] = useState<IdeasResponse | null>(null);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState<{ query: string; breakouts: BreakoutVideo[] } | null>(null);
@@ -76,7 +78,7 @@ export default function IdeasPage() {
         // Re-open the last search: it's cached for a week, so this costs nothing.
         let last = "";
         try {
-          last = localStorage.getItem(QUERY_KEY) ?? "";
+          last = localStorage.getItem(queryKey(userId)) ?? "";
         } catch {}
         if (last) {
           setQuery(last);
@@ -101,7 +103,7 @@ export default function IdeasPage() {
     if (!r?.ok || !d?.breakouts) return setSearchError(d?.error ?? "Couldn't search right now.");
     setSearch({ query: d.query ?? q, breakouts: d.breakouts });
     try {
-      localStorage.setItem(QUERY_KEY, d.query ?? q);
+      localStorage.setItem(queryKey(userId), d.query ?? q);
     } catch {}
   }
 

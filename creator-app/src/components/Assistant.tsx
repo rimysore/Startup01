@@ -13,7 +13,8 @@ interface Msg {
   content: string;
 }
 
-const STORE = "mitra-chat";
+/** Per account, so a second person signing in on the same browser never sees someone else's conversation. */
+const storeKey = (userId: string) => `mitra-chat:${userId}`;
 const SPARK = "M12 3l1.9 5.8L20 10l-6.1 1.2L12 17l-1.9-5.8L4 10l6.1-1.2zM19 17l.8 2.2L22 20l-2.2.8L19 23l-.8-2.2L16 20l2.2-.8z";
 
 /** The panel's own words in each language, so a Telugu creator isn't greeted (and nudged) in Hinglish. */
@@ -51,9 +52,9 @@ function Rich({ text }: { text: string }) {
   );
 }
 
-function loadSaved(): Msg[] {
+function loadSaved(userId: string): Msg[] {
   try {
-    const raw = sessionStorage.getItem(STORE);
+    const raw = sessionStorage.getItem(storeKey(userId));
     const v = raw ? (JSON.parse(raw) as Msg[]) : [];
     return Array.isArray(v) ? v.filter((m) => (m.role === "user" || m.role === "assistant") && typeof m.content === "string").slice(-30) : [];
   } catch {
@@ -68,8 +69,9 @@ function loadSaved(): Msg[] {
  */
 export function AssistantChat({ onClose }: { onClose?: () => void }) {
   const { language, refreshMe, me } = useDashboard();
+  const userId = me?.user?.id ?? "guest";
   const path = usePathname();
-  const [messages, setMessages] = useState<Msg[]>(loadSaved);
+  const [messages, setMessages] = useState<Msg[]>(() => loadSaved(userId));
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<AiError | null>(null);
@@ -79,9 +81,9 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
   useEffect(() => {
     end.current?.scrollIntoView({ block: "end" });
     try {
-      sessionStorage.setItem(STORE, JSON.stringify(messages.slice(-30)));
+      sessionStorage.setItem(storeKey(userId), JSON.stringify(messages.slice(-30)));
     } catch {}
-  }, [messages, sending]);
+  }, [messages, sending, userId]);
   useEffect(() => field.current?.focus(), []);
 
   async function send(text: string) {
@@ -201,6 +203,7 @@ export function AssistantChat({ onClose }: { onClose?: () => void }) {
  */
 export function AssistantWidget() {
   const path = usePathname();
+  const { me } = useDashboard();
   const [state, setState] = useState<"closed" | "open" | "closing">("closed");
   const close = () => {
     setState("closing");
@@ -214,6 +217,8 @@ export function AssistantWidget() {
   }, [state]);
   // The full-page chat doesn't need a second one floating over it.
   if (path.startsWith("/dashboard/assistant")) return null;
+  // Mitra answers from the creator's own channel, so there's nothing to ask before it's connected.
+  if (!me?.user || !me.youtube) return null;
 
   return (
     <>

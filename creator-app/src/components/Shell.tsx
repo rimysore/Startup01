@@ -142,7 +142,7 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 function AccountMenu() {
-  const { me, reload } = useDashboard();
+  const { me } = useDashboard();
   const [open, setOpen] = useState(false);
   if (!me) return <div className="h-9 w-9 rounded-full bg-surface-2" />;
   if (!me.user) {
@@ -157,8 +157,13 @@ function AccountMenu() {
 
   async function signOut() {
     await fetch("/api/auth/logout", { method: "POST" });
-    setOpen(false);
-    reload();
+    // Drop everything this account left in the tab (chats, page state) before anyone else signs in.
+    try {
+      for (const k of Object.keys(sessionStorage)) if (k.startsWith("mitra-chat")) sessionStorage.removeItem(k);
+    } catch {}
+    // A full page load (not router.push) so no page keeps the last account's data in memory.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.assign("/");
   }
 
   return (
@@ -266,9 +271,66 @@ function BottomTabs() {
   );
 }
 
+/** Pages a signed-in creator can use before connecting YouTube. Everything else needs their real channel. */
+const OPEN_PATHS = ["/dashboard/connections", "/dashboard/billing"];
+
+/**
+ * No demo channel inside the app: signed-out visitors are asked to sign in, and signed-in creators connect YouTube
+ * first (right after picking their language), so nobody mistakes sample numbers for their own.
+ */
+function ChannelGate({ children }: { children: React.ReactNode }) {
+  const path = usePathname();
+  const { me } = useDashboard();
+  if (!me) return <div className="h-64 animate-pulse rounded-3xl bg-surface-2" aria-label="Loading" />;
+  const open = OPEN_PATHS.some((p) => path.startsWith(p)) || (me.admin && ADMIN_NAV.some((a) => path.startsWith(a.href)));
+  if (me.user && ((me.youtube && !me.youtube.needsReconnect) || open)) return <>{children}</>;
+
+  const signedIn = Boolean(me.user);
+  const reconnect = Boolean(me.youtube?.needsReconnect);
+  return (
+    <div className="mx-auto max-w-xl py-6 text-center sm:py-12">
+      <span className="bg-brand mx-auto grid h-16 w-16 place-items-center rounded-2xl text-white">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+          <path d="M23 7.2a3 3 0 0 0-2.1-2.1C19 4.6 12 4.6 12 4.6s-7 0-8.9.5A3 3 0 0 0 1 7.2 31 31 0 0 0 .5 12a31 31 0 0 0 .5 4.8 3 3 0 0 0 2.1 2.1c1.9.5 8.9.5 8.9.5s7 0 8.9-.5a3 3 0 0 0 2.1-2.1 31 31 0 0 0 .5-4.8 31 31 0 0 0-.5-4.8zM9.7 15.1V8.9l5.8 3.1z" />
+        </svg>
+      </span>
+      <h1 className="mt-5 font-display text-3xl sm:text-4xl">
+        {!signedIn ? "Sign in to see your channel" : reconnect ? "Reconnect your YouTube channel" : "Connect your YouTube channel"}
+      </h1>
+      <p className="mt-3 text-ink-2">
+        {!signedIn
+          ? "Mitra works on your own YouTube numbers. Sign in with the Google account that owns your channel."
+          : reconnect
+            ? "Google stopped sharing your channel with Mitra. Connect again to see your latest numbers."
+            : "Everything in Mitra is built from your own channel: how each video did, what to post next, your Monday report. It takes one minute."}
+      </p>
+      {signedIn && (
+        <ul className="mx-auto mt-5 max-w-sm space-y-1.5 text-left text-sm text-ink-2">
+          <li>🔒 Read-only: Mitra can never upload, edit or delete anything</li>
+          <li>👤 Only you see your data</li>
+          <li>↩️ Disconnect any time in Connections</li>
+        </ul>
+      )}
+      <a
+        href={signedIn ? "/api/auth/youtube/start" : `/login?next=${encodeURIComponent(path)}`}
+        className="bg-brand mt-7 inline-block rounded-full px-7 py-3.5 font-bold text-white transition hover:-translate-y-0.5"
+      >
+        {!signedIn ? "Sign in with Google" : reconnect ? "Reconnect YouTube" : "Connect YouTube"}
+      </a>
+      {signedIn && process.env.NEXT_PUBLIC_GOOGLE_VERIFIED !== "1" && (
+        <p className="mx-auto mt-5 max-w-sm rounded-xl bg-surface-2 p-3 text-xs text-ink-2">
+          If Google says it hasn&apos;t verified this app, tap <b>Advanced</b>, then <b>Go to trymitraapp.com</b>. Google is still reviewing Mitra.
+        </p>
+      )}
+    </div>
+  );
+}
+
 function TopBar() {
-  const { summary } = useDashboard();
-  const live = summary?.mode === "live";
+  const { summary: loaded, me } = useDashboard();
+  // Sample numbers never show as someone's channel.
+  const summary = loaded?.mode === "live" && me?.youtube ? loaded : null;
+  const live = Boolean(summary);
   return (
     <header className="sticky top-0 z-20 flex items-center gap-2 border-b border-line bg-bg/85 px-3 py-2.5 backdrop-blur sm:gap-3 sm:px-8 sm:py-3">
       <div className="lg:hidden">
@@ -284,18 +346,10 @@ function TopBar() {
           </div>
         )}
         <div className="min-w-0">
-          <div className="truncate text-sm font-semibold">{summary?.channel.title ?? "Loading…"}</div>
+          <div className="truncate text-sm font-semibold">{summary?.channel.title ?? (me?.user ? me.youtube?.channelTitle ?? "No channel connected" : "Mitra")}</div>
           <div className="truncate text-xs text-muted">{summary?.channel.handle}</div>
         </div>
-        {summary && (
-          <span
-            className={`ml-1 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-              live ? "bg-good/15 text-good" : "bg-accent-soft text-accent"
-            }`}
-          >
-            {live ? "● Live" : "Demo channel"}
-          </span>
-        )}
+        {live && <span className="ml-1 rounded-full bg-good/15 px-2.5 py-1 text-[11px] font-semibold text-good">● Live</span>}
       </div>
       <div className="ml-auto flex min-w-0 items-center gap-2">
         <LanguageButton />
@@ -332,7 +386,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </aside>
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-8 sm:py-8 lg:pb-8">{children}</main>
+          <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-28 pt-6 sm:px-8 sm:py-8 lg:pb-8">
+            <ChannelGate>{children}</ChannelGate>
+          </main>
           <BottomTabs />
           <AssistantWidget />
           <LanguageOnboarding />

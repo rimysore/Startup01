@@ -219,18 +219,40 @@ interface HeadlineLayout {
   box: Box;
 }
 
-/** Fits the headline: as big as possible in at most 3 lines within `maxWidth`. */
+/** Room kept between text and the frame's edge, so the outline and shadow never get cut off. */
+const EDGE = 28;
+
+/**
+ * Fits the headline: as big as possible, every word kept, within `maxWidth` and the frame. Up to 3 lines while
+ * it's big, 4 when it has to get small; a single word too long for any line shrinks until it fits.
+ */
 function layoutHeadline(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, family: string, x: number, maxWidth: number, align: "left" | "center", offsetY = 0): HeadlineLayout | null {
   const words = d.headline.split(/\s+/).filter(Boolean);
   if (!words.length) return null;
-  let size = 200;
-  let lines: string[][] = [];
-  do {
+  // Never wider than the space between x and the frame's edge.
+  maxWidth = Math.min(maxWidth, align === "center" ? 2 * Math.min(x, W - x) - 2 * EDGE : W - x - EDGE);
+  const fits = (size: number) => {
     ctx.font = `800 ${size}px ${family}`;
-    lines = wrap(ctx, words, maxWidth, 3);
-    size -= 6;
-  } while (size > 56 && (lines.some((l) => ctx.measureText(l.join(" ")).width > maxWidth) || lines.length * size * 1.08 > H * 0.72 || lines.flat().length < words.length));
-  size += 6;
+    const maxLines = size >= 80 ? 3 : 4;
+    const lines = wrap(ctx, words, maxWidth, maxLines);
+    const ok =
+      lines.flat().length === words.length && lines.every((l) => ctx.measureText(l.join(" ")).width <= maxWidth) && lines.length * size * 1.08 + size * 0.3 <= H * 0.8;
+    return ok ? lines : null;
+  };
+  let size = 200;
+  let lines = fits(size);
+  while (!lines && size > 32) {
+    size -= 4;
+    lines = fits(size);
+  }
+  if (!lines) {
+    // A word longer than a whole line (long names, some Indian-language words): size to the longest word.
+    ctx.font = `800 32px ${family}`;
+    const widest = Math.max(...words.map((w) => ctx.measureText(w).width));
+    size = Math.max(14, Math.floor((32 * maxWidth) / widest));
+    ctx.font = `800 ${size}px ${family}`;
+    lines = wrap(ctx, words, maxWidth, 99);
+  }
   ctx.font = `800 ${size}px ${family}`;
   const lineH = size * 1.08;
   const top = (H - lines.length * lineH) / 2 + size * 0.82 + offsetY;
@@ -299,6 +321,8 @@ export interface Box {
   y: number;
   w: number;
   h: number;
+  /** Where the element sits before the creator's edits. */
+  base?: Box;
 }
 /** What can be dragged and resized on the thumbnail. */
 export type LayerId = "headline" | "badge" | "emoji" | "subject" | "inset0" | "inset1";
@@ -311,12 +335,27 @@ export type LayerEdits = Partial<Record<LayerId, LayerEdit>>;
 
 const NO_EDIT: LayerEdit = { dx: 0, dy: 0, scale: 1 };
 
+/** Writing must stay readable: text, badge and emoji can't be dragged or grown past the frame. Photos may bleed off. */
+const TEXT_LAYERS: ReadonlySet<LayerId> = new Set(["headline", "badge", "emoji"]);
+
+export function keepInFrame(id: LayerId, box: Box, e: LayerEdit): LayerEdit {
+  if (!TEXT_LAYERS.has(id) || box.w <= 0 || box.h <= 0) return e;
+  const m = 8;
+  const scale = Math.min(e.scale, (W - 2 * m) / box.w, (H - 2 * m) / box.h);
+  const w = box.w * scale;
+  const h = box.h * scale;
+  const cx = box.x + box.w / 2;
+  const cy = box.y + box.h / 2;
+  const clamp = (v: number, lo: number, hi: number) => (lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v)));
+  return { scale, dx: clamp(cx + e.dx, m + w / 2, W - m - w / 2) - cx, dy: clamp(cy + e.dy, m + h / 2, H - m - h / 2) - cy };
+}
+
 /**
  * Draws one element moved and scaled around its own centre, and records where it ended up so the editor can put
  * a handle on it.
  */
 function layer(ctx: CanvasRenderingContext2D, id: LayerId, box: Box, edits: LayerEdits, boxes: Partial<Record<LayerId, Box>>, draw: () => void) {
-  const e = edits[id] ?? NO_EDIT;
+  const e = keepInFrame(id, box, edits[id] ?? NO_EDIT);
   const cx = box.x + box.w / 2;
   const cy = box.y + box.h / 2;
   ctx.save();
@@ -325,7 +364,7 @@ function layer(ctx: CanvasRenderingContext2D, id: LayerId, box: Box, edits: Laye
   ctx.translate(-cx, -cy);
   draw();
   ctx.restore();
-  boxes[id] = { x: cx + e.dx - (box.w * e.scale) / 2, y: cy + e.dy - (box.h * e.scale) / 2, w: box.w * e.scale, h: box.h * e.scale };
+  boxes[id] = { x: cx + e.dx - (box.w * e.scale) / 2, y: cy + e.dy - (box.h * e.scale) / 2, w: box.w * e.scale, h: box.h * e.scale, base: box };
 }
 
 /**
@@ -502,7 +541,11 @@ export function ThumbnailMaker({
   const [selected, setSelected] = useState<LayerId | null>(null);
   const drag = useRef<Drag | null>(null);
 
-  const setLayer = (id: LayerId, e: LayerEdit) => setEdits({ key: designKey, layers: { ...layers, [id]: e } });
+  // Clamped as it's made (not only when drawn), so dragging back from an edge responds at once.
+  const setLayer = (id: LayerId, e: LayerEdit) => {
+    const base = boxes[id]?.base;
+    setEdits({ key: designKey, layers: { ...layers, [id]: base ? keepInFrame(id, base, e) : e } });
+  };
 
   useEffect(() => {
     const ctx = canvas.current?.getContext("2d");

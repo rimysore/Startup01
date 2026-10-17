@@ -240,6 +240,10 @@ export default function BillingPage() {
         {(Object.values(PLANS)).map((p) => {
           const isCurrent = p.id === current;
           const featured = highlighted ? highlighted === p.id : p.id === "pro";
+          // The Free allowance can be raised on the server (FREE_CREDITS, e.g. for early testers): show what they really get.
+          const limit = me?.usage?.limit;
+          const points =
+            p.id === "free" && current === "free" && limit && limit !== p.credits ? [`${limit} AI credits / month (early tester)`, ...p.points.slice(1)] : p.points;
           return (
             <div key={p.id} className={`card flex flex-col p-6 ${featured && !isCurrent ? "!border-accent ring-2 ring-accent/30" : ""}`}>
               <div className="flex items-center justify-between">
@@ -251,7 +255,7 @@ export default function BillingPage() {
                 {p.pricePaise > 0 && <span className="font-sans text-sm text-muted">/month</span>}
               </p>
               <ul className="mt-5 flex-1 space-y-2 text-sm text-ink-2">
-                {p.points.map((pt) => (
+                {points.map((pt) => (
                   <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>
                 ))}
               </ul>
