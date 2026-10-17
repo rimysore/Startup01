@@ -9,7 +9,7 @@ shows the actual cost of every AI call, per feature.
 | --- | --- | --- |
 | Titles (with YouTube research) | Haiku 5.5, ~1.5K tokens in, ~1.5K out; YouTube search is free (quota) | ~₹0.08 |
 | Thumbnail design (5 photos + 3 reference thumbnails) | Haiku 5.5 with images, ~4K in, ~1.5K out | ~₹0.10 |
-| Blend my photos (cut-out) | MediaPipe, runs on the creator's phone | ₹0 |
+| Pro thumbnail ("Make my thumbnail", the creator painted into the scene) | Haiku plan + Gemini Nano Banana 2.1, 2K image (~$0.0504) + photo input | **~₹4.8** (charged 6 credits) |
 | AI background, full HD | Cloudflare FLUX.2 klein: first ~30 a day free (whole account), then ~$0.0034 | ₹0 → ~₹0.30 |
 | Trends, audience, slang, comments, breakouts, competitors, Ask Mitra | Haiku 5.5, ~3K in, ~2K out | ~₹0.06–0.12 |
 | Video Doctor | Sonnet 5.5 (deeper reasoning), ~4K in, ~3–4K out | **~₹3–4** |
@@ -18,7 +18,9 @@ shows the actual cost of every AI call, per feature.
 | PDF report, email, YouTube data | Our servers, Gmail, YouTube API | ₹0 |
 
 One Haiku credit costs us about ₹0.10. One Video Doctor (5 credits since October 2026) costs about ₹3.3, i.e.
-₹0.66 per credit: **Video Doctor is where the money goes.**
+₹0.66 per credit. A pro thumbnail costs ~₹4.8 for 6 credits (₹0.80 per credit). **Video Doctor and pro thumbnails
+are where the money goes.** Worst case on Pro if every credit went to pro thumbnails: 16 × ₹4.8 ≈ ₹78 against
+₹82 kept: still (barely) positive, so 6 credits is the floor for it.
 
 ## Per creator, per month
 

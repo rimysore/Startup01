@@ -22,7 +22,7 @@ npm run dev                  # http://localhost:3000
 | `/` | Landing page | — |
 | `/dashboard` | KPIs, 28-day views chart, weekly suggested actions, recent uploads | YouTube Data + Analytics API |
 | `/dashboard/doctor` | Retention curve vs channel norm, drop/spike markers, AI diagnosis with fixes | Analytics API (`audienceWatchRatio`) + Claude |
-| `/dashboard/studio` | AI titles, 15-second hook, thumbnail text; canvas thumbnail maker that renders Indian scripts correctly, exports 1280×720 PNG | Claude |
+| `/dashboard/studio` | YouTube research of viral hits, AI titles, 15-second hook; pro thumbnails (the creator painted into a new scene by Gemini), editable canvas text in every Indian script, 1920×1080 JPEG export | Claude, Gemini, Cloudflare |
 | `/dashboard/trends` | Trend ideas by language and niche | **Sample data** for now |
 | `/dashboard/comments` | Mood, themes, questions, video ideas, reply drafts from mixed-language comments | `commentThreads` + Claude |
 | `/dashboard/assistant` | "Ask Mitra" chat that knows the channel's numbers | Claude |
@@ -40,7 +40,7 @@ The output language (top bar) controls what language the AI writes in.
   (disabled in production unless `ALLOW_DEV_LOGIN=1`).
 - **YouTube** is connected separately, after sign-in, with read-only scopes. Tokens are stored per user,
   encrypted (AES-256-GCM, key from `SESSION_SECRET`), and refreshed automatically.
-- **Plans** (`src/lib/plans.ts`): Free (10 AI credits / month), Pro ₹99 launch price (100), Creator+ ₹249 (250); Agency ₹1,999 is sold by conversation. The first 100 creators to connect a channel become **Founding Creators** (`users.founder_number`) with a **Founder Pass**: 50 free uses a month, for life, of the small-model features (titles, thumbnails, trends, audience, slang, comments, Ask Mitra), counted in `usage.founder_uses` apart from credits. Video Doctor and AI images still use credits.
+- **Plans** (`src/lib/plans.ts`): Free (10 AI credits / month), Pro ₹99 launch price (100), Creator+ ₹249 (250); Agency ₹1,999 is sold by conversation. The first 100 creators to connect a channel become **Founding Creators** (`users.founder_number`) with a **Founder Pass**: 50 free uses a month, for life, of the small-model features (titles, thumbnails, trends, audience, slang, comments, Ask Mitra), counted in `usage.founder_uses` apart from credits. Video Doctor and pro thumbnails still use credits.
   One credit = one AI answer. Credits are reserved atomically before the AI call and refunded if it fails.
   Signed-out visitors get sample answers only, so the public demo costs nothing.
 - **Payments:** Razorpay Subscriptions (UPI Autopay, cards, netbanking).
@@ -139,6 +139,12 @@ to 300 chars. About a third fewer input tokens on a typical batch of 60.
 `tests/ai-pipeline.e2e.py` checks all of this against a local mock of the Anthropic API (`tests/mock-anthropic.mjs`).
 
 ## Thumbnails
+
+**Pro thumbnails** (`/api/thumbnail/compose`, needs `GEMINI_API_KEY`): the creator adds 1–3 photos of themselves
+(plus up to 2 of the place or product) and presses **Make my thumbnail**. Claude plans the shot from the title and
+the most-viewed reference hit (side, expression and pose, scene, colours, headline), then Google's Nano Banana 2.1
+paints a new 2K photo with the creator in it (`src/lib/compose.ts`, storage off). The canvas puts the headline on
+the side kept clear, so text is always crisp and editable. 6 credits (~₹4.8 cost), refunded on failure.
 
 Mitra plans, the browser draws. "Design with Mitra" sends the topic, the current text and up to 3 of the
 creator's photos (shrunk in the browser to ≤768px JPEG, a few hundred image tokens each) to Haiku, which returns

@@ -4,6 +4,7 @@ import { liveSubscription, simulateBillingEnabled } from "@/lib/billing";
 import { creditLimit, FOUNDER_FREE_USES, planOf } from "@/lib/plans";
 import { razorpayConfigured } from "@/lib/razorpay";
 import { monthKey, usageThisMonth } from "@/lib/usage";
+import { composeConfigured } from "@/lib/compose";
 import { imageGenerationConfigured } from "@/lib/images";
 import { googleConfigured, youtubeConnection } from "@/lib/youtube";
 
@@ -15,6 +16,7 @@ export async function GET() {
     devLogin: devLoginEnabled(),
     simulateBilling: simulateBillingEnabled(),
     images: imageGenerationConfigured(),
+    compose: composeConfigured() && aiConfigured(),
     stockPhotos: Boolean(process.env.PEXELS_API_KEY),
   };
   const user = await currentUser();

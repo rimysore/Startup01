@@ -45,6 +45,32 @@ function Strength({ value }: { value: number }) {
   );
 }
 
+function PhotoPicker({ label, hint, photos, max, onAdd, onRemove }: { label: string; hint: string; photos: Photo[]; max: number; onAdd: (f: FileList | null) => void; onRemove: (i: number) => void }) {
+  return (
+    <div className="mt-2 rounded-2xl border border-line p-3">
+      <p className="text-sm font-semibold">{label}</p>
+      <p className="text-[11px] text-muted">{hint}</p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {photos.map((p, i) => (
+          <div key={p.img.src} className="relative">
+            {/* eslint-disable-next-line @next/next/no-img-element -- local blob preview */}
+            <img src={p.img.src} alt={`${label} ${i + 1}`} className="h-14 w-14 rounded-xl object-cover" />
+            <button onClick={() => onRemove(i)} className="absolute -right-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-ink text-xs text-bg" aria-label={`Remove ${label} ${i + 1}`}>
+              ×
+            </button>
+          </div>
+        ))}
+        {photos.length < max && (
+          <label className="grid h-14 w-14 cursor-pointer place-items-center rounded-xl border border-dashed border-line text-xl text-muted hover:border-accent hover:text-accent">
+            +
+            <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => onAdd(e.target.files)} aria-label={`Add ${label}`} />
+          </label>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function StudioPage() {
   const { summary, language, refreshMe, me } = useDashboard();
   const prefill = useQueryParam("topic");
@@ -62,15 +88,20 @@ export default function StudioPage() {
   const [copied, setCopied] = useState<string | null>(null);
 
   const [design, setDesign] = useState<ThumbnailDesign>(() => defaultDesign("कौन जीता?"));
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  // Photos of the creator (their face) and optional extras (the place, product or food).
+  const [faces, setFaces] = useState<Photo[]>([]);
+  const [extras, setExtras] = useState<Photo[]>([]);
+  const photos = [...faces, ...extras];
+  const [composed, setComposed] = useState<HTMLImageElement | null>(null);
+  const [composing, setComposing] = useState(false);
   const [background, setBackground] = useState<{ img: HTMLImageElement; credit: string | null; query: string; n: number; count: number; ai: boolean } | null>(null);
   const [designing, setDesigning] = useState(false);
   const [painting, setPainting] = useState(false);
-  const [mode, setMode] = useState<"ai" | "blend">("ai");
   const [designNote, setDesignNote] = useState<{ demo?: boolean; demoReason?: "signin" | "nokey"; error?: AiError } | null>(null);
   const setThumbText = (t: string) => setDesign((d) => ({ ...d, headline: t }));
   const busy = phase !== "idle";
   const canAi = me?.config.images;
+  const canCompose = me?.config.compose;
 
   /** Step 1 + 2: research what already went viral for this topic, then write titles that learn from it. */
   async function researchAndWrite() {
@@ -165,8 +196,7 @@ export default function StudioPage() {
       text: design.headline,
       images: photos.map((p) => ({ mediaType: "image/jpeg", data: p.data })),
       // Most-viewed first: the designer follows that one's style when it's a common format.
-      references: research?.mode === "live" ? research.videos.filter((v) => refs.includes(v.id)).sort((a, b) => b.views - a.views).map((v) => v.id) : [],
-      blend: mode === "blend",
+      references: referenceIds(),
     });
     setDesigning(false);
     refreshMe();
@@ -174,20 +204,63 @@ export default function StudioPage() {
     const d = res.result;
     setDesign(d);
     setDesignNote({ demo: res.demo, demoReason: res.demoReason });
+    setComposed(null);
     // A generated or stock background only when the creator's own photos don't already fill it.
-    if (mode === "blend") return setBackground(null);
     const ownBackground = d.images.some((im) => im.role === "background") || (d.layout === "full-bleed" && photos.length > 0) || (d.layout === "split" && photos.length > 1);
     if (ownBackground || res.demo) setBackground(null);
     else if (canAi) await paintBackground(d.imagePrompt || d.backgroundQuery);
     else await loadBackground(d.backgroundQuery, 0);
   }
 
-  async function addPhotos(files: FileList | null) {
+  /** The hits the creator ticked, most-viewed first: the designer follows that one's style when it's a common format. */
+  function referenceIds(): string[] {
+    return research?.mode === "live" ? research.videos.filter((v) => refs.includes(v.id)).sort((a, b) => b.views - a.views).map((v) => v.id) : [];
+  }
+
+  async function addTo(kind: "faces" | "extras", files: FileList | null) {
     if (!files) return;
-    const added = await Promise.all([...files].slice(0, 5 - photos.length).map((f) => loadPhoto(f).catch(() => null)));
-    setPhotos([...photos, ...added.filter((p): p is Photo => p != null)]);
+    const list = kind === "faces" ? faces : extras;
+    const room = (kind === "faces" ? 3 : 2) - list.length;
+    const added = (await Promise.all([...files].slice(0, room).map((f) => loadPhoto(f).catch(() => null)))).filter((p): p is Photo => p != null);
+    (kind === "faces" ? setFaces : setExtras)([...list, ...added]);
     // New photos invalidate the AI's per-photo plan; keep the text and colours.
     setDesign((d) => ({ ...d, images: [] }));
+  }
+
+  /** Pro thumbnail: Mitra plans the shot, Google's image AI paints a new photo with the creator in it. */
+  async function compose() {
+    setComposing(true);
+    setDesignNote(null);
+    const r = await fetch("/api/thumbnail/compose", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        language,
+        title: (chosen ?? topic).trim() || design.headline,
+        text: design.headline,
+        faces: faces.map((p) => ({ mediaType: "image/jpeg", data: p.data })),
+        extras: extras.map((p) => ({ mediaType: "image/jpeg", data: p.data })),
+        references: referenceIds(),
+      }),
+    }).catch(() => null);
+    const d = (await r?.json().catch(() => null)) as { design?: ThumbnailDesign; image?: string; mimeType?: string; error?: string; detail?: string; upgrade?: boolean } | null;
+    refreshMe();
+    if (!r?.ok || !d?.design || !d.image) {
+      setComposing(false);
+      return setDesignNote({ error: { message: d?.error ?? "Couldn't make the thumbnail right now.", detail: d?.detail, upgrade: d?.upgrade } });
+    }
+    const img = new Image();
+    img.onload = () => {
+      setDesign(d.design!);
+      setComposed(img);
+      setBackground(null);
+      setComposing(false);
+    };
+    img.onerror = () => {
+      setComposing(false);
+      setDesignNote({ error: { message: "The image came back broken. Please try again." } });
+    };
+    img.src = `data:${d.mimeType ?? "image/jpeg"};base64,${d.image}`;
   }
 
   const titles = result ? [...result.data.titles].sort((a, b) => b.strength - a.strength) : [];
@@ -394,94 +467,92 @@ export default function StudioPage() {
       <Card className="mt-6">
         <h2 className="font-semibold">Thumbnail</h2>
         <p className="mt-1 text-sm text-muted">
-          Full HD (1920×1080){refs.length && research?.mode === "live" ? `, styled after the ${refs.length} hit${refs.length === 1 ? "" : "s"} you picked` : ""}. Drag and resize anything after;
+          Full HD (1920×1080){refs.length && research?.mode === "live" ? `, styled after the ${refs.length} hit${refs.length === 1 ? "" : "s"} you picked` : ""}. Drag and resize the text after;
           Indian scripts always render correctly.
         </p>
-        <div className="mt-5 grid gap-6 lg:grid-cols-[250px_1fr]">
-          <div className="space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted">Choose your style</p>
-            {(
-              [
-                { id: "ai", emoji: "🎨", name: "AI image", text: "Mitra paints a full-HD scene for your topic. Add your face photo if you like." },
-                { id: "blend", emoji: "📸", name: "Blend my photos", text: "Upload 3 or more photos. Mitra cuts you out and blends them like top YouTubers do." },
-              ] as const
-            ).map((o) => (
-              <button
-                key={o.id}
-                onClick={() => setMode(o.id)}
-                aria-pressed={mode === o.id}
-                className={`block w-full rounded-2xl border-2 p-4 text-left transition ${mode === o.id ? "border-accent bg-accent-soft" : "border-line hover:border-ink-2/40"}`}
-              >
-                <span className="flex items-center gap-2 font-semibold">
-                  <span className="text-xl" aria-hidden>
-                    {o.emoji}
-                  </span>
-                  {o.name}
-                  {mode === o.id && <span className="ml-auto grid h-5 w-5 place-items-center rounded-full bg-accent text-[11px] font-bold text-accent-ink">✓</span>}
-                </span>
-                <span className="mt-1 block text-xs text-ink-2">{o.text}</span>
-              </button>
-            ))}
+        <div className="mt-5 grid gap-6 lg:grid-cols-[260px_1fr]">
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted">1 · Your photos</p>
+              <PhotoPicker
+                label="You (1–3 photos)"
+                hint="Clear face, good light. Selfies work."
+                photos={faces}
+                max={3}
+                onAdd={(f) => addTo("faces", f)}
+                onRemove={(i) => setFaces(faces.filter((_, j) => j !== i))}
+              />
+              <PhotoPicker
+                label="Extras (optional)"
+                hint="The place, product or food in your video."
+                photos={extras}
+                max={2}
+                onAdd={(f) => addTo("extras", f)}
+                onRemove={(i) => setExtras(extras.filter((_, j) => j !== i))}
+              />
+            </div>
 
-            {mode === "blend" && (
-              <div className="rounded-2xl border border-dashed border-line p-3">
-                <div className="flex items-center justify-between text-xs font-semibold">
-                  <span>Your photos</span>
-                  <span className={photos.length >= 3 ? "text-good" : "text-muted"}>{photos.length}/3 needed · max 5</span>
-                </div>
-                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
-                  <div className="bg-brand h-full rounded-full transition-all" style={{ width: `${Math.min(100, (photos.length / 3) * 100)}%` }} />
-                </div>
-                <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-surface-2 px-3 py-3 text-sm font-semibold hover:bg-accent-soft">
-                  + Add photos
-                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} aria-label="Add photos to blend" />
-                </label>
-                <p className="mt-2 text-[11px] text-muted">Best mix: 1 clear photo of you, 1 of the place, 1-3 of the thing you show.</p>
-              </div>
-            )}
-
-            <button
-              onClick={designWithMitra}
-              disabled={designing || (mode === "blend" ? photos.length < 3 : (chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
-              className="bg-brand w-full rounded-full px-5 py-3 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
-            >
-              {designing ? "Designing…" : mode === "blend" ? `✨ Blend with Mitra · ${FEATURE_CREDITS.thumbnail}` : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
-            </button>
-            {mode === "ai" && canAi && (
-              <button
-                // Only ever paint a scene description: a raw title makes the image model draw garbled letters.
-                // No scene yet → let Mitra design first (which paints the background too).
-                onClick={() => (design.imagePrompt ? paintBackground(design.imagePrompt) : designWithMitra())}
-                disabled={painting || designing || (!design.imagePrompt && (chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
-                className="w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 disabled:opacity-50"
-              >
-                {painting ? "Painting…" : `🎨 New AI background · ${FEATURE_CREDITS.image}`}
-              </button>
-            )}
-            {mode === "ai" && background && !background.ai && background.count > 1 && (
-              <button onClick={() => loadBackground(background.query, (background.n + 1) % background.count)} className="w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2">
-                Another photo
-              </button>
-            )}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted">2 · Make it</p>
+              {canCompose && faces.length > 0 ? (
+                <>
+                  <button
+                    onClick={compose}
+                    disabled={composing || designing}
+                    className="bg-brand mt-2 w-full rounded-full px-5 py-3.5 text-sm font-bold text-white shadow-[0_12px_30px_-12px_rgba(217,70,239,0.6)] transition hover:brightness-110 disabled:opacity-50"
+                  >
+                    {composing ? "Making your thumbnail…" : composed ? `🔁 New version · ${FEATURE_CREDITS.compose} credits` : `✨ Make my thumbnail · ${FEATURE_CREDITS.compose} credits`}
+                  </button>
+                  <p className="mt-2 text-[11px] leading-snug text-muted">
+                    Google&apos;s image AI paints a new photo of you in the scene, styled after the top hits. Takes ~20 seconds. Your photos are sent to Google only to make it, and
+                    aren&apos;t kept.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={designWithMitra}
+                    disabled={designing || ((chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
+                    className="bg-brand mt-2 w-full rounded-full px-5 py-3 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+                  >
+                    {designing ? "Designing…" : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
+                  </button>
+                  {canAi && design.imagePrompt && (
+                    <button
+                      onClick={() => paintBackground(design.imagePrompt)}
+                      disabled={painting || designing}
+                      className="mt-2 w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 disabled:opacity-50"
+                    >
+                      {painting ? "Painting…" : `🎨 New background · ${FEATURE_CREDITS.image}`}
+                    </button>
+                  )}
+                  {background && !background.ai && background.count > 1 && (
+                    <button onClick={() => loadBackground(background.query, (background.n + 1) % background.count)} className="mt-2 w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2">
+                      Another photo
+                    </button>
+                  )}
+                  {canCompose && <p className="mt-2 text-[11px] text-muted">Add a photo of yourself for a pro thumbnail with you in it.</p>}
+                </>
+              )}
+            </div>
             {designNote?.error && <AiErrorNote error={designNote.error} />}
             {designNote?.demo && <AiDemoNote reason={designNote.demoReason} what="thumbnail design" />}
-            {(designing || painting) && <Spinner label={designing ? "Mitra is designing…" : "Painting a full-HD background…"} />}
+            {(designing || painting || composing) && (
+              <Spinner label={composing ? "Painting you into the scene…" : designing ? "Mitra is designing…" : "Painting a background…"} />
+            )}
           </div>
 
           <div className="min-w-0">
             <ThumbnailMaker
               design={design}
               onDesignChange={setDesign}
-              photos={photos}
-              onPhotosChange={setPhotos}
-              background={mode === "ai" ? (background?.img ?? null) : null}
-              credit={mode === "ai" ? (background?.credit ?? null) : null}
-              blend={mode === "blend"}
+              photos={composed ? [] : photos}
+              onPhotosChange={() => {}}
+              background={composed ?? background?.img ?? null}
+              credit={composed ? "AI photo made with your pictures" : (background?.credit ?? null)}
+              composed={Boolean(composed)}
+              showPhotos={false}
             />
-            <p className="mt-3 text-xs text-muted">
-              {mode === "blend" ? "Cutting you out happens on your device. " : ""}Photos are only sent (as small copies) when you press Design or Blend with Mitra, to plan the
-              layout, and aren&apos;t kept.
-            </p>
           </div>
         </div>
       </Card>

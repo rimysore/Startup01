@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ThumbnailDesign } from "@/lib/ai";
-import { cutOutPerson, type Cutout } from "@/lib/cutout";
 import { Button } from "./ui";
 
 /** Design space. Everything is laid out in 1280×720 and rendered at 1.5× = 1920×1080 (full HD). */
@@ -43,8 +42,6 @@ export interface Photo {
   img: HTMLImageElement;
   /** Shrunk JPEG (≤768px) as base64, what gets sent to the AI. */
   data: string;
-  /** The person cut out of it (blend mode): undefined = not tried yet, null = nobody in the photo. */
-  cutout?: Cutout | null;
 }
 
 /** Loads a file and makes a small JPEG copy for the AI: ~300-500 image tokens instead of thousands. */
@@ -331,129 +328,17 @@ function layer(ctx: CanvasRenderingContext2D, id: LayerId, box: Box, edits: Laye
   boxes[id] = { x: cx + e.dx - (box.w * e.scale) / 2, y: cy + e.dy - (box.h * e.scale) / 2, w: box.w * e.scale, h: box.h * e.scale };
 }
 
-const silhouettes = new WeakMap<HTMLCanvasElement, HTMLCanvasElement>();
-
-/** The cut-out person filled with one colour: drawn around them as the outline. */
-function silhouette(cut: HTMLCanvasElement): HTMLCanvasElement {
-  let s = silhouettes.get(cut);
-  if (s) return s;
-  s = document.createElement("canvas");
-  s.width = cut.width;
-  s.height = cut.height;
-  const x = s.getContext("2d")!;
-  x.drawImage(cut, 0, 0);
-  x.globalCompositeOperation = "source-in";
-  x.fillStyle = "#ffffff";
-  x.fillRect(0, 0, s.width, s.height);
-  silhouettes.set(cut, s);
-  return s;
-}
-
-/** A photo as a tilted card with a white border (secondary photos in a blend). */
-function photoCard(ctx: CanvasRenderingContext2D, photo: HTMLImageElement, cx: number, cy: number, w: number, h: number, tilt: number) {
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(tilt);
-  ctx.shadowColor = "rgba(0,0,0,0.5)";
-  ctx.shadowBlur = 30;
-  ctx.shadowOffsetY = 12;
-  ctx.fillStyle = "#ffffff";
-  ctx.beginPath();
-  ctx.roundRect(-w / 2 - 8, -h / 2 - 8, w + 16, h + 16, 18);
-  ctx.fill();
-  ctx.shadowColor = "transparent";
-  ctx.beginPath();
-  ctx.roundRect(-w / 2, -h / 2, w, h, 12);
-  ctx.clip();
-  cover(ctx, photo, -w / 2, -h / 2, w, h);
-  ctx.restore();
-}
-
 /**
- * The modern YouTuber composite: a photo (or AI scene) behind, softened and colour-graded; secondary photos as
- * tilted cards; the creator cut out large in front with a white outline and a glow; big text on the other side.
+ * A pro thumbnail: the AI's photo (the creator already in it) fills the frame; the side kept clear for text gets a
+ * gentle shade so the headline reads on any image.
  */
-function blendScene(
-  ctx: CanvasRenderingContext2D,
-  d: ThumbnailDesign,
-  photos: Photo[],
-  background: HTMLImageElement | null,
-  family: string,
-  edits: LayerEdits,
-  boxes: Partial<Record<LayerId, Box>>,
-) {
-  const pick = (r: string) => d.images.filter((im) => im.role === r && photos[im.index]).map((im) => im.index);
-  const withPerson = photos.map((p, i) => ({ i, share: p.cutout?.share ?? 0 })).filter((x) => x.share > 0);
-  const subjectIdx = pick("subject").find((i) => photos[i].cutout) ?? withPerson.sort((a, b) => b.share - a.share)[0]?.i;
-  const bgIdx = pick("background").find((i) => i !== subjectIdx) ?? photos.findIndex((_, i) => i !== subjectIdx && !pick("skip").includes(i));
-  const used = new Set([subjectIdx, bgIdx]);
-  const insetIdx = [...pick("inset"), ...photos.map((_, i) => i)].filter((i, k, all) => !used.has(i) && !pick("skip").includes(i) && all.indexOf(i) === k).slice(0, 2);
+function composedScene(ctx: CanvasRenderingContext2D, d: ThumbnailDesign, image: HTMLImageElement, family: string, edits: LayerEdits, boxes: Partial<Record<LayerId, Box>>) {
   const left = d.layout === "subject-left";
-  const subjX = left ? W * 0.27 : W * 0.74;
-
-  // Scene: the background photo (or the AI's), softened so the person pops, tinted toward the palette.
-  if (bgIdx >= 0 && photos[bgIdx]) {
-    ctx.save();
-    ctx.filter = "blur(4px) saturate(1.3) brightness(0.8)";
-    cover(ctx, photos[bgIdx].img, -12, -12, W + 24, H + 24);
-    ctx.restore();
-  } else if (background) {
-    cover(ctx, background, 0, 0, W, H);
-  } else {
-    richBackground(ctx, d.palette, subjX);
-  }
-  ctx.fillStyle = hexToRgba(d.palette.bgTo, 0.3);
-  ctx.fillRect(0, 0, W, H);
+  cover(ctx, image, 0, 0, W, H, 0.5, 0.45);
   textScrim(ctx, left ? "right" : "left");
-  vignette(ctx, 0.5);
-
-  // Secondary photos behind the person, near their shoulders.
-  insetIdx.forEach((i, k) => {
-    const cx = left ? W * (0.12 + k * 0.3) : W * (0.58 + k * 0.3);
-    const cy = H * (0.24 + k * 0.08);
-    const tilt = (k ? 1 : -1) * 0.07;
-    layer(ctx, k ? "inset1" : "inset0", { x: cx - 160, y: cy - 110, w: 320, h: 220 }, edits, boxes, () => photoCard(ctx, photos[i].img, cx, cy, 300, 200, tilt));
-  });
-
-  const cut = subjectIdx != null ? photos[subjectIdx]?.cutout : null;
-  if (cut) {
-    const c = cut.canvas;
-    const h = H * 0.94;
-    const w = Math.min(W * 0.55, (c.width / c.height) * h);
-    const hh = (c.height / c.width) * w;
-    const x = subjX - w / 2;
-    const y = H - hh;
-    layer(ctx, "subject", { x: x - 12, y: y - 12, w: w + 24, h: hh + 12 }, edits, boxes, () => {
-      // Glow, then a white outline (the silhouette drawn around them), then the person.
-      ctx.save();
-      const glow = ctx.createRadialGradient(subjX, H * 0.55, 20, subjX, H * 0.55, W * 0.4);
-      glow.addColorStop(0, hexToRgba(d.palette.glow, 0.85));
-      glow.addColorStop(1, hexToRgba(d.palette.glow, 0));
-      ctx.fillStyle = glow;
-      ctx.fillRect(x - W * 0.2, 0, w + W * 0.4, H);
-      const sil = silhouette(c);
-      ctx.shadowColor = hexToRgba(d.palette.glow, 0.9);
-      ctx.shadowBlur = 30;
-      for (let a = 0; a < Math.PI * 2; a += Math.PI / 8) ctx.drawImage(sil, x + Math.cos(a) * 7, y + Math.sin(a) * 7, w, hh);
-      ctx.shadowColor = "transparent";
-      ctx.drawImage(c, x, y, w, hh);
-      ctx.restore();
-    });
-  } else if (subjectIdx != null && photos[subjectIdx]) {
-    // Nobody to cut out (a product, a place): fall back to the photo card.
-    const sw = W * 0.42 + 24;
-    const sh = H * 0.8 + 24;
-    layer(ctx, "subject", { x: subjX - sw / 2, y: H / 2 + 10 - sh / 2, w: sw, h: sh }, edits, boxes, () =>
-      subjectCard(ctx, photos[subjectIdx].img, subjX, d.palette, 0.5, 0.4, 1, left ? 0.035 : -0.035),
-    );
-  }
-
-  const l = layoutHeadline(ctx, d, family, left ? W * 0.52 : 64, W * 0.46, "left");
+  vignette(ctx, 0.35);
+  const l = layoutHeadline(ctx, d, family, left ? W * 0.52 : 56, W * 0.45, "left");
   if (l) layer(ctx, "headline", l.box, edits, boxes, () => drawHeadline(ctx, d, family, l));
-  if (d.arrow && subjectIdx != null) {
-    const e = edits.subject ?? NO_EDIT;
-    arrow(ctx, left ? W * 0.66 : W * 0.36, H * 0.88, (left ? W * 0.44 : W * 0.56) + e.dx, H * 0.7 + e.dy, d.palette.accent);
-  }
 }
 
 /** Draws the whole thumbnail and returns where each movable element is (canvas pixels). */
@@ -464,12 +349,12 @@ export function drawThumbnail(
   background: HTMLImageElement | null,
   family: string,
   edits: LayerEdits = {},
-  blend = false,
+  composed = false,
 ): Partial<Record<LayerId, Box>> {
   const boxes: Partial<Record<LayerId, Box>> = {};
   ctx.clearRect(0, 0, W, H);
-  if (blend && photos.length) {
-    blendScene(ctx, d, photos, background, family, edits, boxes);
+  if (composed && background) {
+    composedScene(ctx, d, background, family, edits, boxes);
     return finish(ctx, d, family, edits, boxes, d.layout === "subject-left");
   }
   const role = (r: string) => d.images.filter((im) => im.role === r && photos[im.index]);
@@ -590,7 +475,8 @@ export function ThumbnailMaker({
   onPhotosChange,
   background,
   credit,
-  blend = false,
+  composed = false,
+  showPhotos = true,
 }: {
   design: ThumbnailDesign;
   onDesignChange: (d: ThumbnailDesign) => void;
@@ -598,8 +484,10 @@ export function ThumbnailMaker({
   onPhotosChange: (p: Photo[]) => void;
   background: HTMLImageElement | null;
   credit: string | null;
-  /** Blend the creator's photos (person cut out in front) instead of the AI-image layouts. */
-  blend?: boolean;
+  /** `background` is a finished pro photo (the creator already in it): only text goes on top. */
+  composed?: boolean;
+  /** Show the photo picker here (Studio has its own). */
+  showPhotos?: boolean;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const stage = useRef<HTMLDivElement>(null);
@@ -627,7 +515,7 @@ export function ThumbnailMaker({
     const draw = () => {
       if (!live) return;
       ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-      const b = drawThumbnail(ctx, design, photos, background, family, layers, blend);
+      const b = drawThumbnail(ctx, design, photos, background, family, layers, composed);
       requestAnimationFrame(() => live && setBoxes(b));
     };
     document.fonts.ready.then(draw);
@@ -635,35 +523,7 @@ export function ThumbnailMaker({
     return () => {
       live = false;
     };
-  }, [design, photos, background, layers, font, blend]);
-
-  // Blend mode: cut the person out of each new photo (in the browser, once per photo).
-  const [cutting, setCutting] = useState<"idle" | "busy" | "failed">("idle");
-  const todo = blend ? photos.filter((p) => p.cutout === undefined).length : 0;
-  useEffect(() => {
-    if (!todo) return;
-    let live = true;
-    void (async () => {
-      setCutting("busy");
-      try {
-        const done = await Promise.all(photos.map(async (p) => (p.cutout === undefined ? { ...p, cutout: await cutOutPerson(p.img) } : p)));
-        if (live) {
-          onPhotosChange(done);
-          setCutting("idle");
-        }
-      } catch (err) {
-        console.error("Cut-out failed", err);
-        if (live) {
-          // Without the model the photos still blend, as cards; mark them so we don't retry forever.
-          onPhotosChange(photos.map((p) => (p.cutout === undefined ? { ...p, cutout: null } : p)));
-          setCutting("failed");
-        }
-      }
-    })();
-    return () => {
-      live = false;
-    };
-  }, [todo, photos, onPhotosChange]);
+  }, [design, photos, background, layers, font, composed]);
 
   /** Canvas pixels per screen pixel. */
   const ratio = () => W / (stage.current?.getBoundingClientRect().width || W);
@@ -780,9 +640,7 @@ export function ThumbnailMaker({
           aria-label="Thumbnail editor: drag to move, drag the corner or scroll to resize"
         >
           <canvas ref={canvas} width={OUT_W} height={OUT_H} className="block aspect-video w-full rounded-xl border border-line" aria-label="Thumbnail preview" />
-          {cutting === "busy" && (
-            <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-ink/80 px-3 py-1.5 text-xs font-semibold text-bg">✂️ Cutting you out of the photos…</span>
-          )}
+
           {(Object.keys(boxes) as LayerId[]).map((id) => {
             const b = boxes[id]!;
             const on = selected === id;
@@ -879,7 +737,7 @@ export function ThumbnailMaker({
             />
           </label>
         </div>
-        {design.imagePrompt && (
+        {design.imagePrompt && !composed && (
           <label className="block text-xs font-medium text-muted">
             Background idea (for the AI image)
             <textarea
@@ -933,9 +791,10 @@ export function ThumbnailMaker({
             ))}
           </div>
         </div>
+        {showPhotos && (
         <div>
           <p className="text-xs font-medium text-muted">
-            Your photos (up to {MAX_PHOTOS}){blend ? ` · ${photos.length}/3 needed to blend` : " — face, product, location"}
+            Your photos (up to {MAX_PHOTOS}) — face, product, location
           </p>
           <div className="mt-1 flex flex-wrap gap-2">
             {photos.map((p, i) => (
@@ -960,8 +819,9 @@ export function ThumbnailMaker({
           </div>
           {loadError && <p className="mt-1 text-xs text-bad">{loadError}</p>}
         </div>
+        )}
         <Button onClick={download} className="w-full">Download HD (1920×1080)</Button>
-        {cutting === "failed" && <p className="text-xs text-muted">Couldn&apos;t cut people out on this device, so photos are shown as cards.</p>}
+
       </div>
     </div>
   );

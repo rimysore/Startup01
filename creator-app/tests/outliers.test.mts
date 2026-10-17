@@ -146,6 +146,31 @@ assert(
 hdFails = true;
 const img = await generateBackground("rainy street", 7);
 assert(Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && Object.keys(cfBody).length === 2, "if the HD model fails, FLUX.1 schnell answers with only the fields it accepts");
+
+// ---- Pro thumbnails (Gemini Nano Banana 2.1) -----------------------------------------------------------------
+process.env.GEMINI_API_KEY = "gk";
+const { composePrompt, composeThumbnail, UnsafeCompose } = await import("@/lib/compose");
+const plan = { headline: "बाली में क्या हुआ?", highlight: "", badge: "", layout: "subject-left" as const, images: [], palette: { accent: "#ffd23f", text: "#fff", stroke: "#000", glow: "#ff7a1a", bgFrom: "#000", bgTo: "#2b2357" }, backgroundQuery: "", imagePrompt: "a Balinese water temple at dusk", emoji: "", arrow: false, why: "", look: "shocked, hand over mouth" };
+const pp = composePrompt(plan, 2, 1);
+assert(/left side/.test(pp) && /right 45%/.test(pp) && /first 2 photos/.test(pp) && /shocked, hand over mouth/.test(pp) && /no text/i.test(pp) && !pp.includes("बाली"), "the image prompt places the creator, keeps the text side clear and never includes the headline");
+let gemini: { model?: string; input?: { type: string }[]; response_format?: { aspect_ratio?: string; image_size?: string }; store?: boolean } = {};
+let geminiMode: "ok" | "refuse" = "ok";
+globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
+  assert(String(input).includes("generativelanguage.googleapis.com/v1beta/interactions") && (init?.headers as Record<string, string>)["x-goog-api-key"] === "gk", "calls Gemini's Interactions API with the key");
+  gemini = JSON.parse(String(init?.body));
+  if (geminiMode === "refuse") return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: "I can't create images of that." }] }] });
+  return Response.json({ steps: [{ type: "model_output", content: [{ type: "text", text: "Here you go" }, { type: "image", mime_type: "image/jpeg", data: "SU1H" }] }], usage: { total_input_tokens: 3000, total_output_tokens: 1680 } });
+}) as typeof fetch;
+const made = await composeThumbnail(pp, [{ mediaType: "image/jpeg", data: "QQ==" }, { mediaType: "image/jpeg", data: "Qg==" }]);
+assert(
+  made.data === "SU1H" && gemini.model === "gemini-nano-banana-2.1" && gemini.input?.length === 3 && gemini.response_format?.aspect_ratio === "16:9" && gemini.response_format?.image_size === "2K" && gemini.store === false,
+  "sends the prompt + photos for a 16:9 2K image, not stored by Google",
+);
+assert(Math.abs(made.costUsd - 0.0549) < 0.0005, `cost logged from token usage (got $${made.costUsd.toFixed(4)})`);
+geminiMode = "refuse";
+let refused = false;
+try { await composeThumbnail(pp, [{ mediaType: "image/jpeg", data: "QQ==" }]); } catch (e) { refused = e instanceof UnsafeCompose; }
+assert(refused, "a refusal in words becomes a friendly 'try a different photo' error");
 globalThis.fetch = realFetch;
 
 console.log("all outlier tests passed");

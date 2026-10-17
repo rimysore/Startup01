@@ -139,7 +139,7 @@ export function FounderPassCard({ me }: { me: Me | null }) {
             <li key={l} className="rounded-full bg-white/70 px-2.5 py-1 dark:bg-black/30">✓ {l}</li>
           ))}
         </ul>
-        <p className="mt-3 text-xs opacity-70">Resets on the 1st. Video Doctor and competitor analysis use your plan&apos;s credits.</p>
+        <p className="mt-3 text-xs opacity-70">Resets on the 1st. Video Doctor, pro thumbnails and competitor analysis use your plan&apos;s credits.</p>
       </section>
     );
   }

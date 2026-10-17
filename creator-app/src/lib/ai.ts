@@ -9,7 +9,7 @@ import { FEATURE_CREDITS } from "./plans";
 // Each feature uses the cheapest model that does the job well. Override per feature with environment
 // variables (e.g. AI_MODEL_DOCTOR=claude-opus-5-5, AI_EFFORT_CHAT=medium) without a code change.
 
-export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "breakouts" | "outreach" | "report";
+export type Feature = "doctor" | "titles" | "comments" | "chat" | "thumbnail" | "trends" | "audience" | "slang" | "competitors" | "breakouts" | "compose" | "outreach" | "report";
 type Effort = "low" | "medium" | "high";
 
 interface Route {
@@ -42,6 +42,9 @@ const DEFAULT_ROUTES: Record<Feature, Route> = {
   competitors: { model: "claude-haiku-5-5", effort: "medium", maxTokens: 8000, cacheHours: 12, credits: FEATURE_CREDITS.competitors },
   // Turning a short list of breakout videos into ideas for this creator: light reading, cached for a day.
   breakouts: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 24, credits: FEATURE_CREDITS.breakouts },
+  // Plans a pro thumbnail (the image itself is made by Gemini, see compose.ts): never cached, every press is a
+  // new version.
+  compose: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: FEATURE_CREDITS.compose },
   // Admin prospecting: short personal openers, batched. Not charged to anyone's credits.
   outreach: { model: "claude-haiku-5-5", effort: "low", maxTokens: 6000, cacheHours: 0, credits: 0 },
   // Monday report and 48-hour check: Mitra pays (about ₹0.05 each), the creator is never charged.
@@ -323,6 +326,12 @@ export const ThumbnailSchema = z.object({
 });
 export type ThumbnailDesign = z.infer<typeof ThumbnailSchema>;
 
+/** For a pro thumbnail, the plan also says how the creator should look in the new photo. */
+export const ComposeSchema = ThumbnailSchema.extend({
+  look: z.string().describe("Expression and pose for the creator in the new photo, in English, e.g. 'shocked, hand over mouth' or 'pointing at the temple, excited'"),
+});
+export type ComposePlan = ThumbnailDesign & { look: string };
+
 const HEX = /^#[0-9a-f]{6}$/i;
 
 export async function designThumbnail(
@@ -331,22 +340,25 @@ export async function designThumbnail(
   preferredText: string,
   images: InputImage[],
   references: InputImage[] = [],
-  blend = false,
-): Promise<AiResult<ThumbnailDesign>> {
+  compose = false,
+): Promise<AiResult<ComposePlan>> {
   const refs = references.length
     ? `Images ${images.length} to ${images.length + references.length - 1} are NOT the creator's: they are thumbnails of videos on this topic that went viral on YouTube in India, the most-viewed first. ` +
       "Look at the most-viewed one first. If its style is a common, reusable format (for example: a big expressive face on one side with 2-4 huge words on the other; a scenic location shot with bold text; a before/after split; a product close-up with a price), follow that style closely: the same side for the person, a similar amount and size of text, similar colours, badge and mood, and an imagePrompt for a similar kind of scene. " +
       "If it is unique to that creator (their own artwork, mascot, branding, recurring characters or a one-off visual), learn only the general lessons instead. Either way never copy their people, logos, exact words or pictures, and never use them as images in the design. Say in 'why' which reference style you followed.\n"
     : "";
   const out = await structured(
-    "thumbnail",
-    ThumbnailSchema,
+    compose ? "compose" : "thumbnail",
+    compose ? ComposeSchema : ThumbnailSchema,
     language,
     `Design a YouTube thumbnail for this video. ${images.length ? `The creator uploaded ${images.length} image(s) (Image 0${images.length > 1 ? ` to ${images.length - 1}` : ""}); decide how to use each one (the most expressive face or the product should be the subject; drop blurry or irrelevant ones).` : "The creator uploaded no images: pick a background photo search that fits the topic."}\n` +
       refs +
-      (blend
-        ? "BLEND MODE: build a modern YouTuber composite from the creator's photos. Give exactly one photo the role 'subject' (the clearest, most expressive person: they are cut out and placed large in front), one the role 'background' (the scene behind them: a place, crowd or setting), up to two 'inset' (supporting proof: product, food, before/after) and 'skip' for weak ones. " +
-          "layout must be 'subject-right' or 'subject-left' (the side the person stands on; text goes on the other side).\n"
+      (compose
+        ? "PRO MODE: an image AI will paint a brand-new photo containing the creator, using their photos for their face. Plan that photo: " +
+          "give the role 'subject' to the photos of the creator and 'inset' to photos of a place, product or food that should appear in the scene; " +
+          "layout 'subject-right' or 'subject-left' is the side the creator stands on (text goes on the other side); " +
+          "imagePrompt is the scene around them (setting, objects from the extra photos, time of day, mood), dramatic and specific, never any writing; " +
+          "look is their expression and pose, chosen to match the emotion of the topic and of the most-viewed reference.\n"
         : "") +
       "Rules: at most 5 words of text, large and readable on a phone; one clear focal point; strong contrast; honest about what the video shows.\n\n" +
       `Video title or topic:\n${untrusted(title)}` +
@@ -386,6 +398,7 @@ export async function designThumbnail(
       emoji: [...d.emoji.trim()].slice(0, 2).join(""),
       arrow: Boolean(d.arrow),
       why: cut(d.why, 240),
+      look: cut(String((d as { look?: unknown }).look ?? "").replace(/[<>]/g, " "), 200),
     },
   };
 }
