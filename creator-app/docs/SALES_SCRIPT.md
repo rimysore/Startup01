@@ -104,10 +104,10 @@ report arrives this Monday. I'll check in next week to hear what you think."
 
 ## 5. When they say yes
 
-> Amazing, welcome aboard! 🎉 Three quick steps:
-> 1. Sign in at https://trymitraapp.com with the Google account that owns your channel
-> 2. Connections → Connect YouTube
-> 3. WhatsApp & reports → send the JOIN code on WhatsApp
+> Amazing, welcome aboard! 🎉 Nothing to install. Here is the 3-minute setup:
+> https://trymitraapp.com/start
+> (Short version: sign in with the Google account that owns your channel → Connections → Connect YouTube →
+> WhatsApp & reports → send the JOIN code.)
 > Your first report lands Monday morning. I'll message you next week to ask what you think. Reply here anytime;
 > it comes straight to me.
 

@@ -3,6 +3,7 @@ import { COMPANY } from "@/lib/company";
 import { Logo } from "./ui";
 
 export const LEGAL_LINKS = [
+  { href: "/start", label: "Get started" },
   { href: "/terms", label: "Terms" },
   { href: "/privacy", label: "Privacy" },
   { href: "/refunds", label: "Refunds & cancellation" },
