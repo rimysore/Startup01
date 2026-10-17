@@ -30,9 +30,10 @@ export const POST = aiRoute(
   {
     title: z.string().min(3).max(500),
     text: z.string().max(80),
-    images: z.array(Image).max(3),
+    images: z.array(Image).max(5),
     references: z.array(z.string().regex(/^[\w-]{11}$/)).max(3).optional(),
+    blend: z.boolean().optional(),
   },
   DEMO_THUMBNAIL,
-  async ({ language, title, text, images, references = [] }) => designThumbnail(language, title, text, images, await referenceThumbnails(references)),
+  async ({ language, title, text, images, references = [], blend = false }) => designThumbnail(language, title, text, images, await referenceThumbnails(references), blend),
 );

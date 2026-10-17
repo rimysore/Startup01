@@ -1,13 +1,14 @@
 /**
- * Background images for thumbnails from FLUX.1 [schnell], a fast open image model. Two providers, first one set up
- * wins:
- *   1. Cloudflare Workers AI (CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_AI_TOKEN): free up to 10,000 "neurons" a day,
- *      which is roughly 170 backgrounds a day; past that about $0.0006 each on the paid plan.
- *      https://developers.cloudflare.com/workers-ai/models/flux-1-schnell/
- *   2. fal.ai (FAL_KEY): about $0.003 each. https://fal.ai/models/fal-ai/flux-1/schnell
+ * Background images for thumbnails. Two providers, first one set up wins:
+ *   1. Cloudflare Workers AI (CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_AI_TOKEN):
+ *      - FLUX.2 [klein] 4B at full HD (1920×1088): about 310 "neurons" an image, so ~30 a day fit in the free
+ *        10,000-neuron daily allowance; past that ~$0.0034 (₹0.30) each on the $5/month Workers paid plan.
+ *      - falls back to FLUX.1 [schnell] (1024×1024, ~58 neurons) if klein fails.
+ *      https://developers.cloudflare.com/workers-ai/platform/pricing/
+ *   2. fal.ai (FAL_KEY): FLUX.1 [schnell], about $0.003 each. https://fal.ai/models/fal-ai/flux-1/schnell
  * Text is never baked into the image; the canvas draws it so Indian scripts render correctly.
  */
-export const IMAGE_MODEL = "flux-1-schnell";
+export const IMAGE_MODEL = "flux-2-klein-4b";
 
 type Provider = "cloudflare" | "fal";
 
@@ -23,7 +24,7 @@ export function imageGenerationConfigured(): boolean {
 
 /** USD per image, for the cost log. Cloudflare's free daily allowance makes most images cost us nothing. */
 export function imageCostUsd(): number {
-  return imageProvider() === "fal" ? 0.003 : 0.0006;
+  return imageProvider() === "fal" ? 0.003 : 0.0034;
 }
 
 export class UnsafeImage extends Error {}
@@ -38,18 +39,19 @@ export interface GeneratedImage {
 
 export async function generateBackground(prompt: string, seed = Math.floor(Math.random() * 2 ** 31)): Promise<GeneratedImage> {
   const full = `${prompt}. ${STYLE}`;
-  return imageProvider() === "cloudflare" ? cloudflare(full, seed) : fal(full, seed);
+  if (imageProvider() !== "cloudflare") return fal(full, seed);
+  try {
+    return await cloudflareHD(full, seed);
+  } catch (err) {
+    if (err instanceof UnsafeImage) throw err;
+    console.error("Full-HD image failed, falling back to FLUX.1 schnell:", err instanceof Error ? err.message : err);
+    return cloudflare(full, seed);
+  }
 }
 
-async function cloudflare(prompt: string, seed: number): Promise<GeneratedImage> {
-  const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.CLOUDFLARE_AI_TOKEN}`, "Content-Type": "application/json" },
-    // 4 steps is schnell's sweet spot: quality close to 8 at half the cost. Cloudflare's schema rejects any other
-    // field (a "seed" is a 400), and each call already gives a different image.
-    body: JSON.stringify({ prompt: prompt.slice(0, 2048), steps: 4 }),
-    signal: AbortSignal.timeout(45_000),
-  });
+const cfUrl = (model: string) => `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/${model}`;
+
+async function cfResult(res: Response, seed: number): Promise<GeneratedImage> {
   const text = await res.text();
   if (!res.ok) {
     // Cloudflare refuses unsafe prompts with an error rather than a flag.
@@ -60,6 +62,34 @@ async function cloudflare(prompt: string, seed: number): Promise<GeneratedImage>
   const b64 = out.result?.image;
   if (!b64) throw new Error("Cloudflare AI returned no image");
   return { body: new Uint8Array(Buffer.from(b64, "base64")), contentType: "image/jpeg", seed };
+}
+
+/** FLUX.2 [klein] 4B, 16:9 at full HD. This model takes multipart form data, not JSON. */
+async function cloudflareHD(prompt: string, seed: number): Promise<GeneratedImage> {
+  const form = new FormData();
+  form.set("prompt", prompt.slice(0, 2048));
+  form.set("width", "1920");
+  form.set("height", "1088"); // dimensions must be multiples of 16; the canvas crops to 1080
+  form.set("seed", String(seed));
+  const res = await fetch(cfUrl("flux-2-klein-4b"), {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.CLOUDFLARE_AI_TOKEN}` },
+    body: form,
+    signal: AbortSignal.timeout(60_000),
+  });
+  return cfResult(res, seed);
+}
+
+async function cloudflare(prompt: string, seed: number): Promise<GeneratedImage> {
+  const res = await fetch(cfUrl("flux-1-schnell"), {
+    method: "POST",
+    headers: { Authorization: `Bearer ${process.env.CLOUDFLARE_AI_TOKEN}`, "Content-Type": "application/json" },
+    // 4 steps is schnell's sweet spot: quality close to 8 at half the cost. Cloudflare's schema rejects any other
+    // field (a "seed" is a 400), and each call already gives a different image.
+    body: JSON.stringify({ prompt: prompt.slice(0, 2048), steps: 4 }),
+    signal: AbortSignal.timeout(45_000),
+  });
+  return cfResult(res, seed);
 }
 
 async function fal(prompt: string, seed: number): Promise<GeneratedImage> {

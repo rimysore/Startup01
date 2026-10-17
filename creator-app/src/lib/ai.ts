@@ -331,6 +331,7 @@ export async function designThumbnail(
   preferredText: string,
   images: InputImage[],
   references: InputImage[] = [],
+  blend = false,
 ): Promise<AiResult<ThumbnailDesign>> {
   const refs = references.length
     ? `Images ${images.length} to ${images.length + references.length - 1} are NOT the creator's: they are thumbnails of videos on this topic that went viral on YouTube in India. ` +
@@ -342,6 +343,10 @@ export async function designThumbnail(
     language,
     `Design a YouTube thumbnail for this video. ${images.length ? `The creator uploaded ${images.length} image(s) (Image 0${images.length > 1 ? ` to ${images.length - 1}` : ""}); decide how to use each one (the most expressive face or the product should be the subject; drop blurry or irrelevant ones).` : "The creator uploaded no images: pick a background photo search that fits the topic."}\n` +
       refs +
+      (blend
+        ? "BLEND MODE: build a modern YouTuber composite from the creator's photos. Give exactly one photo the role 'subject' (the clearest, most expressive person: they are cut out and placed large in front), one the role 'background' (the scene behind them: a place, crowd or setting), up to two 'inset' (supporting proof: product, food, before/after) and 'skip' for weak ones. " +
+          "layout must be 'subject-right' or 'subject-left' (the side the person stands on; text goes on the other side).\n"
+        : "") +
       "Rules: at most 5 words of text, large and readable on a phone; one clear focal point; strong contrast; honest about what the video shows.\n\n" +
       `Video title or topic:\n${untrusted(title)}` +
       (preferredText.trim() ? `\nThe creator would like to use this thumbnail text if it works:\n${untrusted(preferredText)}` : ""),

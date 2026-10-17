@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { postAi, useDashboard, useQueryParam, type AiError } from "@/components/dashboard-context";
-import { defaultDesign, ThumbnailMaker, type Photo } from "@/components/ThumbnailMaker";
+import { defaultDesign, loadPhoto, ThumbnailMaker, type Photo } from "@/components/ThumbnailMaker";
 import { AiDemoNote, AiErrorNote, Card, DemoNote, PageHeader, Spinner } from "@/components/ui";
 import type { ThumbnailDesign, Titles } from "@/lib/ai";
 import { compact } from "@/lib/format";
@@ -66,6 +66,7 @@ export default function StudioPage() {
   const [background, setBackground] = useState<{ img: HTMLImageElement; credit: string | null; query: string; n: number; count: number; ai: boolean } | null>(null);
   const [designing, setDesigning] = useState(false);
   const [painting, setPainting] = useState(false);
+  const [mode, setMode] = useState<"ai" | "blend">("ai");
   const [designNote, setDesignNote] = useState<{ demo?: boolean; demoReason?: "signin" | "nokey"; error?: AiError } | null>(null);
   const setThumbText = (t: string) => setDesign((d) => ({ ...d, headline: t }));
   const busy = phase !== "idle";
@@ -164,6 +165,7 @@ export default function StudioPage() {
       text: design.headline,
       images: photos.map((p) => ({ mediaType: "image/jpeg", data: p.data })),
       references: research?.mode === "live" ? refs : [],
+      blend: mode === "blend",
     });
     setDesigning(false);
     refreshMe();
@@ -172,10 +174,19 @@ export default function StudioPage() {
     setDesign(d);
     setDesignNote({ demo: res.demo, demoReason: res.demoReason });
     // A generated or stock background only when the creator's own photos don't already fill it.
+    if (mode === "blend") return setBackground(null);
     const ownBackground = d.images.some((im) => im.role === "background") || (d.layout === "full-bleed" && photos.length > 0) || (d.layout === "split" && photos.length > 1);
     if (ownBackground || res.demo) setBackground(null);
     else if (canAi) await paintBackground(d.imagePrompt || d.backgroundQuery);
     else await loadBackground(d.backgroundQuery, 0);
+  }
+
+  async function addPhotos(files: FileList | null) {
+    if (!files) return;
+    const added = await Promise.all([...files].slice(0, 5 - photos.length).map((f) => loadPhoto(f).catch(() => null)));
+    setPhotos([...photos, ...added.filter((p): p is Photo => p != null)]);
+    // New photos invalidate the AI's per-photo plan; keep the text and colours.
+    setDesign((d) => ({ ...d, images: [] }));
   }
 
   const titles = result ? [...result.data.titles].sort((a, b) => b.strength - a.strength) : [];
@@ -380,57 +391,96 @@ export default function StudioPage() {
       )}
 
       <Card className="mt-6">
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
-            <h2 className="font-semibold">Thumbnail</h2>
-            <p className="mt-1 max-w-xl text-sm text-muted">
-              Add your photo (a clear face works best), then let Mitra design it{refs.length && research?.mode === "live" ? `, learning from the ${refs.length} hit${refs.length === 1 ? "" : "s"} you picked` : ""}.
-              {canAi ? " The background is painted by AI." : ""} Everything stays editable, and Indian scripts render correctly.
-            </p>
-          </div>
-          <div className="flex shrink-0 flex-wrap gap-2">
-            {canAi && (
+        <h2 className="font-semibold">Thumbnail</h2>
+        <p className="mt-1 text-sm text-muted">
+          Full HD (1920×1080){refs.length && research?.mode === "live" ? `, styled after the ${refs.length} hit${refs.length === 1 ? "" : "s"} you picked` : ""}. Drag and resize anything after;
+          Indian scripts always render correctly.
+        </p>
+        <div className="mt-5 grid gap-6 lg:grid-cols-[250px_1fr]">
+          <div className="space-y-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted">Choose your style</p>
+            {(
+              [
+                { id: "ai", emoji: "🎨", name: "AI image", text: "Mitra paints a full-HD scene for your topic. Add your face photo if you like." },
+                { id: "blend", emoji: "📸", name: "Blend my photos", text: "Upload 3 or more photos. Mitra cuts you out and blends them like top YouTubers do." },
+              ] as const
+            ).map((o) => (
+              <button
+                key={o.id}
+                onClick={() => setMode(o.id)}
+                aria-pressed={mode === o.id}
+                className={`block w-full rounded-2xl border-2 p-4 text-left transition ${mode === o.id ? "border-accent bg-accent-soft" : "border-line hover:border-ink-2/40"}`}
+              >
+                <span className="flex items-center gap-2 font-semibold">
+                  <span className="text-xl" aria-hidden>
+                    {o.emoji}
+                  </span>
+                  {o.name}
+                  {mode === o.id && <span className="ml-auto grid h-5 w-5 place-items-center rounded-full bg-accent text-[11px] font-bold text-accent-ink">✓</span>}
+                </span>
+                <span className="mt-1 block text-xs text-ink-2">{o.text}</span>
+              </button>
+            ))}
+
+            {mode === "blend" && (
+              <div className="rounded-2xl border border-dashed border-line p-3">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span>Your photos</span>
+                  <span className={photos.length >= 3 ? "text-good" : "text-muted"}>{photos.length}/3 needed · max 5</span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-surface-2">
+                  <div className="bg-brand h-full rounded-full transition-all" style={{ width: `${Math.min(100, (photos.length / 3) * 100)}%` }} />
+                </div>
+                <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-surface-2 px-3 py-3 text-sm font-semibold hover:bg-accent-soft">
+                  + Add photos
+                  <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={(e) => addPhotos(e.target.files)} aria-label="Add photos to blend" />
+                </label>
+                <p className="mt-2 text-[11px] text-muted">Best mix: 1 clear photo of you, 1 of the place, 1-3 of the thing you show.</p>
+              </div>
+            )}
+
+            <button
+              onClick={designWithMitra}
+              disabled={designing || (mode === "blend" ? photos.length < 3 : (chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
+              className="bg-brand w-full rounded-full px-5 py-3 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+            >
+              {designing ? "Designing…" : mode === "blend" ? `✨ Blend with Mitra · ${FEATURE_CREDITS.thumbnail}` : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
+            </button>
+            {mode === "ai" && canAi && (
               <button
                 onClick={() => paintBackground(design.imagePrompt || design.backgroundQuery || chosen || topic)}
                 disabled={painting || !(design.imagePrompt || design.backgroundQuery || chosen || topic).trim()}
-                className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 disabled:opacity-50"
+                className="w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 disabled:opacity-50"
               >
                 {painting ? "Painting…" : `🎨 New AI background · ${FEATURE_CREDITS.image}`}
               </button>
             )}
-            {background && !background.ai && background.count > 1 && (
-              <button onClick={() => loadBackground(background.query, (background.n + 1) % background.count)} className="rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2">
+            {mode === "ai" && background && !background.ai && background.count > 1 && (
+              <button onClick={() => loadBackground(background.query, (background.n + 1) % background.count)} className="w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2">
                 Another photo
               </button>
             )}
-            <button
-              onClick={designWithMitra}
-              disabled={designing || ((chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
-              className="bg-brand rounded-full px-5 py-2.5 text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
-            >
-              {designing ? "Designing…" : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
-            </button>
+            {designNote?.error && <AiErrorNote error={designNote.error} />}
+            {designNote?.demo && <AiDemoNote reason={designNote.demoReason} what="thumbnail design" />}
+            {(designing || painting) && <Spinner label={designing ? "Mitra is designing…" : "Painting a full-HD background…"} />}
+          </div>
+
+          <div className="min-w-0">
+            <ThumbnailMaker
+              design={design}
+              onDesignChange={setDesign}
+              photos={photos}
+              onPhotosChange={setPhotos}
+              background={mode === "ai" ? (background?.img ?? null) : null}
+              credit={mode === "ai" ? (background?.credit ?? null) : null}
+              blend={mode === "blend"}
+            />
+            <p className="mt-3 text-xs text-muted">
+              {mode === "blend" ? "Cutting you out happens on your device. " : ""}Photos are only sent (as small copies) when you press Design or Blend with Mitra, to plan the
+              layout, and aren&apos;t kept.
+            </p>
           </div>
         </div>
-        {designNote?.error && (
-          <div className="mb-4">
-            <AiErrorNote error={designNote.error} />
-          </div>
-        )}
-        {designNote?.demo && (
-          <div className="mb-4">
-            <AiDemoNote reason={designNote.demoReason} what="thumbnail design" />
-          </div>
-        )}
-        {(designing || painting) && (
-          <div className="mb-3">
-            <Spinner label={designing ? "Mitra is designing your thumbnail…" : "Painting a background…"} />
-          </div>
-        )}
-        <ThumbnailMaker design={design} onDesignChange={setDesign} photos={photos} onPhotosChange={setPhotos} background={background?.img ?? null} credit={background?.credit ?? null} />
-        <p className="mt-3 text-xs text-muted">
-          Photos stay in your browser until you press Design with Mitra; then a small copy is sent to our AI provider to plan the layout and isn&apos;t kept.
-        </p>
       </Card>
     </div>
   );

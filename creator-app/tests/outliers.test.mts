@@ -123,13 +123,27 @@ process.env.CLOUDFLARE_ACCOUNT_ID = "acc";
 process.env.CLOUDFLARE_AI_TOKEN = "tok";
 const { generateBackground, imageProvider } = await import("@/lib/images");
 let cfBody: { prompt?: string; steps?: number; seed?: number } = {};
+let hdForm: FormData | null = null;
+let hdFails = false;
 globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
-  assert(String(input).includes("/accounts/acc/ai/run/@cf/black-forest-labs/flux-1-schnell"), "calls Cloudflare's FLUX.1 schnell");
+  const url = String(input);
+  if (url.includes("/ai/run/@cf/black-forest-labs/flux-2-klein-4b")) {
+    hdForm = init?.body as FormData;
+    if (hdFails) return new Response(JSON.stringify({ errors: [{ message: "capacity" }] }), { status: 503 });
+    return Response.json({ result: { image: Buffer.from("hdbytes").toString("base64") }, success: true });
+  }
+  assert(url.includes("/accounts/acc/ai/run/@cf/black-forest-labs/flux-1-schnell"), "falls back to Cloudflare's FLUX.1 schnell");
   cfBody = JSON.parse(String(init?.body));
   return Response.json({ result: { image: Buffer.from("jpegbytes").toString("base64") }, success: true });
 }) as typeof fetch;
+const hd = await generateBackground("rainy street", 7);
+assert(
+  imageProvider() === "cloudflare" && Buffer.from(hd.body as Uint8Array).toString() === "hdbytes" && hdForm!.get("width") === "1920" && hdForm!.get("height") === "1088" && /No text/.test(String(hdForm!.get("prompt"))),
+  "full-HD FLUX.2 klein first: 1920×1088 as multipart form, no text asked for",
+);
+hdFails = true;
 const img = await generateBackground("rainy street", 7);
-assert(imageProvider() === "cloudflare" && Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && Object.keys(cfBody).length === 2 && /No text/.test(cfBody.prompt ?? ""), "Cloudflare is used first with only the fields it accepts; the image comes back decoded, with no text asked for");
+assert(Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && Object.keys(cfBody).length === 2, "if the HD model fails, FLUX.1 schnell answers with only the fields it accepts");
 globalThis.fetch = realFetch;
 
 console.log("all outlier tests passed");
