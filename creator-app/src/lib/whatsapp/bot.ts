@@ -147,8 +147,9 @@ export async function respond(user: User, contact: Contact, m: Inbound, now = Da
     }
     case "report": {
       const saved = await latestReport(user.id, "weekly");
-      if (saved) {
-        const pdf = saved.hasPdf ? { link: pdfLink(saved.id, now), filename: pdfFilename(saved.key), caption: w.pdfCaption } : undefined;
+      // Reports saved without their numbers (before PDFs, or a plain fallback) are rebuilt so the PDF comes too.
+      if (saved?.hasPdf) {
+        const pdf = { link: pdfLink(saved.id, now), filename: pdfFilename(saved.key), caption: w.pdfCaption };
         return reportMessages({ text: saved.text, buttons: [{ id: "ideas", title: w.btnIdeas }, { id: "menu", title: w.btnMenu }] }, undefined, pdf);
       }
       const loaded = await loadSummary(user.id);

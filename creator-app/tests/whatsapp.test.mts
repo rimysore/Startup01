@@ -149,6 +149,13 @@ assert(validPdfLink(Number(u.searchParams.get("id")), Number(u.searchParams.get(
 assert(!validPdfLink(Number(u.searchParams.get("id")) + 1, Number(u.searchParams.get("exp")), u.searchParams.get("sig")!, NOW), "…and can't be reused for another report");
 assert(!validPdfLink(Number(u.searchParams.get("id")), Number(u.searchParams.get("exp")), u.searchParams.get("sig")!, NOW + 31 * 86_400_000), "…and expires after 30 days");
 
+// A weekly report saved without its numbers (from before PDFs) is rebuilt, so the PDF still comes.
+const [savedRow] = await d.select().from(schema.notifications).where(eq(schema.notifications.id, Number(u.searchParams.get("id"))));
+await d.update(schema.notifications).set({ payload: { ...savedRow.payload!, data: undefined } }).where(eq(schema.notifications.id, savedRow.id));
+await handleInbound(msg("b2-old", "919800000001", "Full report", "report"), NOW);
+const rebuilt = outbox().slice(-2);
+assert(rebuilt[1].out.type === "document", "a report saved without PDF data is rebuilt and comes with its PDF");
+
 // Inside the window, reports go out as normal messages, not templates.
 await d.delete(schema.notifications).where(eq(schema.notifications.userId, "wa"));
 outbox().length = 0;
