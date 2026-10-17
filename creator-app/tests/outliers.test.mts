@@ -122,14 +122,14 @@ assert(tomorrow.videos.length === 1, "research opens again the next day");
 process.env.CLOUDFLARE_ACCOUNT_ID = "acc";
 process.env.CLOUDFLARE_AI_TOKEN = "tok";
 const { generateBackground, imageProvider } = await import("@/lib/images");
-let cfBody: { prompt?: string; steps?: number } = {};
+let cfBody: { prompt?: string; steps?: number; seed?: number } = {};
 globalThis.fetch = (async (input: string | URL, init?: RequestInit) => {
   assert(String(input).includes("/accounts/acc/ai/run/@cf/black-forest-labs/flux-1-schnell"), "calls Cloudflare's FLUX.1 schnell");
   cfBody = JSON.parse(String(init?.body));
   return Response.json({ result: { image: Buffer.from("jpegbytes").toString("base64") }, success: true });
 }) as typeof fetch;
 const img = await generateBackground("rainy street", 7);
-assert(imageProvider() === "cloudflare" && Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && /No text/.test(cfBody.prompt ?? ""), "Cloudflare is used first; the image comes back decoded, with no text asked for");
+assert(imageProvider() === "cloudflare" && Buffer.from(img.body as Uint8Array).toString() === "jpegbytes" && cfBody.steps === 4 && Object.keys(cfBody).length === 2 && /No text/.test(cfBody.prompt ?? ""), "Cloudflare is used first with only the fields it accepts; the image comes back decoded, with no text asked for");
 globalThis.fetch = realFetch;
 
 console.log("all outlier tests passed");

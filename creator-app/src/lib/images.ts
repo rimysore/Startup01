@@ -45,8 +45,9 @@ async function cloudflare(prompt: string, seed: number): Promise<GeneratedImage>
   const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/ai/run/@cf/black-forest-labs/flux-1-schnell`, {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.CLOUDFLARE_AI_TOKEN}`, "Content-Type": "application/json" },
-    // 4 steps is schnell's sweet spot: quality close to 8 at half the cost.
-    body: JSON.stringify({ prompt: prompt.slice(0, 2048), steps: 4, seed }),
+    // 4 steps is schnell's sweet spot: quality close to 8 at half the cost. Cloudflare's schema rejects any other
+    // field (a "seed" is a 400), and each call already gives a different image.
+    body: JSON.stringify({ prompt: prompt.slice(0, 2048), steps: 4 }),
     signal: AbortSignal.timeout(45_000),
   });
   const text = await res.text();
