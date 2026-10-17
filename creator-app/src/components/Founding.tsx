@@ -67,16 +67,21 @@ export function FounderOfferPopup() {
       const at = Number(localStorage.getItem(DISMISS_KEY));
       if (at && Date.now() - at < DISMISS_DAYS * 86_400_000) return;
     } catch {}
-    const show = () => setOpen(true);
+    // Shown at most once per visit: the first trigger removes both, so scrolling after a close can't reopen it.
+    const stop = () => {
+      clearTimeout(t);
+      window.removeEventListener("scroll", onScroll);
+    };
+    const show = () => {
+      stop();
+      setOpen(true);
+    };
     const t = setTimeout(show, 8000);
     const onScroll = () => {
       if (window.scrollY > document.body.scrollHeight / 3) show();
     };
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("scroll", onScroll);
-    };
+    return stop;
   }, [left]);
   useEffect(() => {
     if (!open) return;
