@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The price is small next to what I earn, but I can't tell yet whether an AI tool understands how my Telugu and Hindi viewers actually talk. I'd use the free 10 credits to test it before paying anything.",
+  "objection": "Whether it really understands regional-language nuance, slang and what my comments mean, or whether it just gives generic YouTube advice in Hindi.",
+  "would_change_my_mind": "Running it on one of my own videos with the free credits and getting a specific, correct explanation of why a Telugu or Hindi video underperformed, based on my comments.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 249
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already paid for vidIQ and it didn't move my views, so a tool that says it will coach me on my channel needs to show me something real before I hand over money. Hindi support is a good sign, but a label on the same kind of tool doesn't change whether it works.",
+  "objection": "That Mitra just repackages the numbers I can already see in YouTube Studio and gives generic advice on titles and thumbnails, and I won't know whether it helped until months later.",
+  "would_change_my_mind": "A free-credit result that names a specific video of mine, beats my usual views, and explains why in Hindi or Hinglish in a way I can check against my own analytics.",
+  "price_too_cheap": 29,
+  "price_cheap": 59,
+  "price_expensive": 149,
+  "price_too_expensive": 299
+}
