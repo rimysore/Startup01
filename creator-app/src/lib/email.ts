@@ -18,6 +18,8 @@ export interface Mail {
   replyTo?: string;
   /** Mail to the Mitra team itself: no "reports are on" footer. */
   internal?: boolean;
+  /** A full designed email (the weekly report); `text` is then only the plain-text version. */
+  html?: string;
 }
 
 const g = globalThis as unknown as { __mailOutbox?: Mail[] };
@@ -41,7 +43,7 @@ function smtp(): Transporter {
   return transport;
 }
 
-const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+export const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
 /** WhatsApp-style text → a clean, phone-friendly email. */
 export function mailHtml(m: Mail): string {
@@ -58,9 +60,14 @@ export function mailHtml(m: Mail): string {
 <div style="max-width:560px;margin:0 auto;padding:24px 18px">
 <p style="font-size:22px;font-weight:800;margin:0 0 18px;letter-spacing:-0.5px">mitra</p>
 <div style="background:#fff;border-radius:18px;padding:22px 20px;font-size:15px">${body}${button}</div>
-${m.internal ? "" : `<p style="font-size:12px;color:#7a7268;margin:16px 4px;line-height:1.5">You get this because reports are on in your Mitra account. Turn them off any time in
-<a href="${esc(SITE_URL)}/dashboard/whatsapp" style="color:#7a7268">WhatsApp &amp; reports</a>. Questions: ${esc(COMPANY.supportEmail)}<br>${esc(COMPANY.product)} · ${esc(COMPANY.address)}</p>`}
+${m.internal ? "" : mailFooter()}
 </div></body></html>`;
+}
+
+/** Why they get this email, how to stop it, and who sends it. */
+export function mailFooter(): string {
+  return `<p style="font-size:12px;color:#7a7268;margin:16px 4px;line-height:1.5">You get this because reports are on in your Mitra account. Turn them off any time in
+<a href="${esc(SITE_URL)}/dashboard/whatsapp" style="color:#7a7268">WhatsApp &amp; reports</a>. Questions: ${esc(COMPANY.supportEmail)}<br>${esc(COMPANY.product)} · ${esc(COMPANY.address)}</p>`;
 }
 
 export async function sendMail(m: Mail): Promise<void> {
@@ -76,7 +83,7 @@ export async function sendMail(m: Mail): Promise<void> {
     to: m.to,
     subject: m.subject,
     text: text.replace(/\*([^*\n]+)\*/g, "$1"),
-    html: mailHtml(m),
+    html: m.html ?? mailHtml(m),
     ...(m.internal ? {} : { headers: { "List-Unsubscribe": `<${SITE_URL}/dashboard/whatsapp>` } }),
   });
 }

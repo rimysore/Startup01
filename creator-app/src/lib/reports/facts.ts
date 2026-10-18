@@ -2,6 +2,7 @@ import { outlierScores } from "../outliers";
 import type { WeeklyCoach, VideoCoach } from "../ai";
 import { compact, full, pctChange, shortDate } from "../format";
 import type { ChannelSummary, Video } from "../types";
+import { reportLabels } from "./labels";
 
 /**
  * The numbers behind the Monday report and the 48-hour check. Pure functions: no I/O, no AI, so they're cheap,
@@ -35,18 +36,21 @@ export interface WeeklyFacts {
   views: number;
   viewsChange: number | null;
   watchHours: number;
+  watchHoursChange: number | null;
   subscribersGained: number;
   subscribersChange: number | null;
   subscribers: number;
   bestDay: { date: string; views: number } | null;
   uploadsThisWeek: number;
   daysSinceUpload: number | null;
-  /** Best recent video versus the average of the others. */
-  star: { title: string; views: number; times: number } | null;
+  /** Best recent video versus the channel's usual for that kind of video (Mitra's outlier score). */
+  star: { id?: string; title: string; views: number; times: number; thumbnail?: string | null } | null;
   /** A recent video people stopped watching early. */
   dropOff: { title: string; avgViewPct: number } | null;
   nextMilestone: { at: number; left: number } | null;
-  /** Daily views for the last 14 days of analytics (the chart in the PDF). */
+  /** Up to 3 latest uploads of the last 14 days, newest first (optional: reports saved before this have none). */
+  uploads?: { title: string; views: number; days: number; avgViewPct: number | null }[];
+  /** Daily views for the last 14 days of analytics: last week then this week (the chart). */
   days: { date: string; views: number }[];
 }
 
@@ -69,15 +73,21 @@ export function weeklyFacts(s: ChannelSummary, now = Date.now()): WeeklyFacts {
     views,
     viewsChange: pctChange(views, sum(prev.map((d) => d.views))),
     watchHours: Math.round(sum(week.map((d) => d.watchMinutes)) / 60),
+    watchHoursChange: pctChange(sum(week.map((d) => d.watchMinutes)), sum(prev.map((d) => d.watchMinutes))),
     subscribersGained: subs,
     subscribersChange: pctChange(subs, sum(prev.map((d) => d.subscribersGained))),
     subscribers: s.channel.subscribers,
     bestDay: best && best.views > 0 ? { date: best.date, views: best.views } : null,
     uploadsThisWeek: ages.filter((a) => a <= 7).length,
     daysSinceUpload: ages.length ? Math.floor(Math.min(...ages)) : null,
-    star: scored && scored.score >= 1.3 ? { title: scored.v.title, views: scored.v.views, times: scored.score } : null,
+    star: scored && scored.score >= 1.3 ? { id: scored.v.id, title: scored.v.title, views: scored.v.views, times: scored.score, thumbnail: scored.v.thumbnail } : null,
     dropOff: dropOff ? { title: dropOff.title, avgViewPct: Math.round(dropOff.avgViewPct ?? 0) } : null,
     nextMilestone: next ? { at: next, left: next - s.channel.subscribers } : null,
+    uploads: s.videos
+      .map((v, i) => ({ title: v.title, views: v.views, days: Math.floor(ages[i]), avgViewPct: v.avgViewPct == null ? null : Math.round(v.avgViewPct) }))
+      .filter((v) => v.days <= 14)
+      .sort((a, b) => a.days - b.days)
+      .slice(0, 3),
     days: s.daily.slice(-14).map((d) => ({ date: d.date, views: d.views })),
   };
 }
@@ -87,7 +97,7 @@ export function weeklyFactsText(f: WeeklyFacts): string {
   const pct = (n: number | null) => (n == null ? "no previous week to compare" : `${n >= 0 ? "+" : ""}${n.toFixed(0)}% vs the week before`);
   return [
     `Channel: ${f.channel}. Period: ${f.period}.`,
-    `Views: ${f.views} (${pct(f.viewsChange)}). Watch time: ${f.watchHours} hours.`,
+    `Views: ${f.views} (${pct(f.viewsChange)}). Watch time: ${f.watchHours} hours (${pct(f.watchHoursChange ?? null)}).`,
     `New subscribers: ${f.subscribersGained} (${pct(f.subscribersChange)}). Total subscribers: ${f.subscribers}.`,
     f.bestDay ? `Best day: ${f.bestDay.date} with ${f.bestDay.views} views.` : "",
     `Uploads in the last 7 days: ${f.uploadsThisWeek}. Days since the last upload: ${f.daysSinceUpload ?? "unknown"}.`,
@@ -113,8 +123,8 @@ export function plainWeekly(f: WeeklyFacts): WeeklyCoach {
   if (!fixes.length) fixes.push("Reply to the top comments on your latest video within a day: it brings people back.");
   return {
     headline: f.subscribersGained > 0 ? `Good week, ${f.channel}! Here's how it went.` : `Here's your week, ${f.channel}.`,
-    wins: wins.slice(0, 3),
-    fixes: fixes.slice(0, 3),
+    wins: wins.slice(0, 2),
+    fixes: fixes.slice(0, 2),
     nextVideo: f.star
       ? { idea: `A follow-up to "${f.star.title}"`, why: "It's your strongest recent video, so its viewers want more of it." }
       : { idea: "Answer the most-asked question in your comments", why: "Your viewers already told you what they want." },
@@ -127,13 +137,38 @@ export function statsLine(f: WeeklyFacts): string {
   return `👀 ${compact(f.views)} views${chg(f.viewsChange)} · ⏱️ ${compact(f.watchHours)} hrs · 🙌 +${full(f.subscribersGained)} subs`;
 }
 
-/** The full Monday report as one WhatsApp message (WhatsApp formatting: *bold*). */
-export function weeklyText(f: WeeklyFacts, c: WeeklyCoach): string {
-  const lines = [`*📊 ${f.channel} · ${f.period}*`, "", c.headline, "", statsLine(f)];
-  if (f.nextMilestone) lines.push(`🎯 ${full(f.nextMilestone.left)} more to ${compact(f.nextMilestone.at)} subscribers`);
-  if (c.wins.length) lines.push("", "*🏆*", ...c.wins.map((w) => `• ${w}`));
-  if (c.fixes.length) lines.push("", "*🔧*", ...c.fixes.map((w) => `• ${w}`));
-  lines.push("", `*🎬 ${c.nextVideo.idea}*`, c.nextVideo.why);
+/** "▲50%" / "▼12%", or "" when there's no previous week. */
+export function change(n: number | null | undefined): string {
+  return n == null || !Number.isFinite(n) ? "" : `${n >= 0 ? "▲" : "▼"}${Math.abs(n).toFixed(0)}%`;
+}
+
+/** "2.5×": the outlier score, one decimal. */
+export const times = (n: number) => `${n.toFixed(1)}×`;
+
+/**
+ * The full Monday report as one WhatsApp message (WhatsApp formatting: *bold*, _italic_). Same order as the PDF
+ * and email: headline, the three numbers, milestone, video of the week, the one move, then wins and fixes.
+ */
+export function weeklyText(f: WeeklyFacts, c: WeeklyCoach, language = "en"): string {
+  const L = reportLabels(language, c);
+  const lower = (x: string) => (/^[A-Z][a-z]/.test(x) ? x.toLowerCase() : x);
+  const stat = (value: string, label: string, n: number | null | undefined) => `*${value}* ${lower(label)}${change(n) ? `  ${change(n)}` : ""}`;
+  const lines = [
+    `*mitra · ${L.report}*`,
+    `${f.channel} · ${f.period}`,
+    "",
+    `*${c.headline}*`,
+    "",
+    stat(compact(f.views), L.views, f.viewsChange),
+    stat(compact(f.watchHours), L.watchTime, f.watchHoursChange),
+    stat(`+${full(f.subscribersGained)}`, L.subscribers, f.subscribersChange),
+  ];
+  if (f.nextMilestone) lines.push(`🎯 ${full(f.nextMilestone.left)} ${L.milestone} (${compact(f.nextMilestone.at)})`);
+  if (f.star) lines.push("", `*${L.videoOfWeek}*`, `"${f.star.title}"`, `${compact(f.star.views)} ${L.views.toLowerCase()} · ${times(f.star.times)} ${L.usual}`);
+  lines.push("", `*👉 ${L.next}*`, c.nextVideo.idea, `_${c.nextVideo.why}_`);
+  if (c.wins.length) lines.push("", `*${L.wins}*`, ...c.wins.slice(0, 2).map((w) => `✓ ${w}`));
+  if (c.fixes.length) lines.push("", `*${L.fixes}*`, ...c.fixes.slice(0, 2).map((w) => `→ ${w}`));
+  if (f.star) lines.push("", "_× = Mitra's calculation from your YouTube data, not a YouTube metric._");
   return lines.join("\n");
 }
 

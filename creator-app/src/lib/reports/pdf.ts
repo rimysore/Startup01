@@ -2,8 +2,9 @@ import path from "node:path";
 import * as fontkit from "fontkit";
 import PDFDocument from "pdfkit";
 import type { WeeklyCoach } from "../ai";
-import { compact, full, shortDate } from "../format";
-import type { WeeklyFacts } from "./facts";
+import { compact, full } from "../format";
+import { times, type WeeklyFacts } from "./facts";
+import { reportLabels, weekday } from "./labels";
 import { SITE_URL } from "../company";
 
 /**
@@ -13,7 +14,6 @@ import { SITE_URL } from "../company";
  */
 
 const FONT_DIR = path.join(process.cwd(), "assets", "pdf-fonts");
-const SCRIPT_FONT: Record<string, string> = { hi: "NotoSansDevanagari", mr: "NotoSansDevanagari", te: "NotoSansTelugu", ta: "NotoSansTamil", bn: "NotoSansBengali", kn: "NotoSansKannada", ml: "NotoSansMalayalam" };
 
 /**
  * fontkit (PDFKit's shaper) crashes on mark-to-base lookups whose anchor is missing, which happens in Noto
@@ -38,45 +38,60 @@ function patchFontkit() {
   }
 }
 
-const C = { ink: "#1a1714", muted: "#6f675d", line: "#e7dfd3", violet: "#6C47FF", saffron: "#FF8A1F", fuchsia: "#D946EF", good: "#1f9d55", warm: "#fff4e8", soft: "#f4f0ff", sun: "#FFD23F" };
-
-type Labels = NonNullable<WeeklyCoach["labels"]>;
-const LABELS: Record<string, Labels> = {
-  en: { report: "Weekly report", views: "Views", watchTime: "Watch hours", subscribers: "New subscribers", wins: "What went well", fixes: "Fix this week", next: "Your next video", milestone: "to your next milestone" },
-  hinglish: { report: "Weekly report", views: "Views", watchTime: "Watch hours", subscribers: "Naye subscribers", wins: "Kya accha gaya", fixes: "Is hafte sudhaaro", next: "Aapka next video", milestone: "agle milestone tak" },
-  hi: { report: "साप्ताहिक रिपोर्ट", views: "व्यूज़", watchTime: "देखने के घंटे", subscribers: "नए सब्सक्राइबर", wins: "क्या अच्छा रहा", fixes: "इस हफ्ते सुधारें", next: "आपका अगला वीडियो", milestone: "अगले माइलस्टोन तक" },
-};
+const C = { ink: "#1c1b19", ink2: "#4a4540", muted: "#7a7268", line: "#ece6dc", card: "#faf7f2", accent: "#e2620b", soft: "#fdf0e5", good: "#1f7a3a", bad: "#b3261e", saffron: "#FF8A1F", fuchsia: "#D946EF", violet: "#6C47FF" };
+const LOGO = path.join(process.cwd(), "public", "brand", "mitra-120.png");
 
 /** Emoji and pictographs aren't in these fonts; drop them rather than print empty boxes. */
 function clean(s: string): string {
   return s.replace(/[\p{Extended_Pictographic}\u{FE0F}\u{200D}\u{20E3}]/gu, "").replace(/\s{2,}/g, " ").trim();
 }
 
-const INDIC = /[ऀ-෿‌‍।॥₹]/u;
-
 /** Splits text into runs that each need one font: the language's script font, or Latin. */
 export function runs(text: string): { indic: boolean; text: string }[] {
-  const out: { indic: boolean; text: string }[] = [];
+  return scriptRuns(text).map((r) => ({ indic: r.font != null, text: r.text }));
+}
+
+/** Unicode blocks of the scripts we have fonts for. Titles can be in any of them, whatever the report language. */
+const BLOCKS: [number, number, string][] = [
+  [0x0900, 0x097f, "NotoSansDevanagari"],
+  [0x0980, 0x09ff, "NotoSansBengali"],
+  [0x0b80, 0x0bff, "NotoSansTamil"],
+  [0x0c00, 0x0c7f, "NotoSansTelugu"],
+  [0x0c80, 0x0cff, "NotoSansKannada"],
+  [0x0d00, 0x0d7f, "NotoSansMalayalam"],
+];
+function fontOf(ch: string): string | null {
+  const c = ch.codePointAt(0) ?? 0;
+  return BLOCKS.find(([lo, hi]) => c >= lo && c <= hi)?.[2] ?? null;
+}
+
+/** Splits text into runs that each need one font (null = Latin). Spaces and joiners stay with their run. */
+export function scriptRuns(text: string): { font: string | null; text: string }[] {
+  const out: { font: string | null; text: string }[] = [];
   for (const ch of text) {
-    // Spaces and joiners stay with the run they're in, so words aren't split across fonts.
-    const indic = /\s/.test(ch) && out.length ? out[out.length - 1].indic : INDIC.test(ch);
     const last = out[out.length - 1];
-    if (last && last.indic === indic) last.text += ch;
-    else out.push({ indic, text: ch });
+    const font = last && /[\s\u200c\u200d]/u.test(ch) ? last.font : fontOf(ch);
+    if (last && last.font === font) last.text += ch;
+    else out.push({ font, text: ch });
   }
   return out;
 }
 
-export function weeklyPdf(f: WeeklyFacts, coach: WeeklyCoach, language: string, opts: { channel?: string; site?: string } = {}): Promise<Buffer> {
+/**
+ * One A4 page, top to bottom: header, the week's headline, three numbers with the change on last week, the
+ * milestone bar, a this-week-vs-last-week chart beside the video of the week, the one move for this week, then
+ * what went well and what to fix. Every block has a fixed place, so the page reads the same every Monday.
+ */
+export function weeklyPdf(f: WeeklyFacts, coach: WeeklyCoach, language: string, opts: { site?: string } = {}): Promise<Buffer> {
   patchFontkit();
-  const L = coach.labels ?? LABELS[language] ?? LABELS.en;
-  const script = SCRIPT_FONT[language];
+  const L = reportLabels(language, coach);
   const doc = new PDFDocument({ size: "A4", margin: 40, font: path.join(FONT_DIR, "NotoSans-Regular.ttf"), info: { Title: `Mitra · ${f.channel} · ${f.period}`, Author: "Mitra" } });
   doc.registerFont("latin", path.join(FONT_DIR, "NotoSans-Regular.ttf"));
   doc.registerFont("latin-bold", path.join(FONT_DIR, "NotoSans-Bold.ttf"));
-  if (script) {
-    doc.registerFont("script", path.join(FONT_DIR, `${script}-Regular.ttf`));
-    doc.registerFont("script-bold", path.join(FONT_DIR, `${script}-Bold.ttf`));
+  // Registering only records the file; a font is embedded only if some text uses it.
+  for (const [, , font] of BLOCKS) {
+    doc.registerFont(font, path.join(FONT_DIR, `${font}-Regular.ttf`));
+    doc.registerFont(`${font}-bold`, path.join(FONT_DIR, `${font}-Bold.ttf`));
   }
   const chunks: Buffer[] = [];
   doc.on("data", (c: Buffer) => chunks.push(c));
@@ -84,115 +99,210 @@ export function weeklyPdf(f: WeeklyFacts, coach: WeeklyCoach, language: string, 
     doc.on("end", () => resolve(Buffer.concat(chunks)));
     doc.on("error", reject);
   });
+  // Everything is placed by hand; never let PDFKit start a second page.
+  doc.page.margins.bottom = 0;
 
   const W = doc.page.width;
+  const H = doc.page.height;
   const M = 40;
   const CW = W - M * 2;
+  type Style = { size: number; bold?: boolean; color?: string; width?: number; lineGap?: number; align?: "left" | "right" | "center" };
 
-  /** Writes mixed-script text at (x, y) within width, switching fonts per run. */
-  function write(text: string, x: number, y: number | undefined, o: { size: number; bold?: boolean; color?: string; width?: number; lineGap?: number }) {
-    const parts = runs(clean(text));
+  const fontFor = (font: string | null, bold?: boolean) => (font ? (bold ? `${font}-bold` : font) : bold ? "latin-bold" : "latin");
+
+  /** Writes mixed-script text at (x, y), switching fonts per run. Returns the y below it. */
+  function write(text: string, x: number, y: number, o: Style): number {
+    const parts = scriptRuns(clean(text));
+    if (!parts.length) return y;
     doc.fillColor(o.color ?? C.ink).fontSize(o.size);
+    // PDFKit can't right-align or centre text continued across fonts, so short aligned lines are placed by hand.
+    if (o.align && o.align !== "left" && parts.length > 1) {
+      const widths = parts.map((p) => doc.font(fontFor(p.font, o.bold)).widthOfString(p.text));
+      const total = widths.reduce((t, w) => t + w, 0);
+      const box = o.width ?? CW;
+      if (total <= box) {
+        let px = x + (o.align === "right" ? box - total : (box - total) / 2);
+        parts.forEach((p, i) => {
+          doc.font(fontFor(p.font, o.bold)).text(p.text, px, y, { lineBreak: false });
+          px += widths[i];
+        });
+        return y + doc.currentLineHeight(true);
+      }
+    }
     parts.forEach((p, i) => {
-      const font = p.indic && script ? (o.bold ? "script-bold" : "script") : o.bold ? "latin-bold" : "latin";
-      doc.font(font);
-      const opts = { width: o.width ?? CW, lineGap: o.lineGap ?? 2, continued: i < parts.length - 1 };
+      doc.font(fontFor(p.font, o.bold));
+      const opts = { width: o.width ?? CW, lineGap: o.lineGap ?? 2, align: o.align, continued: i < parts.length - 1 };
       if (i === 0) doc.text(p.text, x, y, opts);
       else doc.text(p.text, opts);
     });
+    return doc.y;
   }
 
-  // ---- Header band -----------------------------------------------------------------------------------
-  const grad = doc.linearGradient(0, 0, W, 120);
-  grad.stop(0, C.saffron).stop(0.5, C.fuchsia).stop(1, C.violet);
-  doc.rect(0, 0, W, 120).fill(grad);
-  // Mark: white circle with an "m", sun dot.
-  doc.circle(M + 18, 42, 18).fill("#ffffff");
-  doc.lineWidth(3.2).strokeColor(C.violet).lineCap("round").lineJoin("round");
-  // The "m" is 14.4pt wide; centre it in the circle.
-  doc.save().translate(M + 18 - 7.2 - 34, 0);
-  doc.path("M 34 52 L 34 45 a 3.6 3.6 0 0 1 7.2 0 L 41.2 52 M 41.2 52 L 41.2 39 a 3.6 3.6 0 0 1 7.2 0 L 48.4 52").stroke();
-  doc.restore();
-  doc.circle(M + 29, 31, 3.2).fill(C.sun);
-  write("mitra", M + 44, 28, { size: 20, bold: true, color: "#ffffff" });
-  write(L.report, M, 72, { size: 22, bold: true, color: "#ffffff", width: CW * 0.6 });
-  write(`${f.channel} · ${f.period}`, M + CW * 0.6, 80, { size: 11, color: "#ffffff", width: CW * 0.4 });
-  doc.text("", M, 140);
+  /** Height `write` will take, so a box can be drawn behind text before the text. */
+  function measure(text: string, o: Style): number {
+    const t = clean(text);
+    // The tallest script in the text decides the height.
+    const font = scriptRuns(t).find((r) => r.font)?.font ?? null;
+    doc.font(fontFor(font, o.bold)).fontSize(o.size);
+    return doc.heightOfString(t || " ", { width: o.width ?? CW, lineGap: o.lineGap ?? 2 });
+  }
 
-  // ---- Headline ------------------------------------------------------------------------------------------
-  write(coach.headline, M, 140, { size: 15, bold: true });
-  let y = doc.y + 14;
+  const pct = (n: number | null | undefined) => (n == null || !Number.isFinite(n) ? null : `${n >= 0 ? "+" : "−"}${Math.abs(n).toFixed(0)}%`);
+  const gradient = (x0: number, x1: number) => doc.linearGradient(x0, 0, x1, 0).stop(0, C.saffron).stop(0.5, C.fuchsia).stop(1, C.violet);
 
-  // ---- Three big numbers ---------------------------------------------------------------------------------
-  const cardW = (CW - 20) / 3;
-  const stats: [string, string, string | null][] = [
-    [L.views, compact(f.views), f.viewsChange == null ? null : `${f.viewsChange >= 0 ? "+" : ""}${f.viewsChange.toFixed(0)}%`],
-    [L.watchTime, compact(f.watchHours), null],
-    [L.subscribers, `+${full(f.subscribersGained)}`, f.subscribersChange == null ? null : `${f.subscribersChange >= 0 ? "+" : ""}${f.subscribersChange.toFixed(0)}%`],
+  // ---- Header: logo, report name and period ---------------------------------------------------------
+  let y = 34;
+  try {
+    doc.image(LOGO, M, y, { width: 28, height: 28 });
+  } catch {
+    doc.circle(M + 14, y + 14, 14).fill(gradient(M, M + 28));
+  }
+  write("mitra", M + 36, y + 2, { size: 17, bold: true, width: 120 });
+  write(L.report, M + CW - 240, y + 1, { size: 10, bold: true, color: C.accent, width: 240, align: "right" });
+  write(f.period, M + CW - 240, y + 15, { size: 9.5, color: C.muted, width: 240, align: "right" });
+  y += 40;
+  doc.rect(M, y, CW, 2.5).fill(gradient(M, M + CW));
+
+  // ---- Channel and headline -------------------------------------------------------------------------
+  y += 16;
+  y = write(f.channel, M, y, { size: 10, color: C.muted });
+  y = write(coach.headline, M, y + 2, { size: 18, bold: true, lineGap: 1 }) + 14;
+
+  // ---- Scorecard ------------------------------------------------------------------------------------
+  const cardW = (CW - 24) / 3;
+  const stats: [string, string, number | null | undefined][] = [
+    [L.views, compact(f.views), f.viewsChange],
+    [L.watchTime, compact(f.watchHours), f.watchHoursChange],
+    [L.subscribers, `+${full(f.subscribersGained)}`, f.subscribersChange],
   ];
-  stats.forEach(([label, value, change], i) => {
-    const x = M + i * (cardW + 10);
-    doc.roundedRect(x, y, cardW, 78, 12).fill(C.warm);
-    write(label, x + 14, y + 12, { size: 10, color: C.muted, width: cardW - 28 });
-    write(value, x + 14, y + 30, { size: 24, bold: true, width: cardW - 28 });
-    if (change) write(change, x + 14, y + 60, { size: 9, bold: true, color: change.startsWith("-") ? "#c0392b" : C.good, width: cardW - 28 });
-  });
-  y += 92;
-
-  // ---- Milestone -------------------------------------------------------------------------------------------
-  if (f.nextMilestone) {
-    const done = Math.max(0, Math.min(1, 1 - f.nextMilestone.left / f.nextMilestone.at));
-    write(`${full(f.nextMilestone.left)} ${L.milestone}: ${compact(f.nextMilestone.at)}`, M, y, { size: 10, color: C.muted });
-    y = doc.y + 4;
-    doc.roundedRect(M, y, CW, 8, 4).fill(C.line);
-    const bar = doc.linearGradient(M, 0, M + CW, 0);
-    bar.stop(0, C.saffron).stop(0.5, C.fuchsia).stop(1, C.violet);
-    doc.roundedRect(M, y, Math.max(8, CW * done), 8, 4).fill(bar);
-    y += 22;
-  }
-
-  // ---- Chart: daily views, this week highlighted ----------------------------------------------------------
-  if (f.days.length > 1) {
-    const chartH = 90;
-    const max = Math.max(...f.days.map((d) => d.views), 1);
-    const bw = CW / f.days.length;
-    f.days.forEach((d, i) => {
-      const h = Math.max(2, (d.views / max) * chartH);
-      const thisWeek = i >= f.days.length - 7;
-      doc.roundedRect(M + i * bw + 3, y + chartH - h, bw - 6, h, 3).fill(thisWeek ? C.violet : C.line);
-    });
-    doc.fillColor(C.muted).font("latin").fontSize(8);
-    doc.text(shortDate(f.days[0].date), M, y + chartH + 4, { width: 80 });
-    doc.text(shortDate(f.days[f.days.length - 1].date), M + CW - 80, y + chartH + 4, { width: 80, align: "right" });
-    y += chartH + 24;
-  }
-
-  // ---- Lists -----------------------------------------------------------------------------------------------
-  function section(title: string, items: string[], color: string, bg: string) {
-    if (!items.length) return;
-    const top = y;
-    // Measure by writing, then draw the background behind (PDFKit draws in order, so draw first with an estimate).
-    const est = 30 + items.reduce((h, it) => h + Math.ceil(clean(it).length / 70) * 17 + 6, 0);
-    doc.roundedRect(M, top, CW, est, 12).fill(bg);
-    doc.rect(M, top, 4, est).fill(color);
-    write(title, M + 16, top + 10, { size: 12, bold: true, color });
-    let iy = doc.y + 4;
-    for (const it of items) {
-      write(`•  ${it}`, M + 16, iy, { size: 11, width: CW - 32 });
-      iy = doc.y + 4;
+  stats.forEach(([label, value, chg], i) => {
+    const x = M + i * (cardW + 12);
+    doc.roundedRect(x, y, cardW, 82, 12).fill(C.card);
+    write(label, x + 14, y + 12, { size: 9.5, color: C.muted, width: cardW - 28 });
+    write(value, x + 14, y + 27, { size: 26, bold: true, width: cardW - 28 });
+    const p = pct(chg);
+    if (p) {
+      const up = !p.startsWith("−");
+      const text = `${p}  vs ${L.lastWeek.toLowerCase()}`;
+      write(text, x + 14, y + 62, { size: 8.5, bold: true, color: up ? C.good : C.bad, width: cardW - 28 });
     }
-    y = Math.max(top + est, iy) + 12;
-  }
-  section(L.wins, coach.wins, C.good, "#eefaf2");
-  section(L.fixes, coach.fixes, "#d35400", C.warm);
-  section(L.next, [`${coach.nextVideo.idea} — ${coach.nextVideo.why}`], C.violet, C.soft);
+  });
+  y += 82 + 16;
 
-  // ---- Footer ----------------------------------------------------------------------------------------------
-  // Writing inside the bottom margin would start a new page; the footer belongs on this one.
-  doc.page.margins.bottom = 0;
-  const fy = doc.page.height - 48;
-  doc.moveTo(M, fy - 8).lineTo(W - M, fy - 8).lineWidth(0.5).strokeColor(C.line).stroke();
-  doc.fillColor(C.muted).font("latin").fontSize(8).text(`Mitra · ${opts.site ?? new URL(SITE_URL).host} · Numbers from YouTube Analytics (latest 7 days available)`, M, fy, { width: CW, align: "center" });
+  // ---- Milestone ------------------------------------------------------------------------------------
+  if (f.nextMilestone) {
+    const share = Math.max(0, Math.min(1, f.subscribers / f.nextMilestone.at));
+    write(`${full(f.nextMilestone.left)} ${L.milestone}`, M, y, { size: 9.5, bold: true, width: CW * 0.7 });
+    write(`${full(f.subscribers)} / ${compact(f.nextMilestone.at)}`, M + CW * 0.6, y, { size: 9.5, color: C.muted, width: CW * 0.4, align: "right" });
+    y += 17;
+    doc.roundedRect(M, y, CW, 7, 3.5).fill(C.line);
+    doc.roundedRect(M, y, Math.max(7, CW * share), 7, 3.5).fill(gradient(M, M + CW));
+    y += 7 + 18;
+  }
+
+  // ---- Chart (this week vs last week) beside the video of the week -----------------------------------
+  const rowH = 150;
+  const leftW = CW * 0.6 - 6;
+  const rightX = M + leftW + 12;
+  const rightW = CW - leftW - 12;
+  doc.roundedRect(M, y, leftW, rowH, 12).lineWidth(0.8).strokeColor(C.line).stroke();
+  write(L.views, M + 14, y + 11, { size: 10, bold: true, width: 120 });
+  // Legend
+  const legend = (x: number, color: string, label: string) => {
+    doc.roundedRect(x, y + 15, 7, 7, 2).fill(color);
+    write(label, x + 10, y + 12.5, { size: 8, color: C.muted, width: 70 });
+  };
+  legend(M + leftW - 150, C.accent, L.thisWeek);
+  legend(M + leftW - 76, "#d9d1c5", L.lastWeek);
+  const thisWeek = f.days.slice(-7);
+  const lastWeek = f.days.length > 7 ? f.days.slice(-14, -7) : [];
+  const max = Math.max(1, ...f.days.map((d) => d.views));
+  const plotTop = y + 36;
+  const plotH = rowH - 36 - 26;
+  const slot = (leftW - 28) / Math.max(7, thisWeek.length);
+  const bw = Math.min(11, (slot - 8) / 2);
+  doc.moveTo(M + 14, plotTop + plotH).lineTo(M + leftW - 14, plotTop + plotH).lineWidth(0.6).strokeColor(C.line).stroke();
+  thisWeek.forEach((d, i) => {
+    const cx = M + 14 + slot * i + slot / 2;
+    const prev = lastWeek[i - (thisWeek.length - lastWeek.length)] ?? lastWeek[i];
+    if (prev) {
+      const h = Math.max(1.5, (prev.views / max) * plotH);
+      doc.roundedRect(cx - bw - 1, plotTop + plotH - h, bw, h, 2).fill("#d9d1c5");
+    }
+    const h = Math.max(1.5, (d.views / max) * plotH);
+    doc.roundedRect(cx + 1, plotTop + plotH - h, bw, h, 2).fill(C.accent);
+    write(weekday(d.date, language), cx - slot / 2, plotTop + plotH + 6, { size: 7.5, color: C.muted, width: slot, align: "center" });
+  });
+
+  doc.roundedRect(rightX, y, rightW, rowH, 12).fill(C.card);
+  if (f.star) {
+    write(L.videoOfWeek, rightX + 14, y + 11, { size: 10, bold: true, width: rightW - 28 });
+    const title = f.star.title.length > 70 ? `${f.star.title.slice(0, 68).trim()}…` : f.star.title;
+    write(title, rightX + 14, y + 29, { size: 9.5, color: C.ink2, width: rightW - 28, lineGap: 1 });
+    write(times(f.star.times), rightX + 14, y + rowH - 64, { size: 28, bold: true, color: C.accent, width: rightW - 28 });
+    write(`${L.usual} · ${compact(f.star.views)} ${L.views.toLowerCase()}`, rightX + 14, y + rowH - 26, { size: 8.5, color: C.muted, width: rightW - 28 });
+  } else {
+    write(L.thisWeek, rightX + 14, y + 11, { size: 10, bold: true, width: rightW - 28 });
+    write(String(f.uploadsThisWeek), rightX + 14, y + 34, { size: 28, bold: true, color: C.accent, width: rightW - 28 });
+    write(L.uploads, rightX + 14, y + 74, { size: 9, color: C.muted, width: rightW - 28 });
+    if (f.bestDay) write(`${weekday(f.bestDay.date, language)} · ${compact(f.bestDay.views)} ${L.views.toLowerCase()}`, rightX + 14, y + rowH - 26, { size: 8.5, color: C.muted, width: rightW - 28 });
+  }
+  y += rowH + 16;
+
+  // ---- The one move ---------------------------------------------------------------------------------
+  const ideaH = measure(coach.nextVideo.idea, { size: 14, bold: true, width: CW - 40 });
+  const whyH = measure(coach.nextVideo.why, { size: 10, width: CW - 40 });
+  const moveH = 14 + 16 + ideaH + 4 + whyH + 14;
+  doc.roundedRect(M, y, CW, moveH, 12).fill(C.soft);
+  doc.roundedRect(M, y, 4, moveH, 2).fill(C.accent);
+  write(L.next, M + 20, y + 13, { size: 9.5, bold: true, color: C.accent, width: CW - 40 });
+  const iy = write(coach.nextVideo.idea, M + 20, y + 30, { size: 14, bold: true, width: CW - 40 });
+  write(coach.nextVideo.why, M + 20, iy + 4, { size: 10, color: C.ink2, width: CW - 40 });
+  y += moveH + 16;
+
+  // ---- What went well / Fix this week ---------------------------------------------------------------
+  const colW = (CW - 16) / 2;
+  const column = (x: number, title: string, items: string[], color: string, mark: "check" | "arrow"): number => {
+    write(title, x, y, { size: 10.5, bold: true, color, width: colW });
+    let iy2 = y + 20;
+    for (const it of items.slice(0, 2)) {
+      doc.circle(x + 5, iy2 + 6.5, 5).fill(color);
+      doc.lineWidth(1.2).strokeColor("#ffffff").lineCap("round").lineJoin("round");
+      if (mark === "check") doc.moveTo(x + 2.7, iy2 + 6.7).lineTo(x + 4.4, iy2 + 8.3).lineTo(x + 7.4, iy2 + 4.9).stroke();
+      else doc.moveTo(x + 2.8, iy2 + 6.5).lineTo(x + 7.2, iy2 + 6.5).moveTo(x + 5.3, iy2 + 4.6).lineTo(x + 7.2, iy2 + 6.5).lineTo(x + 5.3, iy2 + 8.4).stroke();
+      iy2 = write(it, x + 16, iy2, { size: 10, width: colW - 16, lineGap: 1.5 }) + 8;
+    }
+    return iy2;
+  };
+  const listsEnd = Math.max(
+    coach.wins.length ? column(M, L.wins, coach.wins, C.good, "check") : y,
+    coach.fixes.length ? column(M + colW + 16, L.fixes, coach.fixes, C.accent, "arrow") : y,
+  );
+
+  // ---- Latest uploads, when the page has room (it always does in English; long scripts may fill it) ------
+  y = listsEnd + 4;
+  const uploads = f.uploads ?? [];
+  const fy = H - 52;
+  if (uploads.length && y + 26 + uploads.length * 22 < fy - 8) {
+    y = Math.max(y, fy - 26 - uploads.length * 22 - 22);
+    write(L.recent, M, y, { size: 10.5, bold: true, width: CW });
+    y += 20;
+    for (const u of uploads) {
+      doc.moveTo(M, y).lineTo(W - M, y).lineWidth(0.5).strokeColor(C.line).stroke();
+      const title = u.title.length > 64 ? `${u.title.slice(0, 62).trim()}…` : u.title;
+      write(title, M, y + 5, { size: 9.5, width: CW - 210 });
+      const meta = [`${compact(u.views)} ${L.views.toLowerCase()}`, u.avgViewPct != null ? `${u.avgViewPct}% ${L.watched}` : null, `${u.days} ${L.daysAgo}`].filter(Boolean).join("  ·  ");
+      write(meta, M + CW - 205, y + 5, { size: 9, color: C.muted, width: 205, align: "right" });
+      y += 22;
+    }
+  }
+
+  // ---- Footer ---------------------------------------------------------------------------------------
+  const site = opts.site ?? new URL(SITE_URL).host;
+  doc.moveTo(M, fy).lineTo(W - M, fy).lineWidth(0.5).strokeColor(C.line).stroke();
+  doc.fillColor(C.ink).font("latin-bold").fontSize(8.5).text(`${site}/dashboard`, M, fy + 9, { width: CW / 2 });
+  doc.fillColor(C.muted).font("latin").fontSize(7.5).text("Numbers from YouTube Analytics (latest 7 days available).", M + CW / 2, fy + 9, { width: CW / 2, align: "right" });
+  doc.text("× scores are Mitra's calculation from your YouTube data, not YouTube metrics.", M, fy + 23, { width: CW, align: "right" });
 
   doc.end();
   return done;

@@ -5,6 +5,7 @@ import { WHATSAPP_LOCKED } from "../company";
 import { emailConfigured, sendMail } from "../email";
 import { send, splitText, templateLanguage, whatsappConfigured, type Out } from "../whatsapp/api";
 import type { BuiltReport } from "./build";
+import { weeklyEmailHtml } from "./email";
 
 export type Contact = typeof schema.whatsappContacts.$inferSelect;
 
@@ -70,6 +71,7 @@ export async function deliver(user: User, r: BuiltReport, now = Date.now(), foot
         subject: r.subject,
         text: pdf ? `${r.text}\n\n📄 Download this report as a PDF: ${pdf.link}` : r.text,
         link: { label: "Open Mitra", url: r.link },
+        ...(r.kind === "weekly" && r.data ? { html: weeklyEmailHtml(r.data.facts, r.data.coach, user.language, { dashboard: r.link, pdf: pdf?.link }) } : {}),
       });
       return { channel: "email", ...(waError ? { error: waError } : {}) };
     } catch (err) {

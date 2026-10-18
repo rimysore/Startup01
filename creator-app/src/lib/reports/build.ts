@@ -3,6 +3,7 @@ import { coachVideo, coachWeekly, type WeeklyCoach } from "../ai";
 import { runFreeAi } from "../ai-route";
 import type { User } from "../auth";
 import { SITE_URL } from "../company";
+import { compact } from "../format";
 import type { ChannelSummary, Video } from "../types";
 import { fetchEarlyViews, fetchSummary } from "../youtube";
 import { FRESH_MS, loadYouTube } from "../youtube-data";
@@ -19,6 +20,7 @@ import {
   weeklyFacts,
   weeklyFactsText,
   weeklyText,
+  change,
   type WeeklyFacts,
 } from "./facts";
 
@@ -66,7 +68,7 @@ export async function buildWeekly(user: User, s: ChannelSummary, labels: { ideas
   return {
     kind: "weekly",
     key: weekKey(now),
-    text: weeklyText(f, coach),
+    text: weeklyText(f, coach, user.language),
     data: { facts: f, coach },
     template: {
       name: "mitra_weekly_report",
@@ -78,7 +80,8 @@ export async function buildWeekly(user: User, s: ChannelSummary, labels: { ideas
       { id: "ideas", title: labels.ideas },
       { id: "menu", title: labels.menu },
     ],
-    subject: `Your Mitra weekly report · ${f.period}`,
+    // The subject carries the week's number, so the inbox already shows how it went.
+    subject: `${f.channel}: ${compact(f.views)} views this week${change(f.viewsChange) ? ` ${change(f.viewsChange)}` : ""} · Mitra`,
     link: `${SITE_URL}/dashboard`,
   };
 }

@@ -53,7 +53,15 @@ assert(wf.nextMilestone?.at === 10_000 && wf.nextMilestone.left === 600, "next m
 const plain = F.plainWeekly(wf);
 assert(plain.wins.length > 0 && plain.fixes.length > 0, "plain report has wins and fixes without AI");
 const text = F.weeklyText(wf, plain);
-assert(text.includes("▲50%") && text.includes("600 more to 10K"), `report text has stats and milestone`);
+assert(text.includes("▲50%") && text.includes("600 to your next milestone (10K)"), `report text has stats and milestone`);
+assert(plain.wins.length <= 2 && plain.fixes.length <= 2, "at most two wins and two fixes");
+assert(Math.round(wf.watchHoursChange!) === 50 && wf.uploads?.[0].title === "Video new", "watch-time change and latest uploads");
+assert(F.weeklyText(wf, plain, "hi").includes("नए सब्सक्राइबर"), "WhatsApp report headings in the creator's language");
+const { weeklyEmailHtml } = await import("@/lib/reports/email");
+const html = weeklyEmailHtml({ ...wf, channel: "<Rima & Co>" }, plain, "en", { dashboard: "https://x/dashboard", pdf: "https://x/pdf" });
+assert(html.includes("&lt;Rima &amp; Co&gt;") && !html.includes("<Rima"), "email escapes channel names");
+assert(html.includes("10.5K") && html.includes("▲50%") && html.includes("https://x/pdf") && html.includes("not YouTube metrics"), "email has the numbers, PDF link and the Mitra-metric note");
+assert(/^[A-Z][a-z]{2}/.test((await import("@/lib/reports/labels")).weekday("2026-10-19", "en")), "weekday names");
 
 assert(runs("Views 50% बढ़े aur").map((r) => r.indic).join() === "false,true,false", "PDF text splits into script runs");
 for (const lang of ["en", "hi", "te", "ta", "ml", "bn", "kn"]) {
@@ -118,6 +126,7 @@ assert(names === "mitra_video_check,mitra_weekly_report", "weekly report + video
 const weeklyTpl = tpl.find((o) => (o.out as Extract<Out, { type: "template" }>).name === "mitra_weekly_report")!.out as Extract<Out, { type: "template" }>;
 assert(weeklyTpl.params[0] === "Rima" && weeklyTpl.params.length === 5 && weeklyTpl.buttons?.join() === "report,stop", "template variables and quick replies");
 assert(mailOutbox().length === 2 && mailOutbox().every((m) => m.to === "mail@x.com"), "creator without WhatsApp gets email");
+assert(mailOutbox().some((m) => m.html?.includes("Open my dashboard")) && mailOutbox().filter((m) => m.html).length === 1, "the weekly email is the designed one; the video check stays plain");
 assert(r.sent === 4, `4 reports sent (got ${r.sent})`);
 for (const o of tpl) {
   const out = o.out as Extract<Out, { type: "template" }>;
@@ -146,7 +155,7 @@ assert(c1.lastInboundAt?.getTime() === NOW, "a message opens the 24-hour window"
 
 await handleInbound(msg("b2", "919800000001", "Full report", "report"), NOW);
 const fullReport = outbox().slice(-2);
-assert(fullReport[0].out.type === "buttons" && (fullReport[0].out as { text: string }).text.includes("📊"), "'Full report' sends the saved weekly report");
+assert(fullReport[0].out.type === "buttons" && (fullReport[0].out as { text: string }).text.includes("mitra ·"), "'Full report' sends the saved weekly report");
 const doc = fullReport[1].out as Extract<Out, { type: "document" }>;
 assert(doc.type === "document" && /\/api\/reports\/pdf\?id=\d+&exp=\d+&sig=[0-9a-f]{32}$/.test(doc.link) && doc.filename === "Mitra-weekly-report-2026-W43.pdf", "…followed by its PDF (signed link)");
 const u = new URL(doc.link);

@@ -72,7 +72,7 @@ assert(calls.length === 2 && calls.every((c) => c.feature === "report" && c.mode
 outbox().length = 0;
 await handleInbound({ id: "a1", from: "919800000001", name: null, text: "Full report", action: "report", at: NOW }, NOW);
 const full = outbox()[0].out as { text: string };
-assert(full.text.includes("Badhiya hafta raha!") && full.text.includes("👀") && full.text.includes("Street food part 2"), "full report = AI words + our stats");
+assert(full.text.includes("Badhiya hafta raha!") && full.text.includes("▲") && full.text.includes("Street food part 2"), "full report = AI words + our stats");
 
 // A question costs one credit; the answer is formatted for WhatsApp.
 outbox().length = 0;
