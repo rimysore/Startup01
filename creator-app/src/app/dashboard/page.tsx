@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { burstConfetti, CelebrationToast, nextMilestone, RollingNumber, Sparkline, useLiveSubscribers, type Celebration } from "@/components/celebrate";
 import { useDashboard, useQueryParam, type Me } from "@/components/dashboard-context";
 import { FounderBadge, FounderPassCard } from "@/components/Founding";
+import { InterviewCard } from "@/components/Interview";
 import { LineChart } from "@/components/LineChart";
 import { OutlierBadge } from "@/components/outlier";
 import { Card, ErrorNote, Spinner } from "@/components/ui";
@@ -224,6 +225,7 @@ function OverviewBody({
       </section>
 
       <FounderPassCard me={me} />
+      {me?.user && me.youtube && <InterviewCard userId={me.user.id} />}
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Kpi label="Views · 28 days" value={<RollingNumber value={Math.round(views28)} format={compact} />} change={viewsChange} sub="vs previous 2 weeks" trend={daily.map((d) => d.views)} />

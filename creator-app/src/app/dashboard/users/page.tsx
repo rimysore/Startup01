@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useDashboard } from "@/components/dashboard-context";
 import { Card, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { answerLabel, INTERVIEW, QUESTION_IDS, type QuestionId } from "@/lib/interview";
 import { languageLabel } from "@/lib/languages";
 
 const FEATURE: Record<string, string> = {
@@ -30,6 +31,7 @@ interface Row {
   lastAi: string | null;
   costUsd: number;
   reportsSent: number;
+  interviewed: boolean;
 }
 interface Detail {
   user: { id: string; email: string; name: string | null; plan: string; language: string; createdAt: string; founderNumber: number | null };
@@ -37,6 +39,16 @@ interface Detail {
   recent: { feature: string; model: string; costUsd: number; latencyMs: number; createdAt: string }[];
   reports: { kind: string; key: string; channel: string; status: string; error: string | null; createdAt: string; sentAt: string | null }[];
   months: { month: string; credits: number; founderUses: number }[];
+  interview: Answers | null;
+}
+type Answers = Record<string, string | string[]>;
+interface Interview {
+  userId: string;
+  answers: Answers;
+  updatedAt: string;
+  name: string | null;
+  email: string;
+  channel: string | null;
 }
 
 const INR = 88;
@@ -121,7 +133,10 @@ export default function UsersPage() {
                   {shown.map((r) => (
                     <tr key={r.id} onClick={() => (setOpen(r.id === open ? null : r.id), setDetail(null))} className={`cursor-pointer hover:bg-surface-2 ${open === r.id ? "bg-surface-2" : ""}`}>
                       <td className="px-4 py-2.5">
-                        <p className="font-medium">{r.name ?? "—"}</p>
+                        <p className="font-medium">
+                          {r.name ?? "—"}
+                          {r.interviewed && <span className="ml-1.5 rounded bg-accent-soft px-1 text-[10px] font-semibold text-accent">answered</span>}
+                        </p>
                         <p className="text-xs text-muted">{r.email}</p>
                       </td>
                       <td className="px-4 py-2.5">
@@ -154,6 +169,12 @@ export default function UsersPage() {
                     {detail.user.email} · {detail.user.plan} plan · writes in {languageLabel(detail.user.language)}
                     {detail.user.founderNumber != null && ` · Founding Creator #${detail.user.founderNumber}`} · joined {when(detail.user.createdAt)}
                   </p>
+                  {detail.interview && (
+                    <div className="mt-4 rounded-lg bg-surface-2 p-3 text-sm">
+                      <h3 className="font-medium">What they told us</h3>
+                      <AnswerList answers={detail.interview} />
+                    </div>
+                  )}
                   <div className="mt-5 grid gap-6 lg:grid-cols-2">
                     <div>
                       <h3 className="text-sm font-medium">What they used</h3>
@@ -219,9 +240,115 @@ export default function UsersPage() {
               )}
             </Card>
           )}
+          <InterviewSummary />
           <p className="mt-3 text-xs text-muted">Counts real AI calls only: a repeated question answered from cache isn&apos;t counted. Page visits aren&apos;t tracked.</p>
         </>
       )}
     </div>
   );
 }
+
+const list = (v: string | string[] | undefined) => (v == null ? [] : Array.isArray(v) ? v : [v]);
+
+function AnswerList({ answers }: { answers: Answers }) {
+  return (
+    <dl className="mt-2 space-y-1.5">
+      {QUESTION_IDS.filter((id) => answers[id] != null).map((id) => (
+        <div key={id}>
+          <dt className="text-xs text-muted">{INTERVIEW[id].q}</dt>
+          <dd className="font-indic">{list(answers[id]).map((v) => answerLabel(id, v)).join(", ")}</dd>
+        </div>
+      ))}
+      {typeof answers.other === "string" && (
+        <div>
+          <dt className="text-xs text-muted">Anything else</dt>
+          <dd className="font-indic">{answers.other}</dd>
+        </div>
+      )}
+      {typeof answers.phone === "string" && (
+        <div>
+          <dt className="text-xs text-muted">WhatsApp</dt>
+          <dd>{answers.phone}</dd>
+        </div>
+      )}
+    </dl>
+  );
+}
+
+/** Every creator's interview, counted: what's hard, what they use, where to reach them, what they'd pay. */
+function InterviewSummary() {
+  const [rows, setRows] = useState<Interview[] | null>(null);
+  useEffect(() => {
+    fetch("/api/admin/users?interviews=1", { cache: "no-store" })
+      .then((r) => (r.ok ? (r.json() as Promise<{ interviews: Interview[] }>) : Promise.reject()))
+      .then((d) => setRows(d.interviews))
+      .catch(() => setRows([]));
+  }, []);
+  if (!rows) return null;
+  const counted = QUESTION_IDS.filter((id): id is QuestionId => "options" in INTERVIEW[id]);
+  const words = rows.flatMap((r) => [r.answers.weekly, r.answers.other].filter((x): x is string => typeof x === "string").map((text) => ({ text, who: r.name ?? r.email })));
+  const calls = rows.filter((r) => r.answers.call === "yes");
+  return (
+    <Card className="mt-6">
+      <h2 className="font-semibold">What creators told us</h2>
+      <p className="text-xs text-muted">{rows.length} answered the in-app interview. Use this to decide what to build next.</p>
+      {rows.length > 0 && (
+        <>
+          <div className="mt-4 grid gap-6 lg:grid-cols-2">
+            {counted.map((id) => {
+              const def = INTERVIEW[id];
+              const opts = "options" in def ? Object.entries(def.options as Record<string, string>) : [];
+              const n = (key: string) => rows.filter((r) => list(r.answers[id]).includes(key)).length;
+              const answered = rows.filter((r) => r.answers[id] != null).length || 1;
+              return (
+                <div key={id}>
+                  <h3 className="text-sm font-medium">{def.q}</h3>
+                  <ul className="mt-2 space-y-1.5">
+                    {opts
+                      .sort((x, y) => n(y[0]) - n(x[0]))
+                      .map(([key, label]) => (
+                        <li key={key} className="text-sm">
+                          <div className="flex justify-between gap-2">
+                            <span>{label}</span>
+                            <span className="text-muted">{n(key)}</span>
+                          </div>
+                          <div className="mt-0.5 h-1.5 rounded-full bg-surface-2">
+                            <div className="h-1.5 rounded-full bg-accent" style={{ width: `${(n(key) / answered) * 100}%` }} />
+                          </div>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+          {words.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-medium">In their words</h3>
+              <ul className="mt-2 space-y-2 text-sm">
+                {words.slice(0, 40).map((w, i) => (
+                  <li key={i} className="rounded-lg bg-surface-2 p-2.5 font-indic">
+                    {w.text} <span className="text-xs text-muted">· {w.who}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {calls.length > 0 && (
+            <div className="mt-6">
+              <h3 className="text-sm font-medium">Happy to talk ({calls.length})</h3>
+              <ul className="mt-2 space-y-1 text-sm">
+                {calls.map((r) => (
+                  <li key={r.userId}>
+                    {r.name ?? r.email} · {r.channel ?? "no channel"} · {typeof r.answers.phone === "string" ? r.answers.phone : r.email}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </>
+      )}
+    </Card>
+  );
+}
+

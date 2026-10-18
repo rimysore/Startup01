@@ -71,7 +71,10 @@ await discover({ token: "T" }, { query: "x", language: "any", minSubs: 0, maxSub
 assert(!seen[0].searchParams.get("key") && !seen[0].searchParams.get("relevanceLanguage"), "OAuth fallback sends a bearer token; 'any' language sets no relevance filter");
 globalThis.fetch = realFetch;
 
-const body = outreachBody("Hi Ravi, loved the night test.", "https://mitra-creators.vercel.app", 93, "Rithvik");
-assert(body.includes("93 spots left") && body.includes("design partners") && body.includes("reply \"stop\"") && body.endsWith("I won't write again."), "email is a design-partner invitation with the offer and an easy opt-out");
+const body = outreachBody("Ravi, your night camera test got more views than anything else you posted this month.", 93, "Rithvik");
+assert(body.includes("93 of 100 spots left") && body.includes("design partners") && body.includes('Reply "stop"') && body.endsWith("I won't write again."), "email is a design-partner invitation with the offer and an easy opt-out");
+assert(!/https?:\/\//.test(body) && !body.includes("—") && !body.includes("•"), "first email: no links, no em dashes, no bullets");
+const words = body.split("\n\nRithvik")[0].split(/\s+/).length;
+assert(words <= 130, `first email stays short (${words} words before the signature)`);
 console.log("all prospect tests passed");
 process.exit(0);

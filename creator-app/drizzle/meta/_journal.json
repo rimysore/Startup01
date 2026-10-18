@@ -71,6 +71,13 @@
       "when": 1792191112833,
       "tag": "0009_waitlist",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792367171302,
+      "tag": "0010_creator_interviews",
+      "breakpoints": true
     }
   ]
 }

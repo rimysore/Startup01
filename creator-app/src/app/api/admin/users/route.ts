@@ -12,11 +12,24 @@ export async function GET(request: Request) {
   const me = await currentUser();
   if (!isAdmin(me)) return Response.json({ error: "Not found" }, { status: 404 });
   const d = await db();
-  const id = new URL(request.url).searchParams.get("id");
+  const params = new URL(request.url).searchParams;
+  const id = params.get("id");
   const u = schema.users;
   const c = schema.aiCalls;
   const n = schema.notifications;
   const month = monthKey();
+
+  if (params.get("interviews")) {
+    const i = schema.creatorInterviews;
+    const rows = await d
+      .select({ userId: i.userId, answers: i.answers, updatedAt: i.updatedAt, name: u.name, email: u.email, channel: schema.youtubeConnections.channelTitle })
+      .from(i)
+      .innerJoin(u, eq(u.id, i.userId))
+      .leftJoin(schema.youtubeConnections, eq(schema.youtubeConnections.userId, i.userId))
+      .orderBy(desc(i.updatedAt))
+      .limit(1000);
+    return Response.json({ interviews: rows });
+  }
 
   if (!id) {
     const rows = await d
@@ -38,6 +51,7 @@ export async function GET(request: Request) {
         lastAi: sql<string | null>`(select max(${c.createdAt}) from ${c} where ${c.userId} = ${u.id})`,
         costMicros: sql<number>`(select coalesce(sum(${c.costMicros}), 0)::bigint from ${c} where ${c.userId} = ${u.id})`,
         reportsSent: sql<number>`(select count(*)::int from ${n} where ${n.userId} = ${u.id} and ${n.status} = 'sent')`,
+        interviewed: sql<boolean>`exists(select 1 from ${schema.creatorInterviews} where ${schema.creatorInterviews.userId} = ${u.id})`,
       })
       .from(u)
       .leftJoin(schema.youtubeConnections, eq(schema.youtubeConnections.userId, u.id))
@@ -60,7 +74,7 @@ export async function GET(request: Request) {
 
   const [user] = await d.select().from(u).where(eq(u.id, id));
   if (!user) return Response.json({ error: "No such user" }, { status: 404 });
-  const [byFeature, recent, reports, months] = await Promise.all([
+  const [byFeature, recent, reports, months, interview] = await Promise.all([
     d
       .select({
         feature: c.feature,
@@ -76,6 +90,7 @@ export async function GET(request: Request) {
     d.select({ feature: c.feature, model: c.model, costMicros: c.costMicros, latencyMs: c.latencyMs, createdAt: c.createdAt }).from(c).where(eq(c.userId, id)).orderBy(desc(c.createdAt)).limit(40),
     d.select({ kind: n.kind, key: n.key, channel: n.channel, status: n.status, error: n.error, createdAt: n.createdAt, sentAt: n.sentAt }).from(n).where(eq(n.userId, id)).orderBy(desc(n.createdAt)).limit(30),
     d.select().from(schema.usage).where(eq(schema.usage.userId, id)).orderBy(desc(schema.usage.month)).limit(6),
+    d.select({ answers: schema.creatorInterviews.answers }).from(schema.creatorInterviews).where(eq(schema.creatorInterviews.userId, id)),
   ]);
   return Response.json({
     user: { id: user.id, email: user.email, name: user.name, plan: user.plan, language: user.language, createdAt: user.createdAt, founderNumber: user.founderNumber },
@@ -83,5 +98,6 @@ export async function GET(request: Request) {
     recent: recent.map((r) => ({ ...r, costUsd: r.costMicros / 1e6 })),
     reports,
     months,
+    interview: interview[0]?.answers ?? null,
   });
 }

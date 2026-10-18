@@ -27,7 +27,11 @@ export async function POST(request: Request) {
       const out = await writeOutreach(
         parsed.data.language,
         batch
-          .map((p) => `id ${p.id}: channel "${p.title}" (${p.subscribers} subscribers, language ${p.language ?? "unknown"}); latest video: "${p.latestVideoTitle ?? "?"}"; about: ${(p.description ?? "").slice(0, 200).replace(/\s+/g, " ")}`)
+          .map(
+            (p) =>
+              `id ${p.id}: channel "${p.title}" (${p.subscribers} subscribers, ${p.videoCount} videos, language ${p.language ?? "unknown"}); ` +
+              `latest video: "${p.latestVideoTitle ?? "?"}"${p.lastUploadAt ? ` (uploaded ${p.lastUploadAt.toISOString().slice(0, 10)})` : ""}; about: ${(p.description ?? "").slice(0, 200).replace(/\s+/g, " ")}`,
+          )
           .join("\n"),
       );
       await logCall(user!.id, "outreach", out.usage, Date.now() - started).catch(() => {});

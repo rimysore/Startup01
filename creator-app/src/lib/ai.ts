@@ -649,7 +649,7 @@ export const OutreachSchema = z.object({
     z.object({
       id: z.number(),
       subject: z.string().describe("Under 60 characters, specific to them, no clickbait or ALL CAPS"),
-      opener: z.string().describe("Two or three short sentences: greet them by name, a specific, genuine observation about their latest video or channel, then why their channel stood out (the honest reason they were picked as a design partner)"),
+      opener: z.string().describe("One or two short sentences that start with their name or channel (not 'I'): one specific, checkable observation about their latest video or channel, and why that caught the founder's eye")
     }),
   ),
 });
@@ -661,11 +661,11 @@ export async function writeOutreach(language: string, creators: string): Promise
     "outreach",
     OutreachSchema,
     language,
-    "Write a short, personal subject line and opening for an email to each YouTube creator below, from the founder of Mitra (an AI growth manager for regional-language creators). " +
-      "The email invites them to be one of a small group of design partners who use Mitra free and shape it with their feedback; the rest of the email explains that, so the opening only has to earn the read. " +
-      "Refer to something specific from their latest video title or channel, and say plainly why their channel caught your eye (language, niche, how they connect with viewers), using only what the data shows. " +
-      "Sound like one creator-friendly person writing, not marketing: no hype words, no exclamation marks in the subject, no 'congratulations', no 'you've been selected'. " +
-      "Good subject lines are specific and low-key, e.g. 'Your Lucknow night test + a small ask'. " +
+    "Write a short, personal subject line and opening for an email to each YouTube creator below, from the founder of Mitra (an AI growth coach for regional-language creators). " +
+      "The rest of the email (written separately) explains Mitra and offers a free one-page read of their channel, so the opening only has to show you actually looked. " +
+      "Start with them, not yourself. Make ONE specific observation from the data (their latest video's topic, their language, their niche, how often they post) and say plainly why it caught your eye. " +
+      "Sound like one person typing, not marketing: no em dashes, no exclamation marks, no hype words, no 'hope this finds you well', no 'loved your video', no 'congratulations', no 'you've been selected', no questions. " +
+      "Good subject lines are specific and low-key, e.g. 'Your Lucknow night test'. " +
       "Don't invent facts, numbers, praise you can't see in the data, or urgency. Return one message per id.\n\n" +
       untrusted(creators),
   );

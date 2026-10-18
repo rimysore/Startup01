@@ -279,3 +279,16 @@ export const waitlist = pgTable(
   },
   (t) => [index("waitlist_status").on(t.status, t.createdAt)],
 );
+
+/**
+ * The in-app interview: why a creator wants Mitra, what's hardest about growing, what they'd pay. One row per
+ * creator (answering again replaces it). Read by admins on the Users page to decide what to build next.
+ */
+export const creatorInterviews = pgTable("creator_interviews", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  answers: jsonb("answers").$type<Record<string, string | string[]>>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
