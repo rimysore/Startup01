@@ -272,9 +272,9 @@ function OverviewBody({
       <Card className="mt-6">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="font-semibold">Recent uploads</h2>
-          <Link href="/dashboard/ideas" className="text-xs font-semibold text-accent hover:underline">
-            × = views vs your usual
-          </Link>
+          <span className="text-xs text-muted" title="Mitra's calculation from YouTube data, not a YouTube metric">
+            × = views vs your usual (Mitra&apos;s calculation)
+          </span>
         </div>
         <div className="divide-y divide-line">
           {videos.map((v) => (

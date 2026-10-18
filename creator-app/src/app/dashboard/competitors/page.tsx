@@ -1,5 +1,6 @@
 "use client";
 
+import { MitraMetricNote } from "@/components/outlier";
 import { useEffect, useState } from "react";
 import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
 import { BarList, EmotionBars } from "@/components/insights";
@@ -104,6 +105,7 @@ export default function CompetitorsPage() {
   return (
     <div className="rise">
       <PageHeader eyebrow="Competitors" title="Channels like yours, and what's working for them." />
+      <MitraMetricNote className="-mt-4 mb-4" />
       {data?.mode === "demo" && (
         <div className="mb-4">
           <DemoNote>Sample channels. Connect YouTube, then add up to 5 channels you compete with.</DemoNote>

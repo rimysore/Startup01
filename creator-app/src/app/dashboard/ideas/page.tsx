@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
-import { OutlierBadge } from "@/components/outlier";
+import { OutlierBadge, MitraMetricNote } from "@/components/outlier";
 import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
 import type { BreakoutIdeas } from "@/lib/ai";
@@ -142,6 +142,7 @@ export default function IdeasPage() {
   return (
     <div className="rise">
       <PageHeader eyebrow="Breakout ideas" title="Videos far above their channel's usual, and ideas for your next one." />
+      <MitraMetricNote className="-mt-4 mb-4" />
 
       <Card className="mb-6 !p-4 sm:!p-5">
         <p className="text-sm text-ink-2">

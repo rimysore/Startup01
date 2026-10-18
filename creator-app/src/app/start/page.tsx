@@ -70,7 +70,7 @@ const STEPS: { title: string; time: string; body: React.ReactNode }[] = [
 const FAQ: [string, React.ReactNode][] = [
   ["Do I need to install an app?", <>No. Mitra works in your phone&apos;s browser. To keep it one tap away, open it in Chrome → ⋮ menu → <b>Add to Home screen</b> (iPhone: Safari → Share → <b>Add to Home Screen</b>).</>],
   ["Is it really free?", <>Yes. Every creator gets the Free plan, and the first 100 are Founding Creators: 50 extra free uses a month of the everyday features, for life. No card needed.</>],
-  ["Is my channel safe?", <>Mitra has read-only access and only you see your data. Disconnect any time in Connections, and we delete your YouTube data.</>],
+  ["Is my channel safe?", <>Mitra has read-only access and only you see your dashboard. To answer you, parts of your channel data are processed by our AI and hosting providers (listed in our <a className="underline" href="/privacy">privacy policy</a>). Disconnect any time in Connections, and we delete your YouTube data.</>],
   ["Which languages?", <>Hindi, Hinglish, Telugu, Tamil, Marathi, Bengali, Kannada, Malayalam and English, on the website and on WhatsApp.</>],
   ["Something not working?", <>Email <a className="underline" href={`mailto:${COMPANY.supportEmail}`}>{COMPANY.supportEmail}</a> or reply to the email you got from us. It comes straight to the founder.</>],
 ];

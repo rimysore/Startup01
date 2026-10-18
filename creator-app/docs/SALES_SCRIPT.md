@@ -83,7 +83,7 @@ report arrives this Monday. I'll check in next week to hear what you think."
 | They say | You say |
 | --- | --- |
 | "What's the catch?" | "There isn't one for you. We need real creators to tell us what's useful before we charge anyone. Your feedback is the price." |
-| "Is my channel data safe?" | "We only get read-only access; we can't post or delete anything. Only you see your data, and you can disconnect in one click; we delete it." |
+| "Is my channel data safe?" | "We only get read-only access; we can't post or delete anything. Only you see your dashboard; our AI and hosting providers process data only to answer you (see the privacy policy). You can disconnect in one click and we delete it." |
 | "I don't have time." | "That's exactly who it's for. Most of it comes to you on WhatsApp once a week. Two minutes to read." |
 | "I already use VidIQ / TubeBuddy." | "Keep them! Mitra is different: it speaks your language, reads your own analytics, and tells you what to do on WhatsApp. Try both and tell me which helps more." |
 | "How does it make money?" | "Later, creators who join after the first 100 pay ₹99 a month. Design partners never pay." |

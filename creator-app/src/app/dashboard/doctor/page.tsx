@@ -28,7 +28,7 @@ function ScoreRing({ score }: { score: number }) {
   const s = Math.max(0, Math.min(100, score));
   const color = s >= 70 ? "var(--good)" : s >= 45 ? "var(--warn)" : "var(--bad)";
   return (
-    <svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label={`Health score ${s} out of 100`}>
+    <svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label={`Mitra score ${s} out of 100`}>
       <circle cx="44" cy="44" r={r} fill="none" stroke="var(--surface-2)" strokeWidth="8" />
       <circle cx="44" cy="44" r={r} fill="none" stroke={color} strokeWidth="8" strokeLinecap="round" strokeDasharray={`${(s / 100) * c} ${c}`} transform="rotate(-90 44 44)" />
       <text x="44" y="44" dy="0.35em" textAnchor="middle" fontSize="24" fontWeight="700" fill="var(--ink)">
@@ -223,7 +223,10 @@ export default function DoctorPage() {
             <div className="rise space-y-6">
               {result.demo && <AiDemoNote reason={result.demoReason} what="diagnosis" />}
               <Card className="flex flex-wrap items-center gap-5">
-                <ScoreRing score={result.data.score} />
+                <div className="text-center" title="Mitra's own estimate from YouTube data, not a YouTube metric">
+                  <ScoreRing score={result.data.score} />
+                  <p className="mt-1 text-[11px] text-muted">Mitra score</p>
+                </div>
                 <p className="min-w-0 flex-1 font-display text-lg leading-snug sm:text-3xl">“{result.data.verdict}”</p>
               </Card>
               {result.data.traffic && (

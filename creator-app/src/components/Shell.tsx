@@ -349,7 +349,7 @@ function ChannelGate({ children }: { children: React.ReactNode }) {
       </p>
       {signedIn && (
         <ul className="mx-auto mt-5 max-w-xs space-y-1.5 text-left text-sm text-ink-2">
-          {["Read-only: Mitra can never upload, edit or delete", "Only you see your data", "Disconnect any time in Connections"].map((t) => (
+          {["Read-only: Mitra can never upload, edit or delete", "Only you see your dashboard", "Disconnect any time in Connections"].map((t) => (
             <li key={t} className="flex gap-2">
               <span className="text-good" aria-hidden>✓</span>
               {t}
