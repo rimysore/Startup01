@@ -34,7 +34,7 @@ const MAX = 6000;
 export async function assistantContext(user: User, page?: string, language: string = user.language): Promise<string> {
   const d = await db();
   const [loaded, usage, competitors, [contact], report] = await Promise.all([
-    loadSummary(user.id),
+    loadSummary(user.id, { allowStale: true }),
     usageThisMonth(user.id),
     d.select({ title: schema.competitors.title }).from(schema.competitors).where(eq(schema.competitors.userId, user.id)),
     d.select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.userId, user.id)),

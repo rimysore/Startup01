@@ -220,18 +220,22 @@ export async function fetchSummary(tokens: GoogleTokens): Promise<ChannelSummary
   type VideosRes = {
     items?: Array<{
       id: string;
-      snippet: { title: string; publishedAt: string; thumbnails?: { medium?: { url: string } } };
+      snippet: { title: string; publishedAt: string; liveBroadcastContent?: string; thumbnails?: { medium?: { url: string } } };
       statistics: { viewCount?: string; likeCount?: string; commentCount?: string };
       contentDetails: { duration: string };
+      status?: { privacyStatus?: string };
+      liveStreamingDetails?: { actualStartTime?: string };
     }>;
   };
   const videos: Video[] = ids.length
-    ? ((await api<VideosRes>(tokens, `${DATA}/videos?part=snippet,statistics,contentDetails&id=${ids.join(",")}`)).items ?? []).map(
+    ? ((await api<VideosRes>(tokens, `${DATA}/videos?part=snippet,statistics,contentDetails,status,liveStreamingDetails&id=${ids.join(",")}`)).items ?? []).map(
         (v) => ({
           id: v.id,
           title: v.snippet.title,
           publishedAt: v.snippet.publishedAt.slice(0, 10),
-          publishedAtIso: v.snippet.publishedAt,
+          // A premiere's clock starts when it goes live, not when it was uploaded.
+          publishedAtIso: v.liveStreamingDetails?.actualStartTime ?? v.snippet.publishedAt,
+          isPublic: v.status?.privacyStatus === "public" && (v.snippet.liveBroadcastContent ?? "none") === "none",
           thumbnail: v.snippet.thumbnails?.medium?.url ?? null,
           durationSec: parseDuration(v.contentDetails.duration),
           views: Number(v.statistics.viewCount ?? 0),

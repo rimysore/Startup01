@@ -1,8 +1,9 @@
 import { and, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import type { User } from "../auth";
+import { isAdmin, type User } from "../auth";
+import { WHATSAPP_LOCKED } from "../company";
 import { emailConfigured, sendMail } from "../email";
-import { send, sendAll, splitText, templateLanguage, whatsappConfigured, type Out } from "../whatsapp/api";
+import { send, splitText, templateLanguage, whatsappConfigured, type Out } from "../whatsapp/api";
 import type { BuiltReport } from "./build";
 
 export type Contact = typeof schema.whatsappContacts.$inferSelect;
@@ -41,16 +42,25 @@ export type Delivery = { channel: "whatsapp" | "email" | "none"; error?: string 
  * If WhatsApp fails, falls back to email.
  */
 export async function deliver(user: User, r: BuiltReport, now = Date.now(), footer?: string, pdf?: PdfFile): Promise<Delivery> {
-  const contact = whatsappConfigured() ? await activeContact(user.id) : null;
+  // While WhatsApp is locked (no business number yet), only admins get reports there.
+  const whatsappOn = whatsappConfigured() && (!WHATSAPP_LOCKED || isAdmin(user));
+  const contact = whatsappOn ? await activeContact(user.id) : null;
   let waError: string | undefined;
   if (contact) {
+    let sent = 0;
     try {
-      if (windowOpen(contact, now)) await sendAll(contact.phone, reportMessages(r, footer, pdf));
-      else await send(contact.phone, { type: "template", name: r.template.name, language: templateLanguage(user.language), params: r.template.params, buttons: r.template.buttons });
+      if (windowOpen(contact, now)) {
+        for (const o of reportMessages(r, footer, pdf)) {
+          await send(contact.phone, o);
+          sent++;
+        }
+      } else await send(contact.phone, { type: "template", name: r.template.name, language: templateLanguage(user.language), params: r.template.params, buttons: r.template.buttons });
       return { channel: "whatsapp" };
     } catch (err) {
       waError = err instanceof Error ? err.message : String(err);
       console.error(`WhatsApp ${r.kind} to ${user.id} failed: ${waError}`);
+      // Part of the report already arrived on WhatsApp: don't send it all again by email.
+      if (sent > 0) return { channel: "whatsapp", error: waError };
     }
   }
   if (user.notifyEmail && emailConfigured()) {

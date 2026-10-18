@@ -1,3 +1,4 @@
+import { isShort } from "../outliers";
 import { coachVideo, coachWeekly, type WeeklyCoach } from "../ai";
 import { runFreeAi } from "../ai-route";
 import type { User } from "../auth";
@@ -39,11 +40,17 @@ export interface BuiltReport {
 
 export type SummaryResult = { ok: true; summary: ChannelSummary } | { ok: false; reason: "nochannel" | "reconnect" | "error" };
 
-export async function loadSummary(userId: string): Promise<SummaryResult> {
+/**
+ * The channel summary for a report. `allowStale` (for chat) accepts the last saved copy when YouTube can't be
+ * reached; reports never do, because an old copy would go out as this week's numbers, and YouTube also refuses
+ * when the creator revoked Mitra's access, in which case nothing should be sent at all.
+ */
+export async function loadSummary(userId: string, { allowStale = false } = {}): Promise<SummaryResult> {
   try {
     const r = await loadYouTube(userId, "summary", FRESH_MS.summary, fetchSummary);
     if (r.kind === "demo") return { ok: false, reason: "nochannel" };
     if (r.kind === "reconnect") return { ok: false, reason: "reconnect" };
+    if (r.stale && !allowStale) return { ok: false, reason: "error" };
     return { ok: true, summary: r.value };
   } catch (err) {
     console.error("Report: couldn't load channel", err instanceof Error ? err.message : err);
@@ -92,7 +99,8 @@ async function earlyViews(userId: string, videos: Video[]): Promise<number[]> {
 }
 
 export async function buildVideoCheck(user: User, s: ChannelSummary, video: Video, labels: { titles: string; menu: string }, now = Date.now()): Promise<BuiltReport> {
-  const others = s.videos.filter((v) => v.id !== video.id);
+  // Shorts are only compared with Shorts, long videos with long videos (as the outlier score does).
+  const others = s.videos.filter((v) => v.id !== video.id && isShort(v) === isShort(video));
   const early = await earlyViews(user.id, baselineVideos(others, now));
   const f = videoFacts(video, others, early, now);
   const coach = (await runFreeAi(user.id, "report", () => coachVideo(user.language, videoFactsText(f)))) ?? plainVideo(f);

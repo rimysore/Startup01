@@ -139,12 +139,26 @@ export function weeklyText(f: WeeklyFacts, c: WeeklyCoach): string {
 
 // ---- 48-hour check ----------------------------------------------------------------------------------------
 
-/** Videos that turned 36-60 hours old: with one run a day, every upload is checked exactly once. */
+/**
+ * Public videos 36-72 hours old. The daily run checks each upload once (the claim in `notifications` is keyed by
+ * video), and the extra day catches a run that came late or failed, instead of skipping the video for good.
+ * Private, unlisted and upcoming premieres wait until they're public.
+ */
 export function videosDueForCheck(videos: Video[], now = Date.now()): Video[] {
   return videos.filter((v) => {
+    if (v.isPublic === false) return false;
     const age = (now - Date.parse(v.publishedAtIso ?? `${v.publishedAt}T12:00:00Z`)) / 3_600_000;
-    return age >= 36 && age < 60;
+    return age >= 36 && age < 72;
   });
+}
+
+/**
+ * Monday's report, retried on Tuesday and Wednesday if Monday's attempt couldn't send (YouTube or WhatsApp down).
+ * The weekly claim is keyed by ISO week, so nobody gets it twice.
+ */
+export function weeklyDueInIndia(now = Date.now()): boolean {
+  const day = new Date(now + IST_MS).getUTCDay();
+  return day >= 1 && day <= 3;
 }
 
 /** Older uploads whose first two days we compare against (Analytics is complete for them). */
@@ -178,14 +192,16 @@ export interface VideoFacts {
 }
 
 export function videoFacts(v: Video, others: Video[], earlyViews: number[], now = Date.now()): VideoFacts {
+  const hours = Math.round((now - Date.parse(v.publishedAtIso ?? `${v.publishedAt}T12:00:00Z`)) / 3_600_000);
   const usual = median(earlyViews.filter((n) => n > 0));
-  const ratio = usual ? v.views / usual : null;
+  // `usual` is views in the first two days; a check that runs a day late compares against a fair share of a third day.
+  const ratio = usual ? v.views / (usual * Math.max(1, Math.min(hours, 72) / 48)) : null;
   const rate = (x: Video) => (x.views ? (x.likes / x.views) * 100 : 0);
   const rates = others.filter((o) => o.views > 50).map(rate);
   return {
     videoId: v.id,
     title: v.title,
-    hours: Math.round((now - Date.parse(v.publishedAtIso ?? `${v.publishedAt}T12:00:00Z`)) / 3_600_000),
+    hours,
     views: v.views,
     likes: v.likes,
     comments: v.comments,

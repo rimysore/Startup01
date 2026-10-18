@@ -16,11 +16,16 @@ const KIND = { bug: "Problem", idea: "Idea", question: "Question" } as const;
 /** Per instance; enough to stop a stuck button or a script from flooding the support inbox. */
 const PER_HOUR = 6;
 const recent = new Map<string, number[]>();
-function tooMany(userId: string): boolean {
+function sentLastHour(userId: string): number[] {
   const now = Date.now();
   const times = (recent.get(userId) ?? []).filter((t) => now - t < 3_600_000);
-  recent.set(userId, [...times, now]);
-  return times.length >= PER_HOUR;
+  if (times.length) recent.set(userId, times);
+  else recent.delete(userId);
+  return times;
+}
+/** Only messages that actually went out count, so retrying after a failure never locks anyone out. */
+function noteSent(userId: string) {
+  recent.set(userId, [...sentLastHour(userId), Date.now()]);
 }
 
 /**
@@ -33,7 +38,7 @@ export async function POST(request: Request) {
   const parsed = Body.safeParse(await request.json().catch(() => null));
   if (!parsed.success) return Response.json({ error: "Write a few words about it first." }, { status: 400 });
   if (!emailConfigured()) return Response.json({ error: "unavailable", email: COMPANY.supportEmail }, { status: 503 });
-  if (tooMany(user.id)) return Response.json({ error: "Thanks! We've got your messages. Give us a little time to reply." }, { status: 429 });
+  if (sentLastHour(user.id).length >= PER_HOUR) return Response.json({ error: "Thanks! We've got your messages. Give us a little time to reply." }, { status: 429 });
 
   const { kind, message, page } = parsed.data;
   const yt = await youtubeConnection(user.id).catch(() => null);
@@ -58,5 +63,6 @@ export async function POST(request: Request) {
     console.error("Feedback email failed", err);
     return Response.json({ error: "unavailable", email: COMPANY.supportEmail }, { status: 503 });
   }
+  noteSent(user.id);
   return Response.json({ ok: true });
 }

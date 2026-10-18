@@ -1,4 +1,4 @@
-import { and, eq, gt, sql } from "drizzle-orm";
+import { and, eq, gt, like, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { currentUser, unauthorized } from "@/lib/auth";
 import { buildVideoCheck, buildWeekly, loadSummary } from "@/lib/reports/build";
@@ -16,13 +16,21 @@ const Body = z.object({ kind: z.enum(["weekly", "video_check"]).default("weekly"
 export async function POST(request: Request) {
   const user = await currentUser();
   if (!user) return unauthorized();
-  const { kind } = Body.parse(await request.json().catch(() => ({})));
+  const parsed = Body.safeParse(await request.json().catch(() => ({})));
+  if (!parsed.success) return Response.json({ error: "Invalid request" }, { status: 400 });
+  const { kind } = parsed.data;
   const d = await db();
+  // Take a slot before building anything (the AI part is on Mitra), so parallel clicks can't skip the limit.
+  const slot = `sample:${user.id}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  await d.insert(schema.webhookEvents).values({ id: slot });
   const [recent] = await d
     .select({ n: sql<number>`count(*)::int` })
-    .from(schema.notifications)
-    .where(and(eq(schema.notifications.userId, user.id), sql`${schema.notifications.key} like 'sample:%'`, gt(schema.notifications.createdAt, new Date(Date.now() - 3_600_000))));
-  if ((recent?.n ?? 0) >= 3) return Response.json({ error: "That's enough samples for now — try again in an hour." }, { status: 429 });
+    .from(schema.webhookEvents)
+    .where(and(like(schema.webhookEvents.id, `sample:${user.id}:%`), gt(schema.webhookEvents.receivedAt, new Date(Date.now() - 3_600_000))));
+  if ((recent?.n ?? 0) > 3) {
+    await d.delete(schema.webhookEvents).where(eq(schema.webhookEvents.id, slot));
+    return Response.json({ error: "That's enough samples for now. Try again in an hour." }, { status: 429 });
+  }
 
   const loaded = await loadSummary(user.id);
   if (!loaded.ok) return Response.json({ error: loaded.reason === "reconnect" ? "Reconnect YouTube first." : "Connect your YouTube channel first." }, { status: 409 });

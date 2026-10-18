@@ -109,6 +109,8 @@ export async function respond(user: User, contact: Contact, m: Inbound, now = Da
       return [menu(lang, Boolean(contact.optedOutAt))];
     case "stop":
       await d.update(schema.whatsappContacts).set({ optedOutAt: new Date(now) }).where(eq(schema.whatsappContacts.userId, user.id));
+      // Off everywhere, email included; START turns both back on.
+      await d.update(schema.users).set({ notifyWeekly: false, notifyVideoCheck: false }).where(eq(schema.users.id, user.id));
       return [menuButton(lang, w.stopped)];
     case "start":
       await d.update(schema.whatsappContacts).set({ optedOutAt: null }).where(eq(schema.whatsappContacts.userId, user.id));

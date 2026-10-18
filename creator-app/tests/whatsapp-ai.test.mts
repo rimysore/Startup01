@@ -3,6 +3,7 @@ import { spawn } from "node:child_process";
 
 process.env.PGLITE_DIR = "memory://";
 process.env.WHATSAPP_FAKE = "1";
+process.env.NEXT_PUBLIC_WHATSAPP_LIVE = "1"; // these tests cover WhatsApp once it is open to creators
 process.env.EMAIL_FAKE = "1";
 process.env.ANTHROPIC_API_KEY = "sk-ant-test";
 process.env.ANTHROPIC_BASE_URL = "http://127.0.0.1:4010";

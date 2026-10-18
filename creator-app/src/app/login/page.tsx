@@ -6,6 +6,17 @@ import { useQueryParam } from "@/components/hooks";
 import { Button, ErrorNote, Logo, ThemeToggle } from "@/components/ui";
 import { INVITE_ONLY } from "@/lib/company";
 
+/** A same-site path to go to after sign-in; anything that could leave the site ("//x", "/\\x", tabs) goes to the dashboard. */
+function sameSite(next: string | null): string {
+  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) return "/dashboard";
+  try {
+    const u = new URL(next, "https://mitra.invalid");
+    return u.origin === "https://mitra.invalid" ? `${u.pathname}${u.search}${u.hash}` : "/dashboard";
+  } catch {
+    return "/dashboard";
+  }
+}
+
 const ERRORS: Record<string, string> = {
   not_configured: "Google sign-in isn't set up on this server yet.",
   denied: "Sign-in was cancelled, or Google blocked it because your account isn't invited to the beta yet. Join the waitlist below and we'll invite you.",
@@ -21,7 +32,7 @@ interface Config {
 }
 
 export default function LoginPage() {
-  const next = useQueryParam("next") ?? "/dashboard";
+  const next = sameSite(useQueryParam("next"));
   const error = useQueryParam("error");
   const [config, setConfig] = useState<Config | null>(null);
   const [email, setEmail] = useState("");
@@ -55,7 +66,7 @@ export default function LoginPage() {
     const json = (await res.json()) as { error?: string };
     setBusy(false);
     if (json.error) setFormError(json.error);
-    else window.location.assign(next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard");
+    else window.location.assign(next);
   }
 
   return (

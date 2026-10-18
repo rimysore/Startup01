@@ -5,7 +5,7 @@ import { t } from "../whatsapp/strings";
 import { buildVideoCheck, buildWeekly, loadSummary } from "./build";
 import { claim, deliver, finish, reachable } from "./deliver";
 import { pdfFilename, pdfLink } from "./link";
-import { isMondayInIndia, videosDueForCheck, weekKey } from "./facts";
+import { videosDueForCheck, weekKey, weeklyDueInIndia } from "./facts";
 
 /**
  * The daily job (Vercel Cron, ~8:45 IST). For each creator with a connected channel who can be reached:
@@ -29,10 +29,11 @@ const CONCURRENCY = 4;
 
 async function forUser(user: User, now: number, tally: RunResult): Promise<void> {
   const [contact] = await (await db()).select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.userId, user.id));
-  const active = contact && !contact.optedOutAt ? contact : null;
-  if (!reachable(user, active)) return;
+  // STOP on WhatsApp means no reports anywhere, not "switch to email".
+  if (contact?.optedOutAt) return;
+  if (!reachable(user, contact ?? null)) return;
 
-  const weekly = user.notifyWeekly && isMondayInIndia(now);
+  const weekly = user.notifyWeekly && weeklyDueInIndia(now);
   if (!weekly && !user.notifyVideoCheck) return;
 
   const loaded = await loadSummary(user.id);
@@ -68,7 +69,8 @@ async function forUser(user: User, now: number, tally: RunResult): Promise<void>
 export async function runDaily({ now = Date.now(), cursor = null as string | null, deadline = Date.now() + 240_000 } = {}): Promise<RunResult> {
   const tally: RunResult = { users: 0, sent: 0, skipped: 0, failed: 0, cursor, more: false };
   const d = await db();
-  if (!cursor) await cleanUp(now);
+  // Housekeeping must never stop the reports.
+  if (!cursor) await cleanUp(now).catch((err) => console.error("Daily clean-up failed", err));
   for (;;) {
     const page = await d
       .select({ user: schema.users })
@@ -104,5 +106,5 @@ async function cleanUp(now: number): Promise<void> {
   await d.delete(schema.whatsappLinkCodes).where(lt(schema.whatsappLinkCodes.expiresAt, new Date(now)));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wa:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 7 * 86_400_000))));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wajoin:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 86_400_000))));
-  for (const kind of ["niche:%", "studio:%"]) await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, kind), lt(schema.webhookEvents.receivedAt, new Date(now - 14 * 86_400_000))));
+  for (const kind of ["niche:%", "studio:%", "sample:%"]) await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, kind), lt(schema.webhookEvents.receivedAt, new Date(now - 14 * 86_400_000))));
 }

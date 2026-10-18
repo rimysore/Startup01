@@ -1,16 +1,19 @@
 "use client";
 
 import { AssistantChat } from "@/components/Assistant";
-import { PageHeader } from "@/components/ui";
+import { useDashboard } from "@/components/dashboard-context";
+import { PageHeader, Spinner } from "@/components/ui";
 
 /** Ask Mitra full page (links from WhatsApp and old bookmarks). Everywhere else it's the ✨ button. */
 export default function AssistantPage() {
+  const { me } = useDashboard();
   return (
     // dvh = the visible screen on phones (browser bars excluded); leave room for the bottom tab bar there.
     <div className="rise flex h-[calc(100dvh-13.5rem)] min-h-[420px] flex-col lg:h-[calc(100dvh-170px)] lg:min-h-[520px]">
       <PageHeader eyebrow="Ask Mitra" title="Ask anything about your channel. Mitra answers from your own numbers." />
       <div className="card min-h-0 flex-1 overflow-hidden !p-0">
-        <AssistantChat />
+        {/* Mounted once the account is known, so it opens this account's saved conversation (not an empty one). */}
+        {me ? <AssistantChat key={me.user?.id ?? "guest"} /> : <div className="p-6"><Spinner label="Loading" /></div>}
       </div>
     </div>
   );

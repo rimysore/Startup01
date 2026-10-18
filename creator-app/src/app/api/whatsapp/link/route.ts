@@ -1,7 +1,8 @@
 import { randomInt } from "node:crypto";
 import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { currentUser, unauthorized } from "@/lib/auth";
+import { currentUser, isAdmin, unauthorized } from "@/lib/auth";
+import { WHATSAPP_LOCKED } from "@/lib/company";
 import { chatLink, whatsappConfigured } from "@/lib/whatsapp/api";
 
 const VALID_MS = 30 * 60_000;
@@ -11,6 +12,7 @@ export async function POST() {
   const user = await currentUser();
   if (!user) return unauthorized();
   if (!whatsappConfigured()) return Response.json({ error: "WhatsApp isn't set up yet" }, { status: 503 });
+  if (WHATSAPP_LOCKED && !isAdmin(user)) return Response.json({ error: "WhatsApp is coming soon. Your reports come by email for now." }, { status: 403 });
   const d = await db();
   await d.delete(schema.whatsappLinkCodes).where(eq(schema.whatsappLinkCodes.userId, user.id));
   for (let attempt = 0; attempt < 5; attempt++) {

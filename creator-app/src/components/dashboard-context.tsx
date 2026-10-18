@@ -63,15 +63,42 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     setVersion((v) => v + 1);
   }, []);
   const refreshMe = useCallback(() => setMeVersion((v) => v + 1), []);
-  // Saved on the account too, so the Monday report and WhatsApp replies use the same language.
+  // Saved on the account too, so the Monday report and WhatsApp replies use the same language. A pick made before
+  // the account has loaded waits for it; a save that fails goes back to the account's language instead of
+  // pretending, so the screen never shows a language the reports won't use.
   const signedIn = Boolean(me?.user);
+  const pending = useRef<LanguageCode | null>(null);
+  const saveLanguage = useCallback(
+    (l: LanguageCode) => {
+      pending.current = l;
+      fetch("/api/whatsapp", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ language: l }) })
+        .then((r) => {
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        })
+        .catch((err) => {
+          console.error("Couldn't save the language", err);
+          if (me?.languageChosen && me.language && isLanguageCode(me.language)) storeLanguage(me.language);
+        })
+        .finally(() => {
+          if (pending.current === l) pending.current = null;
+          setMeVersion((v) => v + 1);
+        });
+    },
+    [me, storeLanguage],
+  );
   const setLanguage = useCallback(
     (l: LanguageCode) => {
       storeLanguage(l);
-      if (signedIn) fetch("/api/whatsapp", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ language: l }) }).catch(() => {});
+      if (signedIn) saveLanguage(l);
+      else pending.current = l;
     },
-    [storeLanguage, signedIn],
+    [storeLanguage, signedIn, saveLanguage],
   );
+  // The account loaded after a pick: save it now.
+  useEffect(() => {
+    if (signedIn && pending.current) saveLanguage(pending.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only when sign-in state becomes known
+  }, [signedIn]);
 
   useEffect(() => {
     let live = true;
@@ -106,6 +133,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   // The account is the source of truth once a language was picked (it may have been changed on WhatsApp).
   const serverLanguage = me?.languageChosen ? me.language : undefined;
   useEffect(() => {
+    if (pending.current) return; // a pick is on its way to the account
     if (serverLanguage && isLanguageCode(serverLanguage) && serverLanguage !== stored) storeLanguage(serverLanguage);
     // Only when the account's value changes, not on every local change.
     // eslint-disable-next-line react-hooks/exhaustive-deps

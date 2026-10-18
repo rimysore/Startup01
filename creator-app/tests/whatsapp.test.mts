@@ -1,6 +1,7 @@
 // Run with: npm test. Monday report, 48-hour check, delivery routing, idempotency, and the WhatsApp bot.
 process.env.PGLITE_DIR = "memory://";
 process.env.WHATSAPP_FAKE = "1";
+process.env.NEXT_PUBLIC_WHATSAPP_LIVE = "1"; // these tests cover WhatsApp once it is open to creators
 process.env.EMAIL_FAKE = "1";
 process.env.WHATSAPP_APP_SECRET = "test-secret";
 delete process.env.ANTHROPIC_API_KEY;
@@ -61,7 +62,10 @@ for (const lang of ["en", "hi", "te", "ta", "ml", "bn", "kn"]) {
   assert((pdf.toString("latin1").match(/\/Type \/Page\b/g) ?? []).length === 1, `${lang} PDF is one page`);
 }
 assert(F.videosDueForCheck(summary.videos, NOW).map((v) => v.id).join() === "new", "only the ~2-day-old video is due");
-assert(F.videosDueForCheck([vid("x", 35, 1)], NOW).length === 0 && F.videosDueForCheck([vid("y", 59, 1)], NOW).length === 1, "36-60h window");
+assert(F.videosDueForCheck([vid("x", 35, 1)], NOW).length === 0 && F.videosDueForCheck([vid("y", 59, 1)], NOW).length === 1, "checked from 36h");
+assert(F.videosDueForCheck([vid("late", 71, 1)], NOW).length === 1 && F.videosDueForCheck([vid("old", 73, 1)], NOW).length === 0, "a run that came late still checks the video, up to 72h");
+assert(F.videosDueForCheck([{ ...vid("priv", 48, 0), isPublic: false }], NOW).length === 0, "private, unlisted and upcoming videos aren't checked");
+assert(F.weeklyDueInIndia(NOW) && F.weeklyDueInIndia(NOW + 2 * 86_400_000) && !F.weeklyDueInIndia(NOW + 3 * 86_400_000), "weekly report retried Tuesday and Wednesday, not later");
 assert(F.median([5, 1, 3]) === 3 && F.median([4, 1, 3, 2]) === 2.5 && F.median([]) === null, "median");
 const vf = F.videoFacts(summary.videos[0], summary.videos.slice(1), [400, 500, 600, 0], NOW);
 assert(vf.usual === 500 && vf.pace === "ahead" && vf.hours === 48, `pace vs usual first two days (${vf.pace})`);
@@ -202,10 +206,14 @@ await d.delete(schema.notifications).where(eq(schema.notifications.userId, "wa")
 outbox().length = 0;
 mailOutbox().length = 0;
 await runDaily({ now: NOW + 120_000 });
-assert(outbox().length === 0 && mailOutbox().some((m) => m.to === "wa@x.com"), "opted out of WhatsApp: falls back to email (still on)");
+assert(outbox().length === 0 && !mailOutbox().some((m) => m.to === "wa@x.com"), "STOP means no reports at all: not on WhatsApp, not by email");
+const [stopped] = await d.select().from(schema.users).where(eq(schema.users.id, "wa"));
+assert(!stopped.notifyWeekly && !stopped.notifyVideoCheck, "STOP also turns the website's report switches off");
 await handleInbound(msg("b8", "919800000001", "start"), NOW);
 const [c5] = await d.select().from(schema.whatsappContacts).where(eq(schema.whatsappContacts.userId, "wa"));
 assert(c5.optedOutAt === null, "START opts back in");
+const [restarted] = await d.select().from(schema.users).where(eq(schema.users.id, "wa"));
+assert(restarted.notifyWeekly && restarted.notifyVideoCheck, "START turns reports back on");
 
 // Linking with a one-time code.
 await d.insert(schema.whatsappLinkCodes).values({ code: "482913", userId: "mail", expiresAt: new Date(NOW + 60_000) });

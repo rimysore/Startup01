@@ -75,7 +75,16 @@ export function unauthorized(): Response {
   return Response.json({ error: "Please sign in first." }, { status: 401 });
 }
 
-/** Only allow same-site relative paths as post-login destinations. */
+/**
+ * Only allow same-site relative paths as post-login destinations. Browsers treat "/\\evil.com" and paths with tabs
+ * or newlines like "//evil.com", so the path is resolved against a dummy origin and must stay on it.
+ */
 export function safeNext(next: string | null | undefined): string {
-  return next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) return "/dashboard";
+  try {
+    const u = new URL(next, "https://mitra.invalid");
+    return u.origin === "https://mitra.invalid" ? `${u.pathname}${u.search}${u.hash}` : "/dashboard";
+  } catch {
+    return "/dashboard";
+  }
 }

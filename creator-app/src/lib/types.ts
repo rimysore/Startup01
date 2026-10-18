@@ -30,6 +30,8 @@ export interface Video {
   comments: number;
   /** Average percentage of the video watched, 0-100. Null when analytics aren't available. */
   avgViewPct: number | null;
+  /** False for private, unlisted or not-yet-premiered uploads; missing in data cached before it was added. */
+  isPublic?: boolean;
 }
 
 export interface ChannelSummary {

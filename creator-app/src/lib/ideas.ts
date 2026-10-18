@@ -59,14 +59,22 @@ export async function rationedSearch(userId: string, ownChannelId: string | null
   const r = await cached(userId, `${kind}:${language}:${query}`, SEARCH_MS, async () => {
     const id = `${kind}:${userId}:${k.period(now)}:${language}:${query}`;
     const d = await db();
-    const [already] = await d.select().from(schema.webhookEvents).where(eq(schema.webhookEvents.id, id));
-    if (!already && (await searchesUsed(userId, kind, now)) >= k.limit) throw new SearchLimitError();
-    const tokens = await youtubeTokens(userId);
-    if (!tokens) throw new Error("YouTube access is no longer valid");
-    const found = await searchNiche(tokens, query, language, k.days, now);
-    // Counted only once YouTube answered: a failed search doesn't use up the allowance.
-    await d.insert(schema.webhookEvents).values({ id }).onConflictDoNothing();
-    return found;
+    // Claim the slot before calling YouTube, so many requests at once can't all slip under the limit; give it
+    // back if the limit is passed or the search fails (a failed search doesn't use up the allowance).
+    const claimed = (await d.insert(schema.webhookEvents).values({ id }).onConflictDoNothing().returning()).length > 0;
+    const release = () => (claimed ? d.delete(schema.webhookEvents).where(eq(schema.webhookEvents.id, id)) : null);
+    if (claimed && (await searchesUsed(userId, kind, now)) > k.limit) {
+      await release();
+      throw new SearchLimitError();
+    }
+    try {
+      const tokens = await youtubeTokens(userId);
+      if (!tokens) throw new Error("YouTube access is no longer valid");
+      return await searchNiche(tokens, query, language, k.days, now);
+    } catch (err) {
+      await release();
+      throw err;
+    }
   });
   const subscribers = new Map(Object.entries(r.value.subscribers));
   return {

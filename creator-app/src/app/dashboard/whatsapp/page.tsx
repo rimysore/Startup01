@@ -143,8 +143,14 @@ export default function WhatsAppPage() {
 
   async function save(patch: Record<string, unknown>) {
     if (!s) return;
+    const before = s;
     setS({ ...s, prefs: { ...s.prefs, ...patch }, contact: patch.resume && s.contact ? { ...s.contact, optedOut: false } : s.contact });
-    await fetch("/api/whatsapp", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+    const r = await fetch("/api/whatsapp", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(patch) }).catch(() => null);
+    // A switch that didn't save goes back, so what's shown is what Mitra will actually do.
+    if (!r?.ok) {
+      setS(before);
+      setError("Couldn't save that. Check your connection and try again.");
+    }
   }
 
   async function disconnect() {

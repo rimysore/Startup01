@@ -40,5 +40,6 @@ export async function POST(request: Request) {
     .select({ n: sql<number>`count(*)::int` })
     .from(schema.waitlist)
     .where(and(eq(schema.waitlist.status, "waiting"), lt(schema.waitlist.id, me.id)));
-  return Response.json({ position: (ahead?.n ?? 0) + 1, already: inserted.length === 0 });
+  // Same answer whether or not the email was already listed, so the form can't be used to check who signed up.
+  return Response.json({ position: (ahead?.n ?? 0) + 1 });
 }

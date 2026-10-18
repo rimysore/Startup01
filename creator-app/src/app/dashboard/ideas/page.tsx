@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { postAi, useDashboard, type AiError } from "@/components/dashboard-context";
 import { OutlierBadge } from "@/components/outlier";
 import { AiDemoNote, AiErrorNote, Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
@@ -73,16 +73,6 @@ export default function IdeasPage() {
         if (d.search) {
           setSearch(d.search);
           setQuery(d.search.query);
-          return;
-        }
-        // Re-open the last search: it's cached for a week, so this costs nothing.
-        let last = "";
-        try {
-          last = localStorage.getItem(queryKey(userId)) ?? "";
-        } catch {}
-        if (last) {
-          setQuery(last);
-          void runSearch(last);
         }
       })
       .catch(() => live && setData(null));
@@ -92,18 +82,37 @@ export default function IdeasPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- load once
   }, []);
 
-  async function runSearch(q = query) {
+  // Re-open this account's last search once both the page data and the account are known. It's cached for a week
+  // per query and language, so it's re-run in the language it was made in and never uses up a search.
+  const restored = useRef(false);
+  const signedInId = me?.user?.id;
+  useEffect(() => {
+    if (restored.current || !data || !signedInId || data.search) return;
+    restored.current = true;
+    let last: { q: string; lang?: string } | null = null;
+    try {
+      const raw = localStorage.getItem(queryKey(signedInId));
+      if (raw) last = raw.startsWith("{") ? (JSON.parse(raw) as { q: string; lang?: string }) : { q: raw };
+    } catch {}
+    if (last?.q) {
+      setQuery(last.q);
+      void runSearch(last.q, last.lang ?? language);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, when ready
+  }, [data, signedInId]);
+
+  async function runSearch(q = query, lang: string = language) {
     if (q.trim().length < 2) return;
     setSearching(true);
     setSearchError(null);
-    const r = await fetch("/api/ideas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q, language }) }).catch(() => null);
+    const r = await fetch("/api/ideas", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query: q, language: lang }) }).catch(() => null);
     const d = (await r?.json().catch(() => null)) as { query?: string; breakouts?: BreakoutVideo[]; searchesLeft?: number; error?: string } | null;
     setSearching(false);
     if (d?.searchesLeft != null) setData((x) => (x ? { ...x, searchesLeft: d.searchesLeft! } : x));
     if (!r?.ok || !d?.breakouts) return setSearchError(d?.error ?? "Couldn't search right now.");
     setSearch({ query: d.query ?? q, breakouts: d.breakouts });
     try {
-      localStorage.setItem(queryKey(userId), d.query ?? q);
+      localStorage.setItem(queryKey(userId), JSON.stringify({ q: d.query ?? q, lang }));
     } catch {}
   }
 
