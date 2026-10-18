@@ -322,6 +322,8 @@ export function useLiveSubscribers(channelId: string, initial: number, live: boo
       const body = (await res?.json().catch(() => null)) as { subscribers?: number } | null;
       if (typeof body?.subscribers === "number") update(body.subscribers, "now");
     };
+    // Check once right away too: the summary behind `initial` can be up to an hour old.
+    timers.push(setTimeout(poll, 1500));
     const interval = setInterval(poll, POLL_MS);
     const onVisible = () => document.visibilityState === "visible" && poll();
     document.addEventListener("visibilitychange", onVisible);

@@ -3,7 +3,7 @@ process.env.PGLITE_DIR = "memory://";
 process.env.GOOGLE_CLIENT_ID = "test";
 process.env.GOOGLE_CLIENT_SECRET = "test";
 const { db, schema } = await import("@/db");
-const { cached, forgetUser } = await import("@/lib/memo");
+const { cached, forgetUser, peek } = await import("@/lib/memo");
 const { saveYouTubeConnection, youtubeTokens, youtubeConnection } = await import("@/lib/youtube");
 const { prepareComments } = await import("@/lib/comment-filter");
 const { eq } = await import("drizzle-orm");
@@ -23,6 +23,13 @@ await cached("u1", "summary", 60_000, load, { force: true });
 assert(calls === 1, "Refresh within a minute of the last fetch doesn't call YouTube again");
 const [row] = await d.select().from(schema.youtubeCache).where(eq(schema.youtubeCache.key, "u1:summary"));
 assert(row && !row.value.includes("views"), "stored in Postgres, encrypted");
+
+// The live subscriber count is cached separately; peek reads it without fetching, so the channel summary can
+// use the newer number after a reload instead of reverting to the hourly snapshot.
+await cached("u1", "subs", 60_000, async () => ({ subscribers: 1, hidden: false }));
+const seen = await peek<{ subscribers: number }>("u1", "subs");
+assert(seen?.value.subscribers === 1 && seen.fetchedAt > 0, "peek returns the latest live subscriber count");
+assert((await peek("u1", "nothing-here")) === null, "peek returns nothing when nothing was stored");
 
 // Another server instance has an empty memory but shares Postgres.
 const mem = await d.select().from(schema.youtubeCache).where(eq(schema.youtubeCache.key, "u1:summary"));

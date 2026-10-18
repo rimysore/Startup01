@@ -1,4 +1,4 @@
-import { cached, type Cached } from "./memo";
+import { cached, peek, type Cached } from "./memo";
 import { youtubeConnection, youtubeTokens, type GoogleTokens } from "./youtube";
 
 /** How long each kind of YouTube data stays fresh. YouTube Analytics itself only updates about once a day. */
@@ -35,6 +35,13 @@ export async function loadYouTube<T>(
     return fetch(tokens);
   }, { force });
   return { kind: "live", ...result };
+}
+
+/** The last stored copy of a YouTube cache entry for the user's current channel, without fetching. */
+export async function peekYouTube<T>(userId: string, name: string): Promise<{ value: T; fetchedAt: number } | null> {
+  const yt = await youtubeConnection(userId);
+  if (!yt || yt.needsReconnectAt) return null;
+  return peek<T>(userId, `${yt.channelId ?? "channel"}:${name}`);
 }
 
 export const RECONNECT_MESSAGE = "Google stopped accepting Mitra's access to your channel. Reconnect YouTube in Connections to see live data.";

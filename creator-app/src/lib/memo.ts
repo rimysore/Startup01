@@ -83,6 +83,19 @@ export async function cached<T>(
   }
 }
 
+/**
+ * The last value stored under a name, however old (within its fallback window), without fetching anything.
+ * Lets one cache correct another: e.g. the 2-minute live subscriber count overriding the hourly channel summary.
+ */
+export async function peek<T>(userId: string, name: string): Promise<{ value: T; fetchedAt: number } | null> {
+  const key = `${userId}:${name}`;
+  const hit = memory.get(key);
+  if (hit) return { value: hit.value as T, fetchedAt: hit.fetchedAt };
+  const [row] = await (await db()).select().from(schema.youtubeCache).where(eq(schema.youtubeCache.key, key));
+  const stored = row && row.keepUntil.getTime() > Date.now() ? decrypt(row.value) : null;
+  return stored ? { value: JSON.parse(stored) as T, fetchedAt: row.fetchedAt.getTime() } : null;
+}
+
 /** Forget everything cached for a user (after they disconnect YouTube or delete their account). */
 export async function forgetUser(userId: string): Promise<void> {
   for (const key of memory.keys()) if (key.startsWith(`${userId}:`)) memory.delete(key);
