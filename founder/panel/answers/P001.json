@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm a Hindi creator and I already get growth tips free from the big channels I watch at night. Handing my YouTube login to an app I've never heard of, just to get a chatbot's take on my own numbers, doesn't feel worth it when I can check the analytics myself.",
+  "objection": "Why would an unknown app need Google sign-in access to my channel, even if it says read-only? I don't know who runs it or what they do with my data.",
+  "would_change_my_mind": "A creator I already follow telling me it helped their channel, so I'd trust it before giving it access.",
+  "price_too_cheap": 29,
+  "price_cheap": 60,
+  "price_expensive": 150,
+  "price_too_expensive": 250
+}

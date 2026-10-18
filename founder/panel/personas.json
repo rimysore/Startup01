@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Zara",
+  "age": 39,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 477000,
+  "behaviour": "Copies what is trending",
+  "behaviour_how": "Checks what big channels in their niche posted this week and makes their own version.",
+  "objection": "I don't want to give an unknown app access to my YouTube account",
+  "habit": "you watch Hindi 'YouTube growth tips' videos before bed"
+ },
+ {
+  "id": "P002",
+  "name": "Raj",
+  "age": 38,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 462000,
+  "behaviour": "Free-tools only",
+  "behaviour_how": "Uses YouTube Studio, free vidIQ/TubeBuddy and ChatGPT; has never paid for a creator tool.",
+  "objection": "I tried vidIQ and it didn't help me",
+  "habit": "you pay for Jio/Airtel and maybe Netflix, and nothing else online"
+ },
+ {
+  "id": "P003",
+  "name": "Idris",
+  "age": 18,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 487000,
+  "behaviour": "Already pays for vidIQ or TubeBuddy",
+  "behaviour_how": "Pays for an English tool, mostly for keywords and tags, and half-uses it.",
+  "objection": "Tools don't grow channels; consistency and luck do",
+  "habit": "you pay for Jio/Airtel and maybe Netflix, and nothing else online"
+ },
+ {
+  "id": "P004",
+  "name": "Eli",
+  "age": 39,
+  "segment": "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+  "income": 2546000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone; lives in WhatsApp; rarely opens a laptop.",
+  "objection": "Tools don't grow channels; consistency and luck do",
+  "habit": "you pay for Jio/Airtel and maybe Netflix, and nothing else online"
+ },
+ {
+  "id": "P005",
+  "name": "Maya",
+  "age": 21,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 979000,
+  "behaviour": "Learns from YouTube gurus",
+  "behaviour_how": "Watches 'how to grow on YouTube' videos in Hindi and copies what they say.",
+  "objection": "YouTube Studio and ChatGPT already do this for free",
+  "habit": "you upload one or two videos a week, edited in CapCut or VN on your phone"
+ },
+ {
+  "id": "P006",
+  "name": "Ava",
+  "age": 27,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 561000,
+  "behaviour": "Free-tools only",
+  "behaviour_how": "Uses YouTube Studio, free vidIQ/TubeBuddy and ChatGPT; has never paid for a creator tool.",
+  "objection": "I don't have time to read another dashboard",
+  "habit": "you post Shorts because people say they grow faster"
+ },
+ {
+  "id": "P007",
+  "name": "Harper",
+  "age": 38,
+  "segment": "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+  "income": 2069000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone; lives in WhatsApp; rarely opens a laptop.",
+  "objection": "₹99 a month is a lot when my channel earns nothing yet",
+  "habit": "your creator friends share tips in a WhatsApp group"
+ },
+ {
+  "id": "P008",
+  "name": "Declan",
+  "age": 32,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 642000,
+  "behaviour": "Free-tools only",
+  "behaviour_how": "Uses YouTube Studio, free vidIQ/TubeBuddy and ChatGPT; has never paid for a creator tool.",
+  "objection": "Tools don't grow channels; consistency and luck do",
+  "habit": "you pay for Jio/Airtel and maybe Netflix, and nothing else online"
+ },
+ {
+  "id": "P009",
+  "name": "Dana",
+  "age": 23,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 431000,
+  "behaviour": "Copies what is trending",
+  "behaviour_how": "Checks what big channels in their niche posted this week and makes their own version.",
+  "objection": "₹99 a month is a lot when my channel earns nothing yet",
+  "habit": "you check YouTube Studio first thing in the morning"
+ },
+ {
+  "id": "P010",
+  "name": "Rosa",
+  "age": 18,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 614000,
+  "behaviour": "Learns from YouTube gurus",
+  "behaviour_how": "Watches 'how to grow on YouTube' videos in Hindi and copies what they say.",
+  "objection": "Tools don't grow channels; consistency and luck do",
+  "habit": "you check YouTube Studio first thing in the morning"
+ },
+ {
+  "id": "P011",
+  "name": "Isla",
+  "age": 26,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 258000,
+  "behaviour": "Learns from YouTube gurus",
+  "behaviour_how": "Watches 'how to grow on YouTube' videos in Hindi and copies what they say.",
+  "objection": "Will an AI really understand my Telugu/Hindi audience?",
+  "habit": "you upload one or two videos a week, edited in CapCut or VN on your phone"
+ },
+ {
+  "id": "P012",
+  "name": "Olivia",
+  "age": 31,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 382000,
+  "behaviour": "Free-tools only",
+  "behaviour_how": "Uses YouTube Studio, free vidIQ/TubeBuddy and ChatGPT; has never paid for a creator tool.",
+  "objection": "YouTube Studio and ChatGPT already do this for free",
+  "habit": "you watch Hindi 'YouTube growth tips' videos before bed"
+ },
+ {
+  "id": "P013",
+  "name": "Marco",
+  "age": 34,
+  "segment": "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+  "income": 2255000,
+  "behaviour": "Already pays for vidIQ or TubeBuddy",
+  "behaviour_how": "Pays for an English tool, mostly for keywords and tags, and half-uses it.",
+  "objection": "I don't want to give an unknown app access to my YouTube account",
+  "habit": "your creator friends share tips in a WhatsApp group"
+ },
+ {
+  "id": "P014",
+  "name": "Yara",
+  "age": 29,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 1158000,
+  "behaviour": "Data-curious",
+  "behaviour_how": "Opens YouTube Studio analytics daily but isn't sure what to do with the numbers.",
+  "objection": "Will an AI really understand my Telugu/Hindi audience?",
+  "habit": "you watch Hindi 'YouTube growth tips' videos before bed"
+ },
+ {
+  "id": "P015",
+  "name": "Elena",
+  "age": 36,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 686000,
+  "behaviour": "Data-curious",
+  "behaviour_how": "Opens YouTube Studio analytics daily but isn't sure what to do with the numbers.",
+  "objection": "Will an AI really understand my Telugu/Hindi audience?",
+  "habit": "you watch Hindi 'YouTube growth tips' videos before bed"
+ },
+ {
+  "id": "P016",
+  "name": "Mason",
+  "age": 20,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 599000,
+  "behaviour": "Free-tools only",
+  "behaviour_how": "Uses YouTube Studio, free vidIQ/TubeBuddy and ChatGPT; has never paid for a creator tool.",
+  "objection": "YouTube Studio and ChatGPT already do this for free",
+  "habit": "you check YouTube Studio first thing in the morning"
+ },
+ {
+  "id": "P017",
+  "name": "Ivy",
+  "age": 35,
+  "segment": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+  "income": 999000,
+  "behaviour": "Learns from YouTube gurus",
+  "behaviour_how": "Watches 'how to grow on YouTube' videos in Hindi and copies what they say.",
+  "objection": "I don't have time to read another dashboard",
+  "habit": "you check YouTube Studio first thing in the morning"
+ },
+ {
+  "id": "P018",
+  "name": "Adrian",
+  "age": 38,
+  "segment": "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+  "income": 1096000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone; lives in WhatsApp; rarely opens a laptop.",
+  "objection": "I don't want to give an unknown app access to my YouTube account",
+  "habit": "you upload one or two videos a week, edited in CapCut or VN on your phone"
+ },
+ {
+  "id": "P019",
+  "name": "Gabriel",
+  "age": 34,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 412000,
+  "behaviour": "Copies what is trending",
+  "behaviour_how": "Checks what big channels in their niche posted this week and makes their own version.",
+  "objection": "I tried vidIQ and it didn't help me",
+  "habit": "you pay for Jio/Airtel and maybe Netflix, and nothing else online"
+ },
+ {
+  "id": "P020",
+  "name": "Ezra",
+  "age": 35,
+  "segment": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+  "income": 550000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone; lives in WhatsApp; rarely opens a laptop.",
+  "objection": "I tried vidIQ and it didn't help me",
+  "habit": "you check YouTube Studio first thing in the morning"
+ }
+]

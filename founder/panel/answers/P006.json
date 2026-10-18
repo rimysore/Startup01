@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I've never paid for a creator tool. vidIQ, TubeBuddy and YouTube Studio already give me numbers for free, and ChatGPT tells me what to post. I don't have time to read another dashboard, and a monthly report by email is one more thing I'll skip.",
+  "objection": "It's another analytics layer on top of the free tools I already use, and I can't tell from this what it knows that YouTube Studio doesn't.",
+  "would_change_my_mind": "A clear free trial that shows me, on my own channel, a specific video I should repost or a title that would have beaten my last ten, in Hinglish, with no sign-up hassle.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 249
+}

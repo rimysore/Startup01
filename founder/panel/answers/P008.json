@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already get my views, watch time and click-through in YouTube Studio for free, and vidIQ shows me trends too. I can't see what another ₹99 a month would tell me that I'm not already checking myself.",
+  "objection": "Tools don't grow channels. Consistency and luck do, and a paid AI coach that reads my own numbers back to me doesn't change what I post next week.",
+  "would_change_my_mind": "If a free try on my own channel gave me a specific, checkable reason a video underperformed and a title or thumbnail change that actually beat my usual views.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 99,
+  "price_too_expensive": 199
+}
