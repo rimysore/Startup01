@@ -258,6 +258,7 @@ export default function WhatsAppPage() {
                   </button>
                 )}
                 <p className="mt-4 text-xs text-muted">By connecting you agree to get reports from Mitra on WhatsApp. Reply STOP any time.</p>
+                {me?.admin && <SetupCheck />}
               </div>
             )}
           </section>
@@ -341,3 +342,57 @@ export default function WhatsAppPage() {
     </div>
   );
 }
+
+interface Health {
+  settings: Record<string, boolean>;
+  phone: { ok: boolean; detail: string };
+  webhook: Record<"ok" | "badsig" | "fail", { at: string; detail: string } | null>;
+  callbackUrl: string;
+}
+
+const CheckRow = ({ ok, label, detail }: { ok: boolean | null; label: string; detail?: string }) => (
+  <li className="flex gap-2">
+    <span className={ok ? "text-good" : ok === false ? "text-bad" : "text-muted"}>{ok ? "✓" : ok === false ? "✗" : "•"}</span>
+    <span>
+      {label}
+      {detail && <span className="block break-all text-xs text-muted">{detail}</span>}
+    </span>
+  </li>);
+
+/** Admins only: where the WhatsApp setup breaks, without opening server logs. */
+function SetupCheck() {
+  const [h, setH] = useState<Health | null>(null);
+  const [busy, setBusy] = useState(false);
+  const run = async () => {
+    setBusy(true);
+    setH(await fetch("/api/whatsapp/health", { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).catch(() => null));
+    setBusy(false);
+  };
+  const ago = (s: string) => new Date(s).toLocaleString("en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  return (
+    <div className="mt-5 rounded-lg border border-line p-4 text-sm">
+      <div className="flex items-center justify-between gap-3">
+        <p className="font-semibold">Setup check <span className="text-xs font-normal text-muted">(admins only)</span></p>
+        <button onClick={run} disabled={busy} className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold hover:bg-surface-2 disabled:opacity-50">
+          {busy ? "Checking…" : "Run check"}
+        </button>
+      </div>
+      {h && (
+        <ul className="mt-3 space-y-2">
+          {Object.entries(h.settings).map(([k, v]) => (
+            <CheckRow key={k} ok={v} label={`${k} ${v ? "is set" : "is missing in Vercel"}`} />
+          ))}
+          <CheckRow ok={h.phone.ok} label={h.phone.ok ? "Meta accepts the token for this number" : "Meta rejects the token or number ID"} detail={h.phone.detail} />
+          <CheckRow
+            ok={h.webhook.ok ? true : false}
+            label={h.webhook.ok ? `Last message from Meta: ${ago(h.webhook.ok.at)}` : "Meta has never delivered a message to the webhook"}
+            detail={h.webhook.ok ? h.webhook.ok.detail : `In Meta: WhatsApp → Configuration → Callback URL ${h.callbackUrl}, then subscribe the "messages" field.`}
+          />
+          {h.webhook.badsig && <CheckRow ok={false} label={`Signature failed ${ago(h.webhook.badsig.at)}`} detail="WHATSAPP_APP_SECRET must equal App settings → Basic → App secret, then redeploy." />}
+          {h.webhook.fail && <CheckRow ok={false} label={`Last error ${ago(h.webhook.fail.at)}`} detail={h.webhook.fail.detail} />}
+        </ul>
+      )}
+    </div>
+  );
+}
+
