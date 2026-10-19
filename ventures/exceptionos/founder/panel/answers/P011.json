@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I spend my mornings chasing supplier acks in Outlook, so the pain is real. But a pre-MVP startup reading my open POs and supplier emails is a lot to hand over for a plant, and I would need IT, security and my plant controller to sign off before anything touched our data.",
+  "objection": "A pre-MVP startup might not be around next year, and I would be stuck re-doing the workflow if they folded.",
+  "would_change_my_mind": "A named reference at a similar make-to-order plant that ran it for at least a quarter and proved it caught real late-supplier problems before they hit work orders.",
+  "price_too_cheap": 300,
+  "price_cheap": 900,
+  "price_expensive": 1600,
+  "price_too_expensive": 2500
+}

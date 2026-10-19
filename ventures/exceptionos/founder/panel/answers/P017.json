@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I would take the free six-week test because it costs nothing and needs no IT work, but I would not pay $2,000 a month for a tool I have not seen catch a real shortage in my own data. My team already trusts our open-PO spreadsheet, and a new tool has to earn that trust first.",
+  "objection": "Whether it reads supplier emails accurately enough to avoid false alarms, and whether my team will spend more time checking its alerts than they save.",
+  "would_change_my_mind": "A free test on last month's real exports that flags shortages and late-date changes my team missed or caught late, with the ranked list clear enough that my planners act on it without rework.",
+  "price_too_cheap": 250,
+  "price_cheap": 750,
+  "price_expensive": 1500,
+  "price_too_expensive": 2000
+}

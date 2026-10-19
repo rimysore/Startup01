@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Chasing supplier exceptions across two ERPs is a real pain and I'd take a free look at it. But I can't put $2,000 a month on a plant budget from a startup on the strength of a pitch; I need to see it catch something real first.",
+  "objection": "Our data is split across two ERPs and the emails are messy. If this only works on clean exports, it won't survive a Monday with real supplier chaos, and I'd be the one explaining the spend to the CFO.",
+  "would_change_my_mind": "The free six-week test catches a late supplier date or short ship that would have hit a real work order before we heard about it, and the team says the morning list saved them time. Then a payback number from our own data would get me to a paid pilot.",
+  "price_too_cheap": 150,
+  "price_cheap": 800,
+  "price_expensive": 1500,
+  "price_too_expensive": 2500
+}

@@ -1,0 +1,25 @@
+{
+  "business": "ExceptionOS (USD; 'per day' = per month here, volumes are paying plants)",
+  "unit": "paying plant-month",
+  "price": 2000,
+  "variable": [
+    {"label": "AI processing of supplier emails/PDFs and ranking (estimate)", "cost": 120},
+    {"label": "Cloud hosting, storage, per-tenant (estimate)", "cost": 60},
+    {"label": "Customer success / data-cleanup time, ~6 h at $60/h (estimate)", "cost": 360},
+    {"label": "Card / invoicing fees ~3%", "cost": 60}
+  ],
+  "fixed_monthly": [
+    {"label": "Founder pay, one founder, modest (estimate)", "cost": 8000},
+    {"label": "Software, tools, email sending, insurance (estimate)", "cost": 900},
+    {"label": "Security / SOC 2 compliance tooling (estimate)", "cost": 800}
+  ],
+  "startup": [
+    {"label": "MVP build beyond founder time: contractors, ERP sandbox access (estimate)", "cost": 25000},
+    {"label": "Legal: DPA, MSA, company formation (estimate)", "cost": 6000},
+    {"label": "Security review readiness / pen test (estimate)", "cost": 12000},
+    {"label": "Trade shows, travel to plants (estimate)", "cost": 8000}
+  ],
+  "days_per_month": 1,
+  "plan_per_day": 25,
+  "ramp_per_day": [0, 0, 0, 1, 1, 2, 3, 4, 5, 6, 8, 10]
+}

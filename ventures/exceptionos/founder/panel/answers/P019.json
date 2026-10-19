@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like the idea of a ranked morning list instead of me chasing acknowledgements in Outlook, but I can't hand ERP and supplier email data to a pre-MVP startup without IT and security signing off, and I'm not going to pay $2,000 a month for a month-to-month tool from a company that may not be around next year.",
+  "objection": "A pre-MVP startup might not be around next year, and I'd be giving it our open POs and supplier email before my security team has even looked at it.",
+  "would_change_my_mind": "A security review my IT team can actually sign off on, plus proof from the free six-week test on our own exports that it catches real short ships and missing acknowledgements before they hit work orders.",
+  "price_too_cheap": 200,
+  "price_cheap": 800,
+  "price_expensive": 1500,
+  "price_too_expensive": 2000
+}
