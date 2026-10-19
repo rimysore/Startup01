@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>ExceptionOS · How we handle your data</title>
+<style>
+@page { size: Letter; margin: 0.5in; }
+:root { --ink:#14171f; --muted:#5d6472; --line:#e3e6ec; --soft:#f5f7fa; --accent:#c2410c; --accent-soft:#fff1e8; --ok:#1d6b4f; --ok-soft:#e9f5ef; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Inter", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: var(--ink); font-size: 10.6px; line-height: 1.45; background: #fff; }
+.page { max-width: 7.5in; margin: 0 auto; }
+header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid var(--ink); padding-bottom: 7px; }
+.brand { font-weight: 800; font-size: 13px; } .brand span { color: var(--accent); }
+h1 { margin: 2px 0 0; font-size: 19px; letter-spacing: -.02em; }
+.meta { color: var(--muted); text-align: right; }
+.lede { font-size: 12px; margin: 10px 0; }
+.promise { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; margin: 0 0 10px; }
+.promise div { background: var(--ok-soft); border-radius: 8px; padding: 7px 9px; font-weight: 600; color: var(--ok); font-size: 10.5px; }
+.promise div b { display: block; color: var(--ink); font-size: 11.5px; }
+h2 { font-size: 11.5px; margin: 10px 0 4px; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+ul { margin: 0; padding-left: 15px; } li { margin: 1.5px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 9.8px; }
+th { text-align: left; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 8.8px; border-bottom: 1px solid var(--ink); padding: 3px 5px; }
+td { border-bottom: 1px solid var(--line); padding: 3px 5px; vertical-align: top; }
+code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 9.4px; background: var(--soft); padding: 0 3px; border-radius: 3px; }
+.box { background: var(--soft); border-radius: 8px; padding: 8px 10px; }
+.fill { background: var(--accent-soft); color: var(--accent); font-weight: 600; padding: 0 3px; border-radius: 3px; }
+.foot { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; color: var(--muted); font-size: 9.4px; display: flex; justify-content: space-between; gap: 12px; }
+</style></head><body><div class="page">
+<header><div><div class="brand">Exception<span>OS</span></div><h1>How we handle your data</h1></div>
+<div class="meta">Supplier Delay Risk Audit<br>Version 1 · <span class="fill">[date]</span></div></header>
+
+<p class="lede">The audit needs four exports from Epicor. Below is exactly what we ask for, what we don't, how you can strip anything sensitive before it leaves your building, what we do with it, and when it's deleted. If you'd rather nothing leaves your building at all, see option B.</p>
+
+<div class="promise">
+<div><b>No Epicor login</b>We never ask for credentials or network access.</div>
+<div><b>No AI on your data</b>Plain Python on one machine. No AI model sees it.</div>
+<div><b>Deleted in 30 days</b>After the report, with written confirmation.</div>
+<div><b>Never shared</b>Not sold, not pooled, not used to train anything.</div>
+</div>
+
+<div class="cols">
+<div>
+<h2>What we ask for (open records only)</h2>
+<table><thead><tr><th>Export</th><th>Columns (Epicor names vary by version)</th></tr></thead><tbody>
+<tr><td>Open PO releases</td><td><code>PONum</code> <code>POLine</code> <code>PORelNum</code> supplier, <code>PartNum</code> <code>RelQty</code> <code>ReceivedQty</code> <code>DueDate</code> <code>PromiseDt</code></td></tr>
+<tr><td>Open job materials</td><td><code>JobNum</code> <code>PartNum</code> <code>RequiredQty</code> <code>IssuedQty</code> <code>ReqDate</code>, job start date</td></tr>
+<tr><td>On-hand stock</td><td><code>PartNum</code> <code>OnhandQty</code> (purchased parts only)</td></tr>
+<tr><td>Job → customer order</td><td><code>JobNum</code> order number, customer, ship-by date, order value (rounded is fine)</td></tr>
+</tbody></table>
+<h2>What we don't need, so please leave it out</h2>
+<ul>
+<li>Prices, unit costs, PO values, payment terms or margins</li>
+<li>Supplier or customer contacts, emails, phone numbers, addresses</li>
+<li>Drawings, specs, routings, labour, employees or anything about people</li>
+<li>Email, supplier portals, or any write access to anything</li>
+</ul>
+<h2>Strip it before it leaves: <code>sanitize.py</code></h2>
+<p>A short, readable script you run on your own machine before sending. It turns customer, supplier, part, job, PO and order numbers into codes like <code>SUP-5540B63F</code> using a secret phrase you choose and keep. The files still join, so the audit works the same, but the codes can't be turned back into names without your secret. It also drops descriptions and rounds order values. It can write a code-to-name table that stays with you, so you can read our report against your real data.</p>
+</div>
+<div>
+<h2>Option A: you send sanitized files</h2>
+<ul>
+<li><b>How it reaches us:</b> a link from your own SharePoint/OneDrive/Box that you control and can expire, or an encrypted zip with the password sent separately.</li>
+<li><b>Where it lives:</b> one encrypted laptop (full-disk encryption), not a shared cloud drive. Not uploaded to any service.</li>
+<li><b>Who sees it:</b> only <span class="fill">[founder name]</span>.</li>
+<li><b>What runs on it:</b> the audit script, read-only and offline. Nothing is written back to your systems; we have no way to.</li>
+<li><b>Deletion:</b> files and working copies deleted within 30 days of delivering the report, or sooner if you ask; we confirm in writing.</li>
+<li><b>What we keep:</b> nothing from your data. With your OK, only anonymous counts (e.g. "11 jobs found"), never your name.</li>
+</ul>
+<h2>Option B: nothing leaves your building</h2>
+<p>You run the audit script yourself, on your machine, and send us only the one-page report (or not even that: we walk through it together on a screen-share). The script is plain Python you can read before running.</p>
+<h2>What we will never do</h2>
+<ul>
+<li>Use your data to train AI models, or send it to an AI service</li>
+<li>Combine it with another company's data, or sell or share it</li>
+<li>Name you as a customer or reference without written permission</li>
+<li>Contact your suppliers or customers</li>
+</ul>
+<div class="box" style="margin-top:8px"><b>Your paperwork, not ours.</b> Happy to sign your mutual NDA or data-handling terms before you send anything. Questions from IT go straight to <span class="fill">[founder name]</span>, <span class="fill">[email]</span>, <span class="fill">[phone]</span>.</div>
+</div>
+</div>
+<div class="foot"><span>ExceptionOS is in early customer discovery. This page is a plain-language commitment from the founder; your NDA or written terms take precedence.</span><span><span class="fill">[company / website]</span></span></div>
+</div></body></html>

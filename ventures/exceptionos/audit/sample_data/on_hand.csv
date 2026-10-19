@@ -1,0 +1,19 @@
+PartNum,Description,Warehouse,OnhandQty
+BRG-6205-2RS,Ball bearing 6205-2RS,MAIN,15
+BRG-22216,Spherical roller bearing 22216,MAIN,6
+CST-GBX-110,Gearbox housing casting 110,MAIN,9
+CST-BRK-40,Bracket casting 40,MAIN,0
+SRV-750W,Servo motor 750W,MAIN,12
+LNR-RAIL-25,Linear rail 25mm x 1200,MAIN,7
+HYD-CYL-63,Hydraulic cylinder 63 bore,MAIN,4
+HYD-PMP-12,Gear pump 12cc,MAIN,11
+FST-M12-KIT,M12 fastener kit,MAIN,3
+FST-SHCS-M8,SHCS M8x30 (box),MAIN,2
+PLC-1769,PLC controller,MAIN,6
+VFD-7K5,VFD 7.5kW,MAIN,9
+HMI-10,10in HMI panel,MAIN,2
+STL-PL-12,Plate steel 12mm,MAIN,14
+STL-TUBE-80,Square tube 80x80,MAIN,7
+SNS-PROX-18,Proximity sensor M18,MAIN,6
+SNS-ENC-1024,Rotary encoder 1024ppr,MAIN,3
+SNS-LC-500,Load cell 500kg,MAIN,5
