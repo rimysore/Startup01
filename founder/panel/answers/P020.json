@@ -1,0 +1,14 @@
+{
+ "id": "P020",
+ "buys": false,
+ "stance": "no",
+ "purchases_first_month": 0,
+ "reason_code": "need",
+ "reason": "My team scripts this stuff. And if a client deliverable is wrong, the agent doesn't take the call, I do.",
+ "objection": "Liability lands on me.",
+ "would_change_my_mind": "Revenue share where I list my own workers and earn",
+ "price_too_cheap": 5,
+ "price_cheap": 20,
+ "price_expensive": 80,
+ "price_too_expensive": 200
+}

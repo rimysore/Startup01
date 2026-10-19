@@ -1,0 +1,14 @@
+{
+ "id": "P024",
+ "buys": true,
+ "stance": "buy",
+ "purchases_first_month": 1,
+ "reason_code": "quality",
+ "reason": "Margins are getting squeezed; if a security-audit or UI worker produces a client-ready report I can white-label, $49/mo per worker is noise. I'll pay for one and test it on two clients.",
+ "objection": "Skills are free, so the value has to be in tested, reliable output, not the catalog.",
+ "would_change_my_mind": "",
+ "price_too_cheap": 10,
+ "price_cheap": 49,
+ "price_expensive": 300,
+ "price_too_expensive": 1000
+}

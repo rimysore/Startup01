@@ -1,0 +1,14 @@
+{
+ "id": "P005",
+ "buys": false,
+ "stance": "maybe",
+ "purchases_first_month": 0,
+ "reason_code": "habit",
+ "reason": "My devs already run Claude Code with skills. I might use a design or audit worker as white-label overflow, but I'd test before I pay $49/mo per worker.",
+ "objection": "My team has to review output anyway, so the margin story is thin.",
+ "would_change_my_mind": "White-label output I can resell to clients, with a quality track record per worker",
+ "price_too_cheap": 10,
+ "price_cheap": 30,
+ "price_expensive": 150,
+ "price_too_expensive": 500
+}

@@ -1,0 +1,14 @@
+{
+ "id": "P008",
+ "buys": false,
+ "stance": "no",
+ "purchases_first_month": 0,
+ "reason_code": "price",
+ "reason": "First task free, then I cancel. Claude Pro plus free skills covers this.",
+ "objection": "Price per result versus my existing $20 sub that does it.",
+ "would_change_my_mind": "Bundled into a tool I already pay for",
+ "price_too_cheap": 1,
+ "price_cheap": 5,
+ "price_expensive": 15,
+ "price_too_expensive": 30
+}

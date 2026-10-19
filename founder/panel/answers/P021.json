@@ -1,0 +1,14 @@
+{
+ "id": "P021",
+ "buys": false,
+ "stance": "no",
+ "purchases_first_month": 0,
+ "reason_code": "trust",
+ "reason": "I'd play with it on a personal account, but there's no path to company spend without security docs.",
+ "objection": "Liability and auditability of agent actions.",
+ "would_change_my_mind": "Full audit logs, SSO, SOC 2",
+ "price_too_cheap": 30,
+ "price_cheap": 300,
+ "price_expensive": 2000,
+ "price_too_expensive": 6000
+}

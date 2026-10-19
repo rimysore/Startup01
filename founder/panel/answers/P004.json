@@ -1,0 +1,14 @@
+{
+ "id": "P004",
+ "buys": false,
+ "stance": "no",
+ "purchases_first_month": 0,
+ "reason_code": "trust",
+ "reason": "No SOC 2, no contract, no DPA. I can't even start the review.",
+ "objection": "Freelancers sign NDAs; who signs for an agent?",
+ "would_change_my_mind": "SOC 2 plus a named account manager and outcome SLA",
+ "price_too_cheap": 50,
+ "price_cheap": 500,
+ "price_expensive": 3000,
+ "price_too_expensive": 10000
+}

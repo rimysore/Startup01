@@ -1,0 +1,37 @@
+{
+  "business": "Skill-hire: online per-task marketplace of skill-specialized AI agents (base case: horizontal catalog, ~$15 per finished task)",
+  "unit": "agent task",
+  "mapping_note": "The CFO tool was built for a cafe. Mapping: one 'cup' = one finished, accepted agent task (e.g. a landing page, a spreadsheet model, a UI cleanup, a small code change). 'Price' = what the buyer pays per task; the platform is merchant of record, so revenue is gross task price and the skill author's revenue share is a per-task variable cost (like a commission). 'Variable' = everything one task consumes: model tokens (incl. retries), a verifier/QA pass, sandbox compute, card fees, author share, compute wasted on rejected tasks (pay-on-accept guarantee), human spot-check QA, support. 'Fixed_monthly' = team, paid acquisition (treated as a fixed monthly budget, not per task), tooling, skill security vetting, legal. 'Startup' = pre-launch build. 'days_per_month' = 30 (online, every day). 'capacity_per_day' omitted: compute scales elastically, the real cap is demand and model-provider rate limits.",
+  "price": 15.00,
+  "price_basis": "ESTIMATE. No public willingness-to-pay figure exists (brief: Gaps). Anchors: Devin sells ~15 min of autonomous engineering for ~$2.00-2.25 (https://pricepertoken.com/coding-assistants/devin, cited in board/07-offer.md); Fiverr buyers spend $342/yr (https://investors.fiverr.com/node/9886/pdf); Claude/ChatGPT subscriptions at ~$20/mo already run the same open skills, which caps a horizontal catalog's price low.",
+  "variable": [
+    {"label": "Model tokens incl. retries (ESTIMATE from SOURCED $1.857/agentic coding task avg x1.3 retry overhead)", "cost": 2.40,
+     "basis": "SOURCED: Bai et al. arXiv:2604.22750, 8 frontier models on SWE-bench Verified, avg 4.17M tokens and $1.857 per agentic task; same-model run-to-run variance up to 30x (https://codex.danielvaughan.com/2026/07/03/where-do-your-tokens-go-empirical-token-consumption-coding-agents-codex-cli-budget-control/ ; https://artificialanalysis.ai/agents/coding-agents). Prices: Sonnet 4.6 $3/$15 per M, cached input $0.30 (https://pricepertoken.com/pricing-page/model/anthropic-claude-sonnet-4.6); Opus 5 $5/$25 (https://www.finout.io/blog/claude-opus-5-pricing-2026); GPT-5 $1.25/$10 (https://anotherwrapper.com/tools/llm-pricing/claude-opus-5/gpt-5-2025-08-07). ESTIMATE: design/spreadsheet tasks similar order of magnitude; x1.3 for failed runs re-executed."},
+    {"label": "Verifier / eval agent pass (ESTIMATE)", "cost": 0.40, "basis": "ESTIMATE: second, cheaper-model pass to check the output before delivery, ~20% of main run."},
+    {"label": "Sandbox compute, 2 vCPU + 4 GiB x 20 min (SOURCED rate)", "cost": 0.06, "basis": "SOURCED: E2B $0.000014/vCPU-s, $0.0000045/GiB-s (https://docs.e2b.dev/faq/calculate-sandbox-price.md). 2*0.000014*1200 + 4*0.0000045*1200 = $0.055."},
+    {"label": "Storage, egress, logging, observability (ESTIMATE)", "cost": 0.05, "basis": "ESTIMATE."},
+    {"label": "Card fees 2.9% + $0.30 (SOURCED)", "cost": 0.735, "basis": "SOURCED: Stripe US online card rate (https://www.nerdwallet.com/business/software/learn/stripe-fees). 0.029*15 + 0.30."},
+    {"label": "Skill-author revenue share, 15% of price (ESTIMATE vs SOURCED norms)", "cost": 2.25, "basis": "Norms SOURCED: App Store 70/30, 85/15 under $1M (https://www.businesswire.com/news/home/20201118005376/en/Apple-Announces-App-Store-Small-Business-Program); Fiverr keeps 20% of seller order (secondary: https://productmint.com/the-fiverr-business-model-how-does-fiverr-make-money/). ESTIMATE: the platform pays all compute and the author supplies a free MIT markdown file, so the author gets 15%, not 70%."},
+    {"label": "Compute + fees burned on rejected tasks, 15% rejection, pay-on-accept (ESTIMATE)", "cost": 0.64, "basis": "ESTIMATE: 15% rejection (board/07-offer.md assumption); (2.91 compute + 0.735 fees) x 0.15/0.85."},
+    {"label": "Human QA spot-check, 25% of tasks x 3 min at $40/h (ESTIMATE)", "cost": 0.50, "basis": "ESTIMATE."},
+    {"label": "Support (ESTIMATE)", "cost": 0.30, "basis": "ESTIMATE: ~1 in 10 tasks opens a ticket, ~$3 each."}
+  ],
+  "fixed_monthly": [
+    {"label": "Team: 5 people, fully loaded (ESTIMATE)", "cost": 110000},
+    {"label": "Paid acquisition budget (ESTIMATE; self-serve CAC median ~$702, SOURCED https://saashero.net/google-ppc/saas-cac-benchmarks-2026/)", "cost": 40000},
+    {"label": "Software, monitoring, model-provider minimums (ESTIMATE)", "cost": 6000},
+    {"label": "Skill security vetting / red-team (ESTIMATE; ~13% of skills critical per Snyk, brief)", "cost": 8000},
+    {"label": "Legal, insurance, accounting (ESTIMATE)", "cost": 4000}
+  ],
+  "startup": [
+    {"label": "MVP build: platform, sandboxing, billing, 6 months (ESTIMATE)", "cost": 250000},
+    {"label": "Skill vetting + eval harness for first 20 agents (ESTIMATE)", "cost": 50000},
+    {"label": "Legal: marketplace ToS, author agreements, liability (ESTIMATE)", "cost": 20000},
+    {"label": "Launch marketing (ESTIMATE)", "cost": 30000}
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 1500,
+  "plan_basis": "ESTIMATE: month-24 run-rate target, ~11k buyers doing 4 tasks/month.",
+  "ramp_per_day": [15, 40, 80, 130, 190, 260, 330, 400, 470, 540, 610, 680],
+  "ramp_basis": "ESTIMATE. No panel buy rate usable for a per-task volume; comparables are weak (ActMyAgent ~$2k MRR, Bounty 1,300 tasks on $1M funding, both self-reported, board/07-offer.md). Month 12 = 680 tasks/day = ~5,100 buyers at 4 tasks/month, which at $702 CAC would cost ~$3.6M to acquire: the ramp is optimistic against the $40k/mo budget."
+}

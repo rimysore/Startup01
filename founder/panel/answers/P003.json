@@ -1,0 +1,14 @@
+{
+ "id": "P003",
+ "buys": false,
+ "stance": "maybe",
+ "purchases_first_month": 0,
+ "reason_code": "quality",
+ "reason": "I'd take the free task, an Excel cleanup. If it's right first time, maybe $20 a job, but I'll still be checking every cell.",
+ "objection": "If I have to check the work anyway, what am I paying for over ChatGPT?",
+ "would_change_my_mind": "A money-back guarantee on bad output, and examples of real finished work",
+ "price_too_cheap": 5,
+ "price_cheap": 15,
+ "price_expensive": 60,
+ "price_too_expensive": 150
+}

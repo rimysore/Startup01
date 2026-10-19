@@ -1,0 +1,14 @@
+{
+ "id": "P014",
+ "buys": false,
+ "stance": "maybe",
+ "purchases_first_month": 0,
+ "reason_code": "convenience",
+ "reason": "I hire on Upwork for small design jobs. I'd try the free task, but I'd want to see it inside Claude where I already work.",
+ "objection": "Why not just ask Claude?",
+ "would_change_my_mind": "Clear before/after examples that beat what I get from plain Claude",
+ "price_too_cheap": 3,
+ "price_cheap": 10,
+ "price_expensive": 35,
+ "price_too_expensive": 70
+}

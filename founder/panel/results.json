@@ -1,0 +1,206 @@
+{
+ "business": "Skill-hire: a marketplace to hire specialized AI agents (base model + one open-source Agent Skill) as named AI workers",
+ "seed": 5,
+ "dealt": 24,
+ "answered": 24,
+ "skipped": [],
+ "buys": 2,
+ "passes": 22,
+ "buy_rate": 0.08333333333333333,
+ "by_segment": [
+  [
+   "Small-business owner who buys on Fiverr/Upwork",
+   5,
+   0.2
+  ],
+  [
+   "Agency owner (dev/design/marketing, 3-30 staff)",
+   5,
+   0.2
+  ],
+  [
+   "Enterprise IT/security buyer",
+   4,
+   0.0
+  ],
+  [
+   "In-house developer already using Claude Code/Cursor",
+   5,
+   0.0
+  ],
+  [
+   "Solo founder / indie hacker",
+   5,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Deal hunter",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "Outcome buyer",
+   5,
+   0.2
+  ],
+  [
+   "Burned before",
+   4,
+   0.0
+  ],
+  [
+   "Procurement-gated",
+   3,
+   0.0
+  ],
+  [
+   "Tinkerer",
+   5,
+   0.0
+  ],
+  [
+   "Loyal to a platform",
+   4,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$217,000 and up",
+   8,
+   0.125
+  ],
+  [
+   "$143,000 to $217,000",
+   8,
+   0.125
+  ],
+  [
+   "under $143,000",
+   8,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   9,
+   [
+    "I've watched three 'AI workers' break things in prod. An unaudited startup running community skills against our systems is a hard no.",
+    "No SOC 2, no contract, no DPA. I can't even start the review."
+   ],
+   [
+    "P001",
+    "P004"
+   ]
+  ],
+  [
+   "need",
+   4,
+   [
+    "I already run these exact skills in Claude Code for free on my existing seat. And procurement would take 6 months for a vendor with no SOC 2.",
+    "I build my own agents. I'd rather fork the skill than pay you per task."
+   ],
+   [
+    "P002",
+    "P013"
+   ]
+  ],
+  [
+   "habit",
+   3,
+   [
+    "My devs already run Claude Code with skills. I might use a design or audit worker as white-label overflow, but I'd test before I pay $49/mo per worker.",
+    "I do everything in ChatGPT now. I'm not adding another login and handing over my files."
+   ],
+   [
+    "P005",
+    "P009"
+   ]
+  ],
+  [
+   "price",
+   3,
+   [
+    "The skill is free. I'll install it myself in ten minutes. $49 a month is a real bill on my income.",
+    "First task free, then I cancel. Claude Pro plus free skills covers this."
+   ],
+   [
+    "P007",
+    "P008"
+   ]
+  ],
+  [
+   "convenience",
+   2,
+   [
+    "I hire on Upwork for small design jobs. I'd try the free task, but I'd want to see it inside Claude where I already work.",
+    "I'd buy a finished deliverable, but I live in Claude and don't want a new vendor. If the result were clearly better than Claude alone I'd pay $30 a task."
+   ],
+   [
+    "P014",
+    "P017"
+   ]
+  ],
+  [
+   "quality",
+   1,
+   [
+    "I'd take the free task, an Excel cleanup. If it's right first time, maybe $20 a job, but I'll still be checking every cell."
+   ],
+   [
+    "P003"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "price",
+   1,
+   [
+    "Fiverr charges me $40-80 for a spreadsheet or a landing page mockup and takes days. $9-29 in an hour, first one free? I'll try two jobs."
+   ],
+   [
+    "P012"
+   ]
+  ],
+  [
+   "quality",
+   1,
+   [
+    "Margins are getting squeezed; if a security-audit or UI worker produces a client-ready report I can white-label, $49/mo per worker is noise. I'll pay for one and test it on two clients."
+   ],
+   [
+    "P024"
+   ]
+  ]
+ ],
+ "flip": [
+  "SOC 2 Type II, single-tenant/VPC deploy, contractual indemnity, and a security team that pentests every skill",
+  "Nothing realistic; maybe if it ran inside our own cloud and procurement already approved it",
+  "A money-back guarantee on bad output, and examples of real finished work",
+  "SOC 2 plus a named account manager and outcome SLA",
+  "White-label output I can resell to clients, with a quality track record per worker",
+  "Local/self-hosted runner where code never leaves my machine",
+  "Nothing; maybe $2-3 per task as convenience",
+  "Bundled into a tool I already pay for",
+  "If it showed up as an app inside ChatGPT with one click",
+  "Pay only on accepted output, plus public benchmark results per worker",
+  "Signed, pinned, audited skills; SOC 2; private deployment; 12+ months of references",
+  "A private catalog for my agency with my own tuned workers, billed to clients",
+  "Clear before/after examples that beat what I get from plain Claude",
+  "Insurance-backed guarantee and human QA on every deliverable",
+  "Workers that chain multiple skills plus integrations I can't easily set up",
+  "Proof the specialist beats plain Claude on my type of task",
+  "Shipped inside the Claude/GitHub marketplace we already approved",
+  "Being inside Claude's plugin marketplace",
+  "Revenue share where I list my own workers and earn",
+  "Full audit logs, SSO, SOC 2",
+  "Per-task under $5 with clear value over DIY",
+  "A human-reviewed tier with a refund guarantee"
+ ],
+ "purchases_first_month_per_buyer": 1.5,
+ "price_answers": 24
+}

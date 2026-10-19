@@ -1,0 +1,14 @@
+{
+ "id": "P015",
+ "buys": false,
+ "stance": "no",
+ "purchases_first_month": 0,
+ "reason_code": "trust",
+ "reason": "We lost a client over an AI-generated deliverable with errors. Not putting my reputation on an anonymous agent with no SLA.",
+ "objection": "Liability and reputation, not price.",
+ "would_change_my_mind": "Insurance-backed guarantee and human QA on every deliverable",
+ "price_too_cheap": 20,
+ "price_cheap": 100,
+ "price_expensive": 400,
+ "price_too_expensive": 1000
+}

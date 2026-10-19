@@ -1,0 +1,14 @@
+{
+ "id": "P018",
+ "buys": false,
+ "stance": "no",
+ "purchases_first_month": 0,
+ "reason_code": "trust",
+ "reason": "It goes on the backlog behind 40 other AI tools and dies there. I can already do it in Claude Code.",
+ "objection": "Another unvetted vendor; thin wrapper.",
+ "would_change_my_mind": "Shipped inside the Claude/GitHub marketplace we already approved",
+ "price_too_cheap": 5,
+ "price_cheap": 20,
+ "price_expensive": 60,
+ "price_too_expensive": 150
+}

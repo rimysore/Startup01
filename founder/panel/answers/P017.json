@@ -1,0 +1,14 @@
+{
+ "id": "P017",
+ "buys": false,
+ "stance": "maybe",
+ "purchases_first_month": 0,
+ "reason_code": "convenience",
+ "reason": "I'd buy a finished deliverable, but I live in Claude and don't want a new vendor. If the result were clearly better than Claude alone I'd pay $30 a task.",
+ "objection": "I'd still be checking the work.",
+ "would_change_my_mind": "Proof the specialist beats plain Claude on my type of task",
+ "price_too_cheap": 5,
+ "price_cheap": 20,
+ "price_expensive": 75,
+ "price_too_expensive": 150
+}

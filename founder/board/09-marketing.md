@@ -15,11 +15,11 @@ The buyer pays for a guaranteed outcome. Open-source skills are plumbing, not th
 - **Not doing:** paid social, or a launch built around "AI marketplace" (agent washing fatigue, [Gartner](https://www.gartner.com/en/newsroom/press-releases/2025-06-25-gartner-predicts-over-40-percent-of-agentic-ai-projects-will-be-canceled-by-end-of-2027)).
 
 ## First 100 customers: how and at what cost
-Assumption, not data: a $29-99 fixed-price task, plus a $49/mo plan for repeat buyers.
+Assumed: a $29-99 fixed-price task, plus a $49/mo plan for repeat buyers.
 1. **Founder-led, ~40 customers, ~$0 cash and 3-4 hours each.** Do the job free in public: reply to "can someone fix my sheet / roast my landing page" posts with the finished deliverable and a link. Convert 1 in 10.
 2. **One wedge, SEO and free tools, ~30 customers, ~$30-60 each in content time.** About 50 "fix my X" pages, each with a free preview of the output.
 3. **Paid search test, ~20 customers, ~$150-250 each.** Business-services CPC is around $5.87 ([WordStream via secondary](https://www.wordstream.com/blog/2026-google-ads-benchmarks)). At a 3% click-to-paid rate that's about $195 per customer.
-4. **Skill-author co-marketing, ~10 customers, revenue share only.** Authors push "hire my agent" to their GitHub audience. Weak lever: installs are tiny, with 162 skills totalling 767 installs ([skills.sh](https://www.skills.sh/jarmen423)).
+4. **Skill-author co-marketing, ~10 customers, revenue share only.** Weak lever: 162 skills total 767 installs ([skills.sh](https://www.skills.sh/jarmen423)).
 
 Blended cost for 100 customers: roughly $5-8k cash plus 300+ founder hours.
 
