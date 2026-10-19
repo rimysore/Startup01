@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I got burned by a software rollout that ate months of my team's time, so a free audit that asks for our open PO, job and inventory exports makes me ask what it's really for. Sending that data out means IT and my plant manager have to sign off, and I'm not going to ask them for that this month.",
+  "objection": "A free audit is how they get in the door, and next week I'm on a call about a paid plan with my shortage meeting still running on spreadsheets.",
+  "would_change_my_mind": "A named plant running Epicor Kinetic that has used it for a few months and will say the findings were real, plus a written data-handling statement IT will accept.",
+  "price_too_cheap": 150,
+  "price_cheap": 300,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I like the idea of catching supplier date slips before my planners find them, but sending our POs, jobs and BOMs outside the company is not something I can sign off on myself. It would need IT and management approval, and I doubt that gets done inside 30 days for a free audit.",
+  "objection": "Sending our exports outside the company needs IT and management approval, and I do not know what happens to the data after they process it.",
+  "would_change_my_mind": "IT and management approve a sanitized export with a written data-handling and deletion policy, and I can send only the open PO lines and jobs without any Epicor access.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}

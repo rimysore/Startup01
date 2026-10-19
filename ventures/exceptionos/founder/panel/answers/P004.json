@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The audit is free and the output sounds useful, and I like that they want to know which delays my team already caught. But I'd be sending supplier PO lines and job data from our Epicor system to a startup I've never heard of, and I can't approve that myself. Our IT and whoever owns supplier data would need to sign off, and that won't happen in 30 days.",
+  "objection": "Our BOM and job data is messy, so the results would be wrong, and I'm not comfortable sending supplier and job data outside the company to a startup without a security review.",
+  "would_change_my_mind": "A written security and data-handling one-pager, a commitment to delete the exports after the audit, and a reference from a plant that already ran the audit.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 1200,
+  "price_too_expensive": 2500
+}
