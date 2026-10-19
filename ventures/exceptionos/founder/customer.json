@@ -1,0 +1,38 @@
+{
+  "business": "ExceptionOS, supplier-delivery exception intelligence for mid-market manufacturers",
+  "target": "Purchasing, materials and supply chain people at U.S. discrete / make-to-order manufacturers with 100-500 employees, 3-30 buyers, 100+ suppliers, on a mid-market ERP (Epicor, Infor SyteLine, NetSuite, Dynamics 365/Business Central, Acumatica, Plex)",
+  "where": "United States (Midwest and Southeast industrial states especially)",
+  "age": [28, 62],
+  "segments": [
+    {"name": "Buyer / senior buyer (chases suppliers daily)", "share": 0.30, "income": [55000, 90000]},
+    {"name": "Purchasing or materials manager (owns the team and the shortage meeting)", "share": 0.35, "income": [85000, 135000]},
+    {"name": "Supply chain director or VP (owns OTIF, expedite cost, budget)", "share": 0.20, "income": [130000, 220000]},
+    {"name": "COO, GM or owner of a 100-500 person manufacturer", "share": 0.15, "income": [180000, 400000]}
+  ],
+  "behaviours": [
+    {"name": "Spreadsheet owner", "share": 0.22, "how": "Runs the open-PO / shortage tracker in Excel and trusts it more than the ERP."},
+    {"name": "ERP loyalist", "share": 0.18, "how": "Wants everything inside the ERP and asks the ERP partner first."},
+    {"name": "Burned by software", "share": 0.15, "how": "Lived through a painful ERP or software rollout and is wary of new tools."},
+    {"name": "Improvement champion", "share": 0.15, "how": "Runs lean/continuous-improvement projects and tries new tools if they prove ROI."},
+    {"name": "Budget gatekeeper", "share": 0.15, "how": "Every new spend needs a payback story for the owner or CFO."},
+    {"name": "Security-first IT partner", "share": 0.15, "how": "Won't share ERP or email data with a startup without IT and security sign-off."}
+  ],
+  "objections": [
+    "Our ERP already flags late POs; we just need discipline",
+    "We'd have to give a startup access to our ERP and supplier email",
+    "Integration with our ERP will take IT months we don't have",
+    "Another tool my buyers have to log into",
+    "We tried supplier portals and suppliers ignored them",
+    "AI will get a date wrong and we'll miss a shortage",
+    "No budget this year unless it pays back fast",
+    "A pre-MVP startup might not be around next year"
+  ],
+  "habits": [
+    "you hold a daily or weekly shortage / expedite meeting",
+    "you spend part of every morning in Outlook chasing supplier acknowledgements",
+    "you paid for premium freight to cover a late supplier in the last quarter",
+    "your plant runs Epicor (or Infor SyteLine) and the ERP partner does customisations",
+    "your company grew through an acquisition and runs two ERPs",
+    "you report on-time delivery to customers every month"
+  ]
+}
