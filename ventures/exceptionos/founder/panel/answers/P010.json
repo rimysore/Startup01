@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I have been through two ERP rollouts that promised to save us time and cost us months. A new tool that my buyers have to log into, for $2,000 a month, is exactly what I am wary of. I would take the free six-week test with exports, but I would not sign a paid pilot until it has caught a real late order that we missed.",
+  "objection": "Does it catch anything my buyers do not already catch by phone and by reading acknowledgements every morning, and is it one more login they will ignore after week two?",
+  "would_change_my_mind": "In the free test, it flags a real short ship or backorder that would have hit a work order, early enough that we could act on it, and my buyers do not have to log into anything new.",
+  "price_too_cheap": 250,
+  "price_cheap": 900,
+  "price_expensive": 2000,
+  "price_too_expensive": 3500
+}

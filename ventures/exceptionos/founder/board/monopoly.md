@@ -2,10 +2,9 @@
 Score: 4/10 | Vote: FUND IF
 
 ## What is strong
-- **A real secret.** Pulling data out of acknowledgements is solved. Ranking each exception by its downstream impact and driving it to resolution is not. That is sharper than "AI for procurement".
+- **A real secret.** Pulling data out of acknowledgements is solved. Ranking each exception by its downstream impact and driving it to resolution is not.
 - **A small market it could own.** U.S. make-to-order manufacturers with 100–500 staff on mid-market ERPs. That is narrow enough to dominate one niche first, for example machinery shops on Epicor.
 - **A moat aimed at the right thing.** Ranking by impact needs PO, work order and customer order data joined over time. If that context builds up per customer, leaving gets costly.
-- **Disciplined gates.** Each stage has a clear test before more money goes in, which keeps the cost of being wrong low.
 
 ## What would kill it (the top 3, most dangerous first)
 1. **It is a feature, not a company.** ERP vendors, supplier portals, procurement suites and AI startups all reach this same buyer, and the brief admits their coverage is unknown. If an ERP vendor ships this as a module, it becomes free. Nothing yet shows it is 10x better than a spreadsheet plus an ERP report.

@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Our buyers already run supplier chasing through Epicor and our ERP partner, and I'd have to bolt on an outside tool that reads our PO exports and supplier emails. Early-stage product with no ERP integration means I'd be checking its output by hand, which eats the time it's supposed to save.",
+  "objection": "AI will get a date wrong and we'll miss a shortage, and then I'm the one who answers to the plant manager for the missed work order.",
+  "would_change_my_mind": "A free six-week test that catches real late or short supplier dates our team had already missed, with our ERP partner signing off on how the export is pulled.",
+  "price_too_cheap": 250,
+  "price_cheap": 700,
+  "price_expensive": 1200,
+  "price_too_expensive": 1800
+}

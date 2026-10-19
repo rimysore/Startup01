@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "My ERP partner is the first call I make for anything touching purchasing data, and I don't want a second tool reading our POs and supplier mail from outside the system. A free six-week test I might agree to look at, but I would not sign a $2,000 a month pilot on the strength of a deck and a demo.",
+  "objection": "It works from exports and forwarded emails, not from the ERP. If the data is stale or incomplete, the ranked list could send my team after the wrong exceptions, and I would be the one explaining it to the plant manager.",
+  "would_change_my_mind": "A six-week test that catches a late supplier date or a short ship before it hits a work order, with the premium freight or line-down cost it prevented written down in dollars.",
+  "price_too_cheap": 250,
+  "price_cheap": 800,
+  "price_expensive": 1500,
+  "price_too_expensive": 3000
+}
