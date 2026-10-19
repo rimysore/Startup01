@@ -1,37 +1,34 @@
-# Monopoly lens
-Score: 4/10 | Vote: FUND IF
+# Monopoly lens (round 2)
+Score: 5/10 | Vote: FUND IF
+
+## What changed since round 1
+- **Better:** the small market is now named and can be counted: Epicor Kinetic machinery shops, one exception type, one downstream object. That is the right way to start: a big share of a small market. "OS" is out of the pitch. A kill rule makes the thesis falsifiable.
+- **Worse:** there is no revenue signal at all now. The $2,000 pilot became a free audit, so we learn nothing about whether anyone will pay for this.
+- **Unchanged:** the moat is still a hypothesis, and the team is still unnamed.
+- **Round-1 conditions:** narrow to one pitch is **met**. "OS" off the roadmap is **met**. A written offer is **partly met**: the audit is defined but the paid step is not. Incumbent coverage is **partly met**: the competitor scan is done, but Epicor's own MRP, time-phase and shortage reports have not been checked, and those are the real incumbent. An accuracy bar is **partly met**: there is a metric but no threshold. Three design partners with a baseline is **not met**. The paid pilot is **not met**. The channel to customer 100 and a named team are **not met**.
 
 ## What is strong
-- **A real secret.** Pulling data out of acknowledgements is solved. Ranking each exception by its downstream impact and driving it to resolution is not.
-- **A small market it could own.** U.S. make-to-order manufacturers with 100–500 staff on mid-market ERPs. That is narrow enough to dominate one niche first, for example machinery shops on Epicor.
-- **A moat aimed at the right thing.** Ranking by impact needs PO, work order and customer order data joined over time. If that context builds up per customer, leaving gets costly.
+- The wedge is clear: "tells you what the change will break" is a different claim from chasing acknowledgements, and no competitor publicly claims to rank supplier changes by threatened work orders for mid-market ERPs.
+- Read-only, offline exports remove the IT/security gate that round 1 hit.
+- Being complementary to SourceDay, which Epicor resells, could be a distribution path rather than a fight.
 
 ## What would kill it (the top 3, most dangerous first)
-1. **It is a feature, not a company.** ERP vendors, supplier portals, procurement suites and AI startups all reach this same buyer, and the brief admits their coverage is unknown. If an ERP vendor ships this as a module, it becomes free. Nothing yet shows it is 10x better than a spreadsheet plus an ERP report.
-2. **No proprietary technology yet.** Before an MVP, the ranking is joins and heuristics that a rival could copy in six months. The data moat only arrives after many customers, so it cannot protect the first ones.
-3. **Distribution stops at dozens.** Founder-led outreach plus security and integration work across nine ERPs means each customer may be a custom project. What each customer costs to win is unknown, and there is no channel to customer 100.
+1. **The moat is not proprietary.** The supplier→PO→BOM→work-order graph is built from the customer's own Epicor data, and Epicor's MRP already walks it. Each customer's graph is private and different from the others, so it gives no network effect. Anyone holding the same exports can rebuild it, and Epicor and SourceDay already hold them. Today this is know-how at best, not technology ten times better than the next option.
+2. **Complementary means one feature away.** SourceDay already sees the date changes and sits inside Epicor. If the audits prove the value, the cheapest copycat in month six is the partner. Being complementary helps distribution only until the partner builds the feature itself.
+3. **Epicor's built-in reports may be "good enough".** If a time-phase or shortage report plus a planner's judgement catches most of these, the improvement is small and the kill rule fires. Nobody has checked yet.
 
 ## Scale
-If it works, it becomes the system of record for supply exceptions in mid-market manufacturing, then expands into inventory, work orders and customer orders. For that, all of these must hold:
-- one exception recurs, with a measurable cost, across many plants;
-- ERP integration becomes repeatable instead of custom;
-- the context it builds up visibly improves its ranking over time;
-- a channel such as ERP partners brings customers without the founder.
-
-If integration stays custom, this is a good consulting-style niche business, not a monopoly. How many target companies there are and what they would spend are open questions.
+13,002 U.S. firms with 50–999 employees in NAICS 332–336 is a credible beachhead. The Epicor Kinetic share of that number is unknown, so the reachable first market is unmeasured. Expanding to other ERPs, other exception types and finished-good or customer-order impact is plausible, but each step means more integration work. The one thing that could compound is data on supplier reliability pooled across customers (which suppliers slip, by how much, how often). The brief does not mention it.
 
 ## The questions I would ask the founder
-- Who on the team has sold to manufacturers or built ERP integrations?
-- Which incumbent comes closest, and why haven't they built this?
-- Which one ERP and one vertical do you win first, and how many companies are in it?
-- Why now: what changed this year?
-- What does one exception cost a customer today, in dollars or late orders?
-- How do the first 100 customers arrive, and what does each cost to win?
-- What stops a copycat in month six?
+- What, specifically, does Epicor's time-phase or shortage report miss that your ranking catches? Show it on one real dataset.
+- What does each audit cost in founder hours, and what does customer 100 cost to acquire?
+- What stops SourceDay or Epicor from shipping this once you have proved it?
+- Is there a data asset that grows across customers, or is every deployment a fresh start?
+- Who is the team, and what do you know about Epicor shops that others do not?
 
 ## If FUND IF: the conditions
-1. A map of the competitors showing what each covers and the gap they leave.
-2. One beachhead (one ERP and one vertical) that passes the 20-interview gate there, with the cost of the recurring exception measured.
-3. One design partner where impact ranking clearly beats their current method, measured against their own baseline.
-4. A credible channel to customer 100, and a first estimate of what each customer costs to win.
-5. A named team that includes someone with ERP-integration or manufacturing-sales experience.
+1. Three real audits, each with a written answer to "did your team already know?", and at least one high-impact miss that Epicor's native reports would also have missed.
+2. One buyer names a price and pays it, even a small one.
+3. A one-page moat plan built on a cross-customer asset (for example a supplier-reliability dataset) or on a defensible channel, not on the per-customer graph alone.
+4. A named team and a costed path to the first 100 customers, including whether SourceDay or Epicor is a partner or a threat.

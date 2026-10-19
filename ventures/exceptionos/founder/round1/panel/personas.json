@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Liam",
+  "age": 50,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 121000,
+  "behaviour": "ERP loyalist",
+  "behaviour_how": "Wants everything inside the ERP and asks the ERP partner first.",
+  "objection": "No budget this year unless it pays back fast",
+  "habit": "you paid for premium freight to cover a late supplier in the last quarter"
+ },
+ {
+  "id": "P002",
+  "name": "Declan",
+  "age": 62,
+  "segment": "COO, GM or owner of a 100-500 person manufacturer",
+  "income": 242000,
+  "behaviour": "Improvement champion",
+  "behaviour_how": "Runs lean/continuous-improvement projects and tries new tools if they prove ROI.",
+  "objection": "AI will get a date wrong and we'll miss a shortage",
+  "habit": "you hold a daily or weekly shortage / expedite meeting"
+ },
+ {
+  "id": "P003",
+  "name": "Theo",
+  "age": 33,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 108000,
+  "behaviour": "Budget gatekeeper",
+  "behaviour_how": "Every new spend needs a payback story for the owner or CFO.",
+  "objection": "A pre-MVP startup might not be around next year",
+  "habit": "your company grew through an acquisition and runs two ERPs"
+ },
+ {
+  "id": "P004",
+  "name": "Dev",
+  "age": 61,
+  "segment": "Buyer / senior buyer (chases suppliers daily)",
+  "income": 87000,
+  "behaviour": "Improvement champion",
+  "behaviour_how": "Runs lean/continuous-improvement projects and tries new tools if they prove ROI.",
+  "objection": "A pre-MVP startup might not be around next year",
+  "habit": "your plant runs Epicor (or Infor SyteLine) and the ERP partner does customisations"
+ },
+ {
+  "id": "P005",
+  "name": "Clara",
+  "age": 55,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 124000,
+  "behaviour": "Burned by software",
+  "behaviour_how": "Lived through a painful ERP or software rollout and is wary of new tools.",
+  "objection": "Integration with our ERP will take IT months we don't have",
+  "habit": "you hold a daily or weekly shortage / expedite meeting"
+ },
+ {
+  "id": "P006",
+  "name": "Kira",
+  "age": 31,
+  "segment": "Buyer / senior buyer (chases suppliers daily)",
+  "income": 89000,
+  "behaviour": "ERP loyalist",
+  "behaviour_how": "Wants everything inside the ERP and asks the ERP partner first.",
+  "objection": "AI will get a date wrong and we'll miss a shortage",
+  "habit": "your plant runs Epicor (or Infor SyteLine) and the ERP partner does customisations"
+ },
+ {
+  "id": "P007",
+  "name": "Kofi",
+  "age": 37,
+  "segment": "COO, GM or owner of a 100-500 person manufacturer",
+  "income": 230000,
+  "behaviour": "Security-first IT partner",
+  "behaviour_how": "Won't share ERP or email data with a startup without IT and security sign-off.",
+  "objection": "No budget this year unless it pays back fast",
+  "habit": "you hold a daily or weekly shortage / expedite meeting"
+ },
+ {
+  "id": "P008",
+  "name": "Sienna",
+  "age": 34,
+  "segment": "Buyer / senior buyer (chases suppliers daily)",
+  "income": 60000,
+  "behaviour": "Improvement champion",
+  "behaviour_how": "Runs lean/continuous-improvement projects and tries new tools if they prove ROI.",
+  "objection": "No budget this year unless it pays back fast",
+  "habit": "you paid for premium freight to cover a late supplier in the last quarter"
+ },
+ {
+  "id": "P009",
+  "name": "Wes",
+  "age": 54,
+  "segment": "Buyer / senior buyer (chases suppliers daily)",
+  "income": 89000,
+  "behaviour": "Budget gatekeeper",
+  "behaviour_how": "Every new spend needs a payback story for the owner or CFO.",
+  "objection": "Another tool my buyers have to log into",
+  "habit": "your plant runs Epicor (or Infor SyteLine) and the ERP partner does customisations"
+ },
+ {
+  "id": "P010",
+  "name": "Andre",
+  "age": 51,
+  "segment": "COO, GM or owner of a 100-500 person manufacturer",
+  "income": 378000,
+  "behaviour": "Burned by software",
+  "behaviour_how": "Lived through a painful ERP or software rollout and is wary of new tools.",
+  "objection": "Another tool my buyers have to log into",
+  "habit": "you hold a daily or weekly shortage / expedite meeting"
+ },
+ {
+  "id": "P011",
+  "name": "Priya",
+  "age": 32,
+  "segment": "Supply chain director or VP (owns OTIF, expedite cost, budget)",
+  "income": 163000,
+  "behaviour": "ERP loyalist",
+  "behaviour_how": "Wants everything inside the ERP and asks the ERP partner first.",
+  "objection": "A pre-MVP startup might not be around next year",
+  "habit": "you spend part of every morning in Outlook chasing supplier acknowledgements"
+ },
+ {
+  "id": "P012",
+  "name": "Levi",
+  "age": 41,
+  "segment": "Buyer / senior buyer (chases suppliers daily)",
+  "income": 69000,
+  "behaviour": "ERP loyalist",
+  "behaviour_how": "Wants everything inside the ERP and asks the ERP partner first.",
+  "objection": "No budget this year unless it pays back fast",
+  "habit": "you report on-time delivery to customers every month"
+ },
+ {
+  "id": "P013",
+  "name": "Raj",
+  "age": 62,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 115000,
+  "behaviour": "Spreadsheet owner",
+  "behaviour_how": "Runs the open-PO / shortage tracker in Excel and trusts it more than the ERP.",
+  "objection": "No budget this year unless it pays back fast",
+  "habit": "your company grew through an acquisition and runs two ERPs"
+ },
+ {
+  "id": "P014",
+  "name": "Mateo",
+  "age": 39,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 106000,
+  "behaviour": "Spreadsheet owner",
+  "behaviour_how": "Runs the open-PO / shortage tracker in Excel and trusts it more than the ERP.",
+  "objection": "Our ERP already flags late POs; we just need discipline",
+  "habit": "your plant runs Epicor (or Infor SyteLine) and the ERP partner does customisations"
+ },
+ {
+  "id": "P015",
+  "name": "Victor",
+  "age": 49,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 116000,
+  "behaviour": "Burned by software",
+  "behaviour_how": "Lived through a painful ERP or software rollout and is wary of new tools.",
+  "objection": "Another tool my buyers have to log into",
+  "habit": "you spend part of every morning in Outlook chasing supplier acknowledgements"
+ },
+ {
+  "id": "P016",
+  "name": "Omar",
+  "age": 33,
+  "segment": "Purchasing or materials manager (owns the team and the shortage meeting)",
+  "income": 123000,
+  "behaviour": "Budget gatekeeper",
+  "behaviour_how": "Every new spend needs a payback story for the owner or CFO.",
+  "objection": "Integration with our ERP will take IT months we don't have",
+  "habit": "your company grew through an acquisition and runs two ERPs"
+ },
+ {
+  "id": "P017",
+  "name": "Rosa",
+  "age": 36,
+  "segment": "Supply chain director or VP (owns OTIF, expedite cost, budget)",
+  "income": 141000,
+  "behaviour": "Spreadsheet owner",
+  "behaviour_how": "Runs the open-PO / shortage tracker in Excel and trusts it more than the ERP.",
+  "objection": "Integration with our ERP will take IT months we don't have",
+  "habit": "your company grew through an acquisition and runs two ERPs"
+ },
+ {
+  "id": "P018",
+  "name": "Jasper",
+  "age": 45,
+  "segment": "Supply chain director or VP (owns OTIF, expedite cost, budget)",
+  "income": 220000,
+  "behaviour": "Spreadsheet owner",
+  "behaviour_how": "Runs the open-PO / shortage tracker in Excel and trusts it more than the ERP.",
+  "objection": "We tried supplier portals and suppliers ignored them",
+  "habit": "you paid for premium freight to cover a late supplier in the last quarter"
+ },
+ {
+  "id": "P019",
+  "name": "Sam",
+  "age": 47,
+  "segment": "Supply chain director or VP (owns OTIF, expedite cost, budget)",
+  "income": 167000,
+  "behaviour": "Security-first IT partner",
+  "behaviour_how": "Won't share ERP or email data with a startup without IT and security sign-off.",
+  "objection": "A pre-MVP startup might not be around next year",
+  "habit": "you spend part of every morning in Outlook chasing supplier acknowledgements"
+ },
+ {
+  "id": "P020",
+  "name": "Maeve",
+  "age": 48,
+  "segment": "Buyer / senior buyer (chases suppliers daily)",
+  "income": 87000,
+  "behaviour": "Security-first IT partner",
+  "behaviour_how": "Won't share ERP or email data with a startup without IT and security sign-off.",
+  "objection": "Our ERP already flags late POs; we just need discipline",
+  "habit": "you spend part of every morning in Outlook chasing supplier acknowledgements"
+ }
+]
