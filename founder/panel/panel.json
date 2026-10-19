@@ -1,0 +1,104 @@
+{
+ "n": 24,
+ "seed": 5,
+ "customer": {
+  "business": "Skill-hire: a marketplace to hire specialized AI agents (base model + one open-source Agent Skill) as named AI workers",
+  "target": "People and teams who pay for digital work today (freelancers, software, or their own time) and might hire an AI worker instead",
+  "where": "Online, global, English-speaking",
+  "age": [
+   24,
+   55
+  ],
+  "segments": [
+   {
+    "name": "Solo founder / indie hacker",
+    "share": 0.2,
+    "income": [
+     30000,
+     140000
+    ]
+   },
+   {
+    "name": "Small-business owner who buys on Fiverr/Upwork",
+    "share": 0.2,
+    "income": [
+     50000,
+     250000
+    ]
+   },
+   {
+    "name": "In-house developer already using Claude Code/Cursor",
+    "share": 0.2,
+    "income": [
+     90000,
+     220000
+    ]
+   },
+   {
+    "name": "Agency owner (dev/design/marketing, 3-30 staff)",
+    "share": 0.2,
+    "income": [
+     80000,
+     400000
+    ]
+   },
+   {
+    "name": "Enterprise IT/security buyer",
+    "share": 0.2,
+    "income": [
+     140000,
+     300000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Tinkerer",
+    "share": 0.2,
+    "how": "Would rather install the free skill and run it themselves than pay a middleman."
+   },
+   {
+    "name": "Outcome buyer",
+    "share": 0.2,
+    "how": "Pays for finished work, does not care how it is made, judges only results."
+   },
+   {
+    "name": "Burned before",
+    "share": 0.15,
+    "how": "Has tried GPT Store bots or AI agents that over-promised; skeptical by default."
+   },
+   {
+    "name": "Loyal to a platform",
+    "share": 0.15,
+    "how": "Lives in one tool (Claude, ChatGPT, Upwork) and buys what it offers."
+   },
+   {
+    "name": "Procurement-gated",
+    "share": 0.15,
+    "how": "Needs security review, SOC 2, DPA and a vendor contract before any spend."
+   },
+   {
+    "name": "Deal hunter",
+    "share": 0.15,
+    "how": "Tries free tiers, cancels subscriptions fast, compares price per result."
+   }
+  ],
+  "objections": [
+   "The skills are free and open-source, why would I pay you to run one?",
+   "Claude/ChatGPT already does this with skills built in",
+   "I don't trust a third party with my repo, files and credentials",
+   "AI output still needs a human to check it, so I'm paying twice",
+   "Who is liable when the agent gets it wrong?",
+   "I tried the GPT Store and every bot was a thin wrapper",
+   "A freelancer on Fiverr is cheap and I can talk to them"
+  ],
+  "habits": [
+   "you already pay $20-200/month for an AI subscription",
+   "you posted a job on Upwork or Fiverr in the last 3 months",
+   "you ship code daily and have a stack of half-finished side projects",
+   "you have a vendor review backlog of 40+ AI tools",
+   "you bill clients by the project and margins are getting squeezed by AI"
+  ]
+ },
+ "pitch": "Skill-hire: browse a catalog of specialist AI workers (UI/UX designer, Excel analyst, security auditor, copywriter...). Each is a frontier model plus one tested open-source Agent Skill, run on our platform.\nHire one, connect your files, repo or tools, and get finished work back, usually within the hour.\nPrice: pay per task from $9 to $99 depending on the job, or $49/month per worker for unlimited small tasks. First task free.\nSkill authors list workers and get a revenue share. Early-stage startup; no SOC 2 yet."
+}
