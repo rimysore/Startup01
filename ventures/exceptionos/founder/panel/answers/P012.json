@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I would have to send our open PO lines, job material requirements and supplier history to a startup I have never heard of, and that is a data-sharing decision that goes to IT and probably the Epicor partner before it goes to me. My planners already catch the slips that matter, so I can't see spending a week of approvals and export cleanup on a free audit.",
+  "objection": "Sending our supplier and job data outside the building to an early-stage company, with no Epicor login and no way for me to check what happens to it, is the thing that stops this before the value question even comes up.",
+  "would_change_my_mind": "Our Epicor partner vouches for them and IT signs off on a sanitized export, and the audit can show a supplier date change on one of my open jobs that my planners had not already flagged.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}

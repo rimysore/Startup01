@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The free audit is tempting, but it means sending open PO lines, jobs and supplier date history from our Epicor system to a startup, and that needs IT and security sign-off that won't happen within 30 days. I've also been burned by consultants who told me what my planners already knew, so I'd need proof it finds something new before I push it through.",
+  "objection": "Even sanitized, supplier names, part numbers and job dates are sensitive, and 'read-only, offline' is a promise I can't verify without a security review of where the files go and how long they're kept.",
+  "would_change_my_mind": "A written security summary (data handling, storage location, retention, deletion) that my IT and security team can approve quickly, plus a sample of the findings showing a supplier date change my team missed.",
+  "price_too_cheap": 200,
+  "price_cheap": 500,
+  "price_expensive": 1500,
+  "price_too_expensive": 3000
+}

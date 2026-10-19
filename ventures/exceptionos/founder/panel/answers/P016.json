@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "A free audit sounds fine, but my first thought is that it is a pitch for something paid next. Sending open PO lines, job material requirements and inventory from our Epicor system to an early startup needs IT and probably the CFO to sign off, and I cannot spare the hours to sanitize exports during shortage season.",
+  "objection": "Who is actually reading our supplier and job data, where it is stored, and whether I will get a sales call the week after the audit whether or not it finds anything.",
+  "would_change_my_mind": "A short written data-handling note that IT can approve without a meeting, plus a result from another Epicor plant that my planners would recognize as a missed supplier date.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 1200,
+  "price_too_expensive": 2500
+}

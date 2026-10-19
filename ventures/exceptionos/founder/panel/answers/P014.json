@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The late-supplier problem is real, I paid for premium freight last quarter. But I would not send PO, job and inventory exports from our plant to a startup I have never worked with before I have checked it with IT and our planners, and our shortage report already shows which jobs a late PO hits.",
+  "objection": "Why would I give an outside team our open-PO and material data when our shortage tracker and Epicor Time Phase already tell me which jobs a late PO hits? I would need to see that they catch something my team misses, and I would need IT and security to sign off on sending data outside the company.",
+  "would_change_my_mind": "A reference from an Epicor Kinetic shop my size that the audit caught a supplier date change their planners had missed, plus IT approval of the data handling.",
+  "price_too_cheap": 99,
+  "price_cheap": 300,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}
