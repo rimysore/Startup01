@@ -2,7 +2,7 @@
 Score: 3/10 | Vote: PASS
 
 ## What is strong
-- The raw ingredient really works. Curated skills raise agent pass rates by about 16 points on average, and smaller models with skills can match larger ones without them ([SkillsBench, arXiv 2602.12670](https://arxiv.org/html/2602.12670v1)). So "a specialist beats a generalist" has evidence behind it.
+- The raw ingredient really works. Curated skills raise agent pass rates by about 16 points on average, and smaller models with skills can match larger ones without them ([SkillsBench, arXiv 2602.12670](https://arxiv.org/html/2602.12670v1)). "Specialist beats generalist" has evidence.
 - Focused skills beat sprawling ones, and self-written skills add roughly nothing (same paper). Curation and testing are real work, the one part a company could own.
 - The founder builds agent infrastructure (toolslim), so the hidden plumbing is within reach.
 

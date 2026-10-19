@@ -21,11 +21,11 @@ No buyer panel has run, so there is no Van Westendorp range. These are public pr
 ## The pricing model I'd pick and why
 **Per deliverable, at a fixed price, with a free redo and a refund if the buyer rejects the work.** Not a subscription.
 
-The squeeze is the whole story. A buyer who knows what a "skill" is will put the free MIT file into their own $20 plan, so that buyer is worth $0 to this business. Subscription pricing puts you in a fight with that $20 plan and with Lindy's $30 seat, and you lose it. The only buyer who pays is the one who would otherwise go to Fiverr, and that buyer thinks in **projects** ($100-$700), not tokens. So price against the freelancer and charge for the finished file, not for access to the agent.
+The squeeze is the whole story. A buyer who knows what a "skill" is will put the free MIT file into their own $20 plan, so that buyer is worth $0 to this business. A subscription competes with that $20 plan and Lindy's $30 seat, and loses. The only buyer who pays is the one who would otherwise go to Fiverr, and that buyer thinks in **projects** ($100-$700), not tokens. So price against the freelancer and charge for the finished file, not for access to the agent.
 
 Margin math (estimate): one deliverable takes about 3 runs with retries. At $2-$20 inference per run, that is about $6-$60 of cost. On Opus-heavy tasks a $29 price is underwater, so **the price has to be set per task type, and capped by metered cost**. Outcome pricing (Fin-style, pay only when accepted) is the right long-run shape. But it means you eat the cost of rejected work, so it only works once the acceptance rate is known (above 70%).
 
-Revenue share for skill authors should come out of margin after inference, not out of gross revenue. If it comes out of gross, the GPT Store payout failure happens again.
+Pay skill authors from margin after inference, not from gross revenue, or the GPT Store payout failure repeats.
 
 ## Price points to test
 - **Excel/xlsx job:** $19 vs $39 per workbook. The Upwork median is $12-$30/hr, so a 2-3 hour job costs a buyer $25-$90.
