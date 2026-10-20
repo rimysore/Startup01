@@ -83,7 +83,7 @@
   --color-bad: var(--bad);
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-indic: var(--font-devanagari), var(--font-telugu), var(--font-body), sans-serif;
+  --font-indic: var(--font-devanagari), var(--font-telugu), var(--font-kannada), var(--font-body), sans-serif;
 }
 
 html,

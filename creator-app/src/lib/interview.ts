@@ -5,6 +5,16 @@ import { z } from "zod";
  * multiple choice where we want counts, one or two free answers where we want their words.
  */
 export const INTERVIEW = {
+  // The beta's paying market is creators who already earn and people who manage channels; beginners stay free.
+  who: {
+    q: "Which describes you best?",
+    multi: false,
+    options: {
+      earning: "I earn from YouTube (AdSense or brand deals)",
+      manager: "I manage channels for others (agency or manager)",
+      starting: "I'm just starting out",
+    },
+  },
   hardest: {
     q: "What's hardest about growing your channel right now?",
     multi: true,
@@ -61,6 +71,7 @@ const pick = (id: QuestionId) => {
 };
 
 export const InterviewBody = z.object({
+  who: pick("who"),
   hardest: pick("hardest"),
   tried: pick("tried"),
   weekly: pick("weekly"),

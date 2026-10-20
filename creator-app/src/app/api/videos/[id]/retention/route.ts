@@ -11,9 +11,10 @@ export async function GET(_request: Request, { params }: RouteContext<"/api/vide
     const r = await loadYouTube(user?.id, `retention:${id}`, FRESH_MS.retention, (t) => fetchRetention(t, id));
     if (r.kind === "demo") return Response.json(demo);
     if (r.kind === "reconnect") return Response.json({ ...demo, error: RECONNECT_MESSAGE });
-    return Response.json({ mode: "live", points: r.value, benchmark: demoBenchmark(), ...(r.stale ? { error: staleNote(r.fetchedAt) } : {}) });
+    // No sample curve next to a real channel's data: it would look like the channel's own norm.
+    return Response.json({ mode: "live", points: r.value, benchmark: [], ...(r.stale ? { error: staleNote(r.fetchedAt) } : {}) });
   } catch (err) {
     console.error(err);
-    return Response.json({ mode: "live", points: [], benchmark: demoBenchmark(), error: "Retention data isn't available for this video yet." });
+    return Response.json({ mode: "live", points: [], benchmark: [], error: "Retention data isn't available for this video yet." });
   }
 }

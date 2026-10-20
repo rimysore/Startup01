@@ -72,6 +72,15 @@ The output language (top bar) controls what language the AI writes in.
    Before charging real customers you'll also need Razorpay account activation (KYC) and published
    terms, privacy and refund policies.
 
+## Beta scope (Hindi and Kannada, Video Doctor first)
+
+During the beta (`NEXT_PUBLIC_BETA`, on unless set to `0`): creators choose Hindi or Kannada only; Video Doctor,
+Title & Thumbnail Studio and the new **Your progress** page (Retention Sprints) are live, and the other features are
+paused for everyone except admins; no prices, credits or new Founder Passes are shown (Free accounts get a hidden
+100-credit safety cap). First-party beta events and sprints are stored in `beta_events` / `sprints`, and admins see
+**Beta metrics** (sources and cost per creator, month-2/3 retention, repeat Video Doctor use, language ratings,
+documented results, price survey). Plan, checklist and review process: **docs/BETA.md**.
+
 ## Private beta (waitlist)
 
 Until Google verifies the app, only test users added in Google Cloud can connect YouTube, so the site is

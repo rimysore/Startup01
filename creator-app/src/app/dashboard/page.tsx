@@ -10,6 +10,7 @@ import { LineChart } from "@/components/LineChart";
 import { OutlierBadge } from "@/components/outlier";
 import { Card, ErrorNote, Spinner } from "@/components/ui";
 import { VideoThumb } from "@/components/VideoThumb";
+import { BETA } from "@/lib/beta";
 import { compact, full, pctChange, shortDate } from "@/lib/format";
 import { outlierScores } from "@/lib/outliers";
 import type { ChannelSummary, Video } from "@/lib/types";
@@ -84,12 +85,15 @@ function actions(s: ChannelSummary): Array<{ title: string; body: string; href: 
       cta: "Write titles",
     });
   }
-  out.push({
-    title: "Answer your audience",
-    body: "Turn the most-liked questions in your comments into your next Short.",
-    href: "/dashboard/comments",
-    cta: "See comments",
-  });
+  // Comments are on hold during the beta.
+  if (!BETA) {
+    out.push({
+      title: "Answer your audience",
+      body: "Turn the most-liked questions in your comments into your next Short.",
+      href: "/dashboard/comments",
+      cta: "See comments",
+    });
+  }
   return out;
 }
 
@@ -224,6 +228,17 @@ function OverviewBody({
         <Milestone subscribers={subscribers} perDay={perDay} />
       </section>
 
+      {BETA && videos[0] && (
+        <section className="card mt-6 flex flex-wrap items-center justify-between gap-4 !border-accent p-5" aria-label="Start here">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wider text-accent">Start here</p>
+            <p className="mt-1 font-semibold">Find where viewers left &ldquo;{videos[0].title}&rdquo;</p>
+          </div>
+          <Link href={`/dashboard/doctor?v=${videos[0].id}`} className="rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-accent-ink">
+            Diagnose my latest video →
+          </Link>
+        </section>
+      )}
       <FounderPassCard me={me} />
       {me?.user && me.youtube && <InterviewCard userId={me.user.id} />}
 

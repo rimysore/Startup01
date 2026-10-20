@@ -1,4 +1,6 @@
 // Run with: npm test. The AI parts of reports and the WhatsApp bot, against the local Anthropic stand-in.
+// Credit and upgrade behaviour is tested outside the beta (no prices or upgrade links are shown during it).
+process.env.NEXT_PUBLIC_BETA = "0";
 import { spawn } from "node:child_process";
 
 process.env.PGLITE_DIR = "memory://";

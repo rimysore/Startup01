@@ -1,11 +1,11 @@
 export const LANGUAGES = [
   { code: "hinglish", label: "Hinglish", native: "Hinglish", script: "Latin", writing: "Roman (Latin) letters, Hindi and English mixed the way creators talk, e.g. 'Ye phone kaisa hai?'" },
-  { code: "hi", label: "Hindi", native: "हिन्दी", script: "Devanagari", writing: "Devanagari script (हिन्दी)" },
+  { code: "hi", label: "Hindi", native: "हिन्दी", script: "Devanagari", writing: "Devanagari script (हिन्दी), in the everyday spoken Hindi YouTube creators use, not formal or textbook (shuddh) Hindi; English words creators normally say (video, views, Shorts) stay in English" },
   { code: "te", label: "Telugu", native: "తెలుగు", script: "Telugu", writing: "Telugu script (తెలుగు)" },
   { code: "ta", label: "Tamil", native: "தமிழ்", script: "Tamil", writing: "Tamil script (தமிழ்)" },
   { code: "mr", label: "Marathi", native: "मराठी", script: "Devanagari", writing: "Marathi in Devanagari script (मराठी)" },
   { code: "bn", label: "Bengali", native: "বাংলা", script: "Bengali", writing: "Bengali script (বাংলা)" },
-  { code: "kn", label: "Kannada", native: "ಕನ್ನಡ", script: "Kannada", writing: "Kannada script (ಕನ್ನಡ)" },
+  { code: "kn", label: "Kannada", native: "ಕನ್ನಡ", script: "Kannada", writing: "Kannada script (ಕನ್ನಡ), in the everyday spoken Kannada creators in Karnataka use, not formal or literary Kannada; English words creators normally say (video, views, Shorts) stay in English letters" },
   { code: "ml", label: "Malayalam", native: "മലയാളം", script: "Malayalam", writing: "Malayalam script (മലയാളം)" },
   { code: "en", label: "English", native: "English", script: "Latin", writing: "English" },
 ] as const;

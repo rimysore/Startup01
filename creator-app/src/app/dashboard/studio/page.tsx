@@ -8,7 +8,10 @@ import type { ThumbnailDesign, Titles } from "@/lib/ai";
 import { compact } from "@/lib/format";
 import type { ProvenVideo } from "@/lib/ideas";
 import { languageLabel } from "@/lib/languages";
+import { BETA } from "@/lib/beta";
 import { FEATURE_CREDITS } from "@/lib/plans";
+import { track } from "@/lib/track";
+import { OutputFeedback } from "@/components/BetaWidgets";
 
 const TONES = ["Energetic", "Honest", "Funny", "Educational", "Dramatic"];
 const MAX_REFS = 3;
@@ -133,6 +136,7 @@ export default function StudioPage() {
     refreshMe();
     if (res.result) {
       setResult({ demo: res.demo, demoReason: res.demoReason, data: res.result });
+      if (!res.demo) track("studio_generate", { language });
       const best = [...res.result.titles].sort((a, b) => b.strength - a.strength)[0];
       setChosen(best?.title ?? null);
       if (res.result.thumbnailText[0]) setThumbText(res.result.thumbnailText[0]);
@@ -312,7 +316,7 @@ export default function StudioPage() {
             disabled={busy || topic.trim().length < 3}
             className="shrink-0 rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink transition hover:brightness-105 disabled:opacity-50"
           >
-            {phase === "research" ? "Researching YouTube…" : phase === "titles" ? "Writing titles…" : `Research & write titles · ${FEATURE_CREDITS.titles} credit`}
+            {phase === "research" ? "Researching YouTube…" : phase === "titles" ? "Writing titles…" : BETA ? "Research & write titles" : `Research & write titles · ${FEATURE_CREDITS.titles} credit`}
           </button>
         </div>
       </Card>
@@ -460,6 +464,13 @@ export default function StudioPage() {
               </Card>
             </div>
           </div>
+          {!result.demo && (
+            <OutputFeedback
+              feature="studio"
+              language={language}
+              output={{ titles: result.data.titles.map((t) => t.title), hook: result.data.hook, thumbnailText: result.data.thumbnailText }}
+            />
+          )}
         </div>
       )}
 
@@ -500,7 +511,7 @@ export default function StudioPage() {
                     disabled={composing || designing}
                     className="mt-2 w-full rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-accent-ink transition hover:brightness-105 disabled:opacity-50"
                   >
-                    {composing ? "Making your thumbnail…" : composed ? `🔁 New version · ${FEATURE_CREDITS.compose} credits` : `✨ Make my thumbnail · ${FEATURE_CREDITS.compose} credits`}
+                    {composing ? "Making your thumbnail…" : composed ? (BETA ? "🔁 New version" : `🔁 New version · ${FEATURE_CREDITS.compose} credits`) : BETA ? "✨ Make my thumbnail" : `✨ Make my thumbnail · ${FEATURE_CREDITS.compose} credits`}
                   </button>
                   <p className="mt-2 text-[11px] leading-snug text-muted">
                     Google&apos;s image AI paints a new photo of you in the scene, styled after the top hits. Takes ~20 seconds. Your photos are sent to Google only to make it, and
@@ -514,7 +525,7 @@ export default function StudioPage() {
                     disabled={designing || ((chosen ?? topic).trim().length < 3 && design.headline.trim().length < 3)}
                     className="bg-brand mt-2 w-full rounded-lg px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110 disabled:opacity-50"
                   >
-                    {designing ? "Designing…" : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
+                    {designing ? "Designing…" : BETA ? "✨ Design with Mitra" : `✨ Design with Mitra · ${FEATURE_CREDITS.thumbnail}`}
                   </button>
                   {canAi && design.imagePrompt && (
                     <button
@@ -522,7 +533,7 @@ export default function StudioPage() {
                       disabled={painting || designing}
                       className="mt-2 w-full rounded-full border border-line px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 disabled:opacity-50"
                     >
-                      {painting ? "Painting…" : `🎨 New background · ${FEATURE_CREDITS.image}`}
+                      {painting ? "Painting…" : BETA ? "🎨 New background" : `🎨 New background · ${FEATURE_CREDITS.image}`}
                     </button>
                   )}
                   {background && !background.ai && background.count > 1 && (

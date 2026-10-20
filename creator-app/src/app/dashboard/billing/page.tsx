@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDashboard, useQueryParam } from "@/components/dashboard-context";
 import { Button, Card, DemoNote, ErrorNote, PageHeader, Spinner } from "@/components/ui";
+import { BETA } from "@/lib/beta";
 import { COMPANY } from "@/lib/company";
 import { AGENCY, PLANS, rupees, type PlanId } from "@/lib/plans";
 
@@ -122,6 +123,26 @@ export default function BillingPage() {
   const current = me.plan?.id ?? "free";
   const sub = me.subscription;
   const usage = me.usage;
+  // During the beta Free accounts see no plans or credits (Mitra is free). Anyone already paying keeps the full page.
+  const betaFree = BETA && current === "free" && !sub;
+  if (betaFree) {
+    return (
+      <div className="rise">
+        <PageHeader eyebrow="Account" title="Your account" />
+        <Card>
+          <p className="flex items-center gap-2 font-semibold">
+            <span className="rounded bg-accent-soft px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent">Beta</span> Mitra is free during the beta
+          </p>
+          <p className="mt-2 max-w-2xl text-sm text-ink-2">
+            You can&apos;t be charged while we test Mitra with Hindi and Kannada creators. Before paid plans start we&apos;ll tell you what they cost,
+            and nothing will ever be charged without you choosing a plan yourself.
+          </p>
+          <p className="mt-3 text-sm text-muted">Signed in as {me.user.email}</p>
+        </Card>
+        <DeleteAccount />
+      </div>
+    );
+  }
 
   async function upgrade(plan: PlanId) {
     setBusy(plan);

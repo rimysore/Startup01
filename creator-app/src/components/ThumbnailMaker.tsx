@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ThumbnailDesign } from "@/lib/ai";
 import { Button } from "./ui";
+import { track } from "@/lib/track";
 
 /** Design space. Everything is laid out in 1280×720 and rendered at 1.5× = 1920×1080 (full HD). */
 const W = 1280;
@@ -668,6 +669,7 @@ export function ThumbnailMaker({
     a.href = URL.createObjectURL(blob);
     a.download = "mitra-thumbnail-1080p.jpg";
     a.click();
+    track("thumbnail_download");
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
   }
 

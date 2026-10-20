@@ -7,9 +7,11 @@ import { usePathname } from "next/navigation";
 import { DashboardProvider, useDashboard } from "./dashboard-context";
 import { LEGAL_LINKS } from "./SiteFooter";
 import { AssistantWidget } from "./Assistant";
+import { SessionTracker } from "./BetaWidgets";
 import { FeedbackButton } from "./Feedback";
 import { LanguageButton, LanguageOnboarding } from "./language-picker";
 import { Logo, ThemeToggle } from "./ui";
+import { BETA, PAUSED_PAGES } from "@/lib/beta";
 import { WHATSAPP_LOCKED } from "@/lib/company";
 
 /** Grouped so the sidebar reads as three short lists instead of one long one. */
@@ -22,10 +24,14 @@ const NAV = [
   { group: "Create", href: "/dashboard/ideas", label: "Breakout ideas", icon: "M13 2L3 14h9l-1 8 10-12h-9z" },
   { group: "Create", href: "/dashboard/trends", label: "Trend Radar", icon: "M12 12m-2 0a2 2 0 1 0 4 0a2 2 0 1 0-4 0M16.2 7.8a6 6 0 0 1 0 8.5M7.8 16.2a6 6 0 0 1 0-8.5M19.1 4.9a10 10 0 0 1 0 14.1M4.9 19.1a10 10 0 0 1 0-14.1" },
   { group: "Create", href: "/dashboard/competitors", label: "Competitors", icon: "M3 3v18h18M7 15l4-4 3 3 5-6" },
+  { group: "Create", href: "/dashboard/progress", label: "Your progress", icon: "M3 17l6-6 4 4 8-8M14 7h7v7" },
   { group: "Account", href: "/dashboard/whatsapp", label: "WhatsApp & reports", icon: "M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3zM9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z" },
   { group: "Account", href: "/dashboard/connections", label: "Connections", icon: "M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" },
-  { group: "Account", href: "/dashboard/billing", label: "Plan & billing", icon: "M2 7h20v12H2zM2 11h20M6 15h4" },
+  { group: "Account", href: "/dashboard/billing", label: BETA ? "Account" : "Plan & billing", icon: "M2 7h20v12H2zM2 11h20M6 15h4" },
 ];
+
+/** Pages on hold during the beta are hidden for creators; admins still see everything. */
+const paused = (href: string) => BETA && PAUSED_PAGES.some((p) => href.startsWith(p));
 
 function Icon({ d }: { d: string }) {
   return (
@@ -36,6 +42,7 @@ function Icon({ d }: { d: string }) {
 }
 
 const ADMIN_NAV = [
+  { href: "/dashboard/beta", label: "Beta metrics", hint: "Sources, retention, repeat use, language, results", icon: "M3 3v18h18M7 14l3-3 3 3 5-6" },
   { href: "/dashboard/users", label: "Users", hint: "Who signed up and what they used", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" },
   { href: "/dashboard/admin", label: "AI costs", hint: "Spend, calls and errors by feature", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
   { href: "/dashboard/prospects", label: "Find creators", hint: "Search channels and write outreach", icon: "M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM21 21l-4.35-4.35" },
@@ -129,14 +136,15 @@ function AdminPanel({ onNavigate }: { onNavigate?: () => void }) {
 function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
   const { me } = useDashboard();
+  const items = NAV.filter((n) => me?.admin || !paused(n.href));
   return (
     <>
-      {NAV.map((item, i) => {
+      {items.map((item, i) => {
         const active = item.href === "/dashboard" ? path === item.href : path.startsWith(item.href);
         const locked = item.href === "/dashboard/whatsapp" && WHATSAPP_LOCKED && !me?.admin;
         return (
           <div key={item.href} className="contents">
-            {item.group !== NAV[i - 1]?.group && <p className={`px-3 pb-1 text-[11px] font-medium text-muted ${i ? "pt-4" : ""}`}>{item.group}</p>}
+            {item.group !== items[i - 1]?.group && <p className={`px-3 pb-1 text-[11px] font-medium text-muted ${i ? "pt-4" : ""}`}>{item.group}</p>}
             {locked ? (
               <span
                 aria-disabled="true"
@@ -206,13 +214,13 @@ function AccountMenu() {
         ) : (
           <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-bold text-accent-ink">{initial}</span>
         )}
-        <span className="text-xs font-semibold">{plan?.name}</span>
+        <span className="text-xs font-semibold">{BETA && plan?.id === "free" ? "Beta" : plan?.name}</span>
       </button>
       {open && (
         <div role="menu" className="card absolute right-0 top-12 z-30 w-64 !p-4 shadow-xl">
           <p className="truncate text-sm font-semibold">{user.name ?? user.email}</p>
           <p className="truncate text-xs text-muted">{user.email}</p>
-          {usage && (
+          {usage && !BETA && (
             <div className="mt-4">
               <div className="flex justify-between text-xs">
                 <span className="text-muted">AI credits this month</span>
@@ -226,7 +234,7 @@ function AccountMenu() {
             </div>
           )}
           <Link href="/dashboard/billing" onClick={() => setOpen(false)} className="mt-4 block rounded-xl px-3 py-2 text-sm hover:bg-surface-2">
-            Plan & billing
+            {BETA ? "Account" : "Plan & billing"}
           </Link>
           <div className="flex items-center justify-between rounded-xl px-3 py-1 text-sm sm:hidden">
             Dark mode <ThemeToggle />
@@ -247,8 +255,12 @@ const TABS = [
   { href: "/dashboard", label: "Home", icon: icon("/dashboard") },
   { href: "/dashboard/doctor", label: "Videos", icon: icon("/dashboard/doctor") },
   { href: "/dashboard/studio", label: "Titles", icon: icon("/dashboard/studio") },
-  // Breakout ideas holds WhatsApp's place until WhatsApp opens.
-  WHATSAPP_LOCKED ? { href: "/dashboard/ideas", label: "Ideas", icon: icon("/dashboard/ideas") } : { href: "/dashboard/whatsapp", label: "WhatsApp", icon: icon("/dashboard/whatsapp") },
+  // During the beta Progress sits here; otherwise Breakout ideas holds WhatsApp's place until WhatsApp opens.
+  BETA
+    ? { href: "/dashboard/progress", label: "Progress", icon: icon("/dashboard/progress") }
+    : WHATSAPP_LOCKED
+      ? { href: "/dashboard/ideas", label: "Ideas", icon: icon("/dashboard/ideas") }
+      : { href: "/dashboard/whatsapp", label: "WhatsApp", icon: icon("/dashboard/whatsapp") },
 ];
 
 function BottomTabs() {
@@ -314,6 +326,17 @@ function ChannelGate({ children }: { children: React.ReactNode }) {
   const path = usePathname();
   const { me, summaryError, reload } = useDashboard();
   if (!me) return <div className="h-64 animate-pulse rounded-xl bg-surface-2" aria-label="Loading" />;
+  if (paused(path) && !me.admin) {
+    return (
+      <div className="card mx-auto max-w-md p-6 text-center">
+        <p className="font-semibold">This part of Mitra is paused during the beta</p>
+        <p className="mt-1 text-sm text-muted">We&apos;re focusing on Video Doctor and Title Studio first, in Hindi and Kannada.</p>
+        <Link href="/dashboard/doctor" className="mt-4 inline-block rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-ink">
+          Open Video Doctor →
+        </Link>
+      </div>
+    );
+  }
   const open = OPEN_PATHS.some((p) => path.startsWith(p)) || (me.admin && ADMIN_NAV.some((a) => path.startsWith(a.href)));
   if (me.user && me.youtube && !me.youtube.needsReconnect && summaryError && !open) {
     return (
@@ -412,6 +435,8 @@ function TopBar() {
 function CreditsMeter() {
   const { me } = useDashboard();
   const u = me?.usage;
+  // Credits aren't shown during the beta (Mitra is free); the allowance is only a server-side safety cap.
+  if (BETA) return <BetaNote />;
   if (!me?.user || !u) return null;
   const left = Math.max(0, u.limit - u.used);
   return (
@@ -427,6 +452,30 @@ function CreditsMeter() {
       </span>
     </Link>
   );
+}
+
+/** Where the credits meter sits outside the beta. */
+function BetaNote() {
+  return (
+    <div className="mt-3 shrink-0 rounded-lg border border-line px-3 py-2.5 text-xs">
+      <p className="flex items-center gap-2 font-semibold">
+        <span className="rounded bg-accent-soft px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-accent">Beta</span> Free while we test
+      </p>
+      <p className="mt-1 text-muted">Tell us what&apos;s wrong, especially if the Hindi or Kannada sounds unnatural.</p>
+    </div>
+  );
+}
+
+function Trackers() {
+  const { me } = useDashboard();
+  return <SessionTracker signedIn={Boolean(me?.user)} />;
+}
+
+/** Ask Mitra is on hold during the beta (admins keep it, to test). */
+function Assistant() {
+  const { me } = useDashboard();
+  if (BETA && !me?.admin) return null;
+  return <AssistantWidget />;
 }
 
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -458,8 +507,9 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <ChannelGate>{children}</ChannelGate>
           </main>
           <BottomTabs />
-          <AssistantWidget />
+          <Assistant />
           <LanguageOnboarding />
+          <Trackers />
         </div>
       </div>
     </DashboardProvider>

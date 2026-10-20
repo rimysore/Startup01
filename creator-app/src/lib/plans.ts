@@ -1,3 +1,5 @@
+import { BETA, BETA_FREE_CREDITS } from "./beta";
+
 export type PlanId = "free" | "pro" | "creator";
 
 /**
@@ -53,12 +55,12 @@ export function planOf(v: string | null | undefined): Plan {
 }
 
 /**
- * Monthly credits for a plan. Server-side, FREE_CREDITS overrides the Free plan's allowance (e.g. 20 for beta
- * testers) without a code change.
+ * Monthly credits for a plan. Server-side, FREE_CREDITS overrides the Free plan's allowance without a code change;
+ * during the beta the Free allowance is BETA_FREE_CREDITS (credits are hidden, so it's only a safety cap).
  */
 export function creditLimit(v: string | null | undefined): number {
   const plan = planOf(v);
-  const free = Number(process.env.FREE_CREDITS);
+  const free = Number(process.env.FREE_CREDITS) || (BETA ? BETA_FREE_CREDITS : 0);
   return plan.id === "free" && free > 0 ? Math.floor(free) : plan.credits;
 }
 

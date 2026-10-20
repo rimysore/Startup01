@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { LANGUAGES, type LanguageCode } from "@/lib/languages";
+import { offeredLanguage } from "@/lib/beta";
+import { LANGUAGES as ALL_LANGUAGES, type LanguageCode } from "@/lib/languages";
+
+// During the beta creators choose between Hindi and Kannada only.
+const LANGUAGES = ALL_LANGUAGES.filter((l) => offeredLanguage(l.code));
 import { useDashboard } from "./dashboard-context";
 
 /** A short line in each language, so creators recognise theirs at a glance. */
@@ -20,7 +24,7 @@ const HELLO: Record<LanguageCode, string> = {
 
 function Grid({ value, onPick }: { value: LanguageCode | null; onPick: (l: LanguageCode) => void }) {
   return (
-    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-2.5">
       {LANGUAGES.map((l) => (
         <button
           key={l.code}
@@ -70,7 +74,8 @@ export function LanguageOnboarding() {
   const { me, language, setLanguage, refreshMe } = useDashboard();
   const [done, setDone] = useState(false);
   const [hint, setHint] = useState(false);
-  const show = Boolean(me?.user && me.languageChosen === false && !done);
+  // Asked once; asked again if the account's language isn't offered in the beta.
+  const show = Boolean(me?.user && (me.languageChosen === false || (me.language && !offeredLanguage(me.language))) && !done);
 
   useEffect(() => {
     if (!hint) return;
@@ -106,7 +111,7 @@ export function LanguageOnboarding() {
         🌐
       </p>
       <h2 className="mt-2 font-display text-3xl leading-tight">Choose your language</h2>
-      <p className="font-indic mt-1 text-sm text-muted">अपनी भाषा चुनें · మీ భాషను ఎంచుకోండి · உங்கள் மொழியைத் தேர்ந்தெடுக்கவும்</p>
+      <p className="font-indic mt-1 text-sm text-muted">अपनी भाषा चुनें · ನಿಮ್ಮ ಭಾಷೆಯನ್ನು ಆಯ್ಕೆ ಮಾಡಿ</p>
       <p className="mt-3 text-sm text-ink-2">Mitra will write your advice, reports and WhatsApp messages in it. You can change it any time.</p>
       <div className="mt-5">
         <Grid value={language} onPick={pick} />

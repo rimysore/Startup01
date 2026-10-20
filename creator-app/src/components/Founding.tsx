@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BETA } from "@/lib/beta";
 import { INVITE_ONLY } from "@/lib/company";
 import { FOUNDER_FREE_LABELS, FOUNDER_FREE_USES, FOUNDER_PERKS, FOUNDING_SPOTS } from "@/lib/plans";
 
@@ -144,11 +145,14 @@ export function FounderPassCard({ me }: { me: Me | null }) {
             <li key={l} className="rounded-md bg-surface-2 px-2 py-1">{l}</li>
           ))}
         </ul>
-        <p className="mt-3 text-xs opacity-70">Resets on the 1st. Video Doctor, pro thumbnails and competitor analysis use your plan&apos;s credits.</p>
+        <p className="mt-3 text-xs opacity-70">
+          {BETA ? "Resets on the 1st. Everything else is free during the beta." : "Resets on the 1st. Video Doctor, pro thumbnails and competitor analysis use your plan's credits."}
+        </p>
       </section>
     );
   }
-  if (!left || me.youtube) return null;
+  // No new Founder Passes during the beta (founders who already hold one still see theirs, above).
+  if (BETA || !left || me.youtube) return null;
   return (
     <section className="mt-6 flex flex-col gap-4 rounded-[24px] border border-accent/40 bg-accent-soft p-5 sm:flex-row sm:items-center" aria-label="Founder Pass offer">
       <p className="text-4xl" aria-hidden>🎁</p>

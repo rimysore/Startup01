@@ -3,10 +3,16 @@ import { z } from "zod";
 import { AiRefusal, aiConfigured, route, type AiResult, type Feature } from "./ai";
 import { cacheKey, logCall, overDailyBudget, overRateLimit, readCache, writeCache } from "./ai-guard";
 import { currentUser, isAdmin, type User } from "./auth";
+import { aiPaused, BETA, BETA_DEFAULT_LANGUAGE, offeredLanguage } from "./beta";
 import { isLanguageCode } from "./languages";
 import { monthKey, refundCredit, reserveCredit } from "./usage";
 
-const Language = z.string().refine(isLanguageCode).catch("hinglish");
+// During the beta only Hindi and Kannada are offered; anything else falls back to Hindi.
+const Language = z
+  .string()
+  .refine(isLanguageCode)
+  .catch(BETA_DEFAULT_LANGUAGE)
+  .transform((l) => (offeredLanguage(l) ? l : BETA_DEFAULT_LANGUAGE));
 
 export type DemoReason = "signin" | "nokey";
 
@@ -44,7 +50,10 @@ export async function runPaidAi<R>(user: User, feature: Feature, input: unknown,
 
   const month = monthKey();
   const pool = await reserveCredit(user, r.credits, feature);
-  if (!pool) return { ok: false, status: 402, error: "You've used all your AI credits for this month.", upgrade: true };
+  if (!pool) {
+    if (BETA) return { ok: false, status: 402, error: "You've reached this month's beta limit. It resets on the 1st; tell us via Help & feedback if you need more." };
+    return { ok: false, status: 402, error: "You've used all your AI credits for this month.", upgrade: true };
+  }
 
   const started = Date.now();
   let out: AiResult<R>;
@@ -100,6 +109,8 @@ export function aiRoute<B extends z.ZodRawShape, R>(
     const input = parsed.data as z.infer<z.ZodObject<B>> & { language: string };
 
     const user = await currentUser();
+    // Features on hold during the beta (admins can still test them).
+    if (aiPaused(feature) && !isAdmin(user)) return Response.json({ error: "This feature is paused during the Mitra beta." }, { status: 404 });
     if (!user) return Response.json({ demo: true, demoReason: "signin" satisfies DemoReason, result: demo });
     if (!aiConfigured()) return Response.json({ demo: true, demoReason: "nokey" satisfies DemoReason, result: demo });
 

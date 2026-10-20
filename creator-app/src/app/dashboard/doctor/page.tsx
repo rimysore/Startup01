@@ -1,7 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { OutputFeedback, PriceSurvey } from "@/components/BetaWidgets";
 import { postAi, useDashboard, useQueryParam, type AiError } from "@/components/dashboard-context";
+import { useStoredString } from "@/components/hooks";
 import { audienceRows, BarList } from "@/components/insights";
 import type { AudienceReport } from "@/lib/youtube";
 import { LineChart } from "@/components/LineChart";
@@ -11,9 +14,11 @@ import { VideoThumb } from "@/components/VideoThumb";
 import type { Doctor } from "@/lib/ai";
 import { compact } from "@/lib/format";
 import { outlierScores } from "@/lib/outliers";
+import { BETA, LOW_DATA_VIEWS, SPRINT_UPLOADS } from "@/lib/beta";
 import { FEATURE_CREDITS } from "@/lib/plans";
-import { fmtTime, introDrop, keyMoments } from "@/lib/retention";
-import type { RetentionPoint } from "@/lib/types";
+import { fmtTime, introDrop, isLowData, keyMoments } from "@/lib/retention";
+import { track } from "@/lib/track";
+import type { RetentionPoint, Video } from "@/lib/types";
 
 interface RetentionRes {
   mode: string;
@@ -38,8 +43,27 @@ function ScoreRing({ score }: { score: number }) {
   );
 }
 
+/** Coarse, anonymous buckets for the Hindi/Kannada benchmark (no titles, no IDs). */
+function lengthBucket(sec: number): string {
+  return sec <= 60 ? "short" : sec <= 480 ? "under-8m" : sec <= 1200 ? "8-20m" : "over-20m";
+}
+function sizeBucket(subs: number): string {
+  return subs < 1_000 ? "<1k" : subs < 10_000 ? "1k-10k" : subs < 100_000 ? "10k-100k" : subs < 1_000_000 ? "100k-1M" : "1M+";
+}
+
+/** Average % viewed across the channel's other recent uploads: the baseline a sprint is measured against. */
+function baseline(videos: Video[], exceptId?: string): number | null {
+  const pcts = videos.filter((v) => v.id !== exceptId).map((v) => v.avgViewPct).filter((p): p is number => p != null);
+  return pcts.length ? pcts.reduce((a, b) => a + b, 0) / pcts.length : null;
+}
+
 export default function DoctorPage() {
-  const { summary, language, refreshMe } = useDashboard();
+  const { summary, language, refreshMe, me } = useDashboard();
+  const userId = me?.user?.id ?? "";
+  const [runs, setRuns] = useStoredString(`mitra-doctor-runs:${userId}`, "0");
+  const [benchmark] = useStoredString("mitra-benchmark", "off");
+  const [committed, setCommitted] = useState<string[]>([]);
+  const [committing, setCommitting] = useState(false);
   const requested = useQueryParam("v");
   const [picked, setPicked] = useState<string | null>(null);
   // Each piece of state remembers which video it belongs to, so switching videos never shows stale data.
@@ -76,9 +100,9 @@ export default function DoctorPage() {
 
   const points = retention?.points ?? [];
   const audience = aud?.id === videoId && aud.report ? audienceRows(aud.report) : null;
-  const moments = keyMoments(points);
-  const pcts = videos.map((v) => v.avgViewPct).filter((p): p is number => p != null);
-  const channelAvg = pcts.length ? pcts.reduce((a, b) => a + b, 0) / pcts.length : null;
+  const lowData = video ? isLowData(points, video.views) : false;
+  const moments = lowData ? [] : keyMoments(points);
+  const channelAvg = baseline(videos);
 
   async function run() {
     if (!video) return;
@@ -91,6 +115,7 @@ export default function DoctorPage() {
       channelAvgViewPct: channelAvg == null ? null : Math.round(channelAvg),
       video,
       retention: points,
+      otherTitles: videos.filter((v) => v.id !== id).map((v) => v.title),
       ...(audience
         ? {
             audience: {
@@ -103,8 +128,43 @@ export default function DoctorPage() {
     });
     setRunning(false);
     refreshMe();
-    if (res.result) setDiagnosis({ id, demo: res.demo, demoReason: res.demoReason, data: res.result });
-    else setFailure({ id, error: res.error ?? { message: "Something went wrong." } });
+    if (res.result) {
+      setDiagnosis({ id, demo: res.demo, demoReason: res.demoReason, data: res.result });
+      if (!res.demo) {
+        setRuns(String((Number(runs) || 0) + 1));
+        track("doctor_run", { language, lowData });
+        // Anonymous stats for the Hindi/Kannada benchmark, only when the creator opted in (Connections).
+        if (benchmark === "on" && !lowData && video.avgViewPct != null) {
+          track("benchmark_sample", {
+            language,
+            length: lengthBucket(video.durationSec),
+            size: sizeBucket(summary!.channel.subscribers),
+            avgViewPct: Math.round(video.avgViewPct),
+            introDrop: Math.round(introDrop(points) * 100),
+            drops: keyMoments(points).filter((m) => m.kind === "drop").map((m) => Math.round(m.t * 100)),
+          });
+        }
+      }
+    } else setFailure({ id, error: res.error ?? { message: "Something went wrong." } });
+  }
+
+  async function commit() {
+    if (!video || !result) return;
+    setCommitting(true);
+    const base = baseline(videos, video.id);
+    const r = await fetch("/api/sprints", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        videoId: video.id,
+        videoTitle: video.title,
+        fixes: [...result.data.nextVideo, ...result.data.whatHurt.map((h) => h.fix)].slice(0, 12),
+        baselinePct: base == null ? null : Math.round(base * 10) / 10,
+        language,
+      }),
+    }).catch(() => null);
+    setCommitting(false);
+    if (r?.ok) setCommitted((c) => [...c, video.id]);
   }
 
   return (
@@ -145,7 +205,15 @@ export default function DoctorPage() {
                   </p>
                 </div>
                 <Button onClick={run} disabled={running || !retention}>
-                  {running ? "Diagnosing…" : result ? "Re-run diagnosis" : `Diagnose with Mitra · ${FEATURE_CREDITS.doctor} credits`}
+                  {running
+                    ? "Diagnosing…"
+                    : result
+                      ? "Re-run diagnosis"
+                      : lowData
+                        ? "Get an early read"
+                        : BETA
+                          ? "Diagnose with Mitra"
+                          : `Diagnose with Mitra · ${FEATURE_CREDITS.doctor} credits`}
                 </Button>
               </div>
 
@@ -171,12 +239,16 @@ export default function DoctorPage() {
                       xLabels={points.map((p) => fmtTime(p.t * video.durationSec))}
                       series={[
                         { label: "This video", values: points.map((p) => p.watching * 100), color: "var(--accent)", area: true },
-                        {
-                          label: "Typical for channel",
-                          values: points.map((p, i) => (retention.benchmark[i]?.watching ?? 0) * 100),
-                          color: "var(--chart-compare)",
-                          dashed: true,
-                        },
+                        ...(retention.benchmark.length
+                          ? [
+                              {
+                                label: "Typical video (sample)",
+                                values: points.map((p, i) => (retention.benchmark[i]?.watching ?? 0) * 100),
+                                color: "var(--chart-compare)",
+                                dashed: true,
+                              },
+                            ]
+                          : []),
                       ]}
                       markers={moments.map((m) => ({
                         index: points.findIndex((p) => p.t === m.t),
@@ -190,7 +262,16 @@ export default function DoctorPage() {
                     {retention.mode === "demo" && <div className="mt-3"><DemoNote>Retention curve is simulated for the demo channel.</DemoNote></div>}
                   </>
                 ) : (
-                  <p className="py-12 text-center text-sm text-muted">{retention.error ?? "No retention data yet."}</p>
+                  <p className="py-6 text-center text-sm text-muted">{retention.error ?? "No retention curve for this video yet."}</p>
+                )}
+                {lowData && retention && (
+                  <div className="mt-4 rounded-lg border border-dashed border-accent/50 bg-accent-soft/40 px-4 py-3 text-sm">
+                    <p className="font-semibold">Not enough views for a full retention diagnosis yet</p>
+                    <p className="mt-1 text-ink-2">
+                      YouTube&apos;s drop-off data gets reliable at around {LOW_DATA_VIEWS} views. You can still get an early read: Mitra checks
+                      the title, length and topic against your other videos and fixes your first 15 seconds.
+                    </p>
+                  </div>
                 )}
               </div>
             </Card>
@@ -281,6 +362,34 @@ export default function DoctorPage() {
                   ))}
                 </div>
               </Card>
+              {!result.demo && (
+                <>
+                  <Card className="flex flex-wrap items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="font-semibold">Retention Sprint</p>
+                      <p className="mt-1 text-sm text-muted">
+                        Apply these fixes on your next {SPRINT_UPLOADS} uploads. Mitra compares their average % viewed with your channel&apos;s
+                        {channelAvg == null ? " average" : ` ${channelAvg.toFixed(0)}% average`} today.
+                      </p>
+                    </div>
+                    {video && committed.includes(video.id) ? (
+                      <Link href="/dashboard/progress" className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-accent-ink">
+                        Track my progress →
+                      </Link>
+                    ) : (
+                      <Button onClick={commit} disabled={committing}>
+                        {committing ? "Saving…" : "I'll apply these fixes"}
+                      </Button>
+                    )}
+                  </Card>
+                  <OutputFeedback
+                    feature="doctor"
+                    language={language}
+                    output={{ verdict: result.data.verdict, nextVideo: result.data.nextVideo, whatHurt: result.data.whatHurt, lowData }}
+                  />
+                  {BETA && userId && (Number(runs) || 0) >= 2 && <PriceSurvey userId={userId} />}
+                </>
+              )}
             </div>
           )}
         </div>

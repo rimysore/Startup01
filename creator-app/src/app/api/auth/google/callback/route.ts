@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { currentUser, startSession, upsertUser } from "@/lib/auth";
+import { BETA } from "@/lib/beta";
+import { recordEvent } from "@/lib/beta-events";
 import { claimFounderSpot } from "@/lib/founders";
 import { finishOAuth } from "@/lib/oauth-state";
 import { exchangeCode, fetchSummary, googleProfile, saveYouTubeConnection } from "@/lib/youtube";
@@ -36,7 +38,9 @@ export async function GET(request: NextRequest) {
       return fail(failPath, "no_channel");
     }
     await saveYouTubeConnection(user.id, tokens, channel);
-    const founder = await claimFounderSpot(user.id, channel.id).catch((err: unknown) => (console.error("Founder spot failed", err), null));
+    // The Founder Pass ("free for life") isn't offered during the beta; founders who already hold one keep it.
+    const founder = BETA ? null : await claimFounderSpot(user.id, channel.id).catch((err: unknown) => (console.error("Founder spot failed", err), null));
+    await recordEvent({ userId: user.id, name: "channel_connected", props: {} }).catch(() => {});
     const next = new URL(intent.next, origin);
     if (founder) next.searchParams.set("founder", String(founder));
     return NextResponse.redirect(next);
