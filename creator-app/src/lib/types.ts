@@ -21,6 +21,8 @@ export interface Video {
   id: string;
   title: string;
   publishedAt: string;
+  /** Exact upload time (ISO); missing in data cached before it was added. */
+  publishedAtIso?: string;
   thumbnail: string | null;
   durationSec: number;
   views: number;
@@ -28,6 +30,8 @@ export interface Video {
   comments: number;
   /** Average percentage of the video watched, 0-100. Null when analytics aren't available. */
   avgViewPct: number | null;
+  /** False for private, unlisted or not-yet-premiered uploads; missing in data cached before it was added. */
+  isPublic?: boolean;
 }
 
 export interface ChannelSummary {
@@ -35,6 +39,8 @@ export interface ChannelSummary {
   channel: Channel;
   daily: DailyPoint[];
   videos: Video[];
+  /** When this data was fetched from YouTube (epoch ms); live data only. */
+  fetchedAt?: number;
 }
 
 /** Audience retention: share of viewers still watching at each point (ratio of video length 0..1). */

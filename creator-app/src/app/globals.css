@@ -19,6 +19,7 @@
   --bad: #b3261e;
   --chart-grid: #e9e2d5;
   --chart-compare: #9a9283;
+  --ring-track: #f6d3b6;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,6 +41,7 @@
     --bad: #f07167;
     --chart-grid: #2a261e;
     --chart-compare: #7d776b;
+    --ring-track: #4a2c15;
   }
 }
 
@@ -61,6 +63,7 @@
   --bad: #f07167;
   --chart-grid: #2a261e;
   --chart-compare: #7d776b;
+  --ring-track: #4a2c15;
 }
 
 @theme inline {
@@ -79,8 +82,8 @@
   --color-warn: var(--warn);
   --color-bad: var(--bad);
   --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-display-serif), ui-serif, Georgia, serif;
-  --font-indic: var(--font-devanagari), var(--font-telugu), var(--font-body), sans-serif;
+  --font-display: var(--font-display-face), var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-indic: var(--font-devanagari), var(--font-telugu), var(--font-kannada), var(--font-body), sans-serif;
 }
 
 html,
@@ -92,6 +95,43 @@ body {
 body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headlines: the display face is set bold and tight by default; utilities (e.g. font-semibold) still win. */
+@layer base {
+  .font-display {
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+}
+
+/* Brand gradient (logo colours): saffron → fuchsia → violet. */
+.text-brand {
+  background: linear-gradient(100deg, #ff8a1f 0%, #d946ef 55%, #6c47ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.bg-brand {
+  background: linear-gradient(110deg, #ff8a1f 0%, #d946ef 55%, #6c47ff 100%);
+}
+
+/* A hand on everything clickable (Tailwind's reset leaves buttons with the arrow). */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  label[for],
+  select,
+  input[type="checkbox"],
+  input[type="radio"],
+  input[type="file"] {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
 }
 
 ::selection {
@@ -130,6 +170,148 @@ body {
   animation: rise 0.5s ease-out both;
 }
 
+@keyframes word-in {
+  from { opacity: 0; transform: translateY(0.35em); filter: blur(4px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.word-in {
+  animation: word-in 0.5s cubic-bezier(.2, .9, .2, 1) both;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float-y {
+  animation: float-y 6s ease-in-out infinite;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.toast-in {
+  animation: toast-in 0.45s cubic-bezier(.2, .9, .2, 1.1) both;
+}
+
+/* A slow, warm glow behind hero cards. */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fade-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes modal-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes modal-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(0.97); } }
+.fade-in { animation: fade-in 0.18s ease-out both; }
+.fade-out { animation: fade-out 0.18s ease-in both; }
+.modal-in { animation: modal-in 0.24s cubic-bezier(.2, .9, .3, 1) both; }
+.modal-out { animation: modal-out 0.18s ease-in both; }
+
+@keyframes drift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-6%, 4%) scale(1.08); }
+}
+.glow-blob {
+  animation: drift 14s ease-in-out infinite;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+.pop {
+  animation: pop 0.6s ease-out;
+}
+
+@keyframes pulse-dot {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--good) 60%, transparent); }
+  100% { box-shadow: 0 0 0 10px transparent; }
+}
+.live-dot {
+  animation: pulse-dot 1.8s ease-out infinite;
+}
+
+/* Ask Mitra: a soft ring that pulses a few times after the page opens, then rests. */
+@keyframes ask-ring {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent) 45%, transparent); }
+  100% { box-shadow: 0 0 0 14px transparent; }
+}
+.ask-attention {
+  animation: ask-ring 1.8s ease-out 1s 4;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .marquee, .rise { animation: none; }
+  .ask-attention { animation: none; }
+  .marquee, .rise, .toast-in, .glow-blob, .pop, .live-dot, .word-in, .float-y, .fade-in, .fade-out, .modal-in, .modal-out { animation: none; }
+}
+
+/*
+ * Inside the signed-in app: a calm workspace, not a landing page. Neutral surfaces, one accent kept for actions,
+ * plain sans headings, no gradients or glows. Scoped to .app so the public site keeps its own look.
+ */
+.app {
+  --bg: #f7f7f5;
+  --surface: #ffffff;
+  --surface-2: #f2f2ef;
+  --ink: #1c1b19;
+  --ink-2: #4a4844;
+  --muted: #77746d;
+  --line: #e7e5e0;
+  --accent-soft: #fdeee2;
+  --chart-grid: #ecebe7;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .app {
+    --bg: #0f0f0e;
+    --surface: #171716;
+    --surface-2: #1f1f1d;
+    --ink: #f2f1ee;
+    --ink-2: #c9c7c1;
+    --muted: #94918a;
+    --line: #2b2a27;
+    --accent-soft: #33210f;
+    --chart-grid: #262523;
+  }
+}
+:root[data-theme="dark"] .app {
+  --bg: #0f0f0e;
+  --surface: #171716;
+  --surface-2: #1f1f1d;
+  --ink: #f2f1ee;
+  --ink-2: #c9c7c1;
+  --muted: #94918a;
+  --line: #2b2a27;
+  --accent-soft: #33210f;
+  --chart-grid: #262523;
+}
+.app .card {
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
+}
+.app .bg-brand {
+  background: var(--accent);
+}
+.app .text-brand {
+  background: none;
+  color: var(--accent);
+}
+/* Headings in the app use the body face; the display face stays for the logo. */
+.app main .font-display {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.legal-body ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+}
+.legal-body ul > li + li {
+  margin-top: 0.4rem;
+}
+.legal-body strong {
+  color: var(--ink);
+}
+.legal-body a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

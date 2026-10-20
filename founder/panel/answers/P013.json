@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already pay for vidIQ and use only half of it, so I don't need another tool that promises the same thing. An app I've never heard of asking to read my whole YouTube account is a no for me before I even see what it does.",
+  "objection": "I don't want to give an unknown app access to my YouTube account. Read-only still means it sees my analytics, my channel and my audience data, and I don't know who runs Mitra or what they do with it.",
+  "would_change_my_mind": "A creator I trust in my WhatsApp group using it and saying the Hindi or Telugu title and thumbnail ideas actually beat what I'd have done, plus a way to try it on one video without connecting my whole channel.",
+  "price_too_cheap": 29,
+  "price_cheap": 79,
+  "price_expensive": 199,
+  "price_too_expensive": 299
+}

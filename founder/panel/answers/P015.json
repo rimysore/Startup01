@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The first thing I think is whether an AI can really understand my Telugu and Hindi viewers, not just count their clicks. The page says it reads my analytics, but I can already read YouTube Studio myself, so I don't yet see what it adds that I'd pay for.",
+  "objection": "I don't trust a generic AI to get the nuance of how my Telugu and Hindi audience talks, and I'd be handing my channel's data to a Google sign-in for a vague promise.",
+  "would_change_my_mind": "If I used the 10 free credits and it correctly explained why a specific video of mine beat or missed my usual views, with suggestions that actually fit my language and audience.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 120,
+  "price_too_expensive": 180
+}

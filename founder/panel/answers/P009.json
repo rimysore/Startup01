@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "My channel earns nothing yet, so paying ₹99 a month for an AI coach feels like throwing money away. I already open YouTube Studio every morning and can see my own numbers there for free.",
+  "objection": "Will this tell me anything I can't work out from YouTube Studio and from what the big channels in my niche post this week? If not, I'm paying to copy what I could copy anyway.",
+  "would_change_my_mind": "A free trial or a clear example, using my own channel, that shows a title or video idea that actually brought in more views.",
+  "price_too_cheap": 19,
+  "price_cheap": 29,
+  "price_expensive": 49,
+  "price_too_expensive": 79
+}

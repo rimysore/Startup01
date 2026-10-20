@@ -1,3 +1,4 @@
+import { LOW_DATA_VIEWS } from "./beta";
 import type { RetentionPoint } from "./types";
 
 export interface RetentionMoment {
@@ -39,4 +40,9 @@ export function fmtTime(sec: number): string {
 export function introDrop(points: RetentionPoint[]): number {
   const at = points.find((p) => p.t >= 0.08) ?? points[points.length - 1];
   return points.length ? Math.max(0, (points[0].watching || 1) - at.watching) : 0;
+}
+
+/** True when a video can only get an early read (packaging and hook), not a retention diagnosis. */
+export function isLowData(points: RetentionPoint[], views: number): boolean {
+  return points.length < 20 || views < LOW_DATA_VIEWS;
 }

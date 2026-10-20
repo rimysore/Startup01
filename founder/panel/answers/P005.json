@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "YouTube Studio already shows me my views and what's working, and ChatGPT can give me title and thumbnail ideas for free. I don't see what Mitra does that I can't already get without paying, so I'd only try the free 10 credits.",
+  "objection": "If it's just reading my analytics and giving ideas, why would I pay when YouTube Studio and ChatGPT do that for free?",
+  "would_change_my_mind": "It showed me something from my own channel data that YouTube Studio and ChatGPT clearly can't, like exactly why a specific video in Hindi underperformed.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 249
+}

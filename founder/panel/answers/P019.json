@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already tried vidIQ and it didn't help me, so another AI tool that tells me what to post has to prove itself first. I pay for Jio, Airtel and maybe Netflix, and nothing else online, so I'm not going to start paying a monthly fee for something I haven't seen work.",
+  "objection": "It will probably just tell me to copy what the big channels posted this week, like vidIQ did, and I'll still be guessing about my own videos.",
+  "would_change_my_mind": "Using the 10 free credits, it shows me one of my own videos that beat my usual views and explains why, in Hindi or Hinglish, and that advice actually works on my next upload.",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 99,
+  "price_too_expensive": 149
+}

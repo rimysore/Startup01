@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "YouTube Studio already shows me my analytics every morning and ChatGPT can brainstorm titles and thumbnail ideas for free. I've never paid for a creator tool, and I can't see what Mitra gives me that those two don't already.",
+  "objection": "It reads the same analytics that YouTube Studio shows me for free, so I'd be paying to get a summary of numbers I can already look at.",
+  "would_change_my_mind": "If it showed me a specific, actionable reason why a video flopped that Studio and ChatGPT can't tell me, and that held up on my own channel over a month of use.",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 79,
+  "price_too_expensive": 129
+}

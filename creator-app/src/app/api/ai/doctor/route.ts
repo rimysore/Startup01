@@ -2,11 +2,13 @@ import { z } from "zod";
 import { diagnoseVideo } from "@/lib/ai";
 import { aiRoute } from "@/lib/ai-route";
 import { DEMO_DOCTOR } from "@/lib/demo-ai";
-import { fmtTime, keyMoments } from "@/lib/retention";
+import { fmtTime, isLowData, keyMoments } from "@/lib/retention";
 
 const Point = z.object({ t: z.number(), watching: z.number() });
+const Row = z.object({ label: z.string().max(120), value: z.number() });
 
 export const POST = aiRoute(
+  "doctor",
   {
     channel: z.string().max(200),
     channelAvgViewPct: z.number().nullable(),
@@ -20,21 +22,33 @@ export const POST = aiRoute(
       avgViewPct: z.number().nullable(),
     }),
     retention: z.array(Point).max(200),
+    audience: z.object({ cities: z.array(Row).max(8), sources: z.array(Row).max(8), searchTerms: z.array(Row).max(8) }).optional(),
+    otherTitles: z.array(z.string().max(300)).max(12).default([]),
   },
   DEMO_DOCTOR,
-  ({ language, channel, channelAvgViewPct, video, retention }) => {
+  ({ language, channel, channelAvgViewPct, video, retention, audience, otherTitles }) => {
+    const lowData = isLowData(retention, video.views);
     const sampled = retention.filter((_, i) => i % 5 === 0);
     const curve = sampled.map((p) => `${fmtTime(p.t * video.durationSec)} ${Math.round(p.watching * 100)}%`).join(", ");
     const moments = keyMoments(retention)
       .map((m) => `${m.kind} at ${fmtTime(m.t * video.durationSec)} (${Math.round(m.delta * 100)} pts)`)
       .join("; ");
-    const context = [
-      `Channel: ${channel}. Channel average % viewed: ${channelAvgViewPct ?? "unknown"}.`,
-      `Video: "${video.title}" published ${video.publishedAt}, length ${fmtTime(video.durationSec)}.`,
+    const facts = [
+      `Channel average % viewed: ${channelAvgViewPct ?? "unknown"}.`,
+      `Video published ${video.publishedAt}, length ${fmtTime(video.durationSec)}.`,
       `Views ${video.views}, likes ${video.likes}, comments ${video.comments}, average % viewed ${video.avgViewPct ?? "unknown"}.`,
       curve ? `Retention curve (time: % still watching): ${curve}` : "No retention data available.",
-      moments ? `Key moments: ${moments}` : "",
-    ].join("\n");
-    return diagnoseVideo(language, context);
+      moments && !lowData ? `Key moments: ${moments}` : "",
+      ...(audience
+        ? [
+            `Top cities (views): ${audience.cities.map((r) => `${r.label} ${r.value}`).join(", ") || "no data yet"}`,
+            `Traffic sources (views): ${audience.sources.map((r) => `${r.label} ${r.value}`).join(", ") || "no data yet"}`,
+            `Search terms (views): ${audience.searchTerms.map((r) => `"${r.label}" ${r.value}`).join(", ") || "none"}`,
+          ]
+        : ["No audience data for this video."]),
+    ].filter(Boolean).join("\n");
+    // Other titles are the creator's own, but still third-party text to the model: keep them out of the facts.
+    const title = [video.title, `(channel: ${channel})`, ...(otherTitles.length ? ["Other recent titles on this channel:", ...otherTitles] : [])].join("\n");
+    return diagnoseVideo(language, facts, title, lowData);
   },
 );

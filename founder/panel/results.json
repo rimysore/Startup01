@@ -1,0 +1,151 @@
+{
+ "business": "Mitra, an AI growth coach for Indian regional-language YouTube creators",
+ "seed": 249806,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 0,
+ "passes": 20,
+ "buy_rate": 0.0,
+ "by_segment": [
+  [
+   "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+   7,
+   0.0
+  ],
+  [
+   "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+   9,
+   0.0
+  ],
+  [
+   "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+   4,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Copies what is trending",
+   3,
+   0.0
+  ],
+  [
+   "Free-tools only",
+   5,
+   0.0
+  ],
+  [
+   "Already pays for vidIQ or TubeBuddy",
+   2,
+   0.0
+  ],
+  [
+   "Busy, phone-only",
+   4,
+   0.0
+  ],
+  [
+   "Learns from YouTube gurus",
+   4,
+   0.0
+  ],
+  [
+   "Data-curious",
+   2,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "under $487,000",
+   6,
+   0.0
+  ],
+  [
+   "$487,000 to $979,000",
+   7,
+   0.0
+  ],
+  [
+   "$979,000 and up",
+   7,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   9,
+   [
+    "I'm a Hindi creator and I already get growth tips free from the big channels I watch at night. Handing my YouTube login to an app I've never heard of, just to get a chatbot's take on my own numbers, doesn't feel worth it when I can check the analytics myself.",
+    "Tools don't grow channels, consistency and luck do. I already check YouTube Studio every morning for free, and I'd rather copy what the Hindi guys in my feed say than pay a bot to tell me what my own numbers already show."
+   ],
+   [
+    "P001",
+    "P010"
+   ]
+  ],
+  [
+   "need",
+   6,
+   [
+    "I already pay for vidIQ or TubeBuddy and only use half of it, so I don't need another tool. Honestly my videos do better when I post consistently, not when I buy another dashboard.",
+    "YouTube Studio already tells me which videos beat my usual views, and I can see my own comments. Mitra sounds like the same data with a Monday email on top, and I live in WhatsApp, not my inbox. I need to see it find something I couldn't have seen in Studio before I pay anything."
+   ],
+   [
+    "P003",
+    "P004"
+   ]
+  ],
+  [
+   "habit",
+   3,
+   [
+    "I tried vidIQ and it didn't help, and I've never paid for a creator tool. Ten free credits a month is enough to poke at it, but I'm not paying until it shows me something YouTube Studio doesn't already show me.",
+    "I've never paid for a creator tool. vidIQ, TubeBuddy and YouTube Studio already give me numbers for free, and ChatGPT tells me what to post. I don't have time to read another dashboard, and a monthly report by email is one more thing I'll skip."
+   ],
+   [
+    "P002",
+    "P006"
+   ]
+  ],
+  [
+   "price",
+   2,
+   [
+    "I'm not paying ₹99 a month for something when my channel earns nothing yet. Even if the analytics are useful, I don't know yet whether they'd turn into views, and I'd rather spend that money on editing help.",
+    "My channel earns nothing yet, so paying ₹99 a month for an AI coach feels like throwing money away. I already open YouTube Studio every morning and can see my own numbers there for free."
+   ],
+   [
+    "P007",
+    "P009"
+   ]
+  ]
+ ],
+ "why_yes": [],
+ "flip": [
+  "A creator I already follow telling me it helped their channel, so I'd trust it before giving it access.",
+  "If it named a specific, checkable reason one of my videos underperformed, and my next upload using its advice clearly beat my usual views.",
+  "If I connected my channel on the free 10 credits and it correctly showed me a specific video that beat my usual views and explained why in Hindi or Hinglish, in a way I could check myself.",
+  "A free look at one real video where it caught something specific that Studio missed, delivered on WhatsApp.",
+  "It showed me something from my own channel data that YouTube Studio and ChatGPT clearly can't, like exactly why a specific video in Hindi underperformed.",
+  "A clear free trial that shows me, on my own channel, a specific video I should repost or a title that would have beaten my last ten, in Hinglish, with no sign-up hassle.",
+  "If it sent the report and video insights on WhatsApp, and the free 10 credits showed me one concrete idea from my own analytics that actually beat my usual views.",
+  "If a free try on my own channel gave me a specific, checkable reason a video underperformed and a title or thumbnail change that actually beat my usual views.",
+  "A free trial or a clear example, using my own channel, that shows a title or video idea that actually brought in more views.",
+  "A free trial that correctly predicts which of my next few videos will beat my usual views, and gives a title or thumbnail idea that actually gets clicks.",
+  "If I connect my channel for free and it names a specific video of mine that beat my usual views and gives a reason I can check against my own comments, in language that sounds like how my audience talks.",
+  "If it showed me something in my Studio data that I couldn't find myself, like which of my Hindi videos beat my usual views and why, and that I could check against my own numbers before paying.",
+  "A creator I trust in my WhatsApp group using it and saying the Hindi or Telugu title and thumbnail ideas actually beat what I'd have done, plus a way to try it on one video without connecting my whole channel.",
+  "Running it on one of my own videos with the free credits and getting a specific, correct explanation of why a Telugu or Hindi video underperformed, based on my comments.",
+  "If I used the 10 free credits and it correctly explained why a specific video of mine beat or missed my usual views, with suggestions that actually fit my language and audience.",
+  "If it showed me a specific, actionable reason why a video flopped that Studio and ChatGPT can't tell me, and that held up on my own channel over a month of use.",
+  "If the first report pointed out one specific video that beat my usual views for a reason I could copy the next day, and I could see that without spending time on it.",
+  "A creator I already trust tells me they connected their channel and it's been safe and useful for months, with a clear note on who runs it and what they store.",
+  "Using the 10 free credits, it shows me one of my own videos that beat my usual views and explains why, in Hindi or Hinglish, and that advice actually works on my next upload.",
+  "A free-credit result that names a specific video of mine, beats my usual views, and explains why in Hindi or Hinglish in a way I can check against my own analytics."
+ ],
+ "purchases_first_month_per_buyer": null,
+ "price_answers": 20
+}

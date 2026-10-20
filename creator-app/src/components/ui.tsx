@@ -2,18 +2,9 @@
 
 import Link from "next/link";
 import { useTheme } from "./hooks";
+import { BETA } from "@/lib/beta";
 
-export function Logo({ className = "" }: { className?: string }) {
-  return (
-    <Link href="/" className={`flex items-center gap-2 ${className}`} aria-label="Mitra home">
-      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden>
-        <circle cx="16" cy="16" r="15" fill="var(--accent)" />
-        <path d="M9 21V11l7 7 7-7v10" fill="none" stroke="var(--accent-ink)" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span className="font-display text-2xl leading-none tracking-tight">Mitra</span>
-    </Link>
-  );
-}
+export { Logo } from "./logo";
 
 export function ThemeToggle() {
   const theme = useTheme();
@@ -48,12 +39,13 @@ export function Card({ children, className = "" }: { children: React.ReactNode; 
   return <section className={`card p-5 sm:p-6 ${className}`}>{children}</section>;
 }
 
+/** The page's name as the heading, with one plain line on what it's for. */
 export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{eyebrow}</p>
-        <h1 className="mt-1 font-display text-4xl leading-tight sm:text-5xl">{title}</h1>
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-semibold tracking-tight">{eyebrow}</h1>
+        <p className="mt-1 text-sm text-muted">{title}</p>
       </div>
       {children}
     </div>
@@ -73,7 +65,7 @@ export function Button({
   return (
     <button
       {...props}
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${styles} ${className}`}
     >
       {children}
     </button>
@@ -91,7 +83,7 @@ export function Spinner({ label = "Loading" }: { label?: string }) {
 
 export function DemoNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-xl border border-dashed border-line bg-surface-2/60 px-3 py-2 text-xs text-ink-2">
+    <p className="rounded-lg bg-surface-2 px-3 py-2 text-xs text-ink-2">
       <span className="mr-1 font-semibold text-accent">Sample</span>
       {children}
     </p>
@@ -128,5 +120,43 @@ export function Select({
         ))}
       </select>
     </label>
+  );
+}
+
+/** Explains why an AI answer is a sample, with the next step to get a real one. */
+export function AiDemoNote({ reason, what }: { reason?: "signin" | "nokey"; what: string }) {
+  return (
+    <DemoNote>
+      {reason === "signin" ? (
+        <>
+          This is a sample {what}.{" "}
+          <Link href="/login?next=/dashboard" className="font-semibold underline underline-offset-2">
+            Sign in free
+          </Link>{" "}
+          to get a real one.
+        </>
+      ) : (
+        <>This is a sample {what}. Add an Anthropic API key on the server to get real answers.</>
+      )}
+    </DemoNote>
+  );
+}
+
+export function AiErrorNote({ error }: { error: { message: string; detail?: string; upgrade?: boolean; signin?: boolean } }) {
+  return (
+    <ErrorNote>
+      {error.message}{" "}
+      {error.upgrade && !BETA && (
+        <Link href="/dashboard/billing" className="font-semibold underline underline-offset-2">
+          Upgrade your plan →
+        </Link>
+      )}
+      {error.signin && (
+        <Link href="/login?next=/dashboard" className="font-semibold underline underline-offset-2">
+          Sign in →
+        </Link>
+      )}
+      {error.detail && <span className="mt-1 block break-words font-mono text-xs opacity-80">Admin only: {error.detail}</span>}
+    </ErrorNote>
   );
 }

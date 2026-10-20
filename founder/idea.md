@@ -1,0 +1,11 @@
+# Mitra (trymitraapp.com)
+
+- What it is: an AI growth coach for Indian-language YouTube creators that reads their own channel (YouTube Data + Analytics APIs, read-only) and tells them what to post next and why their last video did what it did, in their language.
+- Who it is for: small and mid-size YouTube creators in India (roughly 1K to 500K subscribers) who make videos in Hindi, Hinglish, Telugu, Tamil, Marathi, Bengali, Kannada or Malayalam, are trying to grow or monetise, and find English-first tools (vidIQ, TubeBuddy) generic or hard to use.
+- What it sells, at what price: monthly subscriptions in INR. Free (10 AI credits/month), Pro ₹99/month (100 credits), Creator+ ₹249/month (250 credits), Agency ₹1,999+/month by conversation. Features: channel overview with outlier ("×-your-usual") scores, Video Doctor (diagnoses one video), Title & Thumbnail Studio, Trend Radar by language, audience, comments and slang insights, competitor comparison, breakout ideas, an "Ask Mitra" chat, and a Monday report plus a 2-day check after each upload by email (WhatsApp coming). First 100 creators get a lifetime "Founder Pass" (50 free small-model uses a month).
+- Where and how: web app (Next.js on Vercel), India-focused, online only. Customers find it through the founders' outreach to creators (an admin prospecting tool, DMs and email), build-in-public posts on X/Threads/Instagram, and creator referrals. Payment via Razorpay (not switched on yet).
+- Budget and constraints:
+  - Bootstrapped; two founders: Rithvik (engineering/product, US Eastern time, individual operator in Bloomington, Indiana) and a co-founder in India (marketing, outreach, customer conversations, IST), part-time and slower-paced.
+  - Infrastructure costs about ₹1,850–3,950 a month; AI cost per action ~₹0.06–0.12 (small model) to ~₹3–4 (Video Doctor) and ~₹4.8 (AI thumbnail).
+  - Status (Oct 2026): live; a handful of test users (one active tester, Ujjwal); 0 paying customers; billing off; free testers get 100 credits/month.
+  - Google OAuth data-access verification for YouTube scopes submitted, pending. YouTube API policy forbids "derived metrics" unless the Analytics & Reporting amendment is accepted (not yet submitted). WhatsApp delivery waits for an Indian business number.

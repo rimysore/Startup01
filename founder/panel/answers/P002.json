@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I tried vidIQ and it didn't help, and I've never paid for a creator tool. Ten free credits a month is enough to poke at it, but I'm not paying until it shows me something YouTube Studio doesn't already show me.",
+  "objection": "Will it tell me why a video flopped in a way I can act on, or just rephrase my analytics with AI language? And why should I give it read access to my channel?",
+  "would_change_my_mind": "If it named a specific, checkable reason one of my videos underperformed, and my next upload using its advice clearly beat my usual views.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 99,
+  "price_too_expensive": 149
+}

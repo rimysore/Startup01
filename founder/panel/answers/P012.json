@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "YouTube Studio already shows me my analytics for free, and ChatGPT can brainstorm titles and thumbnail ideas for nothing. I have never paid for a creator tool, and I can't see what Mitra does that I can't already get by pasting my numbers into ChatGPT.",
+  "objection": "It asks me to connect my channel with Google sign-in, and I can't tell what it does with my data. I'd also be paying monthly for something I can rebuild for free with the tools I already use.",
+  "would_change_my_mind": "If it showed me something in my Studio data that I couldn't find myself, like which of my Hindi videos beat my usual views and why, and that I could check against my own numbers before paying.",
+  "price_too_cheap": 15,
+  "price_cheap": 39,
+  "price_expensive": 79,
+  "price_too_expensive": 99
+}

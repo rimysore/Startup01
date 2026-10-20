@@ -1,0 +1,22 @@
+{
+  "business": "Mitra (amounts in INR; the tool prints a $ sign, read it as ₹)",
+  "unit": "paying Pro creator-month",
+  "price": 83.90,
+  "variable": [
+    {"label": "AI calls, typical Pro use (~half the credits)", "cost": 23.00},
+    {"label": "Reports: 4 weekly + ~6 video checks (AI + WhatsApp template)", "cost": 2.00},
+    {"label": "Razorpay ~2% + 18% GST on the fee", "cost": 2.34}
+  ],
+  "fixed_monthly": [
+    {"label": "Hosting, database, images, domain (midpoint of ₹1,850–3,950)", "cost": 2900},
+    {"label": "Free + Founder Pass users (~100 x ₹7)", "cost": 700},
+    {"label": "Founder salaries", "cost": 0}
+  ],
+  "startup": [
+    {"label": "Launch marketing: creator collabs, small ads (estimate)", "cost": 15000},
+    {"label": "Indian WhatsApp business number + setup (estimate)", "cost": 2000}
+  ],
+  "days_per_month": 1,
+  "plan_per_day": 150,
+  "ramp_per_day": [0, 5, 10, 18, 26, 35, 45, 55, 65, 75, 85, 100]
+}
