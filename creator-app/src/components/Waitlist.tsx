@@ -1,11 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { LANGUAGES } from "@/lib/languages";
+import { BETA_DEFAULT_LANGUAGE, offeredLanguage } from "@/lib/beta";
+import { LANGUAGES as ALL_LANGUAGES } from "@/lib/languages";
+
+// Hindi and Kannada only during the beta.
+const LANGUAGES = ALL_LANGUAGES.filter((l) => offeredLanguage(l.code));
 
 /** Early-access form. Short on purpose: email is the only must; the rest helps us invite the right creators first. */
 export function WaitlistForm({ source = "landing" }: { source?: string }) {
-  const [form, setForm] = useState({ email: "", name: "", channel: "", language: "hinglish", whatsapp: "", consent: false, website: "" });
+  const [form, setForm] = useState({ email: "", name: "", channel: "", language: offeredLanguage("hinglish") ? "hinglish" : BETA_DEFAULT_LANGUAGE, whatsapp: "", consent: false, website: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{ position: number; already: boolean } | null>(null);

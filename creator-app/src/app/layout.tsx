@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BETA } from "@/lib/beta";
 import { SITE_URL } from "@/lib/company";
 import localFont from "next/font/local";
 import "./globals.css";
@@ -10,12 +11,22 @@ const body = localFont({ src: "./fonts/inter-latin-wght-normal.woff2", variable:
 const display = localFont({ src: "./fonts/bricolage-grotesque-latin-wght-normal.woff2", variable: "--font-display-face", weight: "200 800", display: "swap" });
 const devanagari = localFont({ src: "./fonts/noto-sans-devanagari-devanagari-wght-normal.woff2", variable: "--font-devanagari", weight: "100 900", display: "swap" });
 const telugu = localFont({ src: "./fonts/noto-sans-telugu-telugu-wght-normal.woff2", variable: "--font-telugu", weight: "100 900", display: "swap" });
+// Kannada (beta language): the Noto Sans Kannada files the PDF reports already ship (OFL, assets/pdf-fonts).
+const kannada = localFont({
+  src: [
+    { path: "../../assets/pdf-fonts/NotoSansKannada-Regular.ttf", weight: "400" },
+    { path: "../../assets/pdf-fonts/NotoSansKannada-Bold.ttf", weight: "700" },
+  ],
+  variable: "--font-kannada",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Mitra — your channel's digital manager",
-  description:
-    "Mitra is the AI growth manager for creators who make videos in Hindi, Hinglish, Telugu, Tamil and more.",
+  title: BETA ? "Mitra (beta) — your channel's digital manager" : "Mitra — your channel's digital manager",
+  description: BETA
+    ? "Mitra shows Hindi and Kannada YouTube creators where viewers left each video, why, and what to change next. Free during the beta."
+    : "Mitra is the AI growth manager for creators who make videos in Hindi, Hinglish, Telugu, Tamil and more.",
   openGraph: { siteName: "Mitra", type: "website", url: "/" },
 };
 
@@ -27,7 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${body.variable} ${display.variable} ${devanagari.variable} ${telugu.variable} h-full`}
+      className={`${body.variable} ${display.variable} ${devanagari.variable} ${telugu.variable} ${kannada.variable} h-full`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

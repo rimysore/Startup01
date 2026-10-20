@@ -1,4 +1,6 @@
 // Run with: npm test. Exercises the credit limit and billing plan logic against a fresh embedded database.
+// Plan limits are tested outside the beta (tests/beta.test.mts covers the beta allowance).
+process.env.NEXT_PUBLIC_BETA = "0";
 process.env.PGLITE_DIR = "memory://";
 const { db, schema } = await import("@/db");
 const { reserveCredit, refundCredit, creditsUsed, monthKey } = await import("@/lib/usage");

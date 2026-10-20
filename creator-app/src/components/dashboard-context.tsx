@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ChannelSummary } from "@/lib/types";
+import { BETA_DEFAULT_LANGUAGE, offeredLanguage } from "@/lib/beta";
 import { isLanguageCode, type LanguageCode } from "@/lib/languages";
 import type { PlanId } from "@/lib/plans";
 import { useStoredString } from "./hooks";
@@ -52,8 +53,8 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [summary, setSummary] = useState<DashboardState["summary"]>(null);
   const [summaryError, setSummaryError] = useState<string | null>(null);
   const [me, setMe] = useState<Me | null>(null);
-  const [stored, storeLanguage] = useStoredString("mitra-language", "hinglish");
-  const language: LanguageCode = isLanguageCode(stored) ? stored : "hinglish";
+  const [stored, storeLanguage] = useStoredString("mitra-language", BETA_DEFAULT_LANGUAGE);
+  const language: LanguageCode = isLanguageCode(stored) && offeredLanguage(stored) ? stored : BETA_DEFAULT_LANGUAGE;
   const [version, setVersion] = useState(0);
   const [meVersion, setMeVersion] = useState(0);
   const reload = useCallback(() => setVersion((v) => v + 1), []);
@@ -134,7 +135,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const serverLanguage = me?.languageChosen ? me.language : undefined;
   useEffect(() => {
     if (pending.current) return; // a pick is on its way to the account
-    if (serverLanguage && isLanguageCode(serverLanguage) && serverLanguage !== stored) storeLanguage(serverLanguage);
+    if (serverLanguage && isLanguageCode(serverLanguage) && offeredLanguage(serverLanguage) && serverLanguage !== stored) storeLanguage(serverLanguage);
     // Only when the account's value changes, not on every local change.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverLanguage]);

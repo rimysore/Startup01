@@ -49,7 +49,7 @@ export const INVITE_ONLY = process.env.NEXT_PUBLIC_INVITE_ONLY !== "0";
 export const WHATSAPP_LOCKED = process.env.NEXT_PUBLIC_WHATSAPP_LIVE !== "1";
 
 /** Date the current versions of the legal pages take effect. Update whenever the text changes. */
-export const LEGAL_EFFECTIVE_DATE = "16 October 2026";
+export const LEGAL_EFFECTIVE_DATE = "20 October 2026";
 
 export function hasPlaceholders(): boolean {
   return Object.values(COMPANY).some((v) => v.includes("["));

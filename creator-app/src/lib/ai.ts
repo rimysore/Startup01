@@ -217,13 +217,17 @@ export const DoctorSchema = z.object({
 });
 export type Doctor = z.infer<typeof DoctorSchema>;
 
-export async function diagnoseVideo(language: string, facts: string, title: string): Promise<AiResult<Doctor>> {
-  const out = await structured(
-    "doctor",
-    DoctorSchema,
-    language,
-    `Diagnose this video's performance. Explain retention drops by their timestamps and suggest fixes.\n\nVideo title:\n${untrusted(title)}\n\n${facts}`,
-  );
+export async function diagnoseVideo(language: string, facts: string, title: string, lowData = false): Promise<AiResult<Doctor>> {
+  // Small videos: YouTube's retention curve is too thin to read, so give an honest early read instead of
+  // inventing drop-off points.
+  const task = lowData
+    ? [
+        "This video doesn't have enough views yet for a reliable retention curve, so do NOT talk about specific timestamps or invent drop-off points.",
+        "Give an early read instead: judge the title, length and topic against the channel's other videos, and focus the fixes on packaging (title, thumbnail text) and the first 15 seconds.",
+        'For whatHurt, use "at" values like "Title", "Thumbnail" or "First 15s" instead of timestamps. Keep the score conservative (40-70) and say in the verdict that it is an early read.',
+      ].join(" ")
+    : "Diagnose this video's performance. Explain retention drops by their timestamps and suggest fixes.";
+  const out = await structured("doctor", DoctorSchema, language, `${task}\n\nVideo title:\n${untrusted(title)}\n\n${facts}`);
   const d = out.result;
   checkLanguage("doctor", language, [d.verdict, ...d.nextVideo]);
   return {

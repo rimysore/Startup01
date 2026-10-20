@@ -292,3 +292,46 @@ export const creatorInterviews = pgTable("creator_interviews", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * Beta product events (first-party, no third-party trackers): what creators used and when, and where they first
+ * came from. Answers the beta's questions (cost per creator by channel, month-2/3 retention, repeat Video Doctor
+ * use, language ratings, price survey). Deleted with the account. Creators can switch it off in Connections.
+ */
+export const betaEvents = pgTable(
+  "beta_events",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+    /** Random id kept in the browser, so visits before sign-in can be tied to the account that follows. */
+    anonId: text("anon_id"),
+    name: text("name").notNull(),
+    props: jsonb("props").$type<Record<string, unknown>>().notNull().default({}),
+    /** First-touch source (utm_source, referrer host or "direct"). */
+    source: text("source"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("beta_events_user_time").on(t.userId, t.createdAt), index("beta_events_name_time").on(t.name, t.createdAt)],
+);
+
+/**
+ * Retention Sprints: a creator committed to Video Doctor's fixes for a video. Their next uploads' average % viewed
+ * is compared with the channel's average at the time (baselinePct) on the Progress page.
+ */
+export const sprints = pgTable(
+  "sprints",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    videoId: text("video_id").notNull(),
+    videoTitle: text("video_title").notNull(),
+    fixes: jsonb("fixes").$type<string[]>().notNull().default([]),
+    /** Channel average % viewed when the creator committed (null if YouTube had no data). */
+    baselinePct: integer("baseline_pct_x10"),
+    language: text("language"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("sprints_user_video").on(t.userId, t.videoId)],
+);

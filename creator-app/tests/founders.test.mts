@@ -1,5 +1,7 @@
 // Run with: npm test. Founding-creator spots: numbering, the 100 cap, one per channel, concurrency, credits.
 process.env.PGLITE_DIR = "memory://";
+// Plan limits are tested outside the beta; the beta's own allowance is checked separately below.
+process.env.NEXT_PUBLIC_BETA = "0";
 const { db, schema } = await import("@/db");
 const { claimFounderSpot, foundingSpotsLeft } = await import("@/lib/founders");
 const { creditLimit, FOUNDER_FREE_USES, PLANS } = await import("@/lib/plans");

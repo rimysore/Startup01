@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTheme } from "./hooks";
+import { BETA } from "@/lib/beta";
 
 export { Logo } from "./logo";
 
@@ -145,7 +146,7 @@ export function AiErrorNote({ error }: { error: { message: string; detail?: stri
   return (
     <ErrorNote>
       {error.message}{" "}
-      {error.upgrade && (
+      {error.upgrade && !BETA && (
         <Link href="/dashboard/billing" className="font-semibold underline underline-offset-2">
           Upgrade your plan →
         </Link>

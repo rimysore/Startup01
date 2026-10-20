@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { BETA } from "@/lib/beta";
 import { MilestoneRing, RollingNumber, useReducedMotion } from "./celebrate";
 
 /**
@@ -31,7 +32,7 @@ export function LandingCounter() {
         <div className="glow-blob pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent/45 blur-3xl" aria-hidden />
         <div className="glow-blob pointer-events-none absolute -bottom-28 -left-10 h-56 w-56 rounded-full bg-peacock/35 blur-3xl" style={{ animationDelay: "-6s" }} aria-hidden />
         <div className="relative flex items-center justify-between text-xs">
-          <span className="text-bg/70">Example channel · Telugu tech</span>
+          <span className="text-bg/70">Example channel · {BETA ? "Kannada tech" : "Telugu tech"}</span>
           <span className="inline-flex items-center gap-2 rounded-full bg-bg/10 px-3 py-1">
             <span className="live-dot h-2 w-2 rounded-full bg-good" /> Live
           </span>
