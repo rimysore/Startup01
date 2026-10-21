@@ -12,7 +12,7 @@ export type OfferCheck = { term: OfferTerm; state: CheckState; text: string };
 const MONEY = /(₹|rs\.?|inr|rupees?|ರೂ)\s?\d[\d,]*(\.\d+)?\s?(k|l|lakh)?|\b\d[\d,]*(\.\d+)?\s?(k|lakh)?\s?(₹|rs\.?|inr|rupees?|ರೂಪಾಯಿ)/i;
 const BARTER = /\b(free|barter|complimentary|hamper|voucher|gift|meal|treat|product)\b|ಉಚಿತ/i;
 const EXPOSURE = /\b(exposure|visibility|shout ?out|promotion for you)\b/i;
-const DELIVERABLE = /(\d+|one|two|three|a|an)?\s*(reels?|posts?|stories|story|shorts?|videos?|vlogs?|carousels?|ರೀಲ್|ಸ್ಟೋರಿ|ಪೋಸ್ಟ್)/gi;
+const DELIVERABLE = /(?<![a-z])(\d+|one|two|three|a|an)?\s*(reels?|posts?|stories|story|shorts?|videos?|vlogs?|carousels?|ರೀಲ್|ಸ್ಟೋರಿ|ಪೋಸ್ಟ್)(?![a-z])/gi;
 const DATE = /\b(by|before|on|deadline|this (week|weekend)|next (week|weekend)|tomorrow|today|within \d+ days?|\d{1,2}(st|nd|rd|th)?\s?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec))\b|ಒಳಗೆ|ನಾಳೆ/i;
 const TIMING = /\b(advance|upfront|up front|before posting|after posting|on delivery|within \d+ (working )?days|net ?\d+|50 ?%|half now)\b|ಮುಂಗಡ/i;
 const USAGE = /\b(usage rights?|repost|boost|whitelist|run (it |the video )?as (an? )?ads?|use (the|your) (video|content|reel)|ads? on (our|their) page|paid promotion)\b/i;
@@ -20,11 +20,13 @@ const EXCLUSIVE = /\b(exclusive|exclusivity|no other (brand|cafe|café|restauran
 const DISCLOSURE = /(#ad\b|#sponsored|paid partnership|sponsored|disclos)/i;
 
 /** "1 reel + 3 stories" → "1 reel, 3 stories", from what the message names. */
-function deliverables(text: string): string | null {
+export function deliverables(text: string): string | null {
   const found = new Map<string, number>();
   for (const m of text.matchAll(DELIVERABLE)) {
     const raw = m[2].toLowerCase();
     const kind = /reel|ರೀಲ್/.test(raw) ? "reel" : /stor|ಸ್ಟೋರಿ/.test(raw) ? "story" : /short/.test(raw) ? "Short" : /vlog|video/.test(raw) ? "video" : "post";
+    // "Post by Friday", "posting" or "use your video" aren't deliverables: posts, videos and Shorts need a count.
+    if (!m[1] && (kind === "post" || kind === "video" || kind === "Short")) continue;
     const n = m[1] ? ({ one: 1, a: 1, an: 1, two: 2, three: 3 } as Record<string, number>)[m[1].toLowerCase()] ?? Number(m[1]) : 1;
     found.set(kind, Math.max(found.get(kind) ?? 0, n || 1));
   }
@@ -96,4 +98,16 @@ export function offerReply(checks: OfferCheck[], lang: OfferLang): string | null
     .filter((s): s is string => Boolean(s));
   if (!asks.length) return null;
   return [a.hi, ...asks.map((s) => `• ${s}`), a.bye].join("\n");
+}
+
+/** Fields worth pre-filling in the deal log from an offer: the fee in whole rupees and what they want. */
+export function offerFields(raw: string): { feeInr: number | null; deliverables: string | null } {
+  const m = raw.match(MONEY);
+  let feeInr: number | null = null;
+  if (m) {
+    const n = Number((m[0].match(/\d[\d,]*(\.\d+)?/)?.[0] ?? "").replace(/,/g, ""));
+    const unit = /lakh|\bl\b/i.test(m[0]) ? 100_000 : /\d\s?k\b/i.test(m[0]) ? 1000 : 1;
+    if (Number.isFinite(n) && n > 0) feeInr = Math.round(n * unit);
+  }
+  return { feeInr, deliverables: deliverables(raw) };
 }

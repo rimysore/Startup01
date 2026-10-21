@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { MARKETPLACE } from "@/lib/marketplace/flag";
 import { setAudience, useAudience, type Audience } from "./audience";
 
 // Kannada lines are a first draft: a native speaker checks them before launch.
@@ -65,7 +66,8 @@ export function HeroCopy() {
         {c.sub}
       </p>
       <div className="lp-hero__act lp-fade-in" style={{ ["--l" as string]: 3 }}>
-        <a href="#join" className="lp-btn">
+        {/* With the marketplace on, sign up straight away; otherwise join the pilot waitlist below. */}
+        <a href={MARKETPLACE ? `/m/start?role=${a}` : "#join"} className="lp-btn">
           {c.cta} <Arrow />
         </a>
         <a href="#how" className="lp-btn lp-btn--ghost">

@@ -149,6 +149,10 @@ const sections: LegalSection[] = [
         <li><strong>AI usage log</strong> (feature, model, token counts, cost — no content) — until you delete your account.</li>
         <li><strong>WhatsApp number</strong> — until you disconnect WhatsApp or delete your account. Sending STOP pauses reports but keeps the number so you can resume with START.</li>
         <li><strong>Reports we sent</strong> (including the data behind the PDF version) — 90 days, then deleted. PDF download links expire after 30 days.</li>
+        <li><strong>Marketplace profile and media kit</strong> (your role, screen language, handles, the numbers you enter, rates, area and contact email) — until you change them or delete your account. Your media kit is public at its link only while you keep &ldquo;Make my media kit public&rdquo; on.</li>
+        <li><strong>YouTube-verified numbers</strong> (your channel name and subscriber count, read when you tap Verify) — 30 days, then the Verified mark and the number are removed unless you verify again.</li>
+        <li><strong>Deal log</strong> (offers you paste, the terms, status, promo codes, payments and notes) — private to you, until you delete the deal or your account.</li>
+        <li><strong>Consent records</strong> (what you agreed to, which wording, when) — until you delete your account.</li>
         <li><strong>Sign-in sessions</strong> — expire after 30 days or when you sign out.</li>
         <li><strong>Usage counts and subscription records</strong> — until you delete your account. Payment records held by Razorpay, and any records we must keep for tax purposes, are retained for the period the law requires.</li>
       </ul>

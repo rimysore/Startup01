@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { currentUser } from "@/lib/auth";
+import { currentUser, safeNext } from "@/lib/auth";
 import { beginOAuth } from "@/lib/oauth-state";
 import { authUrl, googleConfigured, YOUTUBE_SCOPES } from "@/lib/youtube";
 
@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
   if (!googleConfigured()) {
     return NextResponse.redirect(new URL("/dashboard/connections?error=not_configured", origin));
   }
-  const state = await beginOAuth({ intent: "youtube", next: "/dashboard?connected=1" });
+  // Where to land afterwards: the dashboard by default, or a same-site page that asked (e.g. the media kit).
+  const asked = request.nextUrl.searchParams.get("next");
+  const state = await beginOAuth({ intent: "youtube", next: asked ? safeNext(asked) : "/dashboard?connected=1" });
   return NextResponse.redirect(authUrl(origin, state, YOUTUBE_SCOPES, user.email));
 }
