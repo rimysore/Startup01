@@ -21,4 +21,7 @@ assert(offerFields(fair).feeInr === 6000 && offerFields(fair).deliverables === "
 assert(offerFields("We can pay Rs 8k for a reel").feeInr === 8000 && offerFields("₹1.5 lakh for 3 videos").feeInr === 150000, "8k and 1.5 lakh are read as rupees");
 assert(offerFields(barter).feeInr === null, "no fee when none is offered");
 assert(offerFields("₹6,000 for 1 reel + 2 stories. Post by this weekend. We may use your video on our page.").deliverables === "1 reel, 2 stories", "'post by' and 'your video' aren't counted as deliverables");
+const ask = "Pay a registration fee of ₹499 to confirm. Fee ₹10,000 after posting 1 reel.";
+assert(checkOffer(ask).find((c) => c.term === "pay")?.text.includes("₹10,000") && offerFields(ask).feeInr === 10000, "a registration fee they ask for isn't read as pay");
+assert(checkOffer("Pay registration fee ₹499 to join our campaign").find((c) => c.term === "pay")?.state === "missing", "when the only amount is one asked of the creator, there's no pay");
 console.log("all offer tests passed");

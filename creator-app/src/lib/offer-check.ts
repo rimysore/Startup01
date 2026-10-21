@@ -34,11 +34,25 @@ export function deliverables(text: string): string | null {
   return [...found].map(([k, n]) => `${n} ${n > 1 ? (k === "story" ? "stories" : `${k}s`) : k}`).join(", ");
 }
 
+/** Amounts the creator would be asked to pay ("registration fee ₹499") aren't pay; skip them. */
+const ASKS_CREATOR_TO_PAY = /(registration|joining|onboarding|security|processing|listing|verification|membership)\s*(fee|fees|charge|charges|amount|deposit)\b[^₹\d]{0,20}$/i;
+
+/** The first amount in the message that's offered to the creator, not asked of them. */
+function payAmount(text: string): RegExpMatchArray | null {
+  const re = new RegExp(MONEY.source, "gi");
+  for (const m of text.matchAll(re)) {
+    if (!ASKS_CREATOR_TO_PAY.test(text.slice(Math.max(0, (m.index ?? 0) - 50), m.index))) return m;
+  }
+  return null;
+}
+
 export function checkOffer(raw: string): OfferCheck[] {
   const text = raw.trim();
   const out: OfferCheck[] = [];
-  const money = text.match(MONEY);
-  if (money) out.push({ term: "pay", state: "ok", text: `Pay is stated: ${money[0].trim()}.` });
+  const money = payAmount(text);
+  if (!money && MONEY.test(text) && /(registration|joining|onboarding|security|processing|listing|verification|membership)\s*(fee|fees|charge|amount|deposit)/i.test(text))
+    out.push({ term: "pay", state: "missing", text: "The only amount here is one they want you to pay. That isn't a fee for you." });
+  else if (money) out.push({ term: "pay", state: "ok", text: `Pay is stated: ${money[0].trim()}.` });
   else if (EXPOSURE.test(text)) out.push({ term: "pay", state: "warn", text: "They offer \"exposure\", not money. Exposure doesn't pay rent: ask for a fee." });
   else if (BARTER.test(text)) out.push({ term: "pay", state: "warn", text: "Barter only (free food or products). Fine if it's worth it to you; otherwise ask for a fee as well." });
   else out.push({ term: "pay", state: "missing", text: "No pay mentioned. Ask what they'll pay before anything else." });
@@ -102,7 +116,7 @@ export function offerReply(checks: OfferCheck[], lang: OfferLang): string | null
 
 /** Fields worth pre-filling in the deal log from an offer: the fee in whole rupees and what they want. */
 export function offerFields(raw: string): { feeInr: number | null; deliverables: string | null } {
-  const m = raw.match(MONEY);
+  const m = payAmount(raw);
   let feeInr: number | null = null;
   if (m) {
     const n = Number((m[0].match(/\d[\d,]*(\.\d+)?/)?.[0] ?? "").replace(/,/g, ""));

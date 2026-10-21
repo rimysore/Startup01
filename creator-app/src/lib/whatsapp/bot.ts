@@ -6,6 +6,8 @@ import type { User } from "../auth";
 import { assistantContext } from "../assistant-context";
 import { SITE_URL } from "../company";
 import { isLanguageCode, LANGUAGES, languageLabel } from "../languages";
+import { MARKETPLACE } from "../marketplace/flag";
+import { addToInbox, looksLikeOffer, verdictOf } from "../marketplace/inbox";
 import { creditLimit, FOUNDER_FREE_USES, planOf } from "../plans";
 import { buildVideoCheck, buildWeekly, loadSummary } from "../reports/build";
 import { latestReport, reportMessages, saveOnDemand, type Contact } from "../reports/deliver";
@@ -101,6 +103,7 @@ export async function respond(user: User, contact: Contact, m: Inbound, now = Da
     else if (START_WORDS.test(text)) action = "start";
     else if (/^(report|weekly report|रिपोर्ट)$/i.test(text)) action = "report";
     else if (contact.state?.awaiting === "titles" && contact.state.until > now) action = "titles-topic";
+    else if (MARKETPLACE && looksLikeOffer(text)) action = "offer";
   }
   if (contact.state && action !== "titles-topic") await d.update(schema.whatsappContacts).set({ state: null }).where(eq(schema.whatsappContacts.userId, user.id));
 
@@ -173,11 +176,37 @@ export async function respond(user: User, contact: Contact, m: Inbound, now = Da
       if (!video) return [menuButton(lang, w.noVideos)];
       return reportMessages(await buildVideoCheck(user, loaded.summary, video, { titles: w.btnTitles, menu: w.btnMenu }, now));
     }
+    case "offer":
+      return offerCheck(user, m.text.replace(/^\s*(offer|ಆಫರ್|check( this)? offer)\s*[:\-]?\s*/i, ""));
     case "ideas":
       return ask(user, "Give me 3 specific next video ideas for my channel based on what's working, each with a title and one line on why.");
     default:
       return ask(user, text);
   }
+}
+
+const VERDICT_TEXT: Record<string, { en: string; kn: string }> = {
+  likely_scam: { en: "🚩 This looks like a scam.", kn: "🚩 ಇದು ಮೋಸದಂತೆ ಕಾಣುತ್ತಿದೆ." },
+  careful: { en: "⚠️ Be careful with this one.", kn: "⚠️ ಇದರಲ್ಲಿ ಎಚ್ಚರ ಇರಲಿ." },
+  looks_ok: { en: "✅ The sender looks genuine.", kn: "✅ ಕಳಿಸಿದವರು ನಿಜವೆಂದು ಕಾಣುತ್ತಿದೆ." },
+  unknown: { en: "ℹ️ Not enough to tell who sent it.", kn: "ℹ️ ಯಾರು ಕಳಿಸಿದರು ಎಂದು ಹೇಳಲು ಸಾಕಷ್ಟು ಮಾಹಿತಿ ಇಲ್ಲ." },
+};
+
+/**
+ * An offer forwarded to Mitra on WhatsApp: saved to the creator's offer inbox, checked (no AI, no credits), and
+ * answered with the verdict, the top findings and a link to reply or save it.
+ */
+async function offerCheck(user: User, text: string): Promise<Out[]> {
+  const o = await addToInbox(user.id, { source: "whatsapp", body: text });
+  const kn = user.language === "kn";
+  const v = verdictOf(o);
+  const flags = [
+    ...(v?.signals ?? []).filter((s) => s.level === "bad" || s.level === "warn").map((s) => `• ${s.text}`),
+    ...o.checks.filter((c) => c.state !== "ok").map((c) => `• ${c.text}`),
+  ].slice(0, 4);
+  const head = VERDICT_TEXT[v?.verdict ?? "unknown"][kn ? "kn" : "en"];
+  const body = [head, "", ...flags].join("\n").slice(0, 900);
+  return [{ type: "link", text: body, label: kn ? "ಪೂರ್ತಿ ನೋಡಿ" : "See it in Mitra", url: `${SITE_URL}/m/inbox/${o.id}` }];
 }
 
 async function ask(user: User, question: string): Promise<Out[]> {

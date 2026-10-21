@@ -1,5 +1,6 @@
 // Run with: npm test. Offer inbox: scam patterns, sender checks (with a fake network), reports, forwarding, WhatsApp detection.
 process.env.PGLITE_DIR = "memory://";
+process.env.INBOUND_EMAIL_SECRET = "inbound-test-secret";
 type Fetcher = import("@/lib/marketplace/sender-check").Fetcher;
 const { db, schema } = await import("@/db");
 const sc = await import("@/lib/marketplace/sender-check");
@@ -88,4 +89,18 @@ assert(ib.verdictOf(o4)?.signals.some((s) => s.level === "good" && /paid 1 creat
 const tok = await ib.inboxToken("c1");
 assert(tok === (await ib.inboxToken("c1")) && (await ib.userForToken(tok)) === "c1" && (await ib.userForToken("../x")) === null, "forwarding token is stable and private");
 assert((await ib.inboxCountToday("c1", "paste")) === 1, "daily count per source");
+// Forwarded email webhook.
+const { POST: inbound } = await import("@/app/api/inbound/email/route");
+const mail = (to: string, secret = "inbound-test-secret") =>
+  inbound(new Request("http://x/api/inbound/email", {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-inbound-secret": secret },
+    body: JSON.stringify({ From: "c1@x.com", FromFull: { Email: "c1@x.com", Name: "Me" }, To: to, Subject: "Fwd: Collab", TextBody: "see below\n\n---------- Forwarded message ---------\nFrom: Priya <priya@brandco.in>\nSubject: Collab with BrandCo\n\nWe'd pay ₹7,000 for 1 reel, posted by 5 Nov." }),
+  }));
+assert((await mail(`offers+${tok}@in.mitra.test`, "wrong")).status === 403, "inbound email needs the shared secret");
+const before = (await ib.listInbox("c1")).length;
+assert((await mail(`offers+${tok}@in.mitra.test`)).status === 200, "inbound email accepted");
+const got = (await ib.listInbox("c1"))[0];
+assert((await ib.listInbox("c1")).length === before + 1 && got.source === "email" && got.senderEmail === "priya@brandco.in" && got.subject === "Collab with BrandCo" && got.body.startsWith("We'd pay"), "a forwarded email lands in the right inbox, credited to the real sender");
+assert((await (await mail("offers+nosuchtoken@in.mitra.test")).json()).ignored === "unknown recipient", "unknown addresses are ignored quietly");
 console.log("all inbox tests passed");
