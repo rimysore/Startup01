@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Pulling clean Epicor exports is half a day of work I don't have, and sending PO and job data to an outside startup needs IT and my boss to sign off, which won't happen inside 30 days. I'd take a look if someone else did the export for me.",
+  "objection": "Our Epicor data leaving the building, even sanitized, will trigger a security review that I don't want to start for a free audit from an early-stage company.",
+  "would_change_my_mind": "If the export were a short, template-based pull that IT already approved, so it cost me under an hour and nothing that needed a security review.",
+  "price_too_cheap": 100,
+  "price_cheap": 300,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}

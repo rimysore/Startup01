@@ -1,0 +1,126 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Supplier Delay Risk Audit · Sample Machine Works (fictional)</title>
+<style>
+@page { size: Letter landscape; margin: 0.4in; }
+:root { --ink:#14171f; --muted:#5d6472; --line:#e3e6ec; --soft:#f5f7fa; --accent:#c2410c; --accent-soft:#fff1e8; --ok:#1d6b4f; }
+* { box-sizing:border-box; }
+body { margin:0; font-family: "Inter", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color:var(--ink); font-size:10.5px; background:#fff; }
+.page { max-width:10.2in; margin:0 auto; }
+.banner { background:#14171f; color:#fff; font-size:9.5px; letter-spacing:.08em; padding:5px 10px; border-radius:6px; text-align:center; margin-bottom:10px; }
+header { display:flex; justify-content:space-between; align-items:flex-end; border-bottom:2px solid var(--ink); padding-bottom:8px; }
+.brand { font-weight:800; font-size:13px; letter-spacing:-.01em; } .brand span { color:var(--accent); }
+h1 { margin:2px 0 0; font-size:20px; letter-spacing:-.02em; }
+.meta { text-align:right; color:var(--muted); line-height:1.5; }
+.lede { margin:10px 0 10px; font-size:12.5px; max-width:9.4in; }
+.tiles { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:10px; }
+.tile { background:var(--soft); border-radius:8px; padding:8px 10px; }
+.tile b { display:block; font-size:20px; letter-spacing:-.02em; } .tile span { color:var(--muted); font-size:10px; }
+.tile.hot { background:var(--accent-soft); } .tile.hot b { color:var(--accent); }
+table { width:100%; border-collapse:collapse; }
+th { text-align:left; font-size:9.5px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; padding:5px 6px; border-bottom:1px solid var(--ink); }
+td { padding:4px 6px; border-bottom:1px solid var(--line); vertical-align:top; }
+.sub { color:var(--muted); font-size:9.5px; margin-top:1px; }
+.n { color:var(--muted); width:16px; } .dates, .short { white-space:nowrap; } .short b { color:var(--accent); } .knew { white-space:nowrap; color:var(--muted); }
+.tag { display:inline-block; font-size:9px; font-weight:700; padding:2px 6px; border-radius:999px; }
+.tag.hidden { background:var(--accent-soft); color:var(--accent); } .tag.seen { background:var(--soft); color:var(--muted); }
+.foot { display:grid; grid-template-columns:1.2fr 1fr; gap:14px; margin-top:10px; color:var(--muted); font-size:9.5px; line-height:1.45; }
+.foot h3 { margin:0 0 3px; font-size:10px; color:var(--ink); }
+</style></head><body><div class="page">
+<div class="banner">SAMPLE REPORT · synthetic data for a fictional plant · not a real customer</div>
+<header><div><div class="brand">Exception<span>OS</span></div><h1>Supplier Delay Risk Audit</h1></div>
+<div class="meta"><b>Sample Machine Works (fictional)</b><br>Data as of Oct 19, 2026 · 116 open PO releases · 28 open jobs · 18 purchased parts</div></header>
+<p class="lede"><b>11 open jobs will run short because a supplier pushed a promise date past the PO due date, and they still look on time</b>
+in a due-date view (Time Phase, MRP), because the due date was never changed.
+We also set aside 12 supplier slips that don't hit any job, so your team can ignore them.</p>
+<div class="tiles">
+<div class="tile hot"><b>11</b><span>jobs short on promise dates but on time on due dates</span></div>
+<div class="tile"><b>4</b><span>more jobs already short in a due-date view</span></div>
+<div class="tile"><b>22</b><span>releases with promise date after due date</span></div>
+<div class="tile"><b>12</b><span>slips that hit no job: safe to ignore</span></div>
+<div class="tile"><b>$961K</b><span>customer orders behind threatened jobs</span></div>
+</div>
+<table><thead><tr><th>#</th><th>Job · customer order</th><th>Part</th><th>Supplier · PO</th><th>Due → promise</th><th>Impact</th><th>Due-date view</th><th>Did your team know?</th></tr></thead>
+<tbody><tr>
+<td class="n">1</td>
+<td><b>J4121</b><div class="sub">Northgate Logistics · SO 51010 · $66K</div></td>
+<td><b>STL-TUBE-80</b><div class="sub">Square tube 80x80 · need 6</div></td>
+<td>Tri-State Steel Service<div class="sub">PO 21091-1-1</div></td>
+<td class="dates">Nov 7 → <b>Nov 21</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>12d short</b><div class="sub">needed Nov 9 · starts in 21d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">2</td>
+<td><b>J4113</b><div class="sub">Riverbend Packaging · SO 51006 · $18K</div></td>
+<td><b>STL-TUBE-80</b><div class="sub">Square tube 80x80 · need 12</div></td>
+<td>Tri-State Steel Service<div class="sub">PO 21091-1-1</div></td>
+<td class="dates">Nov 7 → <b>Nov 21</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>12d short</b><div class="sub">needed Nov 9 · starts in 21d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">3</td>
+<td><b>J4125</b><div class="sub">Riverbend Packaging · SO 51012 · $95K</div></td>
+<td><b>VFD-7K5</b><div class="sub">VFD 7.5kW · need 8</div></td>
+<td>Northern Electric Controls<div class="sub">PO 21067-1-1</div></td>
+<td class="dates">Oct 31 → <b>Nov 14</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>10d short</b><div class="sub">needed Nov 4 · starts in 11d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">4</td>
+<td><b>J4110</b><div class="sub">Pinecrest Paper · SO 51005 · $140K</div></td>
+<td><b>VFD-7K5</b><div class="sub">VFD 7.5kW · need 2</div></td>
+<td>Northern Electric Controls<div class="sub">PO 21067-1-1</div></td>
+<td class="dates">Oct 31 → <b>Nov 14</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>5d short</b><div class="sub">needed Nov 9 · starts in 16d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">5</td>
+<td><b>J4113</b><div class="sub">Riverbend Packaging · SO 51006 · $18K</div></td>
+<td><b>VFD-7K5</b><div class="sub">VFD 7.5kW · need 1</div></td>
+<td>Northern Electric Controls<div class="sub">PO 21067-1-1</div></td>
+<td class="dates">Oct 31 → <b>Nov 14</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>5d short</b><div class="sub">needed Nov 9 · starts in 21d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">6</td>
+<td><b>J4125</b><div class="sub">Riverbend Packaging · SO 51012 · $95K</div></td>
+<td><b>SNS-PROX-18</b><div class="sub">Proximity sensor M18 · need 2</div></td>
+<td>Summit Sensors<div class="sub">PO 21097-1-1</div></td>
+<td class="dates">Oct 25 → <b>Nov 8</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>4d short</b><div class="sub">needed Nov 1 · starts in 11d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">7</td>
+<td><b>J4121</b><div class="sub">Northgate Logistics · SO 51010 · $66K</div></td>
+<td><b>FST-M12-KIT</b><div class="sub">M12 fastener kit · need 1</div></td>
+<td>Keystone Fasteners<div class="sub">PO 21057-1-1</div></td>
+<td class="dates">Nov 6 → <b>Nov 13</b><div class="sub">+7d slip</div></td>
+<td class="short"><b>4d short</b><div class="sub">needed Nov 9 · starts in 21d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">8</td>
+<td><b>J4102</b><div class="sub">Hartwell Foods · SO 51001 · $140K</div></td>
+<td><b>SNS-PROX-18</b><div class="sub">Proximity sensor M18 · need 12</div></td>
+<td>Summit Sensors<div class="sub">PO 21097-1-1</div></td>
+<td class="dates">Oct 25 → <b>Nov 8</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>2d short</b><div class="sub">needed Oct 29 · starts in 8d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">9</td>
+<td><b>J4115</b><div class="sub">Hartwell Foods · SO 51007 · $140K</div></td>
+<td><b>SNS-PROX-18</b><div class="sub">Proximity sensor M18 · need 1</div></td>
+<td>Summit Sensors<div class="sub">PO 21097-1-1</div></td>
+<td class="dates">Oct 25 → <b>Nov 8</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>2d short</b><div class="sub">needed Oct 29 · starts in 8d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr><tr>
+<td class="n">10</td>
+<td><b>J4111</b><div class="sub">Pinecrest Paper · SO 51005 · $95K</div></td>
+<td><b>SNS-PROX-18</b><div class="sub">Proximity sensor M18 · need 2</div></td>
+<td>Summit Sensors<div class="sub">PO 21097-1-1</div></td>
+<td class="dates">Oct 25 → <b>Nov 8</b><div class="sub">+14d slip</div></td>
+<td class="short"><b>2d short</b><div class="sub">needed Oct 29 · starts in 10d</div></td>
+<td><span class="tag hidden">Hidden</span></td>
+<td class="knew">☐ Yes&nbsp; ☐ No</td></tr></tbody></table>
+<div class="foot">
+<div><h3>How this was worked out</h3>For each purchased part, on-hand stock and open PO receipts were netted against open job requirements in date order, once on PO due dates and once on supplier promise dates. The table lists job lines that are covered on due dates but short on promise dates. Ranked by jobs starting in the next 3 weeks, then days short, then order value. 19 hidden job lines in total, top 10 shown; 4 more are already short in a due-date view (all in findings.csv). Also: 3 releases due in the next 14 days have no supplier acknowledgement at all.</div>
+<div><h3>Limits, said plainly</h3>Uses only the exports provided. Doesn't yet see allocations, substitutes, safety stock, partial receipts in transit, or multi-level sub-assemblies; your planners will know some of these. "Hidden" means hidden from a due-date view, not from your team: that's what the last column is for. Processed read-only and offline; no AI model saw the data.</div>
+</div></div></body></html>

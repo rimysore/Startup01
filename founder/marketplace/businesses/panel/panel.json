@@ -1,0 +1,91 @@
+{
+ "n": 20,
+ "seed": 2110,
+ "customer": {
+  "business": "Mitra, a Bengaluru app that matches local businesses with Kannada and English creators and counts the customers each post brings",
+  "target": "Owner-run local businesses in Bengaluru (cafés, restaurants, bakeries, salons, gyms, clinics, boutiques) with 1-3 outlets that spend some money on marketing and have tried or considered Instagram creators",
+  "where": "Bengaluru (Indiranagar, Koramangala, HSR, Jayanagar, Malleshwaram, Whitefield)",
+  "age": [
+   25,
+   55
+  ],
+  "currency": "INR",
+  "segments": [
+   {
+    "name": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+    "share": 0.45,
+    "income": [
+     600000,
+     2400000
+    ]
+   },
+   {
+    "name": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+    "share": 0.3,
+    "income": [
+     700000,
+     3000000
+    ]
+   },
+   {
+    "name": "2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month",
+    "share": 0.25,
+    "income": [
+     2000000,
+     8000000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Barter only",
+    "share": 0.25,
+    "how": "Gives creators a free meal or service for a post; has never paid a creator cash."
+   },
+   {
+    "name": "Pays creators directly",
+    "share": 0.2,
+    "how": "Finds creators on Instagram, DMs them, pays ₹2,000-15,000 by UPI, judges by views."
+   },
+   {
+    "name": "Uses an agency",
+    "share": 0.12,
+    "how": "Pays a local digital agency a monthly retainer that includes some influencer posts."
+   },
+   {
+    "name": "Boosts posts and runs Zomato/Swiggy ads",
+    "share": 0.2,
+    "how": "Spends on Meta boosts or aggregator ads; skeptical of influencers."
+   },
+   {
+    "name": "Burned by fake influencers",
+    "share": 0.13,
+    "how": "Paid a creator whose followers turned out fake or who brought no customers."
+   },
+   {
+    "name": "Word-of-mouth only",
+    "share": 0.1,
+    "how": "Relies on Google reviews and regulars; spends almost nothing on marketing."
+   }
+  ],
+  "objections": [
+   "Influencer posts get views but don't bring paying customers through the door",
+   "Most influencers have fake followers; how do I know these are real?",
+   "I can just DM creators myself, why pay a middleman?",
+   "Barter works fine for me; why pay cash plus a fee?",
+   "I don't have time to manage another app or count customers at the till",
+   "A 10% fee plus GST on top adds up when margins are thin",
+   "Kannada creators might not reach my English-speaking customers (or the reverse)",
+   "New app, no track record in my area"
+  ],
+  "habits": [
+   "you check your Google reviews and Instagram every evening after closing",
+   "you've been approached by three 'influencer agencies' this year",
+   "you pay suppliers and staff by UPI",
+   "creators walk in and offer a reel for a free meal at least once a month",
+   "your weekends are busy and weekdays slow",
+   "you ask customers 'how did you hear about us' only sometimes"
+  ]
+ },
+ "pitch": "Mitra: find Bengaluru creators (Kannada and English) who bring real customers to your café, salon or shop, and see exactly how many came.\nTell Mitra your goal (e.g. \"more weekday lunch customers\"), budget and area. You get 3-5 matched creators, each with the reason they fit and their real numbers (Verified where they connected their account; otherwise marked Self-reported), and a suggested split of your budget.\nInvite the ones you like; they accept or decline. Each deal gets its own promo code (e.g. RUCHI-SR) and a link, and you tap +1 at the counter when a customer uses the code. You see customers, money paid and cost per customer for each creator.\nYou pay the creator directly (UPI). On deals Mitra matched, you pay Mitra 10% of the creator's fee on top (minimum ₹199, plus GST); the creator keeps their whole fee. No fee if you bring the creator yourself. Free during the Bengaluru pilot.\nThe price questions below are about Mitra's fee for one ₹5,000 creator deal, in rupees."
+}

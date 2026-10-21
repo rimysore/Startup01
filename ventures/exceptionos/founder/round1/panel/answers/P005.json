@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I got burned by a software rollout and this is a startup with the product still in development, asking me to forward supplier emails and export open POs into it. I would take the free six-week test to see if it catches anything real, but I would not commit $2,000 a month to it, and I would need IT, finance and my boss to sign off on sending our supplier data to an unproven vendor.",
+  "objection": "If it misses a short ship or a backorder that our team would have caught anyway, I have paid to add a tool and a new daily routine. And I do not know yet what happens to our supplier emails and PO data once they leave our inbox.",
+  "would_change_my_mind": "A six-week free test on our own open POs that catches at least a few real late or short supplier changes before my shortage meeting, plus a reference from a plant of similar size that has run it for a year.",
+  "price_too_cheap": 250,
+  "price_cheap": 800,
+  "price_expensive": 1800,
+  "price_too_expensive": 3000
+}

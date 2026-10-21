@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Ada",
+  "age": 29,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 526000,
+  "behaviour": "Burned before",
+  "behaviour_how": "Once paid a 'registration fee' or posted and never got paid; now ignores most DMs.",
+  "objection": "Local businesses here only offer barter, not money",
+  "habit": "you edit Reels in CapCut or InShot"
+ },
+ {
+  "id": "P002",
+  "name": "Luca",
+  "age": 19,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 457000,
+  "behaviour": "Signed up on Influish or similar",
+  "behaviour_how": "Joined an influencer app, applied to campaigns, got few or none.",
+  "objection": "What's the catch if it's free? They'll sell my data or charge me later",
+  "habit": "you post in Kannada and English depending on the audience"
+ },
+ {
+  "id": "P003",
+  "name": "Dev",
+  "age": 28,
+  "segment": "Established local creator (50K-200K followers), creating is the main income, may have a manager",
+  "income": 1522000,
+  "behaviour": "Takes barter happily",
+  "behaviour_how": "Says yes to free food or a free haircut in exchange for a reel; rarely asks for money.",
+  "objection": "Kannada creators always get paid less than English ones; will this change that?",
+  "habit": "you've been paid by UPI for a collab, sometimes weeks late"
+ },
+ {
+  "id": "P004",
+  "name": "Daniel",
+  "age": 24,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 863000,
+  "behaviour": "Takes barter happily",
+  "behaviour_how": "Says yes to free food or a free haircut in exchange for a reel; rarely asks for money.",
+  "objection": "I already get DMs; I don't need an app to find offers",
+  "habit": "you check Instagram insights every morning"
+ },
+ {
+  "id": "P005",
+  "name": "Yara",
+  "age": 33,
+  "segment": "Established local creator (50K-200K followers), creating is the main income, may have a manager",
+  "income": 1880000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone, lives in WhatsApp and Instagram DMs, hates new apps.",
+  "objection": "Will my followers feel I'm selling out with too many local promos?",
+  "habit": "you're in a WhatsApp group of Bengaluru food creators who share leads"
+ },
+ {
+  "id": "P006",
+  "name": "Yusuf",
+  "age": 27,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 441000,
+  "behaviour": "Hustler",
+  "behaviour_how": "Pitches cafés directly on Instagram and WhatsApp, has a rate card, negotiates.",
+  "objection": "What's the catch if it's free? They'll sell my data or charge me later",
+  "habit": "you get two or three 'collab' DMs a week and most look fake"
+ },
+ {
+  "id": "P007",
+  "name": "Pablo",
+  "age": 34,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 670000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone, lives in WhatsApp and Instagram DMs, hates new apps.",
+  "objection": "I don't trust an app I've never heard of with my contacts and deals",
+  "habit": "you get two or three 'collab' DMs a week and most look fake"
+ },
+ {
+  "id": "P008",
+  "name": "Eli",
+  "age": 23,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 625000,
+  "behaviour": "Hustler",
+  "behaviour_how": "Pitches cafés directly on Instagram and WhatsApp, has a rate card, negotiates.",
+  "objection": "If a business pays Mitra a fee, they'll pay me less to cover it",
+  "habit": "you check Instagram insights every morning"
+ },
+ {
+  "id": "P009",
+  "name": "Ben",
+  "age": 21,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 349000,
+  "behaviour": "Burned before",
+  "behaviour_how": "Once paid a 'registration fee' or posted and never got paid; now ignores most DMs.",
+  "objection": "Kannada creators always get paid less than English ones; will this change that?",
+  "habit": "you edit Reels in CapCut or InShot"
+ },
+ {
+  "id": "P010",
+  "name": "Nora",
+  "age": 26,
+  "segment": "Established local creator (50K-200K followers), creating is the main income, may have a manager",
+  "income": 1464000,
+  "behaviour": "Takes barter happily",
+  "behaviour_how": "Says yes to free food or a free haircut in exchange for a reel; rarely asks for money.",
+  "objection": "If a business pays Mitra a fee, they'll pay me less to cover it",
+  "habit": "you edit Reels in CapCut or InShot"
+ },
+ {
+  "id": "P011",
+  "name": "Arjun",
+  "age": 33,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 447000,
+  "behaviour": "Agency-dependent",
+  "behaviour_how": "Gets most deals through one or two local agencies or a manager who takes a cut.",
+  "objection": "If a business pays Mitra a fee, they'll pay me less to cover it",
+  "habit": "you're in a WhatsApp group of Bengaluru food creators who share leads"
+ },
+ {
+  "id": "P012",
+  "name": "Adrian",
+  "age": 21,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 335000,
+  "behaviour": "Hustler",
+  "behaviour_how": "Pitches cafés directly on Instagram and WhatsApp, has a rate card, negotiates.",
+  "objection": "What's the catch if it's free? They'll sell my data or charge me later",
+  "habit": "you get two or three 'collab' DMs a week and most look fake"
+ },
+ {
+  "id": "P013",
+  "name": "Jasper",
+  "age": 27,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 483000,
+  "behaviour": "Agency-dependent",
+  "behaviour_how": "Gets most deals through one or two local agencies or a manager who takes a cut.",
+  "objection": "Another influencer app that will show me zero real deals",
+  "habit": "you check Instagram insights every morning"
+ },
+ {
+  "id": "P014",
+  "name": "Olivia",
+  "age": 23,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 553000,
+  "behaviour": "Hustler",
+  "behaviour_how": "Pitches cafés directly on Instagram and WhatsApp, has a rate card, negotiates.",
+  "objection": "I already get DMs; I don't need an app to find offers",
+  "habit": "you check Instagram insights every morning"
+ },
+ {
+  "id": "P015",
+  "name": "Dana",
+  "age": 27,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 535000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone, lives in WhatsApp and Instagram DMs, hates new apps.",
+  "objection": "I already get DMs; I don't need an app to find offers",
+  "habit": "you get two or three 'collab' DMs a week and most look fake"
+ },
+ {
+  "id": "P016",
+  "name": "Sara",
+  "age": 31,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 389000,
+  "behaviour": "Takes barter happily",
+  "behaviour_how": "Says yes to free food or a free haircut in exchange for a reel; rarely asks for money.",
+  "objection": "Kannada creators always get paid less than English ones; will this change that?",
+  "habit": "you're in a WhatsApp group of Bengaluru food creators who share leads"
+ },
+ {
+  "id": "P017",
+  "name": "Zara",
+  "age": 23,
+  "segment": "Established local creator (50K-200K followers), creating is the main income, may have a manager",
+  "income": 1490000,
+  "behaviour": "Burned before",
+  "behaviour_how": "Once paid a 'registration fee' or posted and never got paid; now ignores most DMs.",
+  "objection": "I already get DMs; I don't need an app to find offers",
+  "habit": "you've been paid by UPI for a collab, sometimes weeks late"
+ },
+ {
+  "id": "P018",
+  "name": "Poppy",
+  "age": 30,
+  "segment": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+  "income": 549000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone, lives in WhatsApp and Instagram DMs, hates new apps.",
+  "objection": "I don't trust an app I've never heard of with my contacts and deals",
+  "habit": "you check Instagram insights every morning"
+ },
+ {
+  "id": "P019",
+  "name": "Levi",
+  "age": 31,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 284000,
+  "behaviour": "Signed up on Influish or similar",
+  "behaviour_how": "Joined an influencer app, applied to campaigns, got few or none.",
+  "objection": "Kannada creators always get paid less than English ones; will this change that?",
+  "habit": "you get two or three 'collab' DMs a week and most look fake"
+ },
+ {
+  "id": "P020",
+  "name": "Ana",
+  "age": 23,
+  "segment": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+  "income": 195000,
+  "behaviour": "Busy, phone-only",
+  "behaviour_how": "Shoots and edits on the phone, lives in WhatsApp and Instagram DMs, hates new apps.",
+  "objection": "Kannada creators always get paid less than English ones; will this change that?",
+  "habit": "you check Instagram insights every morning"
+ }
+]

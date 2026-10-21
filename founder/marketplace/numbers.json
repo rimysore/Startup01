@@ -1,0 +1,25 @@
+{
+  "business": "Mitra marketplace, Bengaluru (amounts in INR; the tool prints a $ sign, read it as ₹)",
+  "unit": "matched deal (business pays Mitra 10% of a ₹5,000 creator fee, on top)",
+  "price": 500,
+  "variable": [
+    {"label": "Payment provider ~2% on the whole ₹5,590 collected (payment protection version)", "cost": 112},
+    {"label": "AI + messages per deal (offer checks, matching, WhatsApp templates)", "cost": 6},
+    {"label": "Guarantee refunds: ~1 in 10 deals gets the next fee free (estimate)", "cost": 50}
+  ],
+  "fixed_monthly": [
+    {"label": "Hosting, database, domain, email (midpoint of ₹1,850-3,950)", "cost": 2900},
+    {"label": "WhatsApp Business API + Indian number (estimate)", "cost": 800},
+    {"label": "CA / bookkeeping retainer once charging (estimate)", "cost": 3000},
+    {"label": "Field visits to sign up businesses: travel, samples (estimate)", "cost": 3000},
+    {"label": "Founder salaries", "cost": 0}
+  ],
+  "startup": [
+    {"label": "Company registration + DPIIT + GST registration via a CA (estimate)", "cost": 25000},
+    {"label": "Terms / privacy review for the marketplace by a lawyer (estimate)", "cost": 15000},
+    {"label": "Pilot launch: printed counter cards, creator meetups, small ads (estimate)", "cost": 15000}
+  ],
+  "days_per_month": 1,
+  "plan_per_day": 300,
+  "ramp_per_day": [0, 0, 0, 10, 20, 30, 45, 60, 80, 100, 120, 150]
+}

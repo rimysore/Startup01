@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I run a 100-500 person shop and a tool that reads our POs and supplier emails and ranks what will hit our work orders sounds useful, but I have heard this pitch before and a wrong date is what costs us a shortage on the floor. I would take the free six-week test with exports and a few forwarded emails, and I would not sign a monthly paid pilot until my buyers say the ranked list is right.",
+  "objection": "If it misreads one supplier acknowledgement or misses a backorder, my buyers stop trusting the morning list and we are back to chasing suppliers by hand, with one more tool to explain to my plant manager.",
+  "would_change_my_mind": "Proof on our own data during the free test: it catches real late and short shipments that my buyers had not yet seen, with few false alarms, and my team says it saves them time in the daily shortage meeting.",
+  "price_too_cheap": 250,
+  "price_cheap": 800,
+  "price_expensive": 2000,
+  "price_too_expensive": 3500
+}

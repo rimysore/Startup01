@@ -1,0 +1,97 @@
+{
+ "n": 20,
+ "seed": 176352,
+ "customer": {
+  "business": "ExceptionOS v0: production-impact intelligence for supplier delivery changes in Epicor manufacturers",
+  "target": "Purchasing, materials, planning and operations people at U.S. machinery/equipment manufacturers with 50-500 employees running Epicor Kinetic, with purchased components feeding make-to-order or engineer-to-order jobs",
+  "where": "United States (Midwest and Southeast industrial states especially)",
+  "age": [
+   28,
+   62
+  ],
+  "segments": [
+   {
+    "name": "Buyer / senior buyer (chases suppliers daily)",
+    "share": 0.3,
+    "income": [
+     55000,
+     90000
+    ]
+   },
+   {
+    "name": "Purchasing or materials manager (owns the team and the shortage meeting)",
+    "share": 0.35,
+    "income": [
+     85000,
+     135000
+    ]
+   },
+   {
+    "name": "Supply chain director or VP (owns OTIF, expedite cost, budget)",
+    "share": 0.2,
+    "income": [
+     130000,
+     220000
+    ]
+   },
+   {
+    "name": "COO, GM or owner of a 100-500 person manufacturer",
+    "share": 0.15,
+    "income": [
+     180000,
+     400000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Spreadsheet owner",
+    "share": 0.22,
+    "how": "Runs the open-PO / shortage tracker in Excel and trusts it more than the ERP."
+   },
+   {
+    "name": "ERP loyalist",
+    "share": 0.18,
+    "how": "Wants everything inside the ERP and asks the ERP partner first."
+   },
+   {
+    "name": "Burned by software",
+    "share": 0.15,
+    "how": "Lived through a painful ERP or software rollout and is wary of new tools."
+   },
+   {
+    "name": "Improvement champion",
+    "share": 0.15,
+    "how": "Runs lean/continuous-improvement projects and tries new tools if they prove ROI."
+   },
+   {
+    "name": "Budget gatekeeper",
+    "share": 0.15,
+    "how": "Every new spend needs a payback story for the owner or CFO."
+   },
+   {
+    "name": "Security-first IT partner",
+    "share": 0.15,
+    "how": "Won't share ERP or email data with a startup without IT and security sign-off."
+   }
+  ],
+  "objections": [
+   "Epicor Time Phase and our shortage report already show which jobs a late PO hits",
+   "Sending exports of our POs, jobs and BOMs outside the company needs IT and management approval",
+   "Getting clean exports takes someone half a day we don't have",
+   "Our BOM and job data is messy; any analysis will be wrong",
+   "Our planners already know which supplier slips matter",
+   "A free audit means you'll try to sell me something next",
+   "We've been burned by consultants who told us what we already knew"
+  ],
+  "habits": [
+   "you hold a daily or weekly shortage / expedite meeting",
+   "you spend part of every morning in Outlook chasing supplier acknowledgements",
+   "you paid for premium freight to cover a late supplier in the last quarter",
+   "your plant runs Epicor (or Infor SyteLine) and the ERP partner does customisations",
+   "you report on-time delivery to customers every month",
+   "your planner runs a Time Phase or BAQ check when a supplier calls with a new date"
+  ]
+ },
+ "pitch": "ExceptionOS (early-stage, Epicor manufacturers only). It finds supplier delivery-date changes that put your open jobs at risk, before your planners discover the shortage manually.\nFree \"Supplier Delay Risk Audit\": you send sanitized exports (open PO lines, open jobs / material requirements, current inventory if available, supplier date-change history if available). We process them read-only and offline: no Epicor login, no inbox access, nothing written back, no AI agent acting on anything.\nWithin a week you get back: the supplier date changes we found, the specific jobs each one threatens, the order we'd tackle them in, and one question: which of these did your team already know about?\nNo cost and no commitment. If it finds something your team missed, we'd talk about continuing; price not set yet."
+}

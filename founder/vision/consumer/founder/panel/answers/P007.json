@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already check YouTube Studio every day and I ask ChatGPT for title and hook ideas when I'm stuck, and both are free. I can't see what Mitra knows that those don't, so I wouldn't pay for a second dashboard that tells me the same things.",
+  "objection": "YouTube Studio and ChatGPT already tell me this for free, so I don't see what I'd be paying ₹299 for.",
+  "would_change_my_mind": "Mitra finds me a real local deal, like a shop or coaching centre paying me for a video, and it shows that the deal earned more than my usual weeks of ad revenue. One proven paid deal would matter more to me than any feature list.",
+  "price_too_cheap": 29,
+  "price_cheap": 99,
+  "price_expensive": 249,
+  "price_too_expensive": 399
+}

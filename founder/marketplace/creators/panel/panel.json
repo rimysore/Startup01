@@ -1,0 +1,91 @@
+{
+ "n": 20,
+ "seed": 2110,
+ "customer": {
+  "business": "Mitra, a free app for Bengaluru creators: paid local deals plus a scam and terms check for every offer you get",
+  "target": "Creators in and around Bengaluru who post in Kannada and/or English on Instagram (mostly Reels), YouTube or Moj, 2K to 200K followers, food, local lifestyle, comedy or city content, who get brand DMs and want paid work",
+  "where": "Bengaluru, online (Instagram, YouTube, WhatsApp)",
+  "age": [
+   18,
+   35
+  ],
+  "currency": "INR",
+  "segments": [
+   {
+    "name": "Small creator (2K-10K followers), student or day job, mostly barter offers so far",
+    "share": 0.45,
+    "income": [
+     150000,
+     600000
+    ]
+   },
+   {
+    "name": "Growing creator (10K-50K followers), a few paid deals a month at ₹1,000-8,000",
+    "share": 0.35,
+    "income": [
+     300000,
+     1200000
+    ]
+   },
+   {
+    "name": "Established local creator (50K-200K followers), creating is the main income, may have a manager",
+    "share": 0.2,
+    "income": [
+     700000,
+     2500000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Takes barter happily",
+    "share": 0.22,
+    "how": "Says yes to free food or a free haircut in exchange for a reel; rarely asks for money."
+   },
+   {
+    "name": "Burned before",
+    "share": 0.15,
+    "how": "Once paid a 'registration fee' or posted and never got paid; now ignores most DMs."
+   },
+   {
+    "name": "Hustler",
+    "share": 0.18,
+    "how": "Pitches cafés directly on Instagram and WhatsApp, has a rate card, negotiates."
+   },
+   {
+    "name": "Signed up on Influish or similar",
+    "share": 0.12,
+    "how": "Joined an influencer app, applied to campaigns, got few or none."
+   },
+   {
+    "name": "Agency-dependent",
+    "share": 0.1,
+    "how": "Gets most deals through one or two local agencies or a manager who takes a cut."
+   },
+   {
+    "name": "Busy, phone-only",
+    "share": 0.23,
+    "how": "Shoots and edits on the phone, lives in WhatsApp and Instagram DMs, hates new apps."
+   }
+  ],
+  "objections": [
+   "Another influencer app that will show me zero real deals",
+   "What's the catch if it's free? They'll sell my data or charge me later",
+   "Local businesses here only offer barter, not money",
+   "I already get DMs; I don't need an app to find offers",
+   "Will my followers feel I'm selling out with too many local promos?",
+   "I don't trust an app I've never heard of with my contacts and deals",
+   "Kannada creators always get paid less than English ones; will this change that?",
+   "If a business pays Mitra a fee, they'll pay me less to cover it"
+  ],
+  "habits": [
+   "you get two or three 'collab' DMs a week and most look fake",
+   "you're in a WhatsApp group of Bengaluru food creators who share leads",
+   "you edit Reels in CapCut or InShot",
+   "you check Instagram insights every morning",
+   "you've been paid by UPI for a collab, sometimes weeks late",
+   "you post in Kannada and English depending on the audience"
+  ]
+ },
+ "pitch": "Mitra: get paid local deals in Bengaluru, and check every collab offer before you reply. In Kannada or English.\nSign in with Google; no need to connect your Instagram or YouTube. Make a media kit in five minutes (connect YouTube if you want a \"Verified\" badge).\nGot a DM or email offer? Paste it, screenshot it or forward it (email or WhatsApp). Mitra tells you if it looks like a scam (registration fees, \"buy first, we refund\", OTP requests), what's missing (pay, deadline, usage rights) and drafts a reply.\nTurn on \"Let local businesses find me\": cafés, salons and gyms nearby send you paid invites with the fee written down. You accept or decline; your number is shared only when you accept.\nFree for creators, always. You keep your whole fee: on deals Mitra brings, the business pays Mitra's fee on top. Mitra never charges you to join, apply or be seen.\nLater, an optional Creator Pro with growth tools (video feedback, unlimited screenshot checks, AI replies) will be offered; the price questions below are about what Creator Pro should cost per month in rupees. Getting deals will never be behind it."
+}

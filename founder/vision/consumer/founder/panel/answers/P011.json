@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I make videos in Hindi and Telugu and I don't know if an AI can get what my audience actually likes, the slang and the jokes. The free start is fine to try, but I won't pay ₹299 a month until I see it give me a title or script that beats my usual views.",
+  "objection": "Will an AI really understand my Telugu/Hindi/Kannada audience?",
+  "would_change_my_mind": "A free trial that shows, on my own channel's numbers, a title or script that beat my usual views.",
+  "price_too_cheap": 49,
+  "price_cheap": 99,
+  "price_expensive": 249,
+  "price_too_expensive": 399
+}

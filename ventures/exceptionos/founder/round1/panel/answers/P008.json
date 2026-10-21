@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "I have no budget this year unless something pays back fast, and a $2,000 a month tool from a startup that hasn't built the product yet doesn't pay back on a sales pitch. I might take the free six-week test with a few exports, but I wouldn't approve the paid pilot without seeing it catch real late POs first.",
+  "objection": "Will it catch the late supplier dates and short shipments before they become premium freight and blown work orders, or will it just give me a list I have to check by hand every morning?",
+  "would_change_my_mind": "The free six-week test flags at-risk work orders that my team had not already caught, with a payback number I can show my plant manager.",
+  "price_too_cheap": 150,
+  "price_cheap": 600,
+  "price_expensive": 1500,
+  "price_too_expensive": 1800
+}

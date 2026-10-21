@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The idea is useful, since I already chase late and short supplier acknowledgements by hand every day. But I would not pay $2,000 a month to a company that may not exist next year, and I would have to explain that to my plant manager and controller.",
+  "objection": "A pre-MVP startup might not be around next year, and then I am stuck with a tool my ERP partner cannot support.",
+  "would_change_my_mind": "A paying customer I can call as a reference, or a signed commitment with data export and a refund if they fold, plus proof the alerts catch things my buyers miss.",
+  "price_too_cheap": 300,
+  "price_cheap": 1000,
+  "price_expensive": 2000,
+  "price_too_expensive": 3000
+}

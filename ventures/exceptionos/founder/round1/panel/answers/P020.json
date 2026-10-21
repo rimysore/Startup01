@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Our ERP already flags late POs, so what I need is discipline on my side, not another tool. I would not hand supplier emails and open-PO data to a startup at $2,000 a month without IT and security signing off, and a product still in development is a hard sell to them.",
+  "objection": "Who is accountable for our supplier data once it leaves our systems, where is it stored, and does it get used to train anything? Until IT and security have answers in writing, this does not get past my desk.",
+  "would_change_my_mind": "A security review IT will sign off on, plus a free test that catches a missed supplier acknowledgement or a short-shipped PO that our ERP did not flag.",
+  "price_too_cheap": 150,
+  "price_cheap": 600,
+  "price_expensive": 1200,
+  "price_too_expensive": 1500
+}

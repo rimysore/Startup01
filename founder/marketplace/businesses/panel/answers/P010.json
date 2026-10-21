@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "We get creators in for a free meal and a post, and that has worked well enough. Mitra assumes I pay creators cash, and I've never done that, so even with the pilot being free I'm not starting a ₹5,000 cash habit just to try a dashboard.",
+  "objection": "My customers mostly speak English, and I'm not convinced a Kannada creator brings them in. Plus why pay cash, and then a fee on top, when barter already gets me posts?",
+  "would_change_my_mind": "If Mitra let me run barter deals (free meal or service for a post) and still track the promo code redemptions, I'd try it during the pilot and only think about paying cash once I saw a creator actually bring in customers.",
+  "price_too_cheap": 50,
+  "price_cheap": 199,
+  "price_expensive": 400,
+  "price_too_expensive": 750
+}

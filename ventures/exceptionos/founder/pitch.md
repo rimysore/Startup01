@@ -1,0 +1,4 @@
+ExceptionOS (early-stage, Epicor manufacturers only). It finds supplier delivery-date changes that put your open jobs at risk, before your planners discover the shortage manually.
+Free "Supplier Delay Risk Audit": you send sanitized exports (open PO lines, open jobs / material requirements, current inventory if available, supplier date-change history if available). We process them read-only and offline: no Epicor login, no inbox access, nothing written back, no AI agent acting on anything.
+Within a week you get back: the supplier date changes we found, the specific jobs each one threatens, the order we'd tackle them in, and one question: which of these did your team already know about?
+No cost and no commitment. If it finds something your team missed, we'd talk about continuing; price not set yet.

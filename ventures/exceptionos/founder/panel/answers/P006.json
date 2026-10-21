@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd ask our Epicor partner before anything else, and I'm not sending open PO and job data to a startup I've never heard of, even sanitized, without IT and my boss signing off. Our BOM and job data is messy, so I don't trust a result built on it either.",
+  "objection": "If our BOM and job data is messy, any analysis will be wrong, and an outside company would be working from exports I can't check against Epicor myself.",
+  "would_change_my_mind": "Our Epicor partner vouching for them and IT approving a read-only export process that they run on our data before any commitment.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}

@@ -1,0 +1,14 @@
+{
+  "as_of": "2026-10-19",
+  "releases": 116,
+  "slipped": 22,
+  "slips_harmless": 12,
+  "jobs_threatened": 15,
+  "jobs_hidden": 11,
+  "lines_threatened": 23,
+  "lines_hidden": 19,
+  "orders_value": 961000.0,
+  "unacked_14d": 3,
+  "parts": 18,
+  "jobs_open": 28
+}

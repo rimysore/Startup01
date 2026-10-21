@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Creators already walk into my salon every month offering a reel, and I find the rest on Instagram myself and pay them by UPI. I don't need someone to match me, and my clients book by phone or WhatsApp, so I don't see my staff tapping +1 for a promo code.",
+  "objection": "A 10% fee plus GST on top of the creator's fee adds up when margins are thin, and I'd be paying it for introductions I can get free in my DMs. Also a salon booking isn't a café counter, so I doubt the code tracking will capture who really came because of the reel.",
+  "would_change_my_mind": "Proof from another Bengaluru salon or gym that a Mitra-matched creator brought in clearly more paying bookings than the creators who approach me for free, with the cost per customer shown.",
+  "price_too_cheap": 99,
+  "price_cheap": 199,
+  "price_expensive": 400,
+  "price_too_expensive": 750
+}

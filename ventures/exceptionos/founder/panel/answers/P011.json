@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The audit is free and sounds useful, but I'd be sending open PO lines and inventory from our Epicor system to a company I've never heard of, and my ERP partner would be the first call I make. Getting IT and legal to sign off on that in 30 days is not something I'd bet on.",
+  "objection": "Who is behind this, what happens to our data after they process it, and why would I trust a startup's read on our supplier dates over what my buyers already see?",
+  "would_change_my_mind": "An endorsement from our Epicor partner or a peer plant that has used it, plus a written data-handling and deletion commitment that legal will accept.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 1200,
+  "price_too_expensive": 2500
+}

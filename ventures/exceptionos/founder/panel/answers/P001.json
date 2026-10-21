@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "A free audit that wants our open POs, jobs and inventory sent to a startup I've never heard of is the first thing I'd question. Sending that data out needs IT and security sign-off, and I'd check with our Epicor partner before anything leaves the building, which won't happen within 30 days.",
+  "objection": "A free audit means you'll try to sell me something next, and I'd be handing over sanitized exports that still show our supplier and job exposure to an outside company.",
+  "would_change_my_mind": "Our Epicor partner vouches for them and IT approves the data handling in writing, plus a reference from a similar plant that caught a real supplier miss we had not already seen.",
+  "price_too_cheap": 200,
+  "price_cheap": 600,
+  "price_expensive": 1800,
+  "price_too_expensive": 3000
+}

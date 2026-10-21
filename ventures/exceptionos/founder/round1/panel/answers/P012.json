@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I'd take the free six-week test to see if it catches anything my team misses, but I can't put a $2,000 a month line into this year's budget on a tool with no track record here. It has to pay back fast and nobody has shown me that yet.",
+  "objection": "My ERP partner already gives me exception reports, and I'd have to explain why I'm paying a startup for something close to what I already have. I also don't know how it fits with our Epicor data and what it does to my supplier emails.",
+  "would_change_my_mind": "A free test on our own open POs that shows a few real late-order catches I could tie to avoided customer penalties, plus a clear answer from my ERP partner that nothing conflicts with their system.",
+  "price_too_cheap": 300,
+  "price_cheap": 800,
+  "price_expensive": 1500,
+  "price_too_expensive": 2000
+}

@@ -1,0 +1,91 @@
+{
+ "n": 20,
+ "seed": 249806,
+ "customer": {
+  "business": "Mitra: an AI manager (AI CMO) for Indian regional-language YouTube creators",
+  "target": "Indian YouTubers making videos in Hindi, Hinglish, Telugu, Tamil, Marathi, Bengali, Kannada or Malayalam, 1K to 500K subscribers, trying to grow or monetise",
+  "where": "India, online (YouTube, Instagram, WhatsApp)",
+  "age": [
+   18,
+   40
+  ],
+  "currency": "INR",
+  "segments": [
+   {
+    "name": "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+    "share": 0.45,
+    "income": [
+     120000,
+     600000
+    ]
+   },
+   {
+    "name": "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+    "share": 0.35,
+    "income": [
+     300000,
+     1200000
+    ]
+   },
+   {
+    "name": "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+    "share": 0.2,
+    "income": [
+     800000,
+     3000000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Free-tools only",
+    "share": 0.25,
+    "how": "Uses YouTube Studio, free vidIQ/TubeBuddy and ChatGPT; has never paid for a creator tool."
+   },
+   {
+    "name": "Already pays for vidIQ or TubeBuddy",
+    "share": 0.12,
+    "how": "Pays for an English tool, mostly for keywords and tags, and half-uses it."
+   },
+   {
+    "name": "Learns from YouTube gurus",
+    "share": 0.18,
+    "how": "Watches 'how to grow on YouTube' videos in Hindi and copies what they say."
+   },
+   {
+    "name": "Copies what is trending",
+    "share": 0.15,
+    "how": "Checks what big channels in their niche posted this week and makes their own version."
+   },
+   {
+    "name": "Data-curious",
+    "share": 0.12,
+    "how": "Opens YouTube Studio analytics daily but isn't sure what to do with the numbers."
+   },
+   {
+    "name": "Busy, phone-only",
+    "share": 0.18,
+    "how": "Shoots and edits on the phone; lives in WhatsApp; rarely opens a laptop."
+   }
+  ],
+  "objections": [
+   "I don't want an unknown app to have access to my YouTube channel",
+   "YouTube Studio and ChatGPT already tell me this for free",
+   "Will an AI really understand my Telugu/Hindi/Kannada audience?",
+   "Brand and local deals sound great but small channels like mine never get them",
+   "I don't want an app negotiating or pitching businesses in my name",
+   "₹299 a month is a lot when my channel earns little or nothing",
+   "Affiliate links might make my audience trust me less",
+   "Too many features; I just want more views"
+  ],
+  "habits": [
+   "you upload one or two videos a week, edited in CapCut or VN on your phone",
+   "you check YouTube Studio first thing in the morning",
+   "your creator friends share tips in a WhatsApp group",
+   "you pay for Jio/Airtel and maybe Netflix, and nothing else online",
+   "you post Shorts because people say they grow faster",
+   "you watch Hindi 'YouTube growth tips' videos before bed"
+  ]
+ },
+ "pitch": "Mitra: your AI manager for YouTube, in your language (Hindi, Kannada, Telugu, Tamil, Marathi, Bengali, Malayalam).\nConnect your channel (read-only). Every week Mitra gives you the 1–3 things worth doing, with the reason from your own numbers, prepares the title, thumbnail, hook and script, and afterwards shows whether it actually beat your usual views.\nIt also helps you earn: affiliate products that fit your audience, and paid deals with businesses near you (shops, restaurants, coaching centres, local brands) that Mitra finds and matches to your channel. It suggests a fair rate from your real numbers and helps you negotiate. Nothing is sent or posted without your OK.\nFree to start. Pro ₹299/month. On deals Mitra finds for you, a small fee is shown before you accept."
+}

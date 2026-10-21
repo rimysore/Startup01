@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I have been burned by consultants who told me what I already knew, and this audit still needs me to pull sanitized exports out of Epicor and get IT and security to sign off on sending them outside the company. That is a lot of effort for a free look I have no reason to trust yet.",
+  "objection": "If they can only find things we already knew about, I have spent IT time and my own time for nothing, and I will have to explain that to the owner.",
+  "would_change_my_mind": "A named reference at a similar Epicor shop that tells me the audit caught a real late supplier date that their planners had missed, plus a sample of what the output looks like before I send any data.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 900,
+  "price_too_expensive": 1500
+}

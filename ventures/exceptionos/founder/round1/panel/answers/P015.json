@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'm already drowning in supplier emails and another tool my buyers have to log into is the last thing I want. I'd take the free six-week test to see if it catches anything real, but I won't put $2,000 a month on it until it has shown me a late supplier acknowledgement my buyers missed.",
+  "objection": "Every morning my buyers would have to export POs and forward emails into a new system, on top of Outlook and the ERP they already use. That's extra work before any value shows up, and I've been through an ERP rollout that promised the same thing.",
+  "would_change_my_mind": "The free test catches a real shortage risk in week one or two, one that my team would have missed or learned about too late, and the buyers say they would keep using it without me chasing them.",
+  "price_too_cheap": 250,
+  "price_cheap": 700,
+  "price_expensive": 1500,
+  "price_too_expensive": 2200
+}

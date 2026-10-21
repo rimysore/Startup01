@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The shortage problem is real and my meeting eats time every week, but I'm not sending open PO lines and job data to an early-stage company I've never heard of. Pulling clean exports means my planner loses a day, and IT or the CFO would want to know who has our data before anyone signs off.",
+  "objection": "A free audit that ends with 'which of these did your team already know about?' reads like a sales pitch dressed up as a favor. I've been burned by consultants who told me what I already knew, and I'd have to hand over our supplier and job data to find out.",
+  "would_change_my_mind": "A reference from another Epicor Kinetic shop of my size that I can call, plus a sample report run on dummy or last year's data so I can see the output before exposing live jobs.",
+  "price_too_cheap": 150,
+  "price_cheap": 400,
+  "price_expensive": 1200,
+  "price_too_expensive": 2500
+}

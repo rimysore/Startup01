@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason": "It's free and I'm always looking for more paid café deals, so I'd sign up and switch on the local invites, but I'd keep pitching directly on Instagram and WhatsApp because that's where my real money comes from. The scam checker I barely need, I can smell a 'registration fee' DM myself.",
+  "reason_code": "need",
+  "objection": "If the café pays Mitra a fee on top, they'll just knock it off what they offer me, so 'you keep your whole fee' means a smaller fee. And I'd rather negotiate my rate card than accept whatever number they write down.",
+  "would_change_my_mind": "Seeing invites that actually match or beat my rate card, and being able to counter the fee inside the app instead of just accept or decline.",
+  "price_too_cheap": 49,
+  "price_cheap": 99,
+  "price_expensive": 249,
+  "price_too_expensive": 499
+}

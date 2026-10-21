@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I get creators in for a free meal on barter and my Swiggy/Zomato ads already show me orders. Even if Mitra's fee is free in the pilot, I'd still be paying a creator ₹5,000 cash, and I don't trust influencers to bring people in on a slow weekday.",
+  "objection": "Why pay cash plus a fee when barter works fine? And who is going to tap +1 at the counter on a busy weekend? I don't believe the counts will be real.",
+  "would_change_my_mind": "A creator who gets paid only per customer who actually walks in with the code, so I pay nothing if nobody comes.",
+  "price_too_cheap": 50,
+  "price_cheap": 150,
+  "price_expensive": 400,
+  "price_too_expensive": 700
+}

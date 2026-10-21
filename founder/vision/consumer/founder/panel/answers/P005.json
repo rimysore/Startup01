@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The first thing I thought was that I don't want an app negotiating or pitching businesses in my name. Free to start I might try, but I'm not paying ₹299 a month for something I haven't seen move my views.",
+  "objection": "Who is it actually talking to when it pitches shops and coaching centres for me, and will it ask before it sends anything?",
+  "would_change_my_mind": "A free trial that shows it beat my usual views on a real video, plus a written promise that nothing goes to any business without my explicit OK.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 299,
+  "price_too_expensive": 499
+}

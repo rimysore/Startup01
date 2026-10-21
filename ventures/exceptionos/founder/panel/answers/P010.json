@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "My planners already track supplier slips, and I've been burned by software rollouts that promised to find problems we already knew about. Pulling and sanitizing exports from Epicor takes my team's time and probably needs IT and finance sign-off, so I would not send them within 30 days on a vendor's word alone.",
+  "objection": "I'm not convinced a file audit will find anything my planners don't already know, and I don't want to spend team hours on another tool that adds noise.",
+  "would_change_my_mind": "A concrete example from a plant like mine, shown to me before I send any data, where a supplier date change threatened a job that my planners had missed.",
+  "price_too_cheap": 250,
+  "price_cheap": 750,
+  "price_expensive": 2500,
+  "price_too_expensive": 4500
+}

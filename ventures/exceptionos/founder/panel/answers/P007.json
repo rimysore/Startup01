@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Supplier and PO data is still sensitive even sanitized, and I have no way to know this startup handles it properly. I'd have to get IT and security to sign off, and they will not do that for a free audit from a company I've never heard of, so I don't see it happening inside 30 days.",
+  "objection": "Who actually sees our data, where it is stored, and what happens to it afterward. A read-only offline process still means sending our supplier terms and job data outside the building, and I've been burned by consultants before.",
+  "would_change_my_mind": "A written data handling and security summary that my IT lead can review, plus a reference from an Epicor shop of similar size that has already been through the audit.",
+  "price_too_cheap": 250,
+  "price_cheap": 700,
+  "price_expensive": 1800,
+  "price_too_expensive": 3500
+}

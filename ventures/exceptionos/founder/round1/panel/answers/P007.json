@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I run a 100-500 person shop and my ERP and supplier email are the most sensitive data we have. A startup with the product still in development asking for exports and forwarded emails means my IT and security team has to sign off first, and that is weeks I don't have, with no budget this year unless something pays back fast.",
+  "objection": "I can't have a startup with an unproven product reading our open POs and supplier email until IT and security have reviewed where that data goes, who can see it and how long it is kept.",
+  "would_change_my_mind": "My IT and security team signing off on the data handling, plus a free-test result showing it caught a late supplier date that our shortage meeting would otherwise have missed.",
+  "price_too_cheap": 300,
+  "price_cheap": 900,
+  "price_expensive": 1500,
+  "price_too_expensive": 2500
+}
