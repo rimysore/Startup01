@@ -421,6 +421,8 @@ export const businessProfiles = pgTable("business_profiles", {
   instagram: text("instagram"),
   /** Shared with a creator only after they accept an invite. */
   whatsapp: text("whatsapp"),
+  /** Hash of the counter PIN staff type to redeem a customer's coupon (never stored in clear). */
+  counterPinHash: text("counter_pin_hash"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -624,3 +626,62 @@ export const lookupCache = pgTable("lookup_cache", {
   value: jsonb("value").$type<unknown>(),
   fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/**
+ * A creator post a business tracks: any creator, found through Mitra or not, paid or barter. Each gets a promo code
+ * the counter knows (RUCHI-SR) and a link (/r/<linkCode>) that hands the customer a coupon. Free to use; Mitra
+ * never takes a cut of these.
+ */
+export const trackedPosts = pgTable(
+  "tracked_posts",
+  {
+    id: text("id").primaryKey(),
+    businessUserId: text("business_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** The creator as the business knows them; linked to a Mitra account when they're on Mitra. */
+    creatorName: text("creator_name").notNull(),
+    creatorHandle: text("creator_handle"),
+    creatorUserId: text("creator_user_id").references(() => users.id, { onDelete: "set null" }),
+    /** The Mitra deal this post belongs to, if it came through an invite. */
+    dealId: text("deal_id").references(() => deals.id, { onDelete: "set null" }),
+    /** paid | barter */
+    kind: text("kind").notNull().default("paid"),
+    /** What the creator is paid for the post (paid), or what they get (barter). */
+    baseFeeInr: integer("base_fee_inr"),
+    barterNote: text("barter_note"),
+    /** What the customer gets for showing the coupon, e.g. "10% off your bill". */
+    offerText: text("offer_text").notNull(),
+    promoCode: text("promo_code").notNull(),
+    linkCode: text("link_code").notNull().unique(),
+    destinationUrl: text("destination_url"),
+    postUrl: text("post_url"),
+    /** active | ended */
+    status: text("status").notNull().default("active"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("tracked_posts_business_code").on(t.businessUserId, t.promoCode), index("tracked_posts_business_time").on(t.businessUserId, t.createdAt)],
+);
+
+/**
+ * One customer's coupon from a tracked post, or a code typed at the counter. A coupon counts as a customer once
+ * redeemed: by staff entering the counter PIN on the customer's phone (`pin`) or typing the code (`counter`).
+ */
+export const coupons = pgTable(
+  "coupons",
+  {
+    id: text("id").primaryKey(),
+    trackedPostId: text("tracked_post_id")
+      .notNull()
+      .references(() => trackedPosts.id, { onDelete: "cascade" }),
+    /** link | counter */
+    source: text("source").notNull().default("link"),
+    redeemedAt: timestamp("redeemed_at", { withTimezone: true }),
+    /** pin | counter */
+    redeemedBy: text("redeemed_by"),
+    /** Wrong PINs tried on this coupon (locked at 5). */
+    pinTries: integer("pin_tries").notNull().default(0),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("coupons_post").on(t.trackedPostId, t.redeemedAt)],
+);

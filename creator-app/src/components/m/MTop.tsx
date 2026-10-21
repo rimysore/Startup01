@@ -3,7 +3,7 @@ import { Logo, ThemeToggle } from "@/components/ui";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { LangSwitch, SignOut } from "./client";
 
-type Tab = "home" | "kit" | "inbox" | "offers" | "deals" | "business" | "briefs";
+type Tab = "home" | "kit" | "inbox" | "offers" | "deals" | "business" | "briefs" | "track";
 
 /** The marketplace top bar: the logo, this side's pages, the language switch and the account links. */
 export function MTop({ s, role, lang, active }: { s: Strings; role: string | null; lang: string; active?: Tab }) {
@@ -11,13 +11,14 @@ export function MTop({ s, role, lang, active }: { s: Strings; role: string | nul
     role === "creator"
       ? [
           { id: "home", href: "/m", label: s.nav.home },
-          { id: "kit", href: "/m/kit", label: s.nav.kit },
           { id: "inbox", href: "/m/inbox", label: s.nav.inbox },
+          { id: "kit", href: "/m/kit", label: s.nav.kit },
           { id: "deals", href: "/m/deals", label: s.nav.deals },
         ]
       : role
         ? [
             { id: "home", href: "/m", label: s.nav.home },
+            { id: "track", href: "/m/track", label: s.nav.track },
             { id: "briefs", href: "/m/briefs/new", label: s.nav.briefs },
             { id: "business", href: "/m/business", label: s.nav.business },
           ]
@@ -38,11 +39,6 @@ export function MTop({ s, role, lang, active }: { s: Strings; role: string | nul
         <div className="mk-top__end">
           <LangSwitch lang={lang} canSave={Boolean(role)} />
           <ThemeToggle />
-          {role === "creator" && (
-            <Link href="/dashboard" className="mk-hide-sm lp-link text-[14px]" style={{ color: "var(--ink-2)" }}>
-              {s.nav.growth}
-            </Link>
-          )}
           <SignOut label={s.nav.signOut} />
         </div>
       </div>

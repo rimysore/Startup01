@@ -45,6 +45,13 @@ export const CONSENT_VERSION = "2026-10-21";
  */
 export const MITRA_FEE_PCT = 10;
 export const FEE_PAID_BY: "business" | "creator" = "business";
+/**
+ * Track (counting customers from any creator post) is free. The free plan's allowance applies once paid plans are
+ * switched on; during the pilot everyone gets unlimited tracked posts. docs/BUSINESS_MODEL.md has the plans.
+ */
+export const FREE_TRACKED_PER_MONTH = 2;
+export const PLANS_ENFORCED = false;
+
 /** During the Bengaluru pilot the fee is shown but not charged. */
 export const FEE_WAIVED_IN_PILOT = true;
 

@@ -7,10 +7,11 @@ Creators need a guaranteed fee to make a reel; that is the motivation. Pay-per-c
 | --- | --- | --- |
 | **Base fee:** paid for making and posting the content | Creator, 100% | ₹3,000 |
 | **Customer bonus:** a set amount per customer who redeems the creator's code, up to a cap | Creator, 100% | ₹30 per customer, cap ₹1,500 (50 customers) |
-| **Mitra's fee:** flat, per matched deal | Mitra | ₹299 + 18% GST |
 | **Payment charges:** itemised, never hidden | Payment provider | ~2% of what's collected |
 
-The business pays everything upfront, inside Mitra: ₹3,000 + ₹1,500 cap + ₹299 + GST + charges ≈ ₹5,000. Then:
+**Mitra doesn't take a cut of deals** (updated 21 Oct): businesses pay a monthly plan instead: Free (2 tracked posts a month), Mitra Local ₹499, Mitra Growth ₹1,499 (payment protection, AI marketing manager), so a deal done off the platform costs Mitra nothing. See `creator-app/docs/BUSINESS_MODEL.md`.
+
+With payment protection, the business pays the deal upfront inside Mitra: ₹3,000 + ₹1,500 bonus cap + charges. Then:
 - **Base fee is released to the creator** when the post is live. The business confirms, or it is released automatically 48 hours after the creator submits the link with no complaint.
 - **Bonus is released weekly** for counted customers.
 - **Unused bonus goes back to the business** when the deal closes, 14 days after posting.
@@ -19,7 +20,7 @@ The business pays everything upfront, inside Mitra: ₹3,000 + ₹1,500 cap + �
 Why this works:
 - Creators are paid for the work, can earn more when they bring customers, and get paid on time because the money is already collected.
 - Businesses risk only the base fee for the post itself. The rest is paid per result, and they get a refund if customers don't come.
-- Mitra gets paid because payment happens inside Mitra, which also stops both sides going round the fee. Every rupee is recorded.
+- Mitra gets paid by the plan, so nobody has a reason to go around it; the bonus only pays out through Mitra, so creators prefer to keep deals here. Every rupee is recorded.
 
 **The payment gateway is built on a provider's marketplace product, not our own licence.** Razorpay Route or Cashfree Easy Split hold the money and split payouts. Being a payment aggregator ourselves needs RBI authorisation and large net-worth requirements, so don't. A CA must confirm GST, TDS (194-O / 194J / 194R) and how turnover is booked before money moves. Until then, use payment links for Mitra's fee only, and record the creator's payment.
 
@@ -27,11 +28,11 @@ Why this works:
 
 | Weeks | Build (product) | Do (people) | Goal at the end |
 | --- | --- | --- | --- |
-| **1–2** (to 4 Nov) | Freeze the analytics beta off the first screen. Free **Track**: code + link for any creator post, barter included. **Customer coupon** with one-tap **Redeem** (replaces the +1 tap at the till). | Choose the company setup with a CA. Submit YC W27 (2 Nov). Recruit 2 city reps. Pick 1–2 neighbourhoods (e.g. Indiranagar + Koramangala), food only. | Track and redeem are live on a preview; company setup decided |
-| **3–4** | **Deal = base fee + customer bonus** (invites, deal room, results). Deal types: paid / barter. Matched-deal fee ₹299 with the guarantee ("no customers counted in 14 days → next match free"). | Reps walk into 30 food places with "free customer counter". Seed creators: WhatsApp-forward scam check in 10 creator groups, 3 paid creator reels about it. | 15 businesses using Track; 60 creators signed up; 3 businesses with a brief |
-| **5–6** | **Payments inside Mitra** via a provider's split product (after CA sign-off): collect upfront, hold, release the base fee on posting, bonus weekly, refund unused. Invoices. | Close the first 5 matched paid deals, hand-held. Check counts against bills at 3 cafés. | 5 paid deals with money through Mitra; counts within ~20% of bills |
-| **7–8** | Results page that sells itself: cost per customer, barter vs paid side by side. Public case-study page (with permission). | Publish 3 case studies. Meta creator-ad test ₹10–15k. Ask every business for a second deal. | **Gate:** 10+ businesses briefed, 5+ paid deals, 3+ repeat, counted outcomes on 3+ |
-| **9–12** | Creator wallet (earned / held / paid), payout history. Repeat-deal fee ₹99. Small fixes from watching 5 owners and 5 creators use it. | Grow to 50 businesses on Track, 20 paying matched deals a month. Collect the pilot numbers deck. Apply to the next cohorts (below). | ~20 matched deals/month, ~₹1L/month GMV through Mitra, repeat rate known |
+| **1–2** (to 4 Nov) | ✅ Built on `claude/track-redeem`: analytics off the first screen; free **Track** (code + link for any creator post, barter included); **customer coupon** redeemed with the counter PIN or counter mode. | Choose the company setup with a CA. Submit YC W27 (2 Nov). Recruit 2 city reps. Pick 1–2 neighbourhoods (e.g. Indiranagar + Koramangala), food only. | Track and redeem are live on a preview; company setup decided |
+| **3–4** | **Deal = base fee + customer bonus** (invites, deal room, results). Deal types: paid / barter. **Plans** (Free / Local ₹499 / Growth ₹1,499) with the "you counted X customers, upgrade" prompt. | Reps walk into 30 food places with "free customer counter". Seed creators: WhatsApp-forward scam check in 10 creator groups, 3 paid creator reels about it. | 15 businesses using Track; 60 creators signed up; 3 businesses with a brief |
+| **5–6** | **Payments inside Mitra** via a provider's split product (after CA sign-off): collect upfront, hold, release the base fee on posting, bonus weekly, refund unused. Invoices. | Close the first 5 matched paid deals, hand-held. Check counts against bills at 3 cafés. | 5 paid deals with money through Mitra; counts within ~20% of bills; first owners on a paid plan |
+| **7–8** | AI marketing manager on WhatsApp (voice brief → plan → report), first predicted cost per customer, public case-study page (with permission). | Publish 3 case studies. Meta creator-ad test ₹10–15k. Ask every business for a second deal. | **Gate:** 10+ businesses briefed, 5+ paid deals, 3+ repeat, counted outcomes on 3+ |
+| **9–12** | Creator wallet (earned / held / paid), payout history; post-checking agent that releases the base fee. Small fixes from watching 5 owners and 5 creators use it. | Grow to 50 businesses on Track, 20 paying matched deals a month. Collect the pilot numbers deck. Apply to the next cohorts (below). | ~20 matched deals/month, ~₹1L/month GMV through Mitra, repeat rate known |
 
 **The numbers to report every week:** businesses on Track, codes redeemed, matched deals (paid / barter), GMV through Mitra, repeat businesses, creators who came through the inbox without a founder DM, cost to sign up a business.
 

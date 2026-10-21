@@ -54,6 +54,19 @@ Matching reasons are written in English for now, also on Kannada screens.
 subject, text }` works too), route `offers+*@<domain>` to it, and set `INBOUND_EMAIL_DOMAIN` and
 `INBOUND_EMAIL_SECRET` in Vercel. Until then the inbox says forwarding opens soon.
 
+### Track: counting customers from any creator post
+
+| Piece | Where |
+| --- | --- |
+| Migration `0015_track_coupons.sql` (additive): `tracked_posts`, `coupons`, `business_profiles.counter_pin_hash` | `src/db/schema.ts` |
+| A business tracks any creator post, paid (base fee) or barter, found on Mitra or not; gets a promo code (unique per business) and a link `/r/<code>` | `/m/track`, `/m/track/new`, `/m/track/<id>`, `POST /api/m/track` |
+| The link gives each visitor a coupon (cookie keeps the same one) at `/c/<id>`: the offer, the code, and a staff-only box; English and Kannada together | `src/app/r/[code]/route.ts`, `src/app/c/[id]/page.tsx` |
+| Staff redeem with the counter PIN (hashed with scrypt; 5 tries per coupon; PIN redeeming pauses after 20 wrong PINs in an hour per business), or type the code in counter mode (10-minute undo) | `POST /api/c/<id>/redeem`, `/m/track/counter`, `/api/m/track/counter`, `/api/m/track/pin` |
+| Results: customers per post, cost per customer for paid posts, paid vs barter totals. Mitra deals get a tracked post sharing their code and link, so coupons count towards the deal | `src/lib/marketplace/track.ts` |
+| First screen: business home leads with Track; creators land on the inbox; sign-in goes to `/m` when the marketplace is on; the growth tools stay at `/dashboard` | `src/app/m/page.tsx`, `MTop.tsx`, `safeNext()` |
+
+Free plan allowance (`FREE_TRACKED_PER_MONTH = 2`) applies only once `PLANS_ENFORCED` is switched on; the pilot is unlimited.
+
 ### Who pays
 
 Creators keep 100% of the agreed fee; on deals Mitra brought, the business pays Mitra's fee (`MITRA_FEE_PCT`) on top
@@ -78,4 +91,5 @@ deals the creator found. No fee is charged in code yet.
 deletion), `tests/business.test.mts` (opt-in, matching and its reasons, the plan, invites, contact hand-off only
 after accepting, deal room access, counters, payments, tracked links, deletion) and `tests/offer.test.mts` run in
 `npm test`, with `tests/inbox.test.mts` (scam patterns, sender checks against a fake network, caching, reports,
-privacy, forwarding webhook) alongside.
+privacy, forwarding webhook) and `tests/track.test.mts` (codes, coupons, PIN limits, counter mode, totals, deal link-up,
+deletion) alongside.

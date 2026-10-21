@@ -97,3 +97,18 @@
 .mk-drop { display: grid; place-items: center; min-height: 160px; border-radius: var(--r); background: var(--tint); cursor: pointer; transition: background-color 200ms ease; }
 .mk-drop:hover { background: var(--tint-2); }
 .mk-drop[aria-busy="true"] { cursor: progress; opacity: 0.8; }
+
+/* Track: share box, counter mode, and the customer's coupon. */
+.mk-copy { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; border-radius: 14px; background: var(--tint); font-size: 14.5px; }
+.mk-copy code { flex: 1; font-family: inherit; }
+.mk-codebig { font-family: var(--font-display-face), sans-serif; font-weight: 600; font-size: clamp(28px, 6vw, 40px); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.mk-counter { display: flex; flex-wrap: wrap; gap: 10px; }
+.mk .mk-counter input { flex: 1 1 220px; min-height: 64px; font-size: 26px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.mk-counter .lp-btn { min-height: 64px; padding: 0 28px; font-size: 18px; }
+.mk-coupon { display: grid; justify-items: center; gap: 18px; padding-top: clamp(32px, 8vh, 72px); padding-bottom: 48px; }
+.mk-coupon__card { width: min(100%, 440px); padding: 28px 24px; text-align: center; display: grid; justify-items: center; }
+.mk-coupon__offer { margin-top: 10px; font-family: var(--font-display-face), var(--font-kannada), sans-serif; font-size: clamp(26px, 7vw, 34px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.1; }
+.mk-coupon__code { margin: 22px 0 14px; padding: 14px 22px; border-radius: 16px; border: 2px dashed var(--rule); font-family: var(--font-display-face), sans-serif; font-size: clamp(30px, 9vw, 44px); font-weight: 600; letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+.mk-coupon__staff { width: 100%; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--rule); display: grid; justify-items: center; }
+.mk-coupon__note { max-width: 440px; text-align: center; font-size: 13px; color: var(--ink-3); }
+.mk-coupon__brand { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-3); }

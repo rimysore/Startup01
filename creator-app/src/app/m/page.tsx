@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MTop } from "@/components/m/MTop";
 import { marketPage } from "@/lib/marketplace/page";
 import { invitesForCreator, listBriefs } from "@/lib/marketplace/business";
+import { listTracked, trackTotals } from "@/lib/marketplace/track";
 import { dealTotals, getBusiness, getKit, isVerified, kitCompleteness, listDeals } from "@/lib/marketplace/store";
 import { youtubeConnection } from "@/lib/youtube";
 
@@ -17,7 +18,8 @@ export default async function MarketHome() {
   const top = <MTop s={s} role={member!.role} lang={member!.uiLanguage} active="home" />;
 
   if (member!.role !== "creator") {
-    const [biz, briefs] = await Promise.all([getBusiness(user.id), listBriefs(user.id)]);
+    const [biz, briefs, tracked] = await Promise.all([getBusiness(user.id), listBriefs(user.id), listTracked(user.id)]);
+    const tot = trackTotals(tracked);
     return (
       <>
         {top}
@@ -27,6 +29,26 @@ export default async function MarketHome() {
             {first ? `, ${first}` : ""}.
           </h1>
           <p className="mk-sub">{s.home.businessSub}</p>
+          <section className="lp-card mk-panel mt-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="min-w-0">
+                <h2 className="mk-h2">{s.track.title}</h2>
+                <p className="mt-2 text-[15px]" style={{ color: "var(--ink-2)" }}>
+                  {tracked.length ? `${tot.customers} ${tot.customers === 1 ? s.track.customer : s.track.customers}` : s.track.sub}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {tracked.length > 0 && (
+                  <Link href="/m/track/counter" className="lp-btn lp-btn--ghost">
+                    {s.track.counter}
+                  </Link>
+                )}
+                <Link href={!biz ? "/m/business" : tracked.length ? "/m/track" : "/m/track/new"} className="lp-btn">
+                  {!biz ? s.track.needBusiness : tracked.length ? s.track.title : s.track.add}
+                </Link>
+              </div>
+            </div>
+          </section>
           <section className="mt-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <h2 className="mk-h2">{s.brief.list}</h2>
@@ -120,6 +142,14 @@ export default async function MarketHome() {
         )}
         <div className="mk-grid">
           <section className="lp-card mk-panel">
+            <h2 className="mk-h2">{s.home.offerTitle}</h2>
+            <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.home.offerSub}</p>
+            <Link href="/m/inbox" className="lp-btn mt-5" style={{ minHeight: 44 }}>
+              {s.home.offerGo}
+            </Link>
+          </section>
+
+          <section className="lp-card mk-panel">
             <div className="flex items-baseline justify-between gap-3">
               <h2 className="mk-h2">{s.home.kitTitle}</h2>
               <span className="lp-label">
@@ -142,14 +172,6 @@ export default async function MarketHome() {
                 </Link>
               )}
             </div>
-          </section>
-
-          <section className="lp-card mk-panel">
-            <h2 className="mk-h2">{s.home.offerTitle}</h2>
-            <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.home.offerSub}</p>
-            <Link href="/m/inbox" className="lp-btn mt-5" style={{ minHeight: 44 }}>
-              {s.home.offerGo}
-            </Link>
           </section>
 
           <section className="lp-card mk-panel">
