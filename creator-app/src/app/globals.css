@@ -1,69 +1,96 @@
 @import "tailwindcss";
 
-/* Mitra design tokens. Warm paper + ink, with a marigold accent. */
+/*
+ * Mitra design tokens. Layer A brand: cobalt #4169E1, mint #72D9B0, midnight navy #101B33. Layer B neutrals make up
+ * most of every screen. The same tokens run the public site and the signed-in app, in light and dark.
+ */
 :root {
   color-scheme: light;
-  --bg: #f7f3ec;
-  --surface: #fffdf9;
-  --surface-2: #f1ebe1;
-  --ink: #17140f;
-  --ink-2: #4f493f;
-  --muted: #7a7366;
-  --line: #e4dccd;
-  --accent: #e2620b;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --hover: #eff4ff;
+  --ink: #172033;
+  --ink-2: #334155;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --accent: #4169e1;
   --accent-ink: #ffffff;
-  --accent-soft: #fbe3cf;
-  --peacock: #0b6e6c;
-  --good: #1f7a3a;
-  --warn: #a86500;
-  --bad: #b3261e;
-  --chart-grid: #e9e2d5;
-  --chart-compare: #9a9283;
-  --ring-track: #f6d3b6;
+  --accent-soft: #eff4ff;
+  --mint: #16876b;
+  --mint-bright: #72d9b0;
+  --navy: #101b33;
+  --peacock: #0d9488;
+  --good: #16876b;
+  --warn: #b45309;
+  --bad: #dc2626;
+  --chart-1: #4169e1;
+  --chart-2: #0d9488;
+  --chart-3: #8b5cf6;
+  --chart-4: #d97706;
+  --chart-grid: #e2e8f0;
+  --chart-compare: #94a3b8;
+  --ring-track: #dce5fb;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --bg: #0e0d0b;
-    --surface: #17150f;
-    --surface-2: #201d16;
-    --ink: #f4efe6;
-    --ink-2: #cdc6b8;
-    --muted: #9b9486;
-    --line: #2d2920;
-    --accent: #ff8a3d;
-    --accent-ink: #1a0f05;
-    --accent-soft: #3a2413;
-    --peacock: #3fb8b2;
-    --good: #5cc27a;
-    --warn: #e2a33a;
-    --bad: #f07167;
-    --chart-grid: #2a261e;
-    --chart-compare: #7d776b;
-    --ring-track: #4a2c15;
+    --bg: #0b1220;
+    --surface: #111c2e;
+    --surface-2: #17243a;
+    --hover: #1a2850;
+    --ink: #f1f5f9;
+    --ink-2: #cbd5e1;
+    --muted: #a7b3c7;
+    --line: #263449;
+    --accent: #6d8fff;
+    --accent-ink: #0b1220;
+    --accent-soft: #1a2850;
+    --mint: #72d9b0;
+    --mint-bright: #72d9b0;
+    --navy: #101b33;
+    --peacock: #2dd4bf;
+    --good: #72d9b0;
+    --warn: #f59e0b;
+    --bad: #f87171;
+    --chart-1: #6d8fff;
+    --chart-2: #2dd4bf;
+    --chart-3: #a78bfa;
+    --chart-4: #f59e0b;
+    --chart-grid: #263449;
+    --chart-compare: #64748b;
+    --ring-track: #1f2d4d;
   }
 }
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --bg: #0e0d0b;
-  --surface: #17150f;
-  --surface-2: #201d16;
-  --ink: #f4efe6;
-  --ink-2: #cdc6b8;
-  --muted: #9b9486;
-  --line: #2d2920;
-  --accent: #ff8a3d;
-  --accent-ink: #1a0f05;
-  --accent-soft: #3a2413;
-  --peacock: #3fb8b2;
-  --good: #5cc27a;
-  --warn: #e2a33a;
-  --bad: #f07167;
-  --chart-grid: #2a261e;
-  --chart-compare: #7d776b;
-  --ring-track: #4a2c15;
+  --bg: #0b1220;
+  --surface: #111c2e;
+  --surface-2: #17243a;
+  --hover: #1a2850;
+  --ink: #f1f5f9;
+  --ink-2: #cbd5e1;
+  --muted: #a7b3c7;
+  --line: #263449;
+  --accent: #6d8fff;
+  --accent-ink: #0b1220;
+  --accent-soft: #1a2850;
+  --mint: #72d9b0;
+  --mint-bright: #72d9b0;
+  --navy: #101b33;
+  --peacock: #2dd4bf;
+  --good: #72d9b0;
+  --warn: #f59e0b;
+  --bad: #f87171;
+  --chart-1: #6d8fff;
+  --chart-2: #2dd4bf;
+  --chart-3: #a78bfa;
+  --chart-4: #f59e0b;
+  --chart-grid: #263449;
+  --chart-compare: #64748b;
+  --ring-track: #1f2d4d;
 }
 
 @theme inline {
@@ -78,6 +105,10 @@
   --color-accent-ink: var(--accent-ink);
   --color-accent-soft: var(--accent-soft);
   --color-peacock: var(--peacock);
+  --color-hover: var(--hover);
+  --color-mint: var(--mint);
+  --color-mint-bright: var(--mint-bright);
+  --color-navy: var(--navy);
   --color-good: var(--good);
   --color-warn: var(--warn);
   --color-bad: var(--bad);
@@ -105,15 +136,13 @@ body {
   }
 }
 
-/* Brand gradient (logo colours): saffron → fuchsia → violet. */
+/* Brand colour: flat cobalt (no gradients). Kept as classes so existing markup picks up the new brand. */
 .text-brand {
-  background: linear-gradient(100deg, #ff8a1f 0%, #d946ef 55%, #6c47ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 .bg-brand {
-  background: linear-gradient(110deg, #ff8a1f 0%, #d946ef 55%, #6c47ff 100%);
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 /* A hand on everything clickable (Tailwind's reset leaves buttons with the arrow). */
@@ -244,54 +273,12 @@ body {
 }
 
 /*
- * Inside the signed-in app: a calm workspace, not a landing page. Neutral surfaces, one accent kept for actions,
- * plain sans headings, no gradients or glows. Scoped to .app so the public site keeps its own look.
+ * Inside the signed-in app: a calm workspace, not a landing page. It shares the site's tokens (one theme everywhere)
+ * but keeps quieter shapes and plain sans headings.
  */
-.app {
-  --bg: #f7f7f5;
-  --surface: #ffffff;
-  --surface-2: #f2f2ef;
-  --ink: #1c1b19;
-  --ink-2: #4a4844;
-  --muted: #77746d;
-  --line: #e7e5e0;
-  --accent-soft: #fdeee2;
-  --chart-grid: #ecebe7;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .app {
-    --bg: #0f0f0e;
-    --surface: #171716;
-    --surface-2: #1f1f1d;
-    --ink: #f2f1ee;
-    --ink-2: #c9c7c1;
-    --muted: #94918a;
-    --line: #2b2a27;
-    --accent-soft: #33210f;
-    --chart-grid: #262523;
-  }
-}
-:root[data-theme="dark"] .app {
-  --bg: #0f0f0e;
-  --surface: #171716;
-  --surface-2: #1f1f1d;
-  --ink: #f2f1ee;
-  --ink-2: #c9c7c1;
-  --muted: #94918a;
-  --line: #2b2a27;
-  --accent-soft: #33210f;
-  --chart-grid: #262523;
-}
 .app .card {
   border-radius: 14px;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.03);
-}
-.app .bg-brand {
-  background: var(--accent);
-}
-.app .text-brand {
-  background: none;
-  color: var(--accent);
 }
 /* Headings in the app use the body face; the display face stays for the logo. */
 .app main .font-display {

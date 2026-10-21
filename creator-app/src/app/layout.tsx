@@ -7,8 +7,8 @@ import "./globals.css";
 // Fonts are bundled (src/app/fonts) rather than fetched from Google at build time, so a Google Fonts hiccup can
 // never fail a deploy. All are variable fonts on the weight axis.
 const body = localFont({ src: "./fonts/inter-latin-wght-normal.woff2", variable: "--font-body", weight: "100 900", display: "swap" });
-// Display face: a friendly, characterful grotesque for headlines and the wordmark.
-const display = localFont({ src: "./fonts/bricolage-grotesque-latin-wght-normal.woff2", variable: "--font-display-face", weight: "200 800", display: "swap" });
+// Display face: Epilogue, a broad grotesque for headlines, the wordmark and the public site's text (OFL).
+const display = localFont({ src: "./fonts/epilogue-latin-wght-normal.woff2", variable: "--font-display-face", weight: "100 900", display: "swap" });
 const devanagari = localFont({ src: "./fonts/noto-sans-devanagari-devanagari-wght-normal.woff2", variable: "--font-devanagari", weight: "100 900", display: "swap" });
 const telugu = localFont({ src: "./fonts/noto-sans-telugu-telugu-wght-normal.woff2", variable: "--font-telugu", weight: "100 900", display: "swap" });
 // Kannada (beta language): the Noto Sans Kannada files the PDF reports already ship (OFL, assets/pdf-fonts).
@@ -31,7 +31,9 @@ export const metadata: Metadata = {
 };
 
 // Applies the saved theme before paint so there is no flash.
-const themeScript = `try{var t=localStorage.getItem("mitra-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}`;
+// Also marks the page as scripted (.js gates the landing page's entrance motion) and, if the reveal observer hasn't
+// started within 3 seconds, shows everything so no content can stay hidden.
+const themeScript = `try{var t=localStorage.getItem("mitra-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}document.documentElement.classList.add("js");setTimeout(function(){if(!window.__mitraReveals)document.querySelectorAll("[data-reveal],.s-stage").forEach(function(e){e.classList.add("is-in")})},3000);`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
@@ -42,6 +44,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
       </head>
       <body className="min-h-full">{children}</body>
     </html>

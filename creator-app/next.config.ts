@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
     "/api/**/*": ["./drizzle/**/*"],
     // Fonts for the PDF reports (Indian scripts need full fonts to shape correctly).
     "/api/reports/**/*": ["./assets/pdf-fonts/**/*", "./public/brand/**/*"],
+    "/opengraph-image": ["./public/brand/**/*"],
   },
   partialPrefetching: true,
   // Basic hardening for every page: no framing (clickjacking), no MIME sniffing, no referrer leaks to other

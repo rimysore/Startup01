@@ -1,15 +1,23 @@
+import Image from "next/image";
 import Link from "next/link";
-import { FounderOfferPopup, FoundingBanner } from "@/components/Founding";
+import "./site.css";
+import { FounderOfferPopup } from "@/components/Founding";
 import { WaitlistForm } from "@/components/Waitlist";
-import { LandingCounter } from "@/components/LandingCounter";
-import { LanguageShowcase, RotatingLanguage } from "@/components/landing";
-import { SiteFooter } from "@/components/SiteFooter";
+import { LEGAL_LINKS } from "@/components/SiteFooter";
+import { DoctorPanel, IndiaTime, Reveals, TitleCheck, WatchHours } from "@/components/site";
+import { MitraMark } from "@/components/brand";
 import { Logo, ThemeToggle } from "@/components/ui";
 import { LandingTracker, TrackedLink } from "@/components/BetaWidgets";
 import { BETA, offeredLanguage, SPRINT_UPLOADS } from "@/lib/beta";
 import { COMPANY, INVITE_ONLY } from "@/lib/company";
 import { LANGUAGES as ALL_LANGUAGES } from "@/lib/languages";
 import { AGENCY, FOUNDER_FREE_USES, PLANS, rupees } from "@/lib/plans";
+
+/*
+ * The landing page, art-directed with the taste skill (direction "colour chapters"): each section is a full-bleed
+ * field in one brand colour. The idea: Mitra's own retention curve, the second viewers left, carries the page, from
+ * the stage cut as a step down to the live Video Doctor panel on it.
+ */
 
 const LANGUAGES = ALL_LANGUAGES.filter((l) => offeredLanguage(l.code));
 
@@ -21,17 +29,8 @@ const PRICING = [
     points: p.points,
     cta: p.id === "free" ? "Start free" : `Get ${p.name}`,
     href: p.id === "free" ? "/login?next=/dashboard" : `/dashboard/billing?plan=${p.id}`,
-    featured: p.id === "pro",
   })),
-  {
-    name: AGENCY.name,
-    price: rupees(AGENCY.pricePaise),
-    per: "/month",
-    points: AGENCY.points,
-    cta: "Talk to us",
-    href: `mailto:${COMPANY.supportEmail}?subject=Mitra%20Agency%20plan`,
-    featured: false,
-  },
+  { name: AGENCY.name, price: rupees(AGENCY.pricePaise), per: "/month", points: AGENCY.points, cta: "Talk to us", href: `mailto:${COMPANY.supportEmail}?subject=Mitra%20Agency%20plan` },
 ];
 
 const BETA_FAQ = [
@@ -54,393 +53,341 @@ const FAQ_FULL = [
 
 const FAQ = BETA ? BETA_FAQ : FAQ_FULL;
 
-const SPRINT = [
-  ["Diagnose", "Connect YouTube (read-only) and run Video Doctor on your latest video."],
-  ["Apply", `Use Mitra's fixes on your next ${SPRINT_UPLOADS} uploads. Tap "I'll apply these fixes" so Mitra knows.`],
-  ["Measure", "Mitra compares their average % viewed with your channel's average before the fixes."],
+/** Kannada on the street, from Wikimedia Commons (CC BY-SA). Credited in the footer; none of them is Mitra's. */
+const SIGNS = [
+  { src: "/site/metro.jpg", alt: "Indiranagar metro station sign in Kannada and English", caption: "Indiranagar metro station, Bengaluru", credit: "Blu Adi, CC BY-SA 4.0", page: "https://commons.wikimedia.org/w/index.php?curid=192876792" },
+  { src: "/site/coorg-coffee.jpg", alt: "Hand-painted tea and coffee shop sign in Kannada and English", caption: "A tea and coffee stall, Kodagu", credit: "Subhashish Panigrahi, CC BY-SA 3.0", page: "https://commons.wikimedia.org/wiki/File:Signboard_of_a_coffee_shop_in_Coorg,_Karnataka.jpg" },
+  { src: "/site/mysore-college.jpg", alt: "Maharaja's College sign in Kannada and English", caption: "Maharaja's College, Mysuru", credit: "Christopher J. Fynn, CC BY-SA 4.0", page: "https://commons.wikimedia.org/wiki/File:Maharaja%27s_College,_Mysore_sign.jpg" },
 ];
 
-function Bento({ title, body, tag, className = "", dark = false, children }: { title: string; body: string; tag: string; className?: string; dark?: boolean; children?: React.ReactNode }) {
-  return (
-    <div
-      className={`group relative flex flex-col overflow-hidden rounded-[28px] border p-6 transition duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-40px_rgba(0,0,0,0.45)] ${dark ? "border-ink bg-ink text-bg" : "border-line bg-surface"} ${className}`}
-    >
-      <span className={`self-start rounded-full px-2.5 py-1 text-[11px] font-semibold ${dark ? "bg-bg/10 text-bg/80" : "bg-surface-2 text-ink-2"}`}>{tag}</span>
-      <h3 className="mt-4 font-display text-2xl">{title}</h3>
-      <p className={`mt-2 ${dark ? "text-bg/70" : "text-ink-2"}`}>{body}</p>
-      {children && <div className="mt-6 flex-1">{children}</div>}
-    </div>
-  );
-}
+/** The Retention Sprint as one bar: widths follow how long each stage really takes (12% minimum). */
+const STAGES = [
+  { dur: "Two minutes", grow: 12, note: "First, sign in with Google and connect YouTube, read-only.", bg: "var(--navy-field)", fg: "#f1f5f9" },
+  { dur: "About a minute", grow: 12, note: "Then Video Doctor reads your latest video and names the fixes.", bg: "var(--cobalt-field)", fg: "#ffffff" },
+  { dur: `Your next ${SPRINT_UPLOADS} uploads`, grow: 52, note: `Next, you use the fixes on ${SPRINT_UPLOADS} uploads and tap "I'll apply these fixes".`, bg: "var(--mint-field)", fg: "#101b33" },
+  { dur: "A week after each", grow: 24, note: "Last, Mitra compares their average % viewed with your channel before.", bg: "var(--pale-field)", fg: "var(--ink)" },
+];
 
-function RetentionMini() {
-  const pts = Array.from({ length: 41 }, (_, i) => {
-    const t = i / 40;
-    const w = (1 - 0.3 * Math.min(1, t / 0.1)) * Math.exp(-0.8 * t) - 0.07 * Math.exp(-((t - 0.42) ** 2) / 0.003);
-    return [8 + t * 304, 12 + (1 - w) * 96] as const;
-  });
-  const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)},${y.toFixed(1)}`).join("");
+function Arrow({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 320 120" className="w-full" role="img" aria-label="Retention curve with a drop marked at 4:12">
-      <path d={`${d}L312,112L8,112Z`} fill="var(--accent)" opacity="0.12" />
-      <path d={d} fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
-      <circle cx={pts[17][0]} cy={pts[17][1]} r="6" fill="var(--bad)" stroke="var(--surface)" strokeWidth="2" />
-      <text x={pts[17][0]} y={pts[17][1] - 11} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--ink)">4:12 −18%</text>
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M12 36 36 12M16 12h20v20" />
     </svg>
   );
 }
 
 export default function Home() {
-  const marquee = [...LANGUAGES, ...LANGUAGES];
+  const join = INVITE_ONLY ? "#waitlist" : "/dashboard/connections";
+  const joinLabel = INVITE_ONLY ? (BETA ? "Join the free beta" : "Get early access") : "Connect YouTube";
   return (
-    <div className="overflow-x-hidden">
+    <div className="site">
       <LandingTracker />
+      <Reveals />
       {!BETA && <FounderOfferPopup />}
-      {/* ---- Nav ---- */}
-      <header className="sticky top-0 z-40 border-b border-transparent bg-bg/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center gap-6 px-4 py-4 sm:px-8">
-          <span className="flex items-center gap-2">
-            <Logo />
-            {BETA && <span className="rounded border border-accent/50 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-accent">Beta</span>}
-          </span>
-          <nav className="ml-6 hidden gap-6 text-sm font-medium text-ink-2 md:flex">
-            <a href="#features" className="hover:text-ink">Features</a>
-            <a href="#languages" className="hover:text-ink">Languages</a>
-            {BETA ? <a href="#sprint" className="hover:text-ink">The beta</a> : <a href="#pricing" className="hover:text-ink">Pricing</a>}
-            <a href="#faq" className="hover:text-ink">FAQ</a>
-          </nav>
-          <div className="ml-auto flex items-center gap-2">
-            <ThemeToggle />
-            <Link href="/login" className="hidden rounded-full px-4 py-2.5 text-sm font-semibold hover:bg-surface-2 sm:block">
-              Sign in
-            </Link>
-            <Link href="/dashboard" className="rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-bg transition hover:opacity-90">
-              Try the demo
-            </Link>
-          </div>
-        </div>
-      </header>
 
-      {/* ---- Hero ---- */}
-      <section className="relative">
-        <div className="pointer-events-none absolute inset-x-0 -top-40 -z-10 h-[640px] opacity-60 [mask-image:radial-gradient(60%_60%_at_50%_30%,black,transparent)]" aria-hidden>
-          <div className="glow-blob absolute left-[8%] top-24 h-80 w-80 rounded-full bg-[#ff8a1f]/40 blur-3xl" />
-          <div className="glow-blob absolute right-[10%] top-10 h-96 w-96 rounded-full bg-[#d946ef]/30 blur-3xl" style={{ animationDelay: "-5s" }} />
-          <div className="glow-blob absolute left-[40%] top-64 h-72 w-72 rounded-full bg-[#6c47ff]/25 blur-3xl" style={{ animationDelay: "-9s" }} />
-        </div>
-        <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 pb-20 pt-10 sm:px-8 lg:grid-cols-[1.1fr_1fr] lg:pt-16">
-          <div className="rise">
-            <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1.5 text-xs font-semibold text-ink-2 backdrop-blur">
-              <span className="h-2 w-2 rounded-full bg-brand" /> {BETA ? "Free beta · for Hindi and Kannada YouTube creators" : "The AI channel manager for India's creators"}
-            </p>
-            <h1 className="mt-6 font-display text-[3.4rem] leading-[0.95] sm:text-7xl lg:text-[5.4rem]">
-              Grow your channel in <RotatingLanguage />
-            </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-2">
+      {/* ---- Hero: fragment on a shaped stage ---- */}
+      <section className="s-hero" aria-labelledby="hero-title">
+        <div className="s-wrap">
+          <header className="s-nav">
+            <Logo />
+            <nav className="s-nav__links" aria-label="Main">
+              <a href="#titles" className="s-nav__text s-link">Title check</a>
+              <a href="#sprint" className="s-nav__text s-link">{BETA ? "The Sprint" : "How it works"}</a>
+              {!BETA && <a href="#pricing" className="s-nav__text s-link">Pricing</a>}
+              <a href="#faq" className="s-nav__text s-link">FAQ</a>
+              <Link href="/login" className="s-link">Sign in</Link>
+              <ThemeToggle />
+            </nav>
+          </header>
+          <div className="s-grid s-hero__copy">
+            <h1 id="hero-title">Find the second viewers&nbsp;left.</h1>
+            <p className="s-hero__sub">
               {BETA
-                ? "Mitra finds the exact second viewers left your video, explains why in Hindi or Kannada, and tells you what to change in your next upload. YouTube shows you where. Mitra tells you why."
-                : "Mitra reads your YouTube analytics and tells you, in your own language, why a video dipped, what your viewers want, which trend to ride and what to post next. Then it celebrates every new subscriber with you."}
+                ? "Mitra is a free Video Doctor for Hindi and Kannada YouTube creators. It finds the moment people stopped watching, says why in your language, and tells you what to change next."
+                : "Mitra reads your YouTube analytics and tells you, in your own language, why a video dipped, what your viewers want and what to post next."}
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/dashboard" className="bg-brand rounded-full px-7 py-4 text-base font-semibold text-white shadow-[0_14px_40px_-12px_#d946ef] transition hover:brightness-110">
-                Try the live demo →
-              </Link>
-              <TrackedLink
-                href={INVITE_ONLY ? "#waitlist" : "/dashboard/connections"}
-                event="signup_click"
-                props={{ from: "hero" }}
-                className="rounded-full border border-line bg-surface px-7 py-4 text-base font-semibold hover:bg-surface-2"
-              >
-                {INVITE_ONLY ? (BETA ? "Join the free beta" : "Get early access") : "Connect YouTube"}
+            <div className="s-hero__act">
+              <TrackedLink href={join} event="signup_click" props={{ from: "hero" }} className="s-btn">
+                {joinLabel}
               </TrackedLink>
+              <Link href="/dashboard" className="s-link">Try the demo</Link>
             </div>
-            <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted">
-              <li>✓ Read-only access</li>
-              <li>✓ {BETA ? "Free during the beta" : "Free to start"}</li>
-              {!BETA && <li>✓ Pro at ₹99/month</li>}
-            </ul>
-            {!BETA && <FoundingBanner />}
+            <p className="s-hero__trust">Read-only YouTube access · {BETA ? "Free during the beta" : `Pro at ${rupees(PLANS.pro.pricePaise)}/month`}</p>
           </div>
-          <div className="float-y">
-            <LandingCounter />
+        </div>
+        <div className="s-stage" id="doctor">
+          <div className="s-stage__inner">
+            <DoctorPanel />
           </div>
         </div>
       </section>
 
-      {/* ---- Languages ---- */}
-      {BETA ? (
-        <section id="languages" className="border-y border-line bg-surface py-10" aria-label="Supported languages">
-          <div className="mx-auto grid max-w-6xl gap-6 px-4 sm:grid-cols-2 sm:px-8">
-            {LANGUAGES.map((l) => (
-              <div key={l.code} className="flex items-baseline justify-between gap-4">
-                <span className="font-indic text-5xl font-semibold sm:text-6xl">{l.native}</span>
-                <span className="text-sm text-muted">{l.label}</span>
+      {/* ---- Title check: the headline you can type ---- */}
+      <section id="titles" className="s-chapter s-navy scroll-mt-4" aria-labelledby="titles-title">
+        <div className="s-wrap">
+          <h2 id="titles-title" className="s-type__q" data-reveal>Type your next video title.</h2>
+          <TitleCheck studioHref="/dashboard/studio" />
+        </div>
+      </section>
+
+      {/* ---- What's in the beta: close-ups on a board ---- */}
+      <section className="bg-bg" aria-labelledby="board-title">
+        <div className="s-board">
+          <div className="s-tile s-tile--head s-t1" style={{ background: "var(--surface-2)" }} data-reveal>
+            <h2 id="board-title" className="font-black tracking-[-0.04em]" style={{ fontSize: "clamp(36px, 4vw, 60px)", lineHeight: 0.95 }}>
+              {BETA ? "Two tools, done properly." : "A manager in your pocket."}
+            </h2>
+          </div>
+
+          <div className="s-tile s-t2" style={{ background: "var(--cobalt-field)", color: "#fff" }} data-reveal>
+            <div className="s-tile__ui" data-ui style={{ right: "-0.3em", top: "0.3em", fontSize: "clamp(48px, 7vw, 112px)" }}>
+              <span className="ui-chip" style={{ fontSize: "1em", padding: "0.12em 0.4em", background: "#fff", color: "#b91c1c", fontWeight: 800, letterSpacing: "-0.03em" }}>
+                0:42 −31%
+              </span>
+            </div>
+            <p className="s-tile__name">Video Doctor</p>
+            <p className="s-tile__line">Finds the second viewers left, says why, and gives the fixes for your next upload.</p>
+          </div>
+
+          <div className="s-tile s-t3" style={{ background: "var(--mint-field)", color: "#101b33" }} data-reveal>
+            <div className="s-tile__ui indic" data-ui style={{ left: "-0.2em", top: "0.4em", fontSize: "clamp(32px, 3.4vw, 56px)", whiteSpace: "nowrap" }}>
+              <span style={{ display: "inline-flex", gap: "0.1em", padding: "0.1em", borderRadius: 999, background: "#ffffff80" }}>
+                <span style={{ padding: "0.05em 0.35em", borderRadius: 999, background: "#101b33", color: "#f1f5f9", fontWeight: 700 }}>हिन्दी</span>
+                <span style={{ padding: "0.05em 0.35em", fontWeight: 700 }}>ಕನ್ನಡ</span>
+              </span>
+            </div>
+            <p className="s-tile__name">In your language</p>
+            <p className="s-tile__line">
+              {BETA ? "Every answer in Hindi or Kannada, checked by native speakers during the beta." : `Every answer in ${LANGUAGES.length} languages.`}
+            </p>
+          </div>
+
+          <div className="s-tile s-t4" style={{ background: "var(--navy-field)", color: "#f1f5f9" }} data-reveal>
+            <div className="s-tile__ui" data-ui style={{ right: "-0.25em", top: "-0.2em", fontSize: "clamp(28px, 3vw, 48px)", whiteSpace: "nowrap" }}>
+              <span style={{ display: "inline-block", padding: "0.1em 0.4em", borderRadius: "0.3em", background: "#72d9b0", color: "#101b33", fontWeight: 800 }}>Read-only</span>
+            </div>
+            <p className="s-tile__name">Can&apos;t touch your channel</p>
+            <p className="s-tile__line">It reads analytics. It never uploads or deletes.</p>
+          </div>
+
+          <div className="s-tile s-t5" style={{ background: "var(--hover)", color: "var(--ink)" }} data-reveal>
+            <div className="s-tile__ui" data-ui style={{ right: "-1.4em", top: "-0.3em", fontSize: "clamp(24px, 2.4vw, 38px)" }}>
+              <span style={{ display: "inline-block", padding: "0.3em 0.8em", borderRadius: 999, background: "var(--accent)", color: "var(--accent-ink)", fontWeight: 700, whiteSpace: "nowrap" }}>
+                I&apos;ll apply these fixes
+              </span>
+            </div>
+            <p className="s-tile__name">One tap to commit</p>
+            <p className="s-tile__line">Then Mitra measures your next {SPRINT_UPLOADS} uploads.</p>
+          </div>
+
+          <div className="s-tile s-t6" style={{ background: "var(--surface-2)" }} data-reveal>
+            <div className="s-tile__ui indic" data-ui style={{ right: "-0.3em", top: "-0.25em", fontSize: "clamp(32px, 4vw, 64px)", whiteSpace: "nowrap" }}>
+              <span style={{ display: "inline-block", padding: "0.12em 0.4em", background: "#101b33", color: "#fff", fontWeight: 800, borderRadius: "0.2em" }}>
+                ₹500 ಫೋನ್ <span style={{ color: "#72d9b0" }}>ಗೆದ್ದಿತಾ?</span>
+              </span>
+            </div>
+            <p className="s-tile__name">Title &amp; Thumbnail Studio</p>
+            <p className="s-tile__line">Titles, a 15-second hook, and thumbnail text where Kannada and Hindi letters render right.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ---- Watch hours: the figure is the visitor's own ---- */}
+      <section className="s-chapter s-mint" aria-label="Watch hours calculator">
+        <div className="s-wrap">
+          <WatchHours />
+        </div>
+      </section>
+
+      {/* ---- Two languages ---- */}
+      <section className="s-chapter s-navy flex flex-col justify-end" aria-labelledby="langs-title">
+        <div className="s-wrap">
+          <h2 id="langs-title" className="s-head" data-reveal>{BETA ? "Two languages, done properly." : "Your language, not ours."}</h2>
+          <div className="s-langs mt-8">
+            {BETA ? (
+              <>
+                <p className="s-langs__word s-langs__hi indic" lang="hi" data-reveal>हिन्दी</p>
+                <p className="s-langs__word s-langs__kn indic" lang="kn" data-reveal style={{ color: "var(--mint-field)" }}>ಕನ್ನಡ</p>
+              </>
+            ) : (
+              <p className="indic col-span-12 text-[clamp(40px,7vw,120px)] font-bold leading-[1.2]" data-reveal>
+                {LANGUAGES.map((l) => l.native).join(" · ")}
+              </p>
+            )}
+            <p className="s-langs__note s-lead" style={{ color: "var(--on-navy-2)" }} data-reveal>
+              {BETA
+                ? "Native speakers check Mitra's answers in both before more languages ship. Not translated English: the way you'd say it to your own viewers."
+                : "Pick one in the top bar and every answer, title and report comes back in it."}
+            </p>
+          </div>
+          <div className="s-signs">
+            {SIGNS.map((g, i) => (
+              <figure key={g.src} data-reveal style={{ ["--i" as string]: i }}>
+                <Image src={g.src} alt={g.alt} width={1280} height={960} sizes="(max-width: 760px) 100vw, 33vw" />
+                <figcaption>{g.caption}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---- The Retention Sprint as one bar ---- */}
+      <section id="sprint" className="s-chapter scroll-mt-4" aria-labelledby="sprint-title">
+        <div className="s-wrap">
+          <h2 id="sprint-title" className="s-head" data-reveal>{BETA ? (
+              <>
+                The <span className="whitespace-nowrap">{SPRINT_UPLOADS}-upload</span> Sprint.
+              </>
+            ) : (
+              "Up and running in minutes."
+            )}</h2>
+          <div className="s-bar" data-ui data-reveal>
+            {STAGES.map((s) => (
+              <div key={s.dur} className="s-bar__seg" style={{ flexGrow: s.grow, flexBasis: 0, background: s.bg, color: s.fg, ["--grow" as string]: s.grow }}>
+                <p className="s-bar__dur">{s.dur}</p>
+                <p className="s-bar__note-in">{s.note}</p>
               </div>
             ))}
           </div>
-          <p className="mx-auto mt-5 max-w-6xl px-4 text-sm text-ink-2 sm:px-8">
-            Two languages, done properly: native speakers check Mitra&apos;s answers during the beta. More languages come after.
-          </p>
-        </section>
-      ) : (
-      <section id="languages" className="border-y border-line bg-surface py-6" aria-label="Supported languages">
-        <div className="flex w-max gap-12 whitespace-nowrap marquee">
-          {marquee.map((l, i) => (
-            <span key={i} className="font-indic text-4xl font-semibold text-ink-2 sm:text-5xl">
-              {l.native}
-              <span className="text-brand ml-12">✦</span>
-            </span>
-          ))}
-        </div>
-      </section>
-      )}
-
-      {/* ---- Why ---- */}
-      <section className="mx-auto max-w-6xl px-4 py-24 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Why Mitra</p>
-            <h2 className="mt-3 font-display text-5xl leading-[1.02] sm:text-6xl">
-              Most of India&apos;s creators don&apos;t create in English. <span className="text-brand">Their tools still do.</span>
-            </h2>
-            <p className="mt-5 max-w-lg text-lg text-ink-2">
-              Mitra gives the same advice a big-city channel manager would, in the language you and your viewers actually speak. Try it: switch the
-              language.
-            </p>
-          </div>
-          <LanguageShowcase />
-        </div>
-        <dl className="mt-16 grid gap-px overflow-hidden rounded-[28px] border border-line bg-line sm:grid-cols-3">
-          {[
-            ["6.4×", "growth in creators outside metro cities, 2020–2025"],
-            ["66%", "of India's creators now live outside the metros"],
-            ["58%", "create in a regional language other than Hindi"],
-          ].map(([n, t]) => (
-            <div key={n} className="bg-surface p-7">
-              <dt className="text-brand font-display text-6xl">{n}</dt>
-              <dd className="mt-2 text-ink-2">{t}</dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-3 text-xs text-muted">Source: ISB–Hashfame, &ldquo;Understanding the Canvas of India&apos;s Creator Economy&rdquo;, July 2026.</p>
-      </section>
-
-      {/* ---- Features (bento) ---- */}
-      <section id="features" className="mx-auto max-w-6xl px-4 pb-24 sm:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Everything a manager does</p>
-        <h2 className="mt-3 max-w-3xl font-display text-5xl leading-[1.02] sm:text-6xl">From &ldquo;why did this flop?&rdquo; to &ldquo;here&apos;s your next hit.&rdquo;</h2>
-        <div className="mt-12 grid gap-4 md:grid-cols-6">
-          <Bento className="md:col-span-4" tag="Retention" title="Video Doctor" body="Pinpoints the second viewers left, explains why in your language, and gives three fixes. Also shows which cities watched and what they searched.">
-            <RetentionMini />
-          </Bento>
-          {!BETA && (
-          <Bento className="md:col-span-2" dark tag="Motivation" title="Every win, celebrated" body="Live subscriber counter, confetti for new subscribers, milestones to your Silver Creator Award.">
-            <p className="font-display text-6xl text-accent">+128</p>
-            <p className="text-sm opacity-70">subscribers since you last looked 🎉</p>
-          </Bento>
-          )}
-          <Bento
-            className="md:col-span-2"
-            tag="Packaging"
-            title="Title & Thumbnail Studio"
-            body={BETA ? "Titles and a 15-second hook in your language, plus thumbnails where Hindi and Kannada text renders right, which most AI image tools still get wrong." : "Titles in your language and AI-designed thumbnails where Hindi and Telugu text render right."}
-          >
-            <div className="grid aspect-video place-items-center rounded-2xl bg-gradient-to-br from-[#1b1446] via-[#7a1f8c] to-[#ff8a1f] p-4">
-              <p className="text-center font-indic text-3xl font-extrabold leading-tight text-white [text-shadow:0_3px_0_#000]">
-                ₹20K में <span className="text-[#ffd23f]">कौन जीता?</span>
+          <div className="s-bar__notes" aria-hidden>
+            {STAGES.map((s) => (
+              <p key={s.dur} className="s-bar__note" style={{ flexGrow: s.grow, flexBasis: 0 }}>
+                {s.note}
               </p>
-            </div>
-          </Bento>
-          {!BETA && (
-          <>
-          <Bento className="md:col-span-2" tag="Ideas" title="Trend Radar" body="What India is watching right now, sorted by language, with the emotions and festivals behind it.">
-            <div className="flex flex-wrap gap-2">
-              {["😊 Joy 30%", "🤔 Curiosity 26%", "🙏 Devotion 16%", "😂 Humour 14%"].map((c) => (
-                <span key={c} className="rounded-full bg-surface-2 px-3 py-1.5 text-sm">{c}</span>
-              ))}
-            </div>
-          </Bento>
-          <Bento className="md:col-span-2" tag="Audience" title="Who watches, from where" body="Top cities, search terms, age and gender, and the slang your Gen Z and millennial viewers really use.">
-            <ul className="space-y-2 text-sm">
-              {[["Hyderabad", 84], ["Vijayawada", 52], ["Dubai", 21]].map(([c, v]) => (
-                <li key={c}>
-                  <div className="flex justify-between"><span>{c}</span><span className="text-muted">{v}K</span></div>
-                  <div className="mt-1 h-1.5 rounded-full bg-surface-2"><div className="bg-brand h-1.5 rounded-full" style={{ width: `${Number(v)}%` }} /></div>
-                </li>
-              ))}
-            </ul>
-          </Bento>
-          <Bento className="md:col-span-3" tag="Strategy" title="Competitor compare" body="Line up against up to 5 channels: views, upload rhythm, Shorts mix, title patterns, and the gaps you can own." />
-          <Bento className="md:col-span-3" tag="Assistant" title="Ask Mitra anything" body="A manager who knows your numbers, on call in your language.">
-            <p className="rounded-2xl rounded-tl-md bg-surface-2 px-4 py-3 text-sm">
-              <span className="font-semibold">Is hafte kya upload karun?</span>
-              <br />
-              <span className="text-ink-2">Tumhara UPI fraud video 2.2× chala — iska Part 2 banao, aur ek 45-sec Short Friday ko. 🔥</span>
-            </p>
-          </Bento>
-          </>
-          )}
-        </div>
-      </section>
-
-      {/* ---- The beta: Retention Sprint ---- */}
-      {BETA && (
-        <section id="sprint" className="scroll-mt-20 mx-auto max-w-6xl px-4 pb-24 sm:px-8">
-          <div className="grid gap-10 rounded-[36px] border border-line bg-surface p-6 sm:p-10 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">The beta programme</p>
-              <h2 className="mt-3 font-display text-5xl leading-tight">The {SPRINT_UPLOADS}-upload Retention Sprint</h2>
-              <p className="mt-4 text-lg text-ink-2">Not more charts. One goal: more of your viewers watching to the end, measured on your own channel.</p>
-              <p className="mt-6 rounded-2xl border border-accent/40 bg-accent-soft p-4 text-sm">
-                <b>Our promise:</b> if your average % viewed hasn&apos;t improved after {SPRINT_UPLOADS} uploads, we&apos;ll go through your channel with you
-                one-on-one and tell you honestly why.
-              </p>
-              <p className="mt-4 text-sm text-muted">
-                Built first for creators who already earn from YouTube and for people who manage channels. Just starting out? You&apos;re welcome too.
-              </p>
-            </div>
-            <ol className="space-y-6">
-              {SPRINT.map(([t, b], i) => (
-                <li key={t} className="flex gap-4">
-                  <span className="text-brand font-display text-5xl leading-none">{i + 1}</span>
-                  <div>
-                    <p className="text-xl font-semibold">{t}</p>
-                    <p className="mt-1 text-ink-2">{b}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
-      )}
-
-      {/* ---- How it works ---- */}
-      <section className="bg-ink py-24 text-bg">
-        <div className="mx-auto max-w-6xl px-4 sm:px-8">
-          <h2 className="font-display text-5xl sm:text-6xl">Up and running in a minute.</h2>
-          <ol className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              ["Connect", "Sign in with Google and connect YouTube with read-only access."],
-              ["Understand", "Every video gets a health score, a retention breakdown and a plain-language diagnosis."],
-              ["Grow", "Weekly actions, better titles and thumbnails, trends and ideas from your own audience."],
-            ].map(([t, b], i) => (
-              <li key={t} className="rounded-[28px] border border-bg/10 bg-bg/5 p-7">
-                <span className="text-brand font-display text-6xl">{i + 1}</span>
-                <p className="mt-4 text-2xl font-semibold">{t}</p>
-                <p className="mt-2 opacity-70">{b}</p>
-              </li>
             ))}
-          </ol>
+          </div>
+          {BETA && (
+            <p className="s-promise" data-reveal>
+              <b>Our promise:</b> if your average % viewed hasn&apos;t improved after {SPRINT_UPLOADS} uploads, we&apos;ll go through your channel with you one-on-one and
+              tell you honestly why.
+            </p>
+          )}
         </div>
       </section>
 
       {/* ---- Waitlist (private beta) ---- */}
       {INVITE_ONLY && (
-        <section id="waitlist" className="scroll-mt-20 mx-auto max-w-6xl px-4 py-20 sm:px-8">
-          <div className="grid gap-10 rounded-[36px] border border-line bg-surface p-6 sm:p-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Private beta</p>
-              <h2 className="mt-3 font-display text-5xl leading-tight">Get early access</h2>
-              <p className="mt-4 text-lg text-ink-2">
-                We&apos;re letting creators in a few at a time, so every one of them gets real help (and we can fix things fast). Join the list and
-                we&apos;ll message you when your spot opens.
+        <section id="waitlist" className="s-chapter s-pale scroll-mt-4" aria-labelledby="join-title">
+          <div className="s-wrap s-join">
+            <div className="s-join__copy" data-reveal>
+              <h2 id="join-title" className="s-head">{BETA ? "Join the beta." : "Get early access."}</h2>
+              <p className="s-lead mt-8 max-w-[34ch]">
+                We let creators in a few at a time, so each one gets real help and we can fix things fast. Leave your email and we&apos;ll write when your spot opens.
               </p>
-              <ul className="mt-6 space-y-2 text-ink-2">
-                {BETA ? (
-                  <>
-                    <li>🎯 Video Doctor on your own videos, in Hindi or Kannada</li>
-                    <li>📈 The {SPRINT_UPLOADS}-upload Retention Sprint, free during the beta</li>
-                  </>
-                ) : (
-                  <>
-                    <li>🏅 The first 100 creators get a Founder Pass, free for life</li>
-                    <li>📲 Your weekly report on WhatsApp, in your language</li>
-                  </>
-                )}
-                <li>🔒 Read-only YouTube access. Mitra never posts for you</li>
-              </ul>
+              <p className="mt-6 text-ink-2">Built first for creators who already earn from YouTube and for people who manage channels. Just starting out? You&apos;re welcome too.</p>
             </div>
-            <WaitlistForm />
+            <div className="s-join__form" data-reveal>
+              <WaitlistForm />
+            </div>
           </div>
         </section>
       )}
 
       {/* ---- Pricing (hidden during the beta) ---- */}
       {!BETA && (
-      <section id="pricing" className="mx-auto max-w-6xl px-4 py-24 sm:px-8">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">Pricing</p>
-        <h2 className="mt-3 font-display text-5xl sm:text-6xl">Priced for Bharat. Pay with UPI.</h2>
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {PRICING.map((p) => (
-            <div
-              key={p.name}
-              className={`relative flex flex-col rounded-[28px] border p-6 ${p.featured ? "border-transparent bg-ink text-bg shadow-[0_30px_70px_-30px_#d946ef]" : "border-line bg-surface"}`}
-            >
-              {p.featured && <span className="bg-brand absolute -top-3 left-6 rounded-full px-3 py-1 text-xs font-bold text-white">Launch price</span>}
-              <p className="font-semibold">{p.name}</p>
-              <p className="mt-4 font-display text-5xl">
-                {p.price}
-                <span className={`font-sans text-sm font-normal ${p.featured ? "opacity-60" : "text-muted"}`}>{p.per}</span>
-              </p>
-              <ul className={`mt-5 flex-1 space-y-2 text-sm ${p.featured ? "opacity-85" : "text-ink-2"}`}>
-                {p.points.map((pt) => (
-                  <li key={pt} className="flex gap-2"><span className="text-accent">✓</span>{pt}</li>
-                ))}
-              </ul>
-              <a
-                href={p.href}
-                className={`mt-6 rounded-full px-4 py-3 text-center text-sm font-semibold ${p.featured ? "bg-brand text-white" : "border border-line hover:bg-surface-2"}`}
-              >
-                {p.cta}
-              </a>
+        <section id="pricing" className="s-chapter s-pale" aria-labelledby="pricing-title">
+          <div className="s-wrap">
+            <h2 id="pricing-title" className="s-head" data-reveal>Priced for Bharat. Pay with UPI.</h2>
+            <div className="mt-16 grid gap-2 md:grid-cols-2 lg:grid-cols-4">
+              {PRICING.map((p, i) => (
+                <div key={p.name} className="flex flex-col rounded-[20px] p-6" style={i === 1 ? { background: "var(--cobalt-field)", color: "#fff" } : { background: "var(--surface)" }}>
+                  <p className="text-xl font-bold">{p.name}</p>
+                  <p className="mt-4 text-5xl font-black tracking-[-0.04em]">
+                    {p.price}
+                    <span className="text-base font-normal">{p.per}</span>
+                  </p>
+                  <ul className="mt-5 flex-1 space-y-2 text-[16px]">
+                    {p.points.map((pt) => (
+                      <li key={pt}>{pt}</li>
+                    ))}
+                  </ul>
+                  <a href={p.href} className="s-btn mt-6 justify-center" style={i === 1 ? { background: "#fff", color: "#101b33" } : undefined}>
+                    {p.cta}
+                  </a>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
-
+          </div>
+        </section>
       )}
 
-      {/* ---- FAQ ---- */}
-      <section id="faq" className="mx-auto max-w-3xl px-4 pb-24 sm:px-8">
-        <h2 className="text-center font-display text-5xl">Questions</h2>
-        <div className="mt-10 divide-y divide-line rounded-[28px] border border-line bg-surface">
-          {FAQ.map(([q, a]) => (
-            <details key={q} className="group px-6 py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold">
-                {q}
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface-2 transition group-open:rotate-45" aria-hidden>+</span>
-              </summary>
-              <p className="mt-3 text-ink-2">{a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      {/* ---- Final CTA ---- */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-8">
-        <div className="bg-brand relative overflow-hidden rounded-[36px] px-6 py-16 text-center text-white sm:py-20">
-          <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-white/15 blur-2xl" aria-hidden />
-          {BETA ? (
-            <>
-              <h2 className="font-indic text-5xl font-bold leading-tight sm:text-6xl">चलो, चैनल बढ़ाते हैं।</h2>
-              <p className="font-indic mt-2 text-2xl text-white/90">ಬನ್ನಿ, ನಿಮ್ಮ ಚಾನೆಲ್ ಬೆಳೆಸೋಣ.</p>
-            </>
-          ) : (
-            <h2 className="font-display text-5xl leading-tight sm:text-7xl">Chalo, channel badhate hain.</h2>
-          )}
-          <p className="mx-auto mt-4 max-w-xl text-lg text-white/85">Let&apos;s grow your channel, starting with your last video.</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/dashboard" className="rounded-full bg-white px-7 py-4 font-semibold text-[#1a0f05] transition hover:bg-white/90">
-              Try the live demo →
-            </Link>
-            <Link href={INVITE_ONLY ? "#waitlist" : "/dashboard/connections"} className="rounded-full border border-white/50 px-7 py-4 font-semibold text-white hover:bg-white/10">
-              {INVITE_ONLY ? "Get early access" : "Connect YouTube"}
-            </Link>
+      {/* ---- FAQ: accordion of filled tiles ---- */}
+      <section id="faq" className="s-chapter scroll-mt-4" aria-labelledby="faq-title">
+        <div className="s-wrap s-faq">
+          <h2 id="faq-title" className="s-faq__head">Questions, answered.</h2>
+          <div className="s-faq__list">
+            {FAQ.map(([q, a]) => (
+              <details key={q} name="faq">
+                <summary>
+                  {q}
+                  <span className="s-faq__plus" aria-hidden />
+                </summary>
+                <p>{a}</p>
+              </details>
+            ))}
           </div>
         </div>
       </section>
 
-      <SiteFooter />
+      {/* ---- One word is the button ---- */}
+      <TrackedLink href={join} event="signup_click" props={{ from: "cta" }} className="s-cta" aria-label={joinLabel}>
+        <span className="s-cta__note">
+          {BETA ? "Free during the beta. Hindi and Kannada. Read-only access to YouTube." : "Free to start. Read-only access to YouTube."}
+        </span>
+        <Arrow className="s-cta__arrow s-arrow" />
+        <span className="s-cta__word" aria-hidden>
+          {INVITE_ONLY ? "Join" : "Start"}
+        </span>
+      </TrackedLink>
+
+      {/* ---- A footer of tiles ---- */}
+      <footer className="s-foot" aria-label="Footer">
+        <div className="s-foot__say">
+          <div>
+            <p className="text-[24px] font-bold leading-tight tracking-[-0.02em]">Mitra means friend.</p>
+            <p className="mt-2 text-ink-2">Made for Bharat&apos;s creators.</p>
+          </div>
+          <p className="s-small text-ink-2">
+            Photographs: {SIGNS.map((g, i) => (
+              <span key={g.page}>
+                {i ? "; " : ""}
+                <a href={g.page} className="s-link font-normal">{g.credit}</a>
+              </span>
+            ))}
+            , via Wikimedia Commons.
+          </p>
+          <p className="s-small text-ink-2">© 2026 {COMPANY.legalName.startsWith("[") ? COMPANY.product : COMPANY.legalName}</p>
+        </div>
+        <nav className="s-foot__nav" aria-label="Legal">
+          <ul className="space-y-2 text-[16px]">
+            {LEGAL_LINKS.map((l) => (
+              <li key={l.href}>
+                <Link href={l.href} className="s-link font-semibold">{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="s-foot__time">
+          <p className="text-[16px] text-ink-2">In India it&apos;s</p>
+          <p className="mt-1 text-[28px] font-black tracking-[-0.03em]">
+            <IndiaTime />
+          </p>
+        </div>
+        <div className="s-foot__mail">
+          <p className="text-[16px] text-ink-2">Write to us</p>
+          <a href={`mailto:${COMPANY.supportEmail}`} className="s-link mt-1 break-words text-[17px]">
+            {COMPANY.supportEmail}
+          </a>
+        </div>
+        <div className="s-foot__mark">
+          <MitraMark size={160} className="h-[9vw] w-[9vw] min-h-16 min-w-16" />
+          <span>mitra</span>
+        </div>
+        <TrackedLink href={join} event="signup_click" props={{ from: "footer" }} className="s-foot__go">
+          <span className="text-[28px] font-bold leading-tight tracking-[-0.02em]">{joinLabel}</span>
+          <Arrow className="s-arrow absolute bottom-5 right-5 h-12 w-12" />
+        </TrackedLink>
+      </footer>
     </div>
   );
 }

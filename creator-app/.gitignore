@@ -43,3 +43,6 @@ next-env.d.ts
 
 # local embedded database
 /.data
+
+# taste skill working files (direction sheet, inspector screenshots)
+/.taste-skill

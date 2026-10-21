@@ -1,26 +1,14 @@
-/** Brand colours, shared by the mark, the app icons and the share image. */
-export const BRAND = { saffron: "#FF8A1F", fuchsia: "#D946EF", violet: "#6C47FF", sun: "#FFD23F" } as const;
+/** Brand colours (layer A), shared by the mark, the app icons and the share image. */
+export const BRAND = { cobalt: "#4169E1", mint: "#72D9B0", navy: "#101B33", paper: "#F8FAFC" } as const;
 
-/** The white "m" with a taller second hump (growth), drawn as one rounded stroke. */
-export const MARK_M = "M12.5 34V27.5a4.25 4.25 0 0 1 8.5 0V34M21 34V19.5a4.25 4.25 0 0 1 8.5 0V34";
+/** The mark as a transparent PNG cut from the master artwork. 256px covers every on-screen size up to 128px at 2×. */
+export const MARK_SRC = "/brand/mitra-mark-256.png";
 
 /**
- * The Mitra mark: a round badge in a saffron → fuchsia → violet sunrise, a white "m" whose second hump stands
- * taller (your channel growing), and a sun dot that turns it into "mi". Deliberately nothing like a play button.
+ * The Mitra mark: an "M" drawn as a rising wave, cobalt into mint, with a spark at its peak (a channel taking off).
+ * `id` is accepted for older call sites and ignored.
  */
-export function MitraMark({ size = 32, className = "", id = "mitra-mark" }: { size?: number; className?: string; id?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 48 48" className={className} aria-hidden>
-      <defs>
-        <linearGradient id={`${id}-g`} x1="6" y1="44" x2="42" y2="4" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor={BRAND.saffron} />
-          <stop offset="0.5" stopColor={BRAND.fuchsia} />
-          <stop offset="1" stopColor={BRAND.violet} />
-        </linearGradient>
-      </defs>
-      <circle cx="24" cy="24" r="22.5" fill={`url(#${id}-g)`} />
-      <path d={MARK_M} fill="none" stroke="#fff" strokeWidth="4.6" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="35.5" cy="15" r="3.6" fill={BRAND.sun} />
-    </svg>
-  );
+export function MitraMark({ size = 32, className = "" }: { size?: number; className?: string; id?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element -- a tiny static brand asset; next/image adds nothing here
+  return <img src={MARK_SRC} width={size} height={size} alt="" aria-hidden className={className} draggable={false} />;
 }
