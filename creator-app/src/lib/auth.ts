@@ -2,6 +2,7 @@ import { and, eq, gt } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { db, schema } from "@/db";
 import { randomToken, sha256 } from "./crypto";
+import { MARKETPLACE } from "./marketplace/flag";
 
 export type User = typeof schema.users.$inferSelect;
 
@@ -80,11 +81,13 @@ export function unauthorized(): Response {
  * or newlines like "//evil.com", so the path is resolved against a dummy origin and must stay on it.
  */
 export function safeNext(next: string | null | undefined): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) return "/dashboard";
+  // With the marketplace on, people land on it (the growth tools stay at /dashboard, off the first screen).
+  const home = MARKETPLACE ? "/m" : "/dashboard";
+  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) return home;
   try {
     const u = new URL(next, "https://mitra.invalid");
-    return u.origin === "https://mitra.invalid" ? `${u.pathname}${u.search}${u.hash}` : "/dashboard";
+    return u.origin === "https://mitra.invalid" ? `${u.pathname}${u.search}${u.hash}` : home;
   } catch {
-    return "/dashboard";
+    return home;
   }
 }
