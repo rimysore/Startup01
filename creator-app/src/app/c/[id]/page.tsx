@@ -25,8 +25,9 @@ export default function CouponPage({ params }: PageProps<"/c/[id]">) {
 }
 
 async function Coupon({ params }: { params: PageProps<"/c/[id]">["params"] }) {
-  if (!MARKETPLACE) notFound();
+  // Per request (redeemed state changes); before the flag check so the route is never prerendered.
   await connection();
+  if (!MARKETPLACE) notFound();
   const c = await couponView((await params).id);
   if (!c) notFound();
   const en = strings("en").coupon;
