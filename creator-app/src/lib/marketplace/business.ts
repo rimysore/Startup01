@@ -2,7 +2,9 @@ import { and, desc, eq, inArray, or, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { checkOffer } from "@/lib/offer-check";
-import { DELIVERABLES, MITRA_FEE_PCT, NICHES } from "./flag";
+import { DELIVERABLES, NICHES, PLANS, PLANS_ENFORCED } from "./flag";
+import { amountDue, terms, termsOf, TermsInput, termsText, type Terms } from "./money";
+import { matchesThisMonth, planOf, withinLimit } from "./plans";
 import { freePromoCode, startTrackedForDeal } from "./track";
 import { isVerified, type CreatorHandle, type CreatorProfile, type Deal, type DealOutcome } from "./store";
 
@@ -143,9 +145,6 @@ export function planBudget(budget: number, matches: Match[]): { picks: { userId:
   return { picks, total: budget - left, left };
 }
 
-/** Mitra's fee on a deal it brought, in whole rupees. */
-export const mitraFee = (feeInr: number | null) => (feeInr ? Math.round((feeInr * MITRA_FEE_PCT) / 100) : 0);
-
 /* ---- Briefs ---- */
 
 export async function createBrief(businessUserId: string, input: z.infer<typeof BriefInput>): Promise<Opportunity> {
@@ -205,21 +204,21 @@ export async function matchesFor(brief: Opportunity, limit = 5): Promise<Match[]
 
 /* ---- Invites ---- */
 
-export const InviteInput = z.object({
-  creatorUserId: z.string().min(1).max(80),
-  feeInr: z.coerce.number().int().min(0).max(10_000_000),
-  message: optText(600),
-});
+/** Who to invite and the deal: a base fee (or barter) plus an optional bonus per customer, all to the creator. */
+export const InviteInput = z.intersection(z.object({ creatorUserId: z.string().min(1).max(80), message: optText(600) }), TermsInput);
 
 /** Invites a creator Mitra matched to this brief. The reasons shown to the business are kept with the invite. */
-export async function inviteCreator(businessUserId: string, briefId: string, input: z.infer<typeof InviteInput>): Promise<Invite | "not_found" | "not_matched"> {
+export async function inviteCreator(businessUserId: string, briefId: string, raw: z.input<typeof InviteInput>): Promise<Invite | "not_found" | "not_matched" | "limit"> {
+  const input = InviteInput.parse(raw);
   const brief = await getBrief(businessUserId, briefId);
   if (!brief || brief.status !== "open") return "not_found";
+  if (PLANS_ENFORCED && !withinLimit(PLANS[await planOf(businessUserId)].matchesPerMonth, await matchesThisMonth(businessUserId))) return "limit";
   const match = (await matchesFor(brief, 50)).find((m) => m.userId === input.creatorUserId);
   if (!match) return "not_matched";
+  const t = terms(input);
   const [inv] = await (await db())
     .insert(schema.invites)
-    .values({ id: crypto.randomUUID(), opportunityId: brief.id, businessUserId, creatorUserId: input.creatorUserId, feeInr: input.feeInr, message: input.message, reasons: match.reasons })
+    .values({ id: crypto.randomUUID(), opportunityId: brief.id, businessUserId, creatorUserId: input.creatorUserId, ...t, message: input.message ?? null, reasons: match.reasons })
     .onConflictDoNothing()
     .returning();
   return inv ?? "not_matched";
@@ -250,13 +249,14 @@ export async function inviteForCreator(creatorUserId: string, inviteId: string) 
 }
 
 /** The brief as the creator reads it, also fed to the offer checker so the creator sees what's clear or missing. */
-export function briefAsOffer(brief: Opportunity, feeInr: number | null, businessName: string): string {
+export function briefAsOffer(brief: Opportunity, t: Terms, businessName: string): string {
   const what = brief.deliverables.map((d) => `1 ${d}`).join(" + ");
+  const money = termsText(t);
   return [
     `${businessName}: ${brief.goal}.`,
     brief.brief ?? "",
-    `We'd like ${what}${feeInr ? ` for ₹${feeInr.toLocaleString("en-IN")}` : ""}${brief.postBy ? `, posted by ${brief.postBy}` : ""}.`,
-    "Payment through the deal room after posting; posts are labelled as a paid partnership.",
+    `We'd like ${what}${money ? `: ${money}` : ""}${brief.postBy ? `, posted by ${brief.postBy}` : ""}.`,
+    t.kind === "barter" ? "Posts are labelled as a paid partnership (gifted)." : "Payment through the deal room after posting; posts are labelled as a paid partnership.",
   ]
     .filter(Boolean)
     .join(" ");
@@ -305,7 +305,8 @@ export async function respondToInvite(creatorUserId: string, inviteId: string, a
   }
   const { invite, brief } = row;
   const businessName = row.business?.name ?? "A local business";
-  const offerText = briefAsOffer(brief, invite.feeInr, businessName);
+  const t = termsOf(invite);
+  const offerText = briefAsOffer(brief, t, businessName);
   const [creator] = await d.select({ name: schema.creatorProfiles.displayName }).from(schema.creatorProfiles).where(eq(schema.creatorProfiles.userId, creatorUserId));
   const dealId = crypto.randomUUID();
   await d.insert(schema.deals).values({
@@ -319,8 +320,11 @@ export async function respondToInvite(creatorUserId: string, inviteId: string, a
     offerText,
     deliverables: brief.deliverables.join(", "),
     feeInr: invite.feeInr,
+    barter: invite.barterNote,
+    bonusPerCustomerInr: invite.bonusPerCustomerInr,
+    bonusCapInr: invite.bonusCapInr,
     postBy: brief.postBy,
-    paymentTerms: "Through the deal room after posting",
+    paymentTerms: invite.kind === "barter" ? null : "Through the deal room after posting",
     status: "agreed",
     checks: checkOffer(offerText).map(({ term, state, text }) => ({ term, state, text })),
   });
@@ -328,7 +332,7 @@ export async function respondToInvite(creatorUserId: string, inviteId: string, a
   const linkCode = await uniqueLinkCode();
   await d.insert(schema.dealOutcomes).values({ dealId, promoCode, linkCode });
   // The deal's code and link hand customers a coupon like any tracked post, counted towards this deal.
-  await startTrackedForDeal({ businessUserId: invite.businessUserId, creatorUserId, creatorName: creator?.name ?? "Creator", dealId, baseFeeInr: invite.feeInr, promoCode, linkCode, destinationUrl: brief.destinationUrl });
+  await startTrackedForDeal({ businessUserId: invite.businessUserId, creatorUserId, creatorName: creator?.name ?? "Creator", dealId, terms: t, promoCode, linkCode, destinationUrl: brief.destinationUrl });
   await d.update(schema.invites).set({ status: "accepted", respondedAt: new Date(), dealId }).where(eq(schema.invites.id, inviteId));
   return { dealId };
 }
@@ -427,8 +431,10 @@ export async function briefResults(businessUserId: string, briefId: string) {
   const spent = rows.reduce((s, r) => s + (r.outcome?.paidInr ?? 0), 0);
   const customers = rows.reduce((s, r) => s + (r.outcome?.redemptions ?? 0), 0);
   const clicks = rows.reduce((s, r) => s + (r.outcome?.clicks ?? 0), 0);
+  // What's owed so far on agreed deals: base fee plus bonus earned for counted customers.
+  const due = rows.reduce((s, r) => s + (r.deal ? amountDue(termsOf(r.deal), r.outcome?.redemptions ?? 0) : 0), 0);
   // No cost per customer until something has been paid (₹0 per customer would mislead).
-  return { rows, totals: { spent, customers, clicks, perCustomer: customers && spent ? Math.round(spent / customers) : null } };
+  return { rows, totals: { spent, customers, clicks, due, perCustomer: customers && spent ? Math.round(spent / customers) : null } };
 }
 
 /** Counts a visit through a tracked link and says where to send it (the brief's link, else the business's site). */

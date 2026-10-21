@@ -423,6 +423,11 @@ export const businessProfiles = pgTable("business_profiles", {
   whatsapp: text("whatsapp"),
   /** Hash of the counter PIN staff type to redeem a customer's coupon (never stored in clear). */
   counterPinHash: text("counter_pin_hash"),
+  /** free | local | growth (billing starts after the pilot; see docs/BUSINESS_MODEL.md). */
+  plan: text("plan").notNull().default("free"),
+  /** The plan the owner said they'd pay for during the pilot, and when (measures willingness to pay). */
+  planInterest: text("plan_interest"),
+  planInterestAt: timestamp("plan_interest_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -474,6 +479,8 @@ export const deals = pgTable(
     deliverables: text("deliverables"),
     feeInr: integer("fee_inr"),
     barter: text("barter"),
+    bonusPerCustomerInr: integer("bonus_per_customer_inr"),
+    bonusCapInr: integer("bonus_cap_inr"),
     postBy: date("post_by"),
     paymentTerms: text("payment_terms"),
     usageTerms: text("usage_terms"),
@@ -541,7 +548,14 @@ export const invites = pgTable(
     creatorUserId: text("creator_user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
+    /** paid | barter */
+    kind: text("kind").notNull().default("paid"),
+    /** Base fee for making and posting (paid deals). */
     feeInr: integer("fee_inr"),
+    barterNote: text("barter_note"),
+    /** Bonus per customer who redeems the creator's code, up to the cap. Paid to the creator in full. */
+    bonusPerCustomerInr: integer("bonus_per_customer_inr"),
+    bonusCapInr: integer("bonus_cap_inr"),
     message: text("message"),
     /** Why Mitra suggested this creator, as shown to the business. */
     reasons: jsonb("reasons").$type<string[]>().notNull().default([]),
@@ -650,6 +664,8 @@ export const trackedPosts = pgTable(
     /** What the creator is paid for the post (paid), or what they get (barter). */
     baseFeeInr: integer("base_fee_inr"),
     barterNote: text("barter_note"),
+    bonusPerCustomerInr: integer("bonus_per_customer_inr"),
+    bonusCapInr: integer("bonus_cap_inr"),
     /** What the customer gets for showing the coupon, e.g. "10% off your bill". */
     offerText: text("offer_text").notNull(),
     promoCode: text("promo_code").notNull(),

@@ -39,21 +39,19 @@ export const OPEN_STATUSES: readonly DealStatus[] = ["offered", "negotiating", "
 export const CONSENT_VERSION = "2026-10-21";
 
 /**
- * Mitra's fee on deals Mitra brought (never on deals a creator finds), paid by the business on top of the
- * creator's fee, so creators keep 100% of what they agree to. Shown to both sides before anyone accepts.
- * docs/BUSINESS_MODEL.md explains the choice.
+ * Businesses pay for the platform, not a cut of deals (docs/BUSINESS_MODEL.md). `null` means unlimited. Matches are
+ * invites to creators Mitra matched, per calendar month. Nothing is enforced or charged during the pilot.
  */
-export const MITRA_FEE_PCT = 10;
-export const FEE_PAID_BY: "business" | "creator" = "business";
-/**
- * Track (counting customers from any creator post) is free. The free plan's allowance applies once paid plans are
- * switched on; during the pilot everyone gets unlimited tracked posts. docs/BUSINESS_MODEL.md has the plans.
- */
-export const FREE_TRACKED_PER_MONTH = 2;
+export const PLANS = {
+  free: { priceInr: 0, trackedPerMonth: 2, matchesPerMonth: 0 },
+  local: { priceInr: 499, trackedPerMonth: null, matchesPerMonth: 3 },
+  growth: { priceInr: 1499, trackedPerMonth: null, matchesPerMonth: null },
+} as const satisfies Record<string, { priceInr: number; trackedPerMonth: number | null; matchesPerMonth: number | null }>;
+export type PlanId = keyof typeof PLANS;
+export const isPlanId = (v: unknown): v is PlanId => typeof v === "string" && v in PLANS;
 export const PLANS_ENFORCED = false;
-
-/** During the Bengaluru pilot the fee is shown but not charged. */
-export const FEE_WAIVED_IN_PILOT = true;
+/** Customers counted in a month on the free plan before Mitra suggests upgrading (results first, then the ask). */
+export const UPGRADE_NUDGE_CUSTOMERS = 10;
 
 /** Goals a business can start a brief from; free text is allowed too. */
 export const GOALS = ["footfall", "orders", "launch", "event", "awareness"] as const;

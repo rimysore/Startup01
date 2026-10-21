@@ -16,7 +16,7 @@ await user("biz", "business");
 await user("other", "business");
 
 // No business profile yet: nothing to track against.
-const input = (x: Partial<Parameters<typeof t.createTrackedPost>[1]> = {}) => t.TrackInput.parse({ creatorName: "Sita Rao", kind: "paid", baseFeeInr: 3000, offerText: "10% off your bill", ...x });
+const input = (x: Record<string, unknown> = {}) => t.TrackInput.parse({ creatorName: "Sita Rao", kind: "paid", feeInr: 3000, offerText: "10% off your bill", ...x });
 assert((await t.createTrackedPost("biz", input())) === "no_business", "a business profile comes first");
 await m.saveBusiness("biz", m.BusinessInput.parse({ name: "Ruchi Dosa Café", area: "Jayanagar", website: "https://ruchi.example" }));
 await m.saveBusiness("other", m.BusinessInput.parse({ name: "Other Place" }));
@@ -29,7 +29,7 @@ assert(!t.PinInput.safeParse({ pin: "12" }).success && t.PinInput.safeParse({ pi
 // Tracked posts: paid and barter, codes unique per business.
 const paid = await t.createTrackedPost("biz", input({ creatorHandle: "@sitaeats" }));
 const paid2 = await t.createTrackedPost("biz", input());
-const barter = await t.createTrackedPost("biz", input({ creatorName: "Arun Kumar", kind: "barter", baseFeeInr: 2000, barterNote: "Dinner for two" }));
+const barter = await t.createTrackedPost("biz", input({ creatorName: "Arun Kumar", kind: "barter", feeInr: 2000, barterNote: "Dinner for two" }));
 assert(typeof paid === "object" && paid.promoCode === "RUCHI-SR" && paid.creatorHandle === "sitaeats", "promo code from business + creator initials; handle without @");
 assert(typeof paid2 === "object" && paid2.promoCode === "RUCHI-SR2", "the same creator twice gets a second code");
 assert(typeof barter === "object" && barter.baseFeeInr === null && barter.barterNote === "Dinner for two", "barter posts carry what the creator gets, no fee");

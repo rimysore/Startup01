@@ -13,6 +13,7 @@ export async function POST(request: Request, ctx: RouteContext<"/api/m/briefs/[i
   const r = await inviteCreator(g.user.id, (await ctx.params).id, b.data);
   if (r === "not_found") return Response.json({ error: "This brief is closed or doesn't exist." }, { status: 404 });
   if (r === "not_matched") return Response.json({ error: "That creator isn't a match for this brief, or is already invited." }, { status: 409 });
+  if (r === "limit") return Response.json({ error: "Your plan's matched creators for this month are used up.", upgrade: true }, { status: 402 });
   const { id: briefId } = await ctx.params;
   after(async () => {
     const [biz, brief] = await Promise.all([getBusiness(g.user.id), getBrief(g.user.id, briefId)]);
