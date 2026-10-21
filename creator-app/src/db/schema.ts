@@ -351,6 +351,8 @@ export const members = pgTable("members", {
   role: text("role").notNull(),
   /** en | kn: the language of the marketplace screens. */
   uiLanguage: text("ui_language").notNull().default("en"),
+  /** Secret part of the member's offer-forwarding address (offers+<token>@…). Made on first use. */
+  inboxToken: text("inbox_token").unique(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -566,3 +568,59 @@ export const dealMessages = pgTable(
   },
   (t) => [index("deal_messages_deal").on(t.dealId, t.createdAt)],
 );
+
+/**
+ * The offer inbox: every offer a creator receives, however it arrived (pasted, a screenshot read by AI, forwarded
+ * by email or on WhatsApp), with the offer check and the sender check. Screenshots themselves are never stored.
+ */
+export const inboxOffers = pgTable(
+  "inbox_offers",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** paste | screenshot | email | whatsapp */
+    source: text("source").notNull(),
+    senderName: text("sender_name"),
+    senderEmail: text("sender_email"),
+    senderPhone: text("sender_phone"),
+    senderHandle: text("sender_handle"),
+    subject: text("subject"),
+    body: text("body").notNull(),
+    checks: jsonb("checks").$type<{ term: string; state: string; text: string }[]>().notNull().default([]),
+    /** The sender check (scam patterns, domain, brand records, other creators' reports). */
+    verdict: jsonb("verdict").$type<Record<string, unknown>>(),
+    /** new | saved | dismissed */
+    status: text("status").notNull().default("new"),
+    dealId: text("deal_id").references(() => deals.id, { onDelete: "set null" }),
+    receivedAt: timestamp("received_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("inbox_offers_user_time").on(t.userId, t.receivedAt)],
+);
+
+/**
+ * Creators' reports about a sender (an email address, domain, phone or handle): "this was a scam" or "this was
+ * fine". Shown to other creators as counts only, and only once two different creators agree.
+ */
+export const senderReports = pgTable(
+  "sender_reports",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    senderKey: text("sender_key").notNull(),
+    /** scam | ok */
+    kind: text("kind").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("sender_reports_user_key").on(t.userId, t.senderKey), index("sender_reports_key").on(t.senderKey)],
+);
+
+/** Answers from free public lookups (domain registration, DNS, Wikidata), kept for a few days to stay polite. */
+export const lookupCache = pgTable("lookup_cache", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").$type<unknown>(),
+  fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+});

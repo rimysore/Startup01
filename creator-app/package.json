@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts && tsx tests/insights.test.mts && tsx tests/growth.test.mts && tsx tests/founders.test.mts && tsx tests/outliers.test.mts && tsx tests/prospects.test.mts && tsx tests/whatsapp.test.mts && tsx tests/whatsapp-ai.test.mts && tsx tests/beta.test.mts && tsx tests/offer.test.mts && tsx tests/marketplace.test.mts && tsx tests/business.test.mts",
+    "test": "tsx tests/billing.test.mts && tsx tests/youtube.test.mts && tsx tests/insights.test.mts && tsx tests/growth.test.mts && tsx tests/founders.test.mts && tsx tests/outliers.test.mts && tsx tests/prospects.test.mts && tsx tests/whatsapp.test.mts && tsx tests/whatsapp-ai.test.mts && tsx tests/beta.test.mts && tsx tests/offer.test.mts && tsx tests/marketplace.test.mts && tsx tests/business.test.mts && tsx tests/inbox.test.mts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.mts",
     "check:env": "tsx scripts/check-env.mts"
