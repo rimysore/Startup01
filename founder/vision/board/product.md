@@ -1,40 +1,39 @@
-# Product lens (new vision)
-Score: 4/10 | Vote: FUND IF
+# Product lens (vision only)
+Score: 6/10 | Vote: FUND IF
 
 ## Verdict in two sentences
-Phase 1 is a clear experience with real focus: a few actions a week, each with a reason and a measured result. Everything after it is a roadmap for a company Mitra is not yet. Today it has no connected channel, no payer and no proof, so the vision is eight products on top of a wedge that hasn't been tested.
+The roadmap's spine is right: one manager, a weekly plan, outcomes measured and fed back, with gates that stop you building ahead of proof. The additions (the local-business agent, the "complete ecosystem") pull in the opposite direction, and the experience gets broken up exactly where the money is supposed to come in.
 
 ## What is strong
-- "Today / This Week" with exactly 1-3 actions is the right experience. Consider a Kannada creator's Monday: she opens Mitra and sees one card. "Your last three videos lost most viewers before 0:20. For Thursday's upload, open on the finished dish. Here is why, from your own retention." She taps Accept. On Friday Mitra tells her whether it beat her baseline. That fits in one sentence, and it is the product.
-- The proposed → accepted → published → measured lifecycle means every recommendation has a result attached. That is the craft nobody sees, and it is also what makes the claim provable.
-- The roadmap is disciplined. Gates, "do not build yet" lists and "no new page unless it is a repeated workflow" are all ways of saying no.
-- Approval before action fits Phase 1 to 3. The creator stays the author, and Mitra prepares the work.
+- The one thing is already in the roadmap, though nobody has said it out loud: **"Mitra tells me the 1–3 things worth doing this week, and shows me whether they worked."** Everything else is downstream of that loop.
+- "Today / This Week" instead of starting with reports, "no new dashboard unless it creates a repeated workflow," and approval before any action. That is product taste.
+- The recommendation lifecycle (proposed → published → measured) is craft in the parts nobody sees. It is also the only thing that makes the later phases believable.
+- The gates are real "no"s: if creators read the plan and do not act, you fix trust before you build anything more.
 
 ## What would kill it (the top 3, most dangerous first)
-1. **The Monday morning can't happen yet.** The Brain needs a connected channel. That has never been tested, OAuth verification is pending, the Analytics amendment hasn't been submitted, and YouTube's 30-day refresh-or-delete rule cuts against "persistent memory". In the simulated panel, about half of those who said yes would only do the free WhatsApp check, not connect. So the first five minutes most creators get is a founder on WhatsApp, not this product.
-2. **The measurement may be noise.** Small regional channels upload irregularly. One video against a baseline, over a week, may not show anything real, and the lifecycle depends on that number. If "measured" says "inconclusive" every Friday, trust goes.
-3. **The manager stops being coherent from Phase 4 on.** One manager that grows your channel is coherent. One manager that also negotiates your deals, picks your affiliate links and sells you to brands who pay Mitra a fee serves two masters. Then approval before action turns from a safeguard into a queue of chores, and "many agents" becomes many seams. The framing "an AI CMO for each influencer, with brands logging in" is where it starts to sprawl.
+1. **The weekly plan does not visibly work.** If the creator cannot feel a difference within a few weeks, Mitra Earn never gets a chance. This is still an open question: there is no evidence yet that Mitra-assisted content beats the creator's own baseline.
+2. **The money moment happens outside Mitra.** Here is a Kannada food creator's week end to end. Monday: Mitra suggests "Dussehra street-food video, Thursday 6pm, because your Bengaluru viewers retain 2x on food walks." Studio writes the script and title. The creator shoots on their own phone and edits in their own app (**seam 1**: the work leaves Mitra), then publishes on YouTube (**seam 2**: publishing permission and a re-upload). Then the agent finds a nearby biryani restaurant that has never heard of Mitra (**seam 3**: a cold approach, on scraped data that may be stale or wrong). The owner replies on WhatsApp or by phone and haggles in person (**seam 4**: the negotiation happens offline). Payment is UPI or cash (**seam 5**: no record and no take rate, and the outcome is never measured). Every step after content is a hand-off Mitra does not own.
+3. **Too many products at once.** Analytics, studio, distribution, affiliates, a local-business agent, negotiation, a marketplace and an OS, all with two founders. Each one would be done at 60%, and the creator would feel all eight half-finished.
 
 ## Scale
-The experience scales cheaply as software if the recommendations hold up per language. Today it covers two languages and two features, and recruiting runs through a part-time founder working in IST. The later phases (managed campaigns, CRM, marketplace) are service-heavy and need staff Mitra doesn't have. Open question: does recommendation quality hold in Kannada without founder review?
+The software loop (plan → content → measurement) scales like software. Local-business matching does not: every city and category needs fresh, verified data, and the business side is a cold sale to owners who are not looking for creators. The regional creator graph only builds up if deals are recorded inside Mitra, which seam 5 says they will not be.
 
-## Phase order: what you would change
-- Split Phase 1. First, 1a: the Retention Sprint as the "Today" card, with one action per upload, measured, for 30 creators. Creator DNA, the Weekly Growth Plan and Trend Radar come later, in 1b.
-- Pull a small part of Studio into 1a: the one fix comes with the rewritten hook or title ready to paste. An action with nothing prepared is just advice.
-- Treat Phases 4-8 as hypotheses, not a plan. Cut the "brands log in" pitch from anything a creator sees.
-- Build the WhatsApp check to hand off into the app on purpose. That handoff is the first seam.
+## The plan: what you would change
+- **Cut for now:** the local-business agent, the "ecosystem" pitch, the marketplace and the Business OS. Put the local agent in the roadmap as a test inside Phase 6, done manually, in one city and one language-niche, not as an always-on agent.
+- **Merge Phases 1 and 2.** A plan without the content pack is just advice. The plan and the pack are one product.
+- **Pull a slim negotiation helper forward:** paste an offer you received, and Mitra flags missing terms and suggests a rate. It is cheap to build, valuable to creators, and records the first deal data.
+- **Close seam 5 before you build a marketplace:** a simple invoice plus a UPI payment link, so the deal and the payment happen in Mitra.
+- **Fix the pitch.** "AI CMO plus ecosystem" takes a paragraph. Try this instead: "Mitra tells you what to make this week and proves it worked."
 
 ## The questions I would ask the founder
-- What is the one sentence a creator would repeat to a friend?
-- How many beta creators have actually connected a channel, and what did their first "Today" card say?
-- What is the smallest channel and upload rate where "measured against baseline" means something?
-- How does persistent memory work within the 30-day data rule?
-- When a brand pays Mitra, whose side is the manager on?
-- Who checks a Kannada recommendation before it reaches the creator, and what happens when that person is asleep?
+- What does the creator see in their first five minutes after connecting YouTube?
+- Can YouTube data really tell a creator their audience is near this shop? How fine-grained is the geography you get? (Open question.)
+- Who verifies the businesses the agent finds, and who is accountable if a pitch goes to a closed or wrong business?
+- When a local deal closes on WhatsApp, how does Mitra find out?
+- Which one language-niche goes first, and why?
 
 ## If FUND IF: the conditions
-1. At least 15 of the 30 beta creators connect a channel and get a weekly "Today" card.
-2. At least half accept an action, and that action reaches a published video.
-3. At least 5 documented before/after results, with honest "inconclusive" cases counted.
-4. Compliance with the YouTube 30-day rule designed in before Creator Brain is built.
-5. No work on Phases 2-8 until conditions 1-3 are met.
+1. A single loop of plan, pack and measured result, shipped to one language-niche, with a measured lift over the creators' own baseline.
+2. The local-business agent stays off the roadmap until the Phase 4 gate is passed, and is then trialled manually.
+3. A one-sentence product pitch the founders actually use.
+4. A defined way for deals and payments to be recorded in Mitra before any marketplace work.
