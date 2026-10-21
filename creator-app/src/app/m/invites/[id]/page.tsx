@@ -44,7 +44,7 @@ export default async function InvitePage({ params }: PageProps<"/m/invites/[id]"
           {invite.message && <p className="lp-reply mt-4">“{invite.message}”</p>}
           <div className="lp-deal__rows">
             <div className="lp-deal__row"><span>{s.invite.want}</span><b>{brief.deliverables.map((d) => s.deliverable[d as keyof typeof s.deliverable] ?? d).join(" + ")}</b></div>
-            <div className="lp-deal__row"><span>{s.invite.fee}</span><b>{invite.feeInr != null ? inr(invite.feeInr) : "–"}</b></div>
+            <div className="lp-deal__row"><span>{s.invite.youGet}</span><b>{invite.feeInr != null ? `${inr(invite.feeInr)} ${s.invite.inFull}` : "–"}</b></div>
             {brief.postBy && <div className="lp-deal__row"><span>{s.invite.postBy}</span><b>{brief.postBy}</b></div>}
             <div className="lp-deal__row">
               <span>

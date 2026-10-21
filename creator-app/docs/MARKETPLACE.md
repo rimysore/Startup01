@@ -40,6 +40,25 @@ Studio) is untouched either way.
 
 Matching reasons are written in English for now, also on Kannada screens.
 
+### The offer inbox (in-house checking)
+
+| Piece | Where |
+| --- | --- |
+| Migration `0014_offer_inbox.sql` (additive): `inbox_offers`, `sender_reports`, `lookup_cache`, `members.inbox_token` | `src/db/schema.ts` |
+| Ways in: paste (with who sent it), screenshot (AI transcribes it; image not kept; 1 credit through the usual credit/limit pipeline), forwarding email to `offers+<token>@INBOUND_EMAIL_DOMAIN`, and WhatsApp (offers sent to the bot are saved and checked; no AI) | `/m/inbox`, `/api/m/inbox*`, `/api/inbound/email`, `src/lib/whatsapp/bot.ts` |
+| Sender check: scam patterns (pay-to-collaborate, buy-then-refund, OTP/PIN, task jobs, APKs, crypto, urgency, short links); free mail vs the brand's domain; RDAP domain age; DNS MX; Wikidata official website and lookalikes; other creators' reports (shown only when 2+ agree); businesses that paid creators through Mitra. Each finding names its source; lookups are cached and time out after 4 s | `src/lib/marketplace/sender-check.ts` |
+| Inbox actions: reply in English or Kannada, save to the deal log (pre-filled), dismiss, report "scam" / "went fine", correct who sent it (re-checks) | `/m/inbox/<id>` |
+
+**Turning on email forwarding:** point an inbound-email service at `POST /api/inbound/email` with header
+`x-inbound-secret: $INBOUND_EMAIL_SECRET` (Postmark's inbound JSON works as is; anything posting `{ from, to,
+subject, text }` works too), route `offers+*@<domain>` to it, and set `INBOUND_EMAIL_DOMAIN` and
+`INBOUND_EMAIL_SECRET` in Vercel. Until then the inbox says forwarding opens soon.
+
+### Who pays
+
+Creators keep 100% of the agreed fee; on deals Mitra brought, the business pays Mitra's fee (`MITRA_FEE_PCT`) on top
+(`FEE_PAID_BY`), shown on the invite to both sides. See `docs/BUSINESS_MODEL.md`.
+
 Mitra's fee is mentioned wherever a deal is logged: only on deals Mitra brought (`source = "mitra"`), never on
 deals the creator found. No fee is charged in code yet.
 
@@ -58,4 +77,5 @@ deals the creator found. No fee is charged in code yet.
 `tests/marketplace.test.mts` (joining, kits, verification rules, deal ownership, totals, rate ranges, account
 deletion), `tests/business.test.mts` (opt-in, matching and its reasons, the plan, invites, contact hand-off only
 after accepting, deal room access, counters, payments, tracked links, deletion) and `tests/offer.test.mts` run in
-`npm test`.
+`npm test`, with `tests/inbox.test.mts` (scam patterns, sender checks against a fake network, caching, reports,
+privacy, forwarding webhook) alongside.
