@@ -33,6 +33,7 @@ export default async function DealPage({ params }: PageProps<"/m/deals/[id]">) {
             notes: deal.notes ?? "",
             offerText: deal.offerText ?? "",
             checks: deal.checks,
+            room: deal.source === "mitra" && Boolean(deal.businessUserId),
             promoCode: o?.promoCode ?? "",
             trackedLink: o?.trackedLink ?? "",
             redemptions: o?.redemptions != null ? String(o.redemptions) : "",

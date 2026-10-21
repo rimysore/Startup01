@@ -82,3 +82,12 @@
 .mk-kit-hero .lp-av { width: 72px; height: 72px; font-size: 24px; }
 .mk-nums { margin-top: 32px; display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
 .mk-num { padding: 20px; border-radius: 16px; background: var(--card); box-shadow: 0 0 0 1px var(--rule); }
+.mk-count { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--tint); font-size: 18px; font-weight: 600; transition: background-color 160ms ease, transform 120ms var(--ease); }
+.mk-count:hover:not(:disabled) { background: var(--tint-2); }
+.mk-count:active:not(:disabled) { transform: scale(0.92); }
+.mk-count:disabled { opacity: 0.4; }
+.mk-thread { display: grid; gap: 8px; max-height: 360px; overflow-y: auto; padding-right: 4px; }
+.mk-msg { max-width: 85%; padding: 10px 14px; border-radius: 16px 16px 16px 4px; background: var(--tint); justify-self: start; animation: lp-fade 400ms var(--ease) both; }
+.mk-msg[data-mine="true"] { justify-self: end; border-radius: 16px 16px 4px 16px; background: var(--ink); color: var(--paper); }
+.mk-msg p { white-space: pre-line; font-size: 15px; }
+.mk-msg time { display: block; margin-top: 4px; font-size: 12px; opacity: 0.6; }

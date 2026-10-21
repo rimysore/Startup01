@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { MTop } from "@/components/m/MTop";
 import { marketPage } from "@/lib/marketplace/page";
+import { invitesForCreator, listBriefs } from "@/lib/marketplace/business";
 import { dealTotals, getBusiness, getKit, isVerified, kitCompleteness, listDeals } from "@/lib/marketplace/store";
 import { youtubeConnection } from "@/lib/youtube";
 
@@ -16,7 +17,7 @@ export default async function MarketHome() {
   const top = <MTop s={s} role={member!.role} lang={member!.uiLanguage} active="home" />;
 
   if (member!.role !== "creator") {
-    const biz = await getBusiness(user.id);
+    const [biz, briefs] = await Promise.all([getBusiness(user.id), listBriefs(user.id)]);
     return (
       <>
         {top}
@@ -26,6 +27,34 @@ export default async function MarketHome() {
             {first ? `, ${first}` : ""}.
           </h1>
           <p className="mk-sub">{s.home.businessSub}</p>
+          <section className="mt-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 className="mk-h2">{s.brief.list}</h2>
+              <Link href={biz ? "/m/briefs/new" : "/m/business"} className="lp-btn">
+                {s.nav.briefs}
+              </Link>
+            </div>
+            <div className="mk-list">
+              {briefs.length ? (
+                briefs.map((b) => (
+                  <Link key={b.id} href={`/m/briefs/${b.id}`} className="mk-deal">
+                    <span className="min-w-0">
+                      <span className="block truncate text-[17px] font-semibold">{b.goal}</span>
+                      <span className="block truncate text-[14px]" style={{ color: "var(--ink-2)" }}>
+                        {b.invited} {s.brief.invited} · {b.accepted} {s.brief.accepted}
+                      </span>
+                    </span>
+                    <span className="text-[16px] font-semibold tabular-nums">{b.budgetInr != null ? `₹${b.budgetInr.toLocaleString("en-IN")}` : ""}</span>
+                    <span className={`lp-chip ${b.status === "open" ? "lp-chip--ok" : ""}`}>{b.status === "open" ? s.brief.open : s.brief.closed}</span>
+                  </Link>
+                ))
+              ) : (
+                <p className="lp-card mk-panel" style={{ color: "var(--ink-2)" }}>
+                  {s.brief.none}
+                </p>
+              )}
+            </div>
+          </section>
           <div className="mk-grid">
             <section className="lp-card mk-panel">
               <h2 className="mk-h2">{biz?.name ?? s.business.title}</h2>
@@ -50,7 +79,8 @@ export default async function MarketHome() {
     );
   }
 
-  const [{ profile, handles }, deals, yt] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id)]);
+  const [{ profile, handles }, deals, yt, invites] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id), invitesForCreator(user.id)]);
+  const pending = invites.filter((i) => i.invite.status === "pending");
   const pct = kitCompleteness(profile, handles);
   const totals = dealTotals(deals);
   const ytVerified = handles.some((h) => h.platform === "youtube" && isVerified(h));
@@ -63,6 +93,31 @@ export default async function MarketHome() {
           {first ? `, ${first}` : ""}.
         </h1>
         <p className="mk-sub">{s.home.creatorSub}</p>
+        {(pending.length > 0 || profile?.openToOffers) && (
+          <section className="mt-8">
+            <h2 className="mk-h2">{s.invite.list}</h2>
+            <div className="mk-list">
+              {pending.length ? (
+                pending.map(({ invite, brief, business }) => (
+                  <Link key={invite.id} href={`/m/invites/${invite.id}`} className="mk-deal">
+                    <span className="min-w-0">
+                      <span className="block truncate text-[17px] font-semibold">{business?.name ?? "A local business"}</span>
+                      <span className="block truncate text-[14px]" style={{ color: "var(--ink-2)" }}>
+                        {brief.goal}
+                      </span>
+                    </span>
+                    <span className="text-[16px] font-semibold tabular-nums">{invite.feeInr != null ? inr(invite.feeInr) : ""}</span>
+                    <span className="lp-chip lp-chip--ink">{s.brief.status.pending}</span>
+                  </Link>
+                ))
+              ) : (
+                <p className="lp-card mk-panel" style={{ color: "var(--ink-2)" }}>
+                  {s.invite.none}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
         <div className="mk-grid">
           <section className="lp-card mk-panel">
             <div className="flex items-baseline justify-between gap-3">

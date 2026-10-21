@@ -21,6 +21,8 @@ type D = {
   notes: string;
   offerText: string;
   checks: { term: string; state: string; text: string }[];
+  /** A deal Mitra brought with a business on the other side has a shared deal room. */
+  room: boolean;
   promoCode: string;
   trackedLink: string;
   redemptions: string;
@@ -89,7 +91,16 @@ export function DealEditor({ s, deal }: { s: Strings; deal: D }) {
           ← {s.deals.title}
         </Link>
         <input aria-label={s.offer.counterparty} className="mk-h1 mk-title-input mt-3" {...field("counterparty")} maxLength={120} />
-        {d.source === "mitra" && <p className="lp-label mt-2">{s.deals.mitraFee}</p>}
+        {d.source === "mitra" && (
+          <p className="lp-label mt-2">
+            {s.deals.mitraFee}{" "}
+            {d.room && (
+              <Link href={`/m/room/${d.id}`} className="lp-link font-semibold underline" style={{ color: "var(--ink)" }}>
+                {s.brief.room} →
+              </Link>
+            )}
+          </p>
+        )}
       </div>
 
       <section className="grid gap-3">

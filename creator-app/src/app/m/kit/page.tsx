@@ -29,7 +29,9 @@ export default async function KitPage() {
             languages: profile?.languages ?? ["kn"],
             rates: profile?.rates ?? [],
             contactEmail: profile?.contactEmail ?? user.email,
+            whatsapp: profile?.whatsapp ?? "",
             isPublic: profile?.isPublic ?? false,
+            openToOffers: profile?.openToOffers ?? false,
             slug: profile?.slug ?? null,
             handles: handles.map((h) => ({
               platform: h.platform,

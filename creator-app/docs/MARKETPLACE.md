@@ -25,6 +25,21 @@ Studio) is untouched either way.
 | 3 | Private deal log: status (offered → talking → agreed → posted → paid, or declined/cancelled), terms, promo code, tracked link, customers, amount paid, date, rating, notes; totals for money received and open deals | `/m/deals`, `/m/deals/<id>`, `/api/m/deals` |
 | 3 | Fair-rate range: the middle half (25th-75th percentile) of rates other creators in the same niche set, shown only once 5 or more have shared one | `rateRange()` in `store.ts` |
 
+### Weeks 3-4: the business side
+
+| Piece | Where |
+| --- | --- |
+| Migration `0013_marketplace_business.sql` (additive): `invites`, `deal_messages`; creators' `open_to_offers` and `whatsapp`; businesses' `whatsapp`; briefs' `post_by` and `destination_url`; outcomes' `link_code` (unique) and `clicks` | `src/db/schema.ts` |
+| Brief: goal (presets or own words), details, what to post, kind of creators, language, total budget, area, date, an https link for viewers | `/m/briefs/new`, `POST /api/m/briefs` |
+| Matching with a reason for every suggestion: shared niche or same area required; language, verified reach and a rate inside the budget rank higher; creators priced above the whole budget are left out. Only creators who switched on "Let local businesses find me" (logged as a `matching` consent) are ever suggested | `matchCreators()` in `src/lib/marketplace/business.ts` |
+| Mitra's plan: the best matches whose fees fit the budget, then a suggested share for creators who haven't set a price, and what's left over | `planBudget()` |
+| Invites with the fee and a note; creators get an email, see the brief, Mitra's fee (10%, shown as waived during the pilot) and the offer checker's reading, then accept or decline. Contact details are shared only on accept | `/m/briefs/<id>`, `/m/invites/<id>`, `/api/m/invites/<id>` |
+| On accept: the deal opens in the creator's log as a Mitra deal, with a promo code (business name + creator initials, e.g. RUCHI-SR) and a tracked link `/r/<code>` that counts visits and redirects to the brief's https link | `respondToInvite()`, `src/app/r/[code]/route.ts` |
+| Deal room for both sides: terms, code, link, WhatsApp/email hand-off, messages; the creator marks it posted, the business counts customers at the counter (+1/−1) and records payment; both rate | `/m/room/<id>` |
+| Results per brief: customers, paid to creators, cost per customer (once something is paid), link visits | `briefResults()` |
+
+Matching reasons are written in English for now, also on Kannada screens.
+
 Mitra's fee is mentioned wherever a deal is logged: only on deals Mitra brought (`source = "mitra"`), never on
 deals the creator found. No fee is charged in code yet.
 
@@ -32,11 +47,15 @@ deals the creator found. No fee is charged in code yet.
 
 - A native Kannada speaker checks every line in `i18n.ts`, the Kannada reply in `offer-check.ts` and the landing page.
 - Instagram verification (Meta's API) is not built; Instagram numbers stay self-reported.
-- The business side's matching, briefs and the CMO agent are weeks 3-4 (`opportunities` is ready for it).
+- Payments go between the two sides directly (UPI, cash); Mitra records them. Split payouts through a payment
+  provider come after a CA confirms the setup (weeks 5-6).
+- `FEE_WAIVED_IN_PILOT` in `flag.ts` shows the 10% fee as waived; turn it off only once billing for it exists.
 - Check the Terms cover the marketplace (roles, deals made between users, Mitra not being a party to deals it
   didn't bring, the disclosed fee) with whoever reviews the legal pages.
 
 ## Tests
 
 `tests/marketplace.test.mts` (joining, kits, verification rules, deal ownership, totals, rate ranges, account
-deletion) and `tests/offer.test.mts` run in `npm test`.
+deletion), `tests/business.test.mts` (opt-in, matching and its reasons, the plan, invites, contact hand-off only
+after accepting, deal room access, counters, payments, tracked links, deletion) and `tests/offer.test.mts` run in
+`npm test`.

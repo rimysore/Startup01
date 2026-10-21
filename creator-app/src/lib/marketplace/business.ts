@@ -425,7 +425,8 @@ export async function briefResults(businessUserId: string, briefId: string) {
   const spent = rows.reduce((s, r) => s + (r.outcome?.paidInr ?? 0), 0);
   const customers = rows.reduce((s, r) => s + (r.outcome?.redemptions ?? 0), 0);
   const clicks = rows.reduce((s, r) => s + (r.outcome?.clicks ?? 0), 0);
-  return { rows, totals: { spent, customers, clicks, perCustomer: customers ? Math.round(spent / customers) : null } };
+  // No cost per customer until something has been paid (₹0 per customer would mislead).
+  return { rows, totals: { spent, customers, clicks, perCustomer: customers && spent ? Math.round(spent / customers) : null } };
 }
 
 /** Counts a visit through a tracked link and says where to send it (the brief's link, else the business's site). */

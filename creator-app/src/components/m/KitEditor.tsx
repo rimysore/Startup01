@@ -14,7 +14,9 @@ type Initial = {
   languages: string[];
   rates: { deliverable: string; priceInr: number }[];
   contactEmail: string;
+  whatsapp: string;
   isPublic: boolean;
+  openToOffers: boolean;
   slug: string | null;
   handles: Handle[];
 };
@@ -48,14 +50,16 @@ export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings
       niches: f.niches,
       languages: f.languages,
       contactEmail: f.contactEmail,
+      whatsapp: f.whatsapp,
       isPublic: f.isPublic,
+      openToOffers: f.openToOffers,
       handles: Object.values(handles)
         .filter((h) => h.handle.trim())
         .map((h) => ({ platform: h.platform, handle: h.handle, followers: h.followers, avgViews: h.avgViews })),
       rates: DELIVERABLES.map((d) => ({ deliverable: d, priceInr: num(rates[d]) ?? 0 })).filter((r) => r.priceInr > 0),
     });
     setBusy(false);
-    if (r.error) return setMsg({ ok: false, text: r.error });
+    if (r.error) return setMsg({ ok: false, text: r.json?.field === "whatsapp" ? s.kit.whatsapp : r.error });
     setF((x) => ({ ...x, slug: String(r.json?.slug ?? x.slug) }));
     setMsg({ ok: true, text: s.common.saved });
   }
@@ -168,9 +172,26 @@ export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings
       </section>
 
       <section className="lp-card mk-fieldset">
-        <label className="mk-label">
-          {s.kit.email}
-          <input type="email" value={f.contactEmail} onChange={(e) => setF({ ...f, contactEmail: e.target.value })} maxLength={200} />
+        <div className="mk-row">
+          <label className="mk-label">
+            {s.kit.email}
+            <input type="email" value={f.contactEmail} onChange={(e) => setF({ ...f, contactEmail: e.target.value })} maxLength={200} />
+          </label>
+          <label className="mk-label">
+            {s.kit.whatsapp} <small>({s.common.optional})</small>
+            <input type="tel" inputMode="tel" value={f.whatsapp} onChange={(e) => setF({ ...f, whatsapp: e.target.value })} placeholder="+91" maxLength={20} />
+            <small>{s.kit.whatsappHint}</small>
+          </label>
+        </div>
+        <label className="mk-check">
+          <input type="checkbox" checked={f.openToOffers} onChange={(e) => setF({ ...f, openToOffers: e.target.checked })} />
+          <span>
+            <b className="font-semibold" style={{ color: "var(--ink)" }}>
+              {s.kit.open}
+            </b>
+            <br />
+            {s.kit.openHint}
+          </span>
         </label>
         <label className="mk-check">
           <input type="checkbox" checked={f.isPublic} onChange={(e) => setF({ ...f, isPublic: e.target.checked })} />

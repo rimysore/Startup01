@@ -25,6 +25,7 @@ export default async function BusinessPage() {
             budgetMaxInr: b?.budgetMaxInr != null ? String(b.budgetMaxInr) : "",
             website: b?.website ?? "",
             instagram: b?.instagram ?? "",
+            whatsapp: b?.whatsapp ?? "",
           }}
         />
       </main>
