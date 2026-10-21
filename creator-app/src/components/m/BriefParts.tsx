@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FEE_WAIVED_IN_PILOT, MITRA_FEE_PCT } from "@/lib/marketplace/flag";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { send } from "./client";
 
@@ -50,6 +51,12 @@ export function InviteCard({ s, briefId, match, fee, inPlan, suggested }: { s: S
         {s.brief.fee}
         <input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))} placeholder="₹" />
         {suggested && <small>{s.brief.planSuggested}</small>}
+        {Number(amount) > 0 && (
+          <small>
+            {s.brief.feeOnTop} ({MITRA_FEE_PCT}%): ₹{Math.round((Number(amount) * MITRA_FEE_PCT) / 100).toLocaleString("en-IN")}
+            {FEE_WAIVED_IN_PILOT ? ` · ${s.invite.waived}` : ""}
+          </small>
+        )}
       </label>
       <label className="mk-label">
         {s.brief.message} <small>({s.common.optional})</small>

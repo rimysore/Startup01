@@ -11,7 +11,9 @@ const OFFERS: Offer[] = [
   { place: "A bookshop in Malleshwaram", meta: "5 km from you · Local finds · English", want: "2 Stories", fee: "₹2,000 + books", by: "15 November", note: { tone: "warn", text: "Part barter: check it's worth it" } },
 ];
 
-const EVERY_MS = 3400;
+/** The first shuffle comes soon after the hero settles, then a steady rhythm. */
+const FIRST_MS = 1200;
+const EVERY_MS = 2600;
 
 function Check() {
   return (
@@ -33,14 +35,22 @@ export function OfferStack() {
 
   useEffect(() => {
     if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => {
+    const step = () => {
       if (document.hidden) return;
       const f = frontRef.current;
       frontRef.current = (f + 1) % OFFERS.length;
       setLeaving(f);
       setFront(frontRef.current);
-    }, EVERY_MS);
-    return () => clearInterval(t);
+    };
+    let every: ReturnType<typeof setInterval> | undefined;
+    const first = setTimeout(() => {
+      step();
+      every = setInterval(step, EVERY_MS);
+    }, FIRST_MS);
+    return () => {
+      clearTimeout(first);
+      clearInterval(every);
+    };
   }, [paused]);
 
   return (

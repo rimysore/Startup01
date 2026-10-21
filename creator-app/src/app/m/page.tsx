@@ -147,7 +147,7 @@ export default async function MarketHome() {
           <section className="lp-card mk-panel">
             <h2 className="mk-h2">{s.home.offerTitle}</h2>
             <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.home.offerSub}</p>
-            <Link href="/m/offers/new" className="lp-btn mt-5" style={{ minHeight: 44 }}>
+            <Link href="/m/inbox" className="lp-btn mt-5" style={{ minHeight: 44 }}>
               {s.home.offerGo}
             </Link>
           </section>

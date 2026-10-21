@@ -13,7 +13,7 @@ export default async function NewOfferPage() {
   const myReel = profile?.rates.find((r) => r.deliverable === "reel")?.priceInr ?? null;
   return (
     <>
-      <MTop s={s} role="creator" lang={member.uiLanguage} active="offers" />
+      <MTop s={s} role="creator" lang={member.uiLanguage} active="deals" />
       <main className="lp-wrap mk-main">
         <h1 className="mk-h1">{s.offer.title}</h1>
         <p className="mk-sub">{s.offer.sub}</p>

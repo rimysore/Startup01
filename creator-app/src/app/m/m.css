@@ -91,3 +91,9 @@
 .mk-msg[data-mine="true"] { justify-self: end; border-radius: 16px 16px 4px 16px; background: var(--ink); color: var(--paper); }
 .mk-msg p { white-space: pre-line; font-size: 15px; }
 .mk-msg time { display: block; margin-top: 4px; font-size: 12px; opacity: 0.6; }
+.lp-chip.mk-v-bad { background: color-mix(in oklab, var(--miss) 12%, var(--tint)); color: var(--miss); }
+.lp-chip.mk-v-warn { background: color-mix(in oklab, var(--warn) 12%, var(--tint)); color: var(--warn); }
+.lp-chip.mk-v-ok { background: color-mix(in oklab, var(--ok) 12%, var(--tint)); color: var(--ok); }
+.mk-drop { display: grid; place-items: center; min-height: 160px; border-radius: var(--r); background: var(--tint); cursor: pointer; transition: background-color 200ms ease; }
+.mk-drop:hover { background: var(--tint-2); }
+.mk-drop[aria-busy="true"] { cursor: progress; opacity: 0.8; }

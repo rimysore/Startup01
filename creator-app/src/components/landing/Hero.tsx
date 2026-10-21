@@ -10,7 +10,7 @@ const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string;
   creator: {
     title: ["Get paid by brands", "and shops near you."],
     kn: "ನಿಮ್ಮ ಹತ್ತಿರದ ಬ್ರ್ಯಾಂಡ್‌ಗಳು ಮತ್ತು ಅಂಗಡಿಗಳಿಂದ ಹಣ ಪಡೆಯಿರಿ.",
-    sub: "Mitra finds paid deals for Kannada and English creators in Bengaluru, checks every offer before you say yes, and keeps your deals in one place. Free to join: Mitra earns only when a deal it brings pays you.",
+    sub: "Mitra finds paid deals for Kannada and English creators in Bengaluru, checks every offer before you say yes, and keeps your deals in one place. Free for creators, and you keep your whole fee.",
     cta: "Join as a creator",
   },
   business: {

@@ -38,8 +38,13 @@ export const OPEN_STATUSES: readonly DealStatus[] = ["offered", "negotiating", "
 /** Wording version recorded with each consent, so a change of wording is visible in the log. */
 export const CONSENT_VERSION = "2026-10-21";
 
-/** Mitra's fee on deals Mitra brought (never on deals a creator finds). Shown before anyone agrees. */
+/**
+ * Mitra's fee on deals Mitra brought (never on deals a creator finds), paid by the business on top of the
+ * creator's fee, so creators keep 100% of what they agree to. Shown to both sides before anyone accepts.
+ * docs/BUSINESS_MODEL.md explains the choice.
+ */
 export const MITRA_FEE_PCT = 10;
+export const FEE_PAID_BY: "business" | "creator" = "business";
 /** During the Bengaluru pilot the fee is shown but not charged. */
 export const FEE_WAIVED_IN_PILOT = true;
 

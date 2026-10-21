@@ -241,5 +241,12 @@ assert(!guessed, "after 5 wrong codes, a number can't link for an hour");
 await handleInbound(msg("l3", "919833333333", "hello"), NOW);
 assert(last().out.type === "link", "unknown numbers get a link to connect");
 
+// Marketplace: an offer forwarded on WhatsApp lands in the offer inbox, checked, with no AI and no credits.
+process.env.NEXT_PUBLIC_MARKETPLACE = "1";
+await handleInbound(msg("of1", "919800000001", "Hi! Pay registration fee ₹499 to join our paid collab for 1 reel. Fee ₹5,000 after posting."), NOW);
+const offerReply = last().out as { type: string; text: string; url?: string };
+const [saved] = await d.select().from(schema.inboxOffers).where(eq(schema.inboxOffers.userId, "wa"));
+assert(offerReply.type === "link" && offerReply.text.includes("scam") && offerReply.url?.includes(`/m/inbox/${saved?.id}`) && saved?.source === "whatsapp", "forwarded offers are checked and saved to the inbox");
+
 console.log("all whatsapp tests passed");
 process.exit(0);
