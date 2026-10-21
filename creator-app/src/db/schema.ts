@@ -1,4 +1,4 @@
-import { boolean, index, integer, jsonb, pgTable, primaryKey, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { boolean, date, index, integer, jsonb, pgTable, primaryKey, serial, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -334,4 +334,175 @@ export const sprints = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("sprints_user_video").on(t.userId, t.videoId)],
+);
+
+/* ------------------------------------------------------------------------------------------------------------------
+ * Marketplace (phase 1): creators, businesses, brands and agencies; cross-platform creator profiles with
+ * self-reported or verified numbers; opportunities; deals and what they produced. Everything is deleted with the
+ * account. Docs: docs/MARKETPLACE.md.
+ * ---------------------------------------------------------------------------------------------------------------- */
+
+/** One row per person who joined the marketplace: which side they're on and the language of their screens. */
+export const members = pgTable("members", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  /** creator | business | brand | agency */
+  role: text("role").notNull(),
+  /** en | kn: the language of the marketplace screens. */
+  uiLanguage: text("ui_language").notNull().default("en"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** A creator's profile and media kit. Public at /kit/<slug> only when `isPublic` is on. */
+export const creatorProfiles = pgTable("creator_profiles", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  slug: text("slug").notNull().unique(),
+  displayName: text("display_name").notNull(),
+  bio: text("bio"),
+  city: text("city").notNull().default("Bengaluru"),
+  area: text("area"),
+  niches: jsonb("niches").$type<string[]>().notNull().default([]),
+  /** Language codes the creator makes content in (kn, en). */
+  languages: jsonb("languages").$type<string[]>().notNull().default([]),
+  /** The creator's own prices, in whole rupees: [{ deliverable: "reel", priceInr: 4000 }]. */
+  rates: jsonb("rates").$type<{ deliverable: string; priceInr: number }[]>().notNull().default([]),
+  contactEmail: text("contact_email"),
+  isPublic: boolean("is_public").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * A creator's account on one platform. Numbers are self-reported until verified (`verifiedAt`), which today means
+ * a connected YouTube channel; the media kit always shows which is which.
+ */
+export const creatorHandles = pgTable(
+  "creator_handles",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** instagram | youtube | facebook | sharechat | moj | josh | other */
+    platform: text("platform").notNull(),
+    handle: text("handle").notNull(),
+    followers: integer("followers"),
+    avgViews: integer("avg_views"),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    /** How it was verified, e.g. "youtube_connection". */
+    verifiedBy: text("verified_by"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("creator_handles_user_platform").on(t.userId, t.platform)],
+);
+
+/** A local business (or brand/agency) profile: what it is, where, and what it can spend. */
+export const businessProfiles = pgTable("business_profiles", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  category: text("category"),
+  city: text("city").notNull().default("Bengaluru"),
+  area: text("area"),
+  budgetMinInr: integer("budget_min_inr"),
+  budgetMaxInr: integer("budget_max_inr"),
+  website: text("website"),
+  instagram: text("instagram"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** What a business wants from creators (the brief). Matching and the CMO agent build on this in weeks 3-4. */
+export const opportunities = pgTable(
+  "opportunities",
+  {
+    id: text("id").primaryKey(),
+    businessUserId: text("business_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    goal: text("goal").notNull(),
+    brief: text("brief"),
+    area: text("area"),
+    niches: jsonb("niches").$type<string[]>().notNull().default([]),
+    languages: jsonb("languages").$type<string[]>().notNull().default([]),
+    deliverables: jsonb("deliverables").$type<string[]>().notNull().default([]),
+    budgetInr: integer("budget_inr"),
+    /** draft | open | closed */
+    status: text("status").notNull().default("draft"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("opportunities_status").on(t.status, t.createdAt)],
+);
+
+/**
+ * A deal as the creator logs it. `source` = "own" for offers the creator found themselves (Mitra never takes a fee
+ * on those) or "mitra" for deals Mitra brought. The business side links in through `businessUserId` once both
+ * sides are on Mitra; until then `counterparty` is just a name.
+ */
+export const deals = pgTable(
+  "deals",
+  {
+    id: text("id").primaryKey(),
+    creatorUserId: text("creator_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    businessUserId: text("business_user_id").references(() => users.id, { onDelete: "set null" }),
+    opportunityId: text("opportunity_id").references(() => opportunities.id, { onDelete: "set null" }),
+    source: text("source").notNull().default("own"),
+    counterparty: text("counterparty").notNull(),
+    /** whatsapp | instagram | email | phone | other */
+    channel: text("channel"),
+    offerText: text("offer_text"),
+    deliverables: text("deliverables"),
+    feeInr: integer("fee_inr"),
+    barter: text("barter"),
+    postBy: date("post_by"),
+    paymentTerms: text("payment_terms"),
+    usageTerms: text("usage_terms"),
+    /** offered | negotiating | agreed | posted | paid | declined | cancelled */
+    status: text("status").notNull().default("offered"),
+    /** The offer checker's result when the offer was saved. */
+    checks: jsonb("checks").$type<{ term: string; state: string; text: string }[]>().notNull().default([]),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("deals_creator_time").on(t.creatorUserId, t.createdAt)],
+);
+
+/** What a deal produced: the promo code or link that measures it, customers, payment and both sides' ratings. */
+export const dealOutcomes = pgTable("deal_outcomes", {
+  dealId: text("deal_id")
+    .primaryKey()
+    .references(() => deals.id, { onDelete: "cascade" }),
+  promoCode: text("promo_code"),
+  trackedLink: text("tracked_link"),
+  redemptions: integer("redemptions"),
+  paidInr: integer("paid_inr"),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  creatorRating: integer("creator_rating"),
+  businessRating: integer("business_rating"),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Consents, kept as a log: what was agreed, which wording, when. */
+export const consents = pgTable(
+  "consents",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** terms | contact | public_kit */
+    kind: text("kind").notNull(),
+    granted: boolean("granted").notNull(),
+    version: text("version").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("consents_user").on(t.userId, t.kind)],
 );

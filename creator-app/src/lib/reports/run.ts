@@ -102,7 +102,8 @@ export async function runDaily({ now = Date.now(), cursor = null as string | nul
 /**
  * Housekeeping on the first page of each daily run. YouTube's developer policies allow keeping data from its API
  * for at most 30 days without refreshing it, so: sent reports (they hold the week's numbers) go after 30 days, and
- * the admin creator list keeps its outreach notes but drops channel numbers not refreshed in 30 days.
+ * the admin creator list keeps its outreach notes but drops channel numbers not refreshed in 30 days, and
+ * marketplace subscriber counts verified through YouTube lapse back to unverified.
  * Also: expired link codes, old message ids and search counters.
  */
 async function cleanUp(now: number): Promise<void> {
@@ -113,6 +114,11 @@ async function cleanUp(now: number): Promise<void> {
     .update(schema.prospects)
     .set({ subscribers: 0, views: "0", videoCount: 0 })
     .where(and(lt(schema.prospects.updatedAt, monthAgo), gt(schema.prospects.subscribers, 0)));
+  // Marketplace: a YouTube-verified subscriber count is API data too, so it lapses after 30 days unless re-verified.
+  await d
+    .update(schema.creatorHandles)
+    .set({ verifiedAt: null, verifiedBy: null, followers: null })
+    .where(and(eq(schema.creatorHandles.verifiedBy, "youtube_connection"), lt(schema.creatorHandles.verifiedAt, monthAgo)));
   await d.delete(schema.whatsappLinkCodes).where(lt(schema.whatsappLinkCodes.expiresAt, new Date(now)));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wa:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 7 * 86_400_000))));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wajoin:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 86_400_000))));
