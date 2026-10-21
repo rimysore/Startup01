@@ -85,7 +85,18 @@ export const KitInput = z.object({
     .optional()
     .nullable()
     .or(z.literal("").transform(() => null)),
+  /** Indian mobile number for WhatsApp, shared with a business only after accepting its invite. */
+  whatsapp: z
+    .string()
+    .trim()
+    .max(20)
+    .transform((v) => v.replace(/[^\d+]/g, ""))
+    .refine((v) => v === "" || /^\+?\d{10,13}$/.test(v), "whatsapp")
+    .optional()
+    .nullable()
+    .transform((v) => v || null),
   isPublic: z.boolean().default(false),
+  openToOffers: z.boolean().default(false),
 });
 
 export function slugify(name: string): string {
@@ -145,7 +156,9 @@ export async function saveKit(userId: string, input: z.infer<typeof KitInput>): 
     languages: input.languages,
     rates: input.rates.filter((r) => r.priceInr > 0),
     contactEmail: input.contactEmail ?? null,
+    whatsapp: input.whatsapp ?? null,
     isPublic: input.isPublic,
+    openToOffers: input.openToOffers,
     updatedAt: new Date(),
   };
   const [profile] = await d
@@ -153,8 +166,11 @@ export async function saveKit(userId: string, input: z.infer<typeof KitInput>): 
     .values({ userId, slug, ...values })
     .onConflictDoUpdate({ target: schema.creatorProfiles.userId, set: values })
     .returning();
-  if (existing.profile?.isPublic !== input.isPublic) {
+  if ((existing.profile?.isPublic ?? false) !== input.isPublic) {
     await d.insert(schema.consents).values({ userId, kind: "public_kit", granted: input.isPublic, version: CONSENT_VERSION });
+  }
+  if ((existing.profile?.openToOffers ?? false) !== input.openToOffers) {
+    await d.insert(schema.consents).values({ userId, kind: "matching", granted: input.openToOffers, version: CONSENT_VERSION });
   }
 
   const keep = new Set(input.handles.filter((h) => h.handle).map((h) => h.platform));
@@ -232,6 +248,15 @@ export const BusinessInput = z
     budgetMaxInr: rupees,
     website: optText(200),
     instagram: optText(80),
+    whatsapp: z
+      .string()
+      .trim()
+      .max(20)
+      .transform((v) => v.replace(/[^\d+]/g, ""))
+      .refine((v) => v === "" || /^\+?\d{10,13}$/.test(v), "whatsapp")
+      .optional()
+      .nullable()
+      .transform((v) => v || null),
   })
   .refine((b) => b.budgetMinInr == null || b.budgetMaxInr == null || b.budgetMinInr <= b.budgetMaxInr, { message: "budget", path: ["budgetMaxInr"] });
 
@@ -241,7 +266,7 @@ export async function getBusiness(userId: string): Promise<BusinessProfile | nul
 }
 
 export async function saveBusiness(userId: string, input: z.infer<typeof BusinessInput>): Promise<BusinessProfile> {
-  const values = { ...input, budgetMinInr: input.budgetMinInr ?? null, budgetMaxInr: input.budgetMaxInr ?? null, updatedAt: new Date() };
+  const values = { ...input, budgetMinInr: input.budgetMinInr ?? null, budgetMaxInr: input.budgetMaxInr ?? null, whatsapp: input.whatsapp ?? null, updatedAt: new Date() };
   const [b] = await (await db())
     .insert(schema.businessProfiles)
     .values({ userId, ...values })

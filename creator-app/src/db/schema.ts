@@ -371,7 +371,11 @@ export const creatorProfiles = pgTable("creator_profiles", {
   /** The creator's own prices, in whole rupees: [{ deliverable: "reel", priceInr: 4000 }]. */
   rates: jsonb("rates").$type<{ deliverable: string; priceInr: number }[]>().notNull().default([]),
   contactEmail: text("contact_email"),
+  /** Shared with a business only after the creator accepts its invite. */
+  whatsapp: text("whatsapp"),
   isPublic: boolean("is_public").notNull().default(false),
+  /** The creator agreed to be suggested to businesses' briefs (off until they switch it on). */
+  openToOffers: boolean("open_to_offers").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -413,6 +417,8 @@ export const businessProfiles = pgTable("business_profiles", {
   budgetMaxInr: integer("budget_max_inr"),
   website: text("website"),
   instagram: text("instagram"),
+  /** Shared with a creator only after they accept an invite. */
+  whatsapp: text("whatsapp"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -432,6 +438,9 @@ export const opportunities = pgTable(
     languages: jsonb("languages").$type<string[]>().notNull().default([]),
     deliverables: jsonb("deliverables").$type<string[]>().notNull().default([]),
     budgetInr: integer("budget_inr"),
+    postBy: date("post_by"),
+    /** Where a tracked link sends people: the business's site, map or WhatsApp link (https only). */
+    destinationUrl: text("destination_url"),
     /** draft | open | closed */
     status: text("status").notNull().default("draft"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -485,6 +494,10 @@ export const dealOutcomes = pgTable("deal_outcomes", {
   redemptions: integer("redemptions"),
   paidInr: integer("paid_inr"),
   paidAt: timestamp("paid_at", { withTimezone: true }),
+  /** Short code for the tracked link /r/<linkCode> (deals Mitra brought). */
+  linkCode: text("link_code").unique(),
+  /** Visits through the tracked link. */
+  clicks: integer("clicks").notNull().default(0),
   creatorRating: integer("creator_rating"),
   businessRating: integer("business_rating"),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
@@ -505,4 +518,51 @@ export const consents = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [index("consents_user").on(t.userId, t.kind)],
+);
+
+/**
+ * A business inviting one matched creator to its brief. The creator sees the brief and fee and accepts or declines;
+ * contact details are exchanged only on accept, which also opens the deal (source "mitra") and its deal room.
+ */
+export const invites = pgTable(
+  "invites",
+  {
+    id: text("id").primaryKey(),
+    opportunityId: text("opportunity_id")
+      .notNull()
+      .references(() => opportunities.id, { onDelete: "cascade" }),
+    businessUserId: text("business_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    creatorUserId: text("creator_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    feeInr: integer("fee_inr"),
+    message: text("message"),
+    /** Why Mitra suggested this creator, as shown to the business. */
+    reasons: jsonb("reasons").$type<string[]>().notNull().default([]),
+    /** pending | accepted | declined | withdrawn */
+    status: text("status").notNull().default("pending"),
+    dealId: text("deal_id").references(() => deals.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    respondedAt: timestamp("responded_at", { withTimezone: true }),
+  },
+  (t) => [uniqueIndex("invites_opportunity_creator").on(t.opportunityId, t.creatorUserId), index("invites_creator").on(t.creatorUserId, t.createdAt)],
+);
+
+/** The deal room: messages between the two sides of a deal Mitra brought. */
+export const dealMessages = pgTable(
+  "deal_messages",
+  {
+    id: serial("id").primaryKey(),
+    dealId: text("deal_id")
+      .notNull()
+      .references(() => deals.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("deal_messages_deal").on(t.dealId, t.createdAt)],
 );

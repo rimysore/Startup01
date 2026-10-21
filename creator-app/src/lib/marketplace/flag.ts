@@ -37,3 +37,11 @@ export const OPEN_STATUSES: readonly DealStatus[] = ["offered", "negotiating", "
 
 /** Wording version recorded with each consent, so a change of wording is visible in the log. */
 export const CONSENT_VERSION = "2026-10-21";
+
+/** Mitra's fee on deals Mitra brought (never on deals a creator finds). Shown before anyone agrees. */
+export const MITRA_FEE_PCT = 10;
+/** During the Bengaluru pilot the fee is shown but not charged. */
+export const FEE_WAIVED_IN_PILOT = true;
+
+/** Goals a business can start a brief from; free text is allowed too. */
+export const GOALS = ["footfall", "orders", "launch", "event", "awareness"] as const;
