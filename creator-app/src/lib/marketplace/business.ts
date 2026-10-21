@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { checkOffer } from "@/lib/offer-check";
 import { DELIVERABLES, MITRA_FEE_PCT, NICHES } from "./flag";
+import { freePromoCode, startTrackedForDeal } from "./track";
 import { isVerified, type CreatorHandle, type CreatorProfile, type Deal, type DealOutcome } from "./store";
 
 /*
@@ -261,13 +262,17 @@ export function briefAsOffer(brief: Opportunity, feeInr: number | null, business
     .join(" ");
 }
 
-async function uniqueLinkCode(): Promise<string> {
+/** A short code for /r/<code>, unused by both deal links and tracked posts. */
+export async function uniqueLinkCode(): Promise<string> {
   const d = await db();
   const abc = "abcdefghjkmnpqrstuvwxyz23456789";
   for (;;) {
     const code = Array.from(crypto.getRandomValues(new Uint8Array(7)), (b) => abc[b % abc.length]).join("");
-    const [taken] = await d.select({ id: schema.dealOutcomes.dealId }).from(schema.dealOutcomes).where(eq(schema.dealOutcomes.linkCode, code));
-    if (!taken) return code;
+    const [[taken], [tracked]] = await Promise.all([
+      d.select({ id: schema.dealOutcomes.dealId }).from(schema.dealOutcomes).where(eq(schema.dealOutcomes.linkCode, code)),
+      d.select({ id: schema.trackedPosts.id }).from(schema.trackedPosts).where(eq(schema.trackedPosts.linkCode, code)),
+    ]);
+    if (!taken && !tracked) return code;
   }
 }
 
@@ -319,14 +324,11 @@ export async function respondToInvite(creatorUserId: string, inviteId: string, a
     status: "agreed",
     checks: checkOffer(offerText).map(({ term, state, text }) => ({ term, state, text })),
   });
-  const taken = await d
-    .select({ code: schema.dealOutcomes.promoCode })
-    .from(schema.dealOutcomes)
-    .innerJoin(schema.deals, eq(schema.deals.id, schema.dealOutcomes.dealId))
-    .where(eq(schema.deals.businessUserId, invite.businessUserId));
-  let n = 0;
-  while (taken.some((t) => t.code === promoCodeFor(businessName, creator?.name ?? "", n))) n++;
-  await d.insert(schema.dealOutcomes).values({ dealId, promoCode: promoCodeFor(businessName, creator?.name ?? "", n), linkCode: await uniqueLinkCode() });
+  const promoCode = await freePromoCode(invite.businessUserId, businessName, creator?.name ?? "");
+  const linkCode = await uniqueLinkCode();
+  await d.insert(schema.dealOutcomes).values({ dealId, promoCode, linkCode });
+  // The deal's code and link hand customers a coupon like any tracked post, counted towards this deal.
+  await startTrackedForDeal({ businessUserId: invite.businessUserId, creatorUserId, creatorName: creator?.name ?? "Creator", dealId, baseFeeInr: invite.feeInr, promoCode, linkCode, destinationUrl: brief.destinationUrl });
   await d.update(schema.invites).set({ status: "accepted", respondedAt: new Date(), dealId }).where(eq(schema.invites.id, inviteId));
   return { dealId };
 }
