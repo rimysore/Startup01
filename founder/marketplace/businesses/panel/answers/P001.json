@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I already find creators on Instagram and pay them by UPI myself, so I wouldn't pay a cut for matches. I might use the free promo code tracking with creators I pick myself, but paying 10% on top for Mitra to choose them doesn't feel worth it.",
+  "objection": "I can just DM creators myself, why pay a middleman? And at a busy counter my staff won't remember to tap +1 every time, so the customer count could be wrong anyway.",
+  "would_change_my_mind": "Seeing another Bengaluru cafe's real numbers, where a creator Mitra matched brought clearly more paying customers per rupee than the ones they found themselves.",
+  "price_too_cheap": 50,
+  "price_cheap": 150,
+  "price_expensive": 350,
+  "price_too_expensive": 600
+}

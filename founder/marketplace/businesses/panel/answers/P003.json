@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I get creators in for a free meal and a post and it costs me almost nothing, so paying someone ₹5,000 cash plus a fee on top is a big jump. The tracking is nice, but the pilot being free only covers Mitra's cut, not the creator's fee.",
+  "objection": "Most of my regulars talk to us in English, and I'm not sure a Kannada creator brings the right crowd. I'd be paying cash to find that out when barter already gets me posts.",
+  "would_change_my_mind": "If Mitra let me start with barter-friendly creators, or proved with real codes from similar outlets that a paid creator brings more weekday customers than a free-meal post does.",
+  "price_too_cheap": 50,
+  "price_cheap": 199,
+  "price_expensive": 600,
+  "price_too_expensive": 1000
+}

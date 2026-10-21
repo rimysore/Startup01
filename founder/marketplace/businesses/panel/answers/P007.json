@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "trust",
+  "reason": "I got burned paying a creator with fake followers, so the promo code that counts actual customers is the only thing that makes me willing to try again. Since Mitra is free in the pilot, I'd try one small deal, but only with a creator marked Verified.",
+  "objection": "Self-reported numbers are worth nothing to me. And I still pay the creator the full fee up front by UPI, so if they bring nobody I lose that money anyway. The code only tells me afterwards that I got cheated.",
+  "would_change_my_mind": "",
+  "price_too_cheap": 50,
+  "price_cheap": 199,
+  "price_expensive": 600,
+  "price_too_expensive": 1000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Creators already walk into my café every month offering a reel for a free meal, so I've never needed to pay anyone cash, let alone pay an app on top of that. Being free during the pilot doesn't help much when the whole thing assumes I'm handing over ₹5,000 by UPI.",
+  "objection": "New app, no track record in my area. And I'm not paying a creator ₹5,000 cash on a promise when barter has always got me posts for the cost of a meal.",
+  "would_change_my_mind": "If it worked for barter deals, so I could give a free meal and still get the promo code and +1 counting to see if anyone actually came, plus a couple of cafés near me showing real customer numbers.",
+  "price_too_cheap": 50,
+  "price_cheap": 150,
+  "price_expensive": 350,
+  "price_too_expensive": 600
+}

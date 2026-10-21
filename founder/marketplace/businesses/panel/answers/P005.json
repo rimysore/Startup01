@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "My outlets run on Google reviews and regulars, and I barely spend on marketing. A new app with no track record in my area isn't something I'll hand creator money to, free pilot or not. Signing up still costs my time and my staff's time.",
+  "objection": "Nobody I know has used it, and I don't believe my counter staff will remember to tap +1 for every code, so the 'exact numbers' could just be guesses.",
+  "would_change_my_mind": "Another owner on my street or in my area telling me a Mitra creator brought them a real, countable rush of customers.",
+  "price_too_cheap": 50,
+  "price_cheap": 199,
+  "price_expensive": 500,
+  "price_too_expensive": 900
+}

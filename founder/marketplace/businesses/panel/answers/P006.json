@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "I already pay my agency to handle Instagram and the influencer posts, so I don't want to pick creators, pay them on UPI and tap +1 at the reception desk myself. Free pilot or not, my time and my front-desk staff's attention cost more than the fee.",
+  "objection": "My receptionist is busy with bookings and walk-ins; nobody is going to remember to tap a counter for every promo code, so the numbers will be wrong anyway. Plus I've been pitched by three influencer agencies this year and they all promised 'real customers'.",
+  "would_change_my_mind": "If the code could be logged automatically when a client books an appointment, and a salon owner I know showed me actual bookings that came from it, I'd try one deal.",
+  "price_too_cheap": 50,
+  "price_cheap": 200,
+  "price_expensive": 600,
+  "price_too_expensive": 1000
+}
