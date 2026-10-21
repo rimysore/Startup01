@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { MARKETPLACE } from "@/lib/marketplace/flag";
 import { setAudience, useAudience, type Audience } from "./audience";
+import { OfferStack } from "./OfferStack";
 
 // Kannada lines are a first draft: a native speaker checks them before launch.
 const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string; cta: string }> = {
@@ -137,28 +138,7 @@ export function HeroArt() {
     );
   return (
     <div className="lp-hero__art lp-fade-in" style={{ ["--l" as string]: 2 }}>
-      <div className="relative">
-        {/* Two offers behind, peeking out: there are more, but Mitra shows a few that fit. */}
-        <div className="lp-card absolute inset-x-6 -top-5 h-24 opacity-60" aria-hidden />
-        <div className="lp-card absolute inset-x-3 -top-2.5 h-24 opacity-80" aria-hidden />
-        <div className="lp-card relative p-6">
-          <div className="flex items-center justify-between gap-3">
-            <span className="lp-chip lp-chip--ink">New offer near you</span>
-            <span className="lp-label">Example</span>
-          </div>
-          <p className="mt-5 font-[family-name:var(--font-display-face)] text-[28px] font-semibold leading-tight tracking-[-0.03em]">A dosa café in Jayanagar</p>
-          <p className="mt-1 text-[15px]" style={{ color: "var(--ink-2)" }}>2 km from you · Food · Kannada</p>
-          <div className="lp-deal__rows">
-            <div className="lp-deal__row"><span>They want</span><b>1 Reel + 2 Stories</b></div>
-            <div className="lp-deal__row"><span>Fee</span><b>₹6,000</b></div>
-            <div className="lp-deal__row"><span>Post by</span><b>2 November</b></div>
-          </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            <span className="lp-chip lp-chip--ok"><Check /> Offer checked</span>
-            <span className="lp-chip lp-chip--warn"><span className="lp-dot" /> Ask about usage rights</span>
-          </div>
-        </div>
-      </div>
+      <OfferStack />
     </div>
   );
 }

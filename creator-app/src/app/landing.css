@@ -272,3 +272,25 @@ html:has(.lp) { scroll-behavior: smooth; }
 .lp-foot__word { font-family: var(--font-display-face), sans-serif; font-weight: 600; letter-spacing: -0.06em; line-height: 0.8; font-size: clamp(88px, 17vw, 260px); }
 .lp-foot__links { display: flex; flex-wrap: wrap; gap: 10px 24px; font-size: 15px; color: var(--ink-2); }
 .lp-foot__base { margin-top: 48px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 14px; color: var(--ink-3); box-shadow: 0 -1px 0 var(--rule); padding-top: 24px; }
+
+/* The hero's offer deck: three cards stacked in one grid cell, the front one shuffling to the back. */
+.lp-stack { position: relative; display: grid; padding-top: 34px; }
+.lp-stack__card { grid-area: 1 / 1; padding: 24px; transform-origin: 50% 0; transition: transform 800ms var(--ease), opacity 600ms ease, filter 600ms ease; }
+.lp-stack__card[data-pos="0"] { z-index: 3; }
+.lp-stack__card[data-pos="1"] { z-index: 2; transform: translateY(-17px) scale(0.955); opacity: 0.92; }
+.lp-stack__card[data-pos="2"] { z-index: 1; transform: translateY(-34px) scale(0.91); opacity: 0.75; }
+.lp-stack__card:not([data-pos="0"]) > * { opacity: 0; transition: opacity 300ms ease; }
+.lp-stack__card[data-pos="0"] > * { transition: opacity 500ms ease 250ms; }
+.lp-stack__card[data-leaving="true"] { animation: lp-shuffle 950ms cubic-bezier(0.65, 0, 0.35, 1) both; }
+.lp-stack__card[data-leaving="true"] > * { opacity: 1; animation: lp-shuffle-fade 950ms ease both; }
+@keyframes lp-shuffle {
+  0% { transform: none; z-index: 3; opacity: 1; }
+  45% { transform: translate(6%, 58%) rotate(4deg) scale(0.97); z-index: 3; opacity: 1; }
+  55% { z-index: 0; }
+  100% { transform: translateY(-34px) scale(0.91); z-index: 1; opacity: 0.75; }
+}
+@keyframes lp-shuffle-fade { 0%, 40% { opacity: 1; } 70%, 100% { opacity: 0; } }
+.lp-stack__dots { display: flex; justify-content: center; gap: 6px; margin-top: 18px; }
+.lp-stack__dots span { width: 6px; height: 6px; border-radius: 6px; background: var(--rule); transition: width 400ms var(--ease), background-color 400ms ease; }
+.lp-stack__dots span[data-on="true"] { width: 20px; background: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .lp-stack__card, .lp-stack__card > * { transition: none; animation: none !important; } }
