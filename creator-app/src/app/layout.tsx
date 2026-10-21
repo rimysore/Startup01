@@ -31,9 +31,9 @@ export const metadata: Metadata = {
 };
 
 // Applies the saved theme before paint so there is no flash.
-// Also marks the page as scripted (.js gates the landing page's entrance motion) and, if the reveal observer hasn't
+// Also marks the page as scripted (.js gates the landing page's scroll reveals where CSS scroll timelines are missing) and, if the reveal observer hasn't
 // started within 3 seconds, shows everything so no content can stay hidden.
-const themeScript = `try{var t=localStorage.getItem("mitra-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}document.documentElement.classList.add("js");setTimeout(function(){if(!window.__mitraReveals)document.querySelectorAll("[data-reveal],.s-stage").forEach(function(e){e.classList.add("is-in")})},3000);`;
+const themeScript = `try{var t=localStorage.getItem("mitra-theme");if(t)document.documentElement.dataset.theme=t}catch(e){}document.documentElement.classList.add("js");setTimeout(function(){if(!window.__mitraReveals)document.querySelectorAll("[data-reveal]").forEach(function(e){e.classList.add("is-in")})},3000);`;
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
