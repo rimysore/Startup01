@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Ada",
+  "age": 36,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 2104000,
+  "behaviour": "Pays creators directly",
+  "behaviour_how": "Finds creators on Instagram, DMs them, pays ₹2,000-15,000 by UPI, judges by views.",
+  "objection": "I can just DM creators myself, why pay a middleman?",
+  "habit": "you pay suppliers and staff by UPI"
+ },
+ {
+  "id": "P002",
+  "name": "Luca",
+  "age": 26,
+  "segment": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+  "income": 1102000,
+  "behaviour": "Boosts posts and runs Zomato/Swiggy ads",
+  "behaviour_how": "Spends on Meta boosts or aggregator ads; skeptical of influencers.",
+  "objection": "Most influencers have fake followers; how do I know these are real?",
+  "habit": "you ask customers 'how did you hear about us' only sometimes"
+ },
+ {
+  "id": "P003",
+  "name": "Dev",
+  "age": 35,
+  "segment": "2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month",
+  "income": 4740000,
+  "behaviour": "Barter only",
+  "behaviour_how": "Gives creators a free meal or service for a post; has never paid a creator cash.",
+  "objection": "Kannada creators might not reach my English-speaking customers (or the reverse)",
+  "habit": "your weekends are busy and weekdays slow"
+ },
+ {
+  "id": "P004",
+  "name": "Daniel",
+  "age": 31,
+  "segment": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+  "income": 2138000,
+  "behaviour": "Barter only",
+  "behaviour_how": "Gives creators a free meal or service for a post; has never paid a creator cash.",
+  "objection": "Barter works fine for me; why pay cash plus a fee?",
+  "habit": "creators walk in and offer a reel for a free meal at least once a month"
+ },
+ {
+  "id": "P005",
+  "name": "Yara",
+  "age": 48,
+  "segment": "2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month",
+  "income": 6684000,
+  "behaviour": "Word-of-mouth only",
+  "behaviour_how": "Relies on Google reviews and regulars; spends almost nothing on marketing.",
+  "objection": "New app, no track record in my area",
+  "habit": "you ask customers 'how did you hear about us' only sometimes"
+ },
+ {
+  "id": "P006",
+  "name": "Yusuf",
+  "age": 33,
+  "segment": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+  "income": 1152000,
+  "behaviour": "Uses an agency",
+  "behaviour_how": "Pays a local digital agency a monthly retainer that includes some influencer posts.",
+  "objection": "I don't have time to manage another app or count customers at the till",
+  "habit": "you've been approached by three 'influencer agencies' this year"
+ },
+ {
+  "id": "P007",
+  "name": "Pablo",
+  "age": 26,
+  "segment": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+  "income": 2753000,
+  "behaviour": "Burned by fake influencers",
+  "behaviour_how": "Paid a creator whose followers turned out fake or who brought no customers.",
+  "objection": "Most influencers have fake followers; how do I know these are real?",
+  "habit": "you check your Google reviews and Instagram every evening after closing"
+ },
+ {
+  "id": "P008",
+  "name": "Eli",
+  "age": 41,
+  "segment": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+  "income": 1646000,
+  "behaviour": "Pays creators directly",
+  "behaviour_how": "Finds creators on Instagram, DMs them, pays ₹2,000-15,000 by UPI, judges by views.",
+  "objection": "A 10% fee plus GST on top adds up when margins are thin",
+  "habit": "you check your Google reviews and Instagram every evening after closing"
+ },
+ {
+  "id": "P009",
+  "name": "Ben",
+  "age": 30,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 1251000,
+  "behaviour": "Barter only",
+  "behaviour_how": "Gives creators a free meal or service for a post; has never paid a creator cash.",
+  "objection": "New app, no track record in my area",
+  "habit": "creators walk in and offer a reel for a free meal at least once a month"
+ },
+ {
+  "id": "P010",
+  "name": "Nora",
+  "age": 28,
+  "segment": "2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month",
+  "income": 4648000,
+  "behaviour": "Barter only",
+  "behaviour_how": "Gives creators a free meal or service for a post; has never paid a creator cash.",
+  "objection": "Kannada creators might not reach my English-speaking customers (or the reverse)",
+  "habit": "you pay suppliers and staff by UPI"
+ },
+ {
+  "id": "P011",
+  "name": "Arjun",
+  "age": 43,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 1625000,
+  "behaviour": "Boosts posts and runs Zomato/Swiggy ads",
+  "behaviour_how": "Spends on Meta boosts or aggregator ads; skeptical of influencers.",
+  "objection": "I don't have time to manage another app or count customers at the till",
+  "habit": "creators walk in and offer a reel for a free meal at least once a month"
+ },
+ {
+  "id": "P012",
+  "name": "Adrian",
+  "age": 45,
+  "segment": "Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month",
+  "income": 2928000,
+  "behaviour": "Pays creators directly",
+  "behaviour_how": "Finds creators on Instagram, DMs them, pays ₹2,000-15,000 by UPI, judges by views.",
+  "objection": "A 10% fee plus GST on top adds up when margins are thin",
+  "habit": "creators walk in and offer a reel for a free meal at least once a month"
+ },
+ {
+  "id": "P013",
+  "name": "Jasper",
+  "age": 46,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 1850000,
+  "behaviour": "Boosts posts and runs Zomato/Swiggy ads",
+  "behaviour_how": "Spends on Meta boosts or aggregator ads; skeptical of influencers.",
+  "objection": "New app, no track record in my area",
+  "habit": "you've been approached by three 'influencer agencies' this year"
+ },
+ {
+  "id": "P014",
+  "name": "Olivia",
+  "age": 28,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 669000,
+  "behaviour": "Uses an agency",
+  "behaviour_how": "Pays a local digital agency a monthly retainer that includes some influencer posts.",
+  "objection": "Most influencers have fake followers; how do I know these are real?",
+  "habit": "you check your Google reviews and Instagram every evening after closing"
+ },
+ {
+  "id": "P015",
+  "name": "Dana",
+  "age": 34,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 1930000,
+  "behaviour": "Word-of-mouth only",
+  "behaviour_how": "Relies on Google reviews and regulars; spends almost nothing on marketing.",
+  "objection": "Influencer posts get views but don't bring paying customers through the door",
+  "habit": "creators walk in and offer a reel for a free meal at least once a month"
+ },
+ {
+  "id": "P016",
+  "name": "Sara",
+  "age": 52,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 936000,
+  "behaviour": "Barter only",
+  "behaviour_how": "Gives creators a free meal or service for a post; has never paid a creator cash.",
+  "objection": "Barter works fine for me; why pay cash plus a fee?",
+  "habit": "you've been approached by three 'influencer agencies' this year"
+ },
+ {
+  "id": "P017",
+  "name": "Zara",
+  "age": 39,
+  "segment": "2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month",
+  "income": 3713000,
+  "behaviour": "Pays creators directly",
+  "behaviour_how": "Finds creators on Instagram, DMs them, pays ₹2,000-15,000 by UPI, judges by views.",
+  "objection": "Barter works fine for me; why pay cash plus a fee?",
+  "habit": "you check your Google reviews and Instagram every evening after closing"
+ },
+ {
+  "id": "P018",
+  "name": "Poppy",
+  "age": 48,
+  "segment": "2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month",
+  "income": 4472000,
+  "behaviour": "Burned by fake influencers",
+  "behaviour_how": "Paid a creator whose followers turned out fake or who brought no customers.",
+  "objection": "Kannada creators might not reach my English-speaking customers (or the reverse)",
+  "habit": "you've been approached by three 'influencer agencies' this year"
+ },
+ {
+  "id": "P019",
+  "name": "Levi",
+  "age": 49,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 887000,
+  "behaviour": "Boosts posts and runs Zomato/Swiggy ads",
+  "behaviour_how": "Spends on Meta boosts or aggregator ads; skeptical of influencers.",
+  "objection": "Barter works fine for me; why pay cash plus a fee?",
+  "habit": "your weekends are busy and weekdays slow"
+ },
+ {
+  "id": "P020",
+  "name": "Ana",
+  "age": 37,
+  "segment": "Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month",
+  "income": 1099000,
+  "behaviour": "Burned by fake influencers",
+  "behaviour_how": "Paid a creator whose followers turned out fake or who brought no customers.",
+  "objection": "A 10% fee plus GST on top adds up when margins are thin",
+  "habit": "creators walk in and offer a reel for a free meal at least once a month"
+ }
+]

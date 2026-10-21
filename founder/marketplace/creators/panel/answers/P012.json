@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I get two or three fake collab DMs a week, so pasting them somewhere to check is actually useful, and it's free with just a Google sign-in, no Instagram connect. I'd sign up and try it, but I'm still pitching cafés myself and keeping my own rate card.",
+  "objection": "If it's free for me, what's the catch? Either they sell my data or the 'business pays on top' bit means cafés won't bother and the invites never actually come.",
+  "would_change_my_mind": "If after a month no real paid invite with a written fee shows up, or I see them using my number or data without me accepting, I'm deleting it.",
+  "price_too_cheap": 29,
+  "price_cheap": 99,
+  "price_expensive": 299,
+  "price_too_expensive": 499
+}
