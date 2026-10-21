@@ -1,0 +1,67 @@
+# Buyer panel: Mitra, a Bengaluru app that matches local businesses with Kannada and English creators and counts the customers each post brings
+
+**4 buy · 16 pass** (20% buy) out of 20 simulated buyers. Seed 2110, so the same cards can be dealt again.
+
+These are simulated buyers, not customers. Use this to find objections and weak spots, then confirm the big ones with real people before you spend.
+
+## By segment
+
+| group | buyers | buy rate |
+| --- | ---: | ---: |
+| Salon, gym, clinic or studio owner, books appointments, budget ₹5,000-30,000 a month | 6 | 33%  (thin) |
+| 2-3 outlet brand or boutique with a marketing person, budget ₹30,000-1,50,000 a month | 5 | 20%  (thin) |
+| Single-outlet café, bakery or restaurant owner, marketing budget ₹5,000-25,000 a month | 9 | 11% |
+
+## By buying behaviour
+
+| group | buyers | buy rate |
+| --- | ---: | ---: |
+| Burned by fake influencers | 3 | 67%  (thin) |
+| Pays creators directly | 4 | 50%  (thin) |
+| Boosts posts and runs Zomato/Swiggy ads | 4 | 0%  (thin) |
+| Barter only | 5 | 0%  (thin) |
+| Word-of-mouth only | 2 | 0%  (thin) |
+| Uses an agency | 2 | 0%  (thin) |
+
+## By income
+
+| group | buyers | buy rate |
+| --- | ---: | ---: |
+| $2,753,000 and up | 7 | 29%  (thin) |
+| under $1,251,000 | 6 | 17%  (thin) |
+| $1,251,000 to $2,753,000 | 7 | 14%  (thin) |
+
+## Why they pass
+
+| reason | buyers | in their words |
+| --- | ---: | --- |
+| habit | 9 | "I already find creators on Instagram and pay them by UPI myself, so I wouldn't pay a cut for matches. I might use the free promo code tracking with creators I pick myself, but paying 10% on top for Mitra to choose them doesn't feel worth it." (P001) · "I get creators in for a free meal and a post and it costs me almost nothing, so paying someone ₹5,000 cash plus a fee on top is a big jump. The tracking is nice, but the pilot being free only covers Mitra's cut, not the creator's fee." (P003) |
+| trust | 5 | "Mitra being free in the pilot doesn't really matter. What I'd actually be risking is ₹5,000 paid to a creator, and Meta boosts already get me reach I can predict. Most of these creators look like bought followers to me, and 'Self-reported' numbers are exactly what I don't trust." (P002) · "My outlets run on Google reviews and regulars, and I barely spend on marketing. A new app with no track record in my area isn't something I'll hand creator money to, free pilot or not. Signing up still costs my time and my staff's time." (P005) |
+| convenience | 2 | "I already pay my agency to handle Instagram and the influencer posts, so I don't want to pick creators, pay them on UPI and tap +1 at the reception desk myself. Free pilot or not, my time and my front-desk staff's attention cost more than the fee." (P006) · "My counter is busy at lunch, and I'm not going to have my staff tap +1 on a phone every time someone says a code. Even if it's free during the pilot, I'd rather put ₹5,000 into a Meta boost or a Swiggy ad where I can see the numbers without doing anything." (P011) |
+
+## Why they buy
+
+| reason | buyers | in their words |
+| --- | ---: | --- |
+| need | 2 | "I already pay creators by UPI and judge them on views, which tells me nothing about who walked into the store, so a promo code with a customer count is actually useful. While it's free in the pilot I'd try one matched creator alongside my usual ones and compare." (P017) · "I have paid creators before and got nothing, so a promo code that shows me how many customers actually came is exactly what I am missing. It is free in the pilot, so I would try one small deal with a Verified creator and see the count myself." (P020) |
+| trust | 1 | "I got burned paying a creator with fake followers, so the promo code that counts actual customers is the only thing that makes me willing to try again. Since Mitra is free in the pilot, I'd try one small deal, but only with a creator marked Verified." (P007) |
+| convenience | 1 | "It's free during the pilot, so I'd try one matched creator to see if the promo code actually shows me bookings instead of just views. After the pilot, I'd mostly find creators myself on Instagram like I do now and skip the fee." (P008) |
+
+## What would flip a no
+
+- Seeing another Bengaluru cafe's real numbers, where a creator Mitra matched brought clearly more paying customers per rupee than the ones they found themselves.
+- Every matched creator Verified, with proof their audience is local to my area, plus a past deal from a salon or gym like mine showing real customers who came in.
+- If Mitra let me start with barter-friendly creators, or proved with real codes from similar outlets that a paid creator brings more weekday customers than a free-meal post does.
+- If Mitra let me run my barter creators through the promo codes for free, and the count showed that one paid creator actually brought far more paying clients than the free-service ones did.
+- Another owner on my street or in my area telling me a Mitra creator brought them a real, countable rush of customers.
+- If the code could be logged automatically when a client books an appointment, and a salon owner I know showed me actual bookings that came from it, I'd try one deal.
+- If it worked for barter deals, so I could give a free meal and still get the promo code and +1 counting to see if anyone actually came, plus a couple of cafés near me showing real customer numbers.
+- If Mitra let me run barter deals (free meal or service for a post) and still track the promo code redemptions, I'd try it during the pilot and only think about paying cash once I saw a creator actually bring in customers.
+- If the code could be redeemed through my billing/POS or on Swiggy/Zomato so counting happened automatically, and if I saw a nearby café's real numbers showing a creator brought more customers per rupee than my boosts.
+- Proof from another Bengaluru salon or gym that a Mitra-matched creator brought in clearly more paying bookings than the creators who approach me for free, with the cost per customer shown.
+- A café owner near me showing real counter numbers from a Mitra creator deal that paid back, and since the pilot is free, maybe I'd try one small deal with a creator I already know.
+- Seeing another Bengaluru café near me that got a clear number of real walk-ins from a Verified creator through Mitra, with the cost per customer, so I could compare it against what my agency gets me.
+
+Buyers say they would buy **1.0 times** in the first month on average.
+
+20 buyers gave all four price answers. Run founder-pricing's van_westendorp.py on the answers folder.
