@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The money is not the problem, ₹299 is small for me. I don't know who is behind this and I'm not giving an unknown app access to my channel, even read-only. If anything I'd use the free start and see what it does before paying.",
+  "objection": "Who actually made this, and what does it do with my channel data and my audience numbers?",
+  "would_change_my_mind": "A named team I can check, with proof on one of my own videos that Mitra beat my usual views before I pay anything.",
+  "price_too_cheap": 29,
+  "price_cheap": 149,
+  "price_expensive": 349,
+  "price_too_expensive": 499
+}

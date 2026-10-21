@@ -1,0 +1,151 @@
+{
+ "business": "Mitra: an AI manager (AI CMO) for Indian regional-language YouTube creators",
+ "seed": 249806,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 0,
+ "passes": 20,
+ "buy_rate": 0.0,
+ "by_segment": [
+  [
+   "Growing part-time creator (10K-100K subs, earns some AdSense or brand deals)",
+   7,
+   0.0
+  ],
+  [
+   "Small hobby-to-serious creator (1K-10K subs, not monetised or just monetised), student or day job",
+   9,
+   0.0
+  ],
+  [
+   "Full-time regional creator (100K-500K subs, YouTube is main income, may have an editor)",
+   4,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Copies what is trending",
+   3,
+   0.0
+  ],
+  [
+   "Free-tools only",
+   5,
+   0.0
+  ],
+  [
+   "Already pays for vidIQ or TubeBuddy",
+   2,
+   0.0
+  ],
+  [
+   "Busy, phone-only",
+   4,
+   0.0
+  ],
+  [
+   "Learns from YouTube gurus",
+   4,
+   0.0
+  ],
+  [
+   "Data-curious",
+   2,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$437,000 to $584,000",
+   7,
+   0.0
+  ],
+  [
+   "under $437,000",
+   6,
+   0.0
+  ],
+  [
+   "$584,000 and up",
+   7,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   11,
+   [
+    "Mitra sounds useful, especially a weekly plan in Hindi from my own numbers, but the affiliate links and paid deals worry me. My audience follows me because I feel like one of them, and I don't want them to think I'm selling to them. I'd use the free start first and only think about paying once I've seen the weekly ideas actually work on my channel.",
+    "I already pay for vidIQ and use maybe half of it, so I don't need another tool, and I don't know who runs this one. Even read-only, I'm not handing a new app access to my channel on the strength of a pitch."
+   ],
+   [
+    "P001",
+    "P003"
+   ]
+  ],
+  [
+   "habit",
+   4,
+   [
+    "I have never paid for a creator tool and YouTube Studio plus free vidIQ and ChatGPT already get me my weekly ideas. A tool that also pushes affiliate products and local deals at my audience feels like it would cost me trust before it gives me any views.",
+    "I've never paid for a creator tool and I get by on YouTube Studio, free vidIQ and ChatGPT. Mitra sounds like one more thing to set up when my problem is just that my videos don't get enough views."
+   ],
+   [
+    "P002",
+    "P008"
+   ]
+  ],
+  [
+   "need",
+   3,
+   [
+    "I already get my weekly numbers from YouTube Studio and my ideas from ChatGPT, and both are free. Mitra sounds useful, but I can't see what it does that those two don't, and I'm not paying ₹299 a month to find out.",
+    "I already check YouTube Studio every day and I ask ChatGPT for title and hook ideas when I'm stuck, and both are free. I can't see what Mitra knows that those don't, so I wouldn't pay for a second dashboard that tells me the same things."
+   ],
+   [
+    "P004",
+    "P007"
+   ]
+  ],
+  [
+   "price",
+   2,
+   [
+    "I earn about ₹48,000 a month from my job and my channel brings in little or nothing, so ₹299 a month is a real cut into my budget for a tool I have never paid for. I can already get YouTube Studio, vidIQ and TubeBuddy for free and ask ChatGPT for title ideas.",
+    "₹299 a month is a lot when my channel earns little or nothing. The free start is what I'd try, and I'd only pay once I'd seen it help my own videos."
+   ],
+   [
+    "P006",
+    "P014"
+   ]
+  ]
+ ],
+ "why_yes": [],
+ "flip": [
+  "Seeing that the weekly ideas beat my usual views on my own channel, and that Mitra only ever shows a deal I can say no to, with the fee visible before I accept.",
+  "A free month where Mitra's title or hook beat my usual views on a real video, and I could see that in my own numbers, with no sponsored or affiliate content forced into my uploads.",
+  "A known company or creator I trust vouches for it, or I can use the free tier for a few weeks and see it give me a title or thumbnail that clearly beats my usual views.",
+  "A free trial on one of my own videos that shows it beat my usual views, so I can see the result before I pay anything.",
+  "A free trial that shows it beat my usual views on a real video, plus a written promise that nothing goes to any business without my explicit OK.",
+  "Seeing proof on my own channel that Mitra's suggestions beat my usual views, or a free tier that is useful enough on its own to show that before I pay.",
+  "Mitra finds me a real local deal, like a shop or coaching centre paying me for a video, and it shows that the deal earned more than my usual weeks of ad revenue. One proven paid deal would matter more to me than any feature list.",
+  "Seeing a real example from a channel my size where the weekly plan beat its usual views, plus a free trial that doesn't need a card.",
+  "A clear, proven example from a creator with my kind of channel showing Mitra's advice beat their usual views by a real margin, shown for free before I pay anything.",
+  "A free week where I can see Mitra's plan for my own channel and approve or reject every single brand message before anything goes out, with the fee stated up front.",
+  "A free trial that shows, on my own channel's numbers, a title or script that beat my usual views.",
+  "Seeing that it actually beat my usual views on my own channel, with a free trial that shows the result before I pay, and a clear promise that affiliate picks never go out without my OK.",
+  "Seeing it correctly predict which of my videos would beat my usual views, in Hindi, for a few weeks on the free plan, with the reason shown from my own data.",
+  "Free weekly suggestions that clearly beat my usual views on my own channel, or a local deal that pays me before I have to pay Mitra anything.",
+  "Seeing one of its suggested videos beat my usual views, or a real local deal that pays me, within the first few weeks.",
+  "A real example of a local deal that was offered to a channel my size in my own city, with the fee shown clearly before I accept.",
+  "A creator I already follow trusting it publicly, or a free-plan weekly report that clearly beats my usual views on my own channel.",
+  "Using it free for a few weeks and seeing it clearly beat my usual views with no product pushed on my audience, and the deal fees staying optional and visible.",
+  "Seeing it work on my own channel for free first, with a clear result that beat my usual views, plus creators I already follow vouching for it in Hindi.",
+  "A named team I can check, with proof on one of my own videos that Mitra beat my usual views before I pay anything."
+ ],
+ "purchases_first_month_per_buyer": null,
+ "price_answers": 20
+}

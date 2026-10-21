@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd like the weekly tips, but I don't know who is behind Mitra or where my channel data goes. Read-only sounds safe, but I'd still rather try the free plan and see if it helps before paying anything.",
+  "objection": "I don't know this app or the people who made it, and I'm not sure what they do with my channel data even if they say read-only.",
+  "would_change_my_mind": "A creator I already follow trusting it publicly, or a free-plan weekly report that clearly beats my usual views on my own channel.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 399,
+  "price_too_expensive": 599
+}
