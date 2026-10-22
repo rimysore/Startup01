@@ -1,0 +1,171 @@
+{
+ "business": "Mitra (beta), a collab marketplace for Bengaluru Instagram creators",
+ "seed": 527407,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 6,
+ "passes": 14,
+ "buy_rate": 0.3,
+ "by_segment": [
+  [
+   "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+   9,
+   0.3333333333333333
+  ],
+  [
+   "Established local creator (50K-100K followers), collabs are real income, may have a manager",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "Micro creator (10K-50K followers), does a few paid collabs a month",
+   8,
+   0.25
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Growth-hungry",
+   3,
+   1.0
+  ],
+  [
+   "Kannada-first",
+   2,
+   0.5
+  ],
+  [
+   "Rate-card professional",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "Already on an app",
+   3,
+   0.3333333333333333
+  ],
+  [
+   "Burned before",
+   3,
+   0.0
+  ],
+  [
+   "Free-only",
+   2,
+   0.0
+  ],
+  [
+   "Barter-first",
+   4,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "under $374,000",
+   6,
+   0.3333333333333333
+  ],
+  [
+   "$795,000 and up",
+   7,
+   0.2857142857142857
+  ],
+  [
+   "$374,000 to $795,000",
+   7,
+   0.2857142857142857
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   10,
+   [
+    "I've been burned by 'agencies' that took a fee and vanished, and a beta app with a small team asking me to connect my Instagram feels like the same story with a nicer website. I might poke at the free month, but I'm not paying for a pass until I see real paid leads, not cafés offering free dosa.",
+    "It's free this month so I might connect my Instagram and look around, but I'm not committing to the ₹499 pass. My WhatsApp groups already send me collab leads for nothing, and I've seen these apps launch with zero businesses on them."
+   ],
+   [
+    "P001",
+    "P002"
+   ]
+  ],
+  [
+   "habit",
+   3,
+   [
+    "I'd probably connect my account during the free month to see which brands show up, but I've never paid for a creator tool and I'm not starting now. Collabs already land in my DMs, and my manager handles the good ones.",
+    "I already apply to campaigns on Influish and barter offers from cafes land in my DMs every week, so I don't see why I'd pay for another app. I might connect Instagram while it's free to see what it shows me, but I wouldn't commit to the ₹499 pass."
+   ],
+   [
+    "P005",
+    "P012"
+   ]
+  ],
+  [
+   "need",
+   1,
+   [
+    "Cafés and brands already slide into my DMs with barter offers, and I barely have time to edit reels after my day job, let alone browse another app. I might connect it during the free month out of curiosity, but I don't see myself paying when the deals find me anyway."
+   ],
+   [
+    "P016"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   3,
+   [
+    "It's free for the month and read-only, so I'll sign up and see if it throws up local brands my WhatsApp groups don't already pass around. But I'm not switching on Auto-DM, and if the matches are the same cafés everyone already pitches, I won't pay the ₹499.",
+    "It's free for a month and ₹499 a year is nothing next to what one collab pays me, so I'd connect my account and see if the auto-DM and brand matches actually grow my reach. I'm not dropping my manager or my own DMs for it, though."
+   ],
+   [
+    "P003",
+    "P006"
+   ]
+  ],
+  [
+   "convenience",
+   2,
+   [
+    "It's free for the month and the read-only Instagram connect means I'm not filling forms, so I'd sign up and see if the matches beat what my four WhatsApp groups already throw at me. The comment-to-DM thing is the bit I actually want, because more people DMing me off a reel is reach, and reach is what I'm after right now.",
+    "It's free for the month and it's just a Google sign-in, so I'd connect my Insta and see what it finds for me. But I'd treat it like Influish: tap Interested, wait, and only pay ₹499 later if a café actually pays me money and not just a free dosa."
+   ],
+   [
+    "P004",
+    "P020"
+   ]
+  ],
+  [
+   "values",
+   1,
+   [
+    "It's free for the month and it's actually built for Bengaluru and Kannada creators like me, not another national app that skips regional people, so I'll sign up and try it. The DOSA auto-DM fits my food reels perfectly, but I'd only pay the ₹499 once a local café actually pays me through it."
+   ],
+   [
+    "P017"
+   ]
+  ]
+ ],
+ "flip": [
+  "Two or three creators from my WhatsApp groups telling me they got actual cash payments, on time, through a brand they found on Mitra.",
+  "Getting one real paid collab through Mitra in the free month, not barter, from a local business that came to me because of my Kannada content.",
+  "If the free month actually brought me a paid collab with a brand I'd want to work with, a real fee and not barter, then ₹499 is nothing and I'd renew.",
+  "A creator I know in Bengaluru telling me she got paid on time through it, plus a named company and a clear way to raise a dispute if a business doesn't pay.",
+  "Seeing a real company name and a clear promise that Mitra steps in or blocks businesses that don't pay, plus a couple of Bengaluru creators my size saying they actually got paid collabs through it.",
+  "Landing one cash collab at my rate-card price through Mitra in the free month, or seeing upfront which listed businesses actually pay cash and how much.",
+  "Two or three creators from my WhatsApp groups saying they got a paid collab through Mitra and the business actually paid, plus a named team and a clear way to report a business that doesn't pay.",
+  "Someone in my creator WhatsApp groups I trust saying they got an actual paid collab through Mitra, and got paid on time, without anything bad happening to their account.",
+  "If my free first collab through Mitra turned out to be properly paid, more than what barter usually gets me, and the café coupon counts actually got my rate raised the next time.",
+  "A named company with a contact, plus some kind of payment protection or escrow for collabs booked through Mitra, and a few creators my size I recognise vouching that the brands actually paid.",
+  "Proof that Mitra uses Instagram's official API for the DMs, plus two or three creators my size in my WhatsApp groups who were actually paid on time through brands they found on it.",
+  "If my free first collab through Mitra turned into actual cash, not just a free meal, because the café's customer count showed I bring people in.",
+  "If my first free collab through Mitra turned out to be a real cash payment from a local business, not just food, I'd pay the ₹499.",
+  "If a couple of creators I actually know from my WhatsApp groups said they got a real paid collab through it and their account was fine."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 20
+}

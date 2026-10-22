@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'm already on Influish applying to campaigns and waiting, and at my size most local offers are a free meal, not money. I might connect my account since it's free, but I wouldn't pay for another app until it actually gets me a paid collab.",
+  "objection": "Local cafés pay in food, not money. Another app showing me the same barter offers doesn't change that, and a small beta team in one city might not have many businesses on it yet.",
+  "would_change_my_mind": "If my first free collab through Mitra turned out to be a real cash payment from a local business, not just food, I'd pay the ₹499.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

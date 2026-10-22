@@ -1,0 +1,37 @@
+{
+  "business": "Mitra (beta), a collab marketplace for Bengaluru Instagram creators",
+  "target": "Bengaluru Instagram creators posting in Kannada and/or English, 2K to 100K followers, who want paid or barter collabs with local businesses and brands",
+  "where": "Bengaluru (Jayanagar, Basavanagudi, Malleshwaram, Koramangala, HSR, Indiranagar), online on Instagram and WhatsApp",
+  "age": [18, 34],
+  "currency": "INR",
+  "segments": [
+    {"name": "Nano creator (2K-10K followers), student or day job, mostly barter so far", "share": 0.45, "income": [150000, 600000]},
+    {"name": "Micro creator (10K-50K followers), does a few paid collabs a month", "share": 0.40, "income": [300000, 1200000]},
+    {"name": "Established local creator (50K-100K followers), collabs are real income, may have a manager", "share": 0.15, "income": [800000, 3000000]}
+  ],
+  "behaviours": [
+    {"name": "Barter-first", "share": 0.20, "how": "Takes free meals and products for posts; rarely asks for money."},
+    {"name": "Rate-card professional", "share": 0.15, "how": "Has a rate card, sends a media kit, invoices brands."},
+    {"name": "Burned before", "share": 0.15, "how": "Was ghosted on payment or paid a 'registration fee' to a fake agency; distrusts platforms."},
+    {"name": "Already on an app", "share": 0.15, "how": "Has Influish or a similar app; applies to campaigns and waits."},
+    {"name": "Growth-hungry", "share": 0.15, "how": "Cares more about followers and reach than money right now."},
+    {"name": "Kannada-first", "share": 0.10, "how": "Makes Kannada content; feels national brands ignore regional creators."},
+    {"name": "Free-only", "share": 0.10, "how": "Never pays for creator tools; uses whatever is free."}
+  ],
+  "objections": [
+    "Will there actually be businesses on it, or is it empty like other apps?",
+    "Why pay ₹499 a year when barter deals come to my DMs anyway?",
+    "Influish costs the same and already has lakhs of creators",
+    "Giving an app access to my Instagram feels risky",
+    "Auto-DM might get my account flagged by Instagram",
+    "Local cafés pay in food, not money",
+    "Is this run by a real company? Who do I complain to if a business doesn't pay?"
+  ],
+  "habits": [
+    "you post 3 to 4 reels a week, mostly food and places in South Bengaluru",
+    "you get 2 or 3 collab DMs a week, half of them sketchy",
+    "you are in 4 creator WhatsApp groups that share collab leads",
+    "you check your Instagram insights every morning",
+    "you work a day job and edit reels at night"
+  ]
+}

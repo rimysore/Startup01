@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I've paid creators and got likes, not customers, so a coupon that tells me who actually walked in is the one thing I'd want. It's free and two minutes, so I'd try it on one outlet with one creator, but I'm not rolling it out everywhere yet.",
+  "objection": "My counter staff won't bother tapping a PIN during a rush, and if redemptions don't get logged the numbers are useless. It's also a beta with a small team, so I'm not sure it'll still be around in six months.",
+  "would_change_my_mind": "If after the first trial the redemptions don't match my bill book, or my staff skip it, I drop it.",
+  "price_too_cheap": 0,
+  "price_cheap": 999,
+  "price_expensive": 4999,
+  "price_too_expensive": 12000
+}

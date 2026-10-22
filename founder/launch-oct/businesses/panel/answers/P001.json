@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "My agency already handles Instagram and picks the creators, and I already have creators asking me for free food every week, so finding more is not my problem. I'm not going to get staff at several outlets learning a coupon-and-PIN routine for a beta app from a small team.",
+  "objection": "Getting my counter staff in every outlet to actually redeem coupons properly during a rush, and whether a small beta team will still be around in six months.",
+  "would_change_my_mind": "If my agency used it and showed me a month of real numbers, customers per creator from one of my own outlets, without me or my staff doing extra work.",
+  "price_too_cheap": 5,
+  "price_cheap": 20,
+  "price_expensive": 60,
+  "price_too_expensive": 150
+}

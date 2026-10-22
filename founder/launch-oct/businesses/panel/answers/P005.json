@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free and takes two minutes, and I genuinely can't tell today whether the creator posts my agency arranges bring anyone in. I'd let my marketing person try it on one outlet with one creator and see if the numbers mean anything.",
+  "objection": "My staff won't remember to tap redeem with a PIN when there's a queue at the counter, so the count will come out low and I'll end up thinking creators don't work when really we just missed the coupons.",
+  "would_change_my_mind": "If after the first trial the redeemed count is clearly lower than the people who mentioned the post, I'd drop it unless redeeming can be done without my counter staff doing anything extra.",
+  "price_too_cheap": 0,
+  "price_cheap": 500,
+  "price_expensive": 2500,
+  "price_too_expensive": 5000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": true,
+  "purchases_first_month": 2,
+  "reason_code": "need",
+  "reason": "I already give free meals to creators every month and have no idea if anyone walks in because of them, so a free tool that counts customers per creator is worth a 2-minute sign-up. I'd try it on one or two barter posts at the quietest outlet first.",
+  "objection": "On a busy Saturday my counter staff will not stop to tap redeem and type a PIN, so the numbers will undercount and I'll end up thinking the creators did nothing when really the staff just skipped it.",
+  "would_change_my_mind": "If after the first couple of posts the redemption count is clearly missing customers I can see in my UPI settlements, I'd drop it; if redeeming could happen without staff doing anything, I'd use it at every outlet.",
+  "price_too_cheap": 0,
+  "price_cheap": 500,
+  "price_expensive": 2000,
+  "price_too_expensive": 5000
+}

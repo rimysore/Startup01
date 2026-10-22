@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've been burned by a fake agency and ghosted on payment before, so a brand-new beta app from a small team asking me to connect my Instagram is a no for now. My WhatsApp groups already send me barter leads for free, so I don't need to take the risk.",
+  "objection": "Giving an app access to my Instagram feels risky, and I have no idea who is behind Mitra or whether the 'brands' on it are real and actually pay.",
+  "would_change_my_mind": "Someone in my creator WhatsApp groups I trust saying they got an actual paid collab through Mitra, and got paid on time, without anything bad happening to their account.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 799,
+  "price_too_expensive": 1499
+}

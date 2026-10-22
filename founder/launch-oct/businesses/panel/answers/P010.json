@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "My salon runs on regulars, Google reviews and the WhatsApp group, and that keeps my chairs full. I've never used creators and I don't see why I'd start just because the app is free.",
+  "objection": "I already get creators asking for freebies every week; a platform that shows them my business straight away just means more of those requests, and I doubt a few coupon redemptions would justify a free haircut or facial.",
+  "would_change_my_mind": "Another salon owner I know in my area telling me it actually brought them paying customers who came back, with the numbers to show it.",
+  "price_too_cheap": 0,
+  "price_cheap": 10,
+  "price_expensive": 30,
+  "price_too_expensive": 60
+}

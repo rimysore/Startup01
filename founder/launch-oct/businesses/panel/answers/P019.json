@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I give free meals to creators all the time and have no idea if anyone comes because of it. It's free, so I'll have my nephew sign up and try it on the next barter creator, but I'm not expecting much.",
+  "objection": "Customers won't bother showing a coupon on their phone, and at rush hour my counter boy won't stop to tap a PIN. If nobody redeems, the numbers will say zero even when people did come.",
+  "would_change_my_mind": "If after one or two creator posts nobody redeems at all, I'll stop using it.",
+  "price_too_cheap": 0,
+  "price_cheap": 199,
+  "price_expensive": 799,
+  "price_too_expensive": 1500
+}

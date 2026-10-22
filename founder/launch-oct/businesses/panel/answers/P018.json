@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I already put my offers on the local WhatsApp group and that works fine for me. Another sign-in, another app, and teaching my counter boy a PIN during the morning rush is not something I will do for a beta.",
+  "objection": "Customers won't bother showing a coupon. They walk in, order idli-vada, pay by UPI and go. Nobody is opening a link at my counter, so the counting will show zero and I will have wasted my time.",
+  "would_change_my_mind": "If it worked fully on WhatsApp with no app or login, and someone from Mitra came to my shop, set it up and showed me a nearby darshini that actually got counted customers from it.",
+  "price_too_cheap": 0,
+  "price_cheap": 200,
+  "price_expensive": 1000,
+  "price_too_expensive": 2000
+}

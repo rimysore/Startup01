@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "Last time I paid a creator I got likes and not one extra customer at the counter. It's free and takes two minutes, and a coupon my staff redeem with a PIN is the first thing I've seen that would tell me who actually brings people in, so I'll list once and try one barter post before I pay anyone again.",
+  "objection": "It's a beta with a small team. If the only creators who turn up are the same ones already DMing me for a free meal, the counting doesn't help me. Will good creators actually be on it?",
+  "would_change_my_mind": "If after the first couple of weeks nobody decent near me has shown interest, or the redeem step slows my counter at rush hour, I'll stop using it.",
+  "price_too_cheap": 200,
+  "price_cheap": 500,
+  "price_expensive": 1500,
+  "price_too_expensive": 3000
+}

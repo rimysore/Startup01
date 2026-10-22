@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free for the month and read-only, so I'll sign up and see if it throws up local brands my WhatsApp groups don't already pass around. But I'm not switching on Auto-DM, and if the matches are the same cafés everyone already pitches, I won't pay the ₹499.",
+  "objection": "Auto-DM sending messages from my account whenever someone comments DOSA sounds exactly like what gets Instagram to flag or shadowban you. My reach is everything to me right now, I can't risk it for a coupon.",
+  "would_change_my_mind": "Proof that Auto-DM runs on Instagram's official API and that creators my size have used it for months without a reach drop or a flag.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2499
+}

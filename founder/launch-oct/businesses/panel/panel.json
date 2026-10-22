@@ -1,0 +1,89 @@
+{
+ "n": 20,
+ "seed": 571712,
+ "customer": {
+  "business": "Mitra (beta), creators and a customer counter for Bengaluru local businesses",
+  "target": "Owners or managers of independent cafés, darshinis, salons, gyms and boutiques in South and Central Bengaluru that have tried or considered Instagram creators",
+  "where": "Bengaluru (Jayanagar, Basavanagudi, Malleshwaram, Koramangala, HSR, Indiranagar)",
+  "age": [
+   24,
+   55
+  ],
+  "currency": "INR",
+  "segments": [
+   {
+    "name": "Single-outlet café or darshini, owner runs the counter",
+    "share": 0.45,
+    "income": [
+     600000,
+     2400000
+    ]
+   },
+   {
+    "name": "Salon, gym or boutique, owner plus 2-10 staff",
+    "share": 0.35,
+    "income": [
+     800000,
+     3000000
+    ]
+   },
+   {
+    "name": "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+    "share": 0.2,
+    "income": [
+     3000000,
+     12000000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Barter veteran",
+    "share": 0.25,
+    "how": "Gives free meals to creators often; not sure it brings anyone."
+   },
+   {
+    "name": "Burned by influencers",
+    "share": 0.2,
+    "how": "Paid a creator, saw likes but no customers; now skeptical."
+   },
+   {
+    "name": "Word-of-mouth only",
+    "share": 0.15,
+    "how": "Relies on regulars and Google reviews; never tried creators."
+   },
+   {
+    "name": "Uses an agency",
+    "share": 0.1,
+    "how": "Pays a local agency or freelancer to handle Instagram."
+   },
+   {
+    "name": "Tech-shy",
+    "share": 0.15,
+    "how": "Uses WhatsApp and UPI, avoids new apps and logins."
+   },
+   {
+    "name": "Numbers-minded",
+    "share": 0.15,
+    "how": "Tracks daily sales in a book or Petpooja; wants proof before spending."
+   }
+  ],
+  "objections": [
+   "My staff won't remember to redeem coupons when it's busy",
+   "Customers won't bother showing a coupon",
+   "Free now, but you'll start charging once I depend on it",
+   "I already get creators asking for free food every week",
+   "I don't have time to learn another app",
+   "Will good creators actually be on it?",
+   "Who are you? A new startup could disappear"
+  ],
+  "habits": [
+   "you are at the counter from 7 am to 2 pm",
+   "you get 3 or 4 Instagram DMs a week from creators asking for a free meal",
+   "you check UPI settlements every evening",
+   "your nephew handles your Instagram page",
+   "you post offers on a local WhatsApp group"
+  ]
+ },
+ "pitch": "Mitra (beta): find local creators who fit your business, and count the customers each post brings. Bengaluru, Kannada and English.\nAdd your business once (Google sign-in, 2 minutes). Creators near you see it straight away; you see who is interested and which creators fit your area, with their verified Instagram followers and average views.\nEvery creator post gets a coupon link. Customers show it on their phone; your staff tap redeem with a 4-digit PIN. You see customers per creator and cost per customer, paid or barter, and can download a daily sheet to check against your bill book.\nFree for businesses and brands. Mitra takes no cut of what you pay creators.\nBeta: a small team, Bengaluru only for now."
+}

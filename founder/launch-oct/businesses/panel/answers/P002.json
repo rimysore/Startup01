@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free and I already get 3-4 creator DMs a week with no idea if any of them bring anyone in. I'll add the café and run one barter post through it to see if the numbers match my book.",
+  "objection": "At 1 pm rush my counter boy will not stop to type a PIN for a coupon, so half the customers won't get counted and the numbers will be useless. Also a beta with a small team could vanish in three months.",
+  "would_change_my_mind": "If the first trial post shows almost nothing redeemed because staff skipped it, I'll drop it. If redeeming took one tap with no PIN, I'd keep using it.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 999,
+  "price_too_expensive": 2000
+}
