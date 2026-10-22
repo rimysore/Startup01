@@ -37,6 +37,17 @@ export const COMPANY = {
 };
 
 /**
+ * The people behind Mitra, shown on the landing page. Add the co-founder here (name, role, one line) when they're
+ * happy to be named; an empty list hides the section's people and keeps the support line.
+ */
+export const TEAM: { name: string; role: string; line: string }[] = [
+  { name: OPERATOR, role: "Co-founder · product and engineering", line: "Builds the app: the offer checks, the counter and everything in between." },
+];
+
+/** Mitra's WhatsApp support number (digits with country code, e.g. 919876543210). Empty hides it. */
+export const SUPPORT_WHATSAPP = (process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "").replace(/\D/g, "");
+
+/**
  * Private beta: until Google verifies the app, only creators added as test users can connect YouTube, so the site
  * offers a waitlist instead of open sign-up. Set NEXT_PUBLIC_INVITE_ONLY=0 once verification is approved.
  */

@@ -48,20 +48,22 @@ await redeem(s1, 3, 20);
 const g1 = await post("gym", "Ravi", 5);
 await t.counterRedeem("gym", g1.promoCode);
 await t.counterRedeem("gym", g1.promoCode);
+// Gym also set up a second post the same day: setup, not a repeat.
+await post("gym", "Ravi 2", 5);
 // Founder's own test shop is excluded.
 const f1 = await post("founder", "Me", 2);
 await redeem(f1, 9, 1);
 
 const n = await p.pilotNumbers({ exclude: ["founder"] });
-assert(n.activeBusinesses.value === 2 && n.activeBusinesses.tracking === 3 && n.activeBusinesses.posts === 4, "active = café and gym (salon's last customer was 20 days ago); founder excluded");
-assert(n.customersPerPost.posts === 4 && n.customersPerPost.median === 2 && n.customersPerPost.max === 6 && n.customersPerPost.total === 13, "customers per post: 6, 2, 3, 2 → median 2, max 6, total 13");
+assert(n.activeBusinesses.value === 2 && n.activeBusinesses.tracking === 3 && n.activeBusinesses.posts === 5, "active = café and gym (salon's last customer was 20 days ago); founder excluded");
+assert(n.customersPerPost.posts === 5 && n.customersPerPost.median === 2 && n.customersPerPost.max === 6 && n.customersPerPost.total === 13, "customers per post: 6, 2, 3, 2, 0 → median 2, max 6, total 13");
 assert(n.customersPerPost.byPin === 11 && n.customersPerPost.byCounter === 2, "split by PIN vs counter mode");
-assert(n.repeat.of === 2 && n.repeat.repeated === 1 && n.repeat.rate === 50, "repeat: café repeated within 30 days, salon didn't; gym too new to count");
+assert(n.repeat.of === 2 && n.repeat.repeated === 1 && n.repeat.rate === 50, "repeat: café repeated within 30 days, salon didn't; gym's same-day second post doesn't count and it's too new");
 assert(n.paying.value === 0 && n.paying.wouldPay === 0, "nobody paying yet");
 await plans.setPlanInterest("cafe", "local");
 await d.update(schema.businessProfiles).set({ plan: "growth" }).where(eq(schema.businessProfiles.userId, "salon"));
 const n2 = await p.pilotNumbers({ exclude: ["founder"] });
-assert(n2.paying.onPlans === 1 && n2.paying.mrrInr === 1499 && n2.paying.wouldPay === 1 && n2.paying.wouldPayMrrInr === 499, "paying on a plan (MRR) and 'would pay' counted separately");
+assert(n2.paying.value === 1 && n2.paying.mrrInr === 1499 && n2.paying.wouldPay === 1 && n2.paying.wouldPayMrrInr === 499, "paying on a plan (MRR) and 'would pay' counted separately");
 
 // Inbox.
 await user("cr1", "creator");

@@ -48,12 +48,13 @@ export async function pilotNumbers(opts: { now?: Date; exclude?: string[] } = {}
   const willingMrr = willing.reduce((s, b) => s + PLANS[b.interest as keyof typeof PLANS].priceInr, 0);
   const paidDeals = (await d.select({ creator: schema.deals.creatorUserId, business: schema.deals.businessUserId }).from(schema.deals).innerJoin(schema.dealOutcomes, eq(schema.dealOutcomes.dealId, schema.deals.id)).where(and(eq(schema.deals.source, "mitra"), isNotNull(schema.dealOutcomes.paidAt)))).filter((r) => !r.business || !skip.has(r.business));
 
-  // 4. Repeat: a second tracked post within 30 days of the first. Counted over businesses whose first post is 30+
-  // days old, plus any that already repeated sooner (they've answered the question).
+  // 4. Repeat: a second tracked post 1-30 days after the first (two set up on day one is setup, not a repeat).
+  // Counted over businesses whose first post is 30+ days old, plus any that already repeated (they've answered).
   const firstTwo = new Map<string, Date[]>();
   for (const p of [...posts].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())) {
     const list = firstTwo.get(p.businessUserId) ?? [];
-    if (list.length < 2) list.push(p.createdAt);
+    // The "second" post is the first one at least a day after the first.
+    if (!list.length || (list.length === 1 && p.createdAt.getTime() - list[0].getTime() >= DAY)) list.push(p.createdAt);
     firstTwo.set(p.businessUserId, list);
   }
   let repeatBase = 0;
@@ -91,7 +92,8 @@ export async function pilotNumbers(opts: { now?: Date; exclude?: string[] } = {}
     asOf: now.toISOString(),
     activeBusinesses: { value: active.size, target: 20, tracking: tracking.size, posts: posts.length },
     customersPerPost: { median: pct(settled, 50), p25: pct(settled, 25), p75: pct(settled, 75), max: settled.length ? settled[settled.length - 1] : null, posts: settled.length, total: redeemed.length, byPin, byCounter: redeemed.length - byPin },
-    paying: { value: paying.length + new Set(paidDeals.map((r) => r.business)).size, onPlans: paying.length, mrrInr: mrr, paidDeals: paidDeals.length, wouldPay: willing.length, wouldPayMrrInr: willingMrr, target: "5-10" },
+    // Paying Mitra means a plan: Mitra takes no cut of deals. Deals paid to creators are shown alongside.
+    paying: { value: paying.length, mrrInr: mrr, paidDeals: paidDeals.length, wouldPay: willing.length, wouldPayMrrInr: willingMrr, target: "5-10" },
     repeat: { rate: repeatBase ? Math.round((repeated / repeatBase) * 100) : null, repeated, of: repeatBase, target: 50 },
     inbox: { creators: new Set(inbox.map((r) => r.userId)).size, offers: inbox.length, bySource, scamsFlagged: scams, scamReports: reports.filter((r) => r.kind === "scam").length, target: 100 },
     weeks,

@@ -5,12 +5,12 @@ import { LEGAL_LINKS } from "@/components/SiteFooter";
 import { MitraMark } from "@/components/brand";
 import { Logo, ThemeToggle } from "@/components/ui";
 import { LandingTracker } from "@/components/BetaWidgets";
-import { AudienceSwitch, HeroArt, HeroCopy } from "@/components/landing/Hero";
+import { Arrow, AudienceSwitch, HeroArt, HeroCopy } from "@/components/landing/Hero";
 import { DealStory } from "@/components/landing/DealStory";
 import { OfferChecker } from "@/components/landing/OfferChecker";
 import { JoinForm } from "@/components/landing/JoinForm";
 import { Reveals, StickyNav } from "@/components/landing/Chrome";
-import { COMPANY } from "@/lib/company";
+import { COMPANY, SUPPORT_WHATSAPP, TEAM } from "@/lib/company";
 
 /*
  * The landing page for the marketplace direction: paid deals between Kannada and English creators and the
@@ -19,9 +19,9 @@ import { COMPANY } from "@/lib/company";
  */
 
 export const metadata: Metadata = {
-  title: "Mitra: paid deals between Bengaluru creators and the businesses near them",
+  title: "Mitra: check every collab offer, and count the customers each creator post brings",
   description:
-    "Mitra matches Kannada and English creators with brands and shops near them, checks every offer, and tracks each post with a promo code. Free for creators.",
+    "For Bengaluru's Kannada and English creators: forward any collab offer and know if it's real, free forever. For cafés, salons and gyms: a coupon for every creator post, counted at your counter.",
 };
 
 const AREAS = [
@@ -36,13 +36,13 @@ const AREAS = [
 ];
 
 const FAQ = [
+  ["How does Mitra make money?", "Creators never pay: not to join, not to check offers, not to get Verified. Mitra takes no cut of deals, so creators keep every rupee of their fee and any customer bonus. Businesses pay a monthly plan for counting customers and finding creators. During the Bengaluru pilot it's all free."],
+  ["How do I know an offer is real?", "Forward it to Mitra on WhatsApp or email, or upload a screenshot. Mitra checks what the offer says and who sent it: scam patterns like registration fees, when their website was registered, whether the brand's official site matches, and what other creators reported. It shows its sources, so you decide."],
+  ["Will the customer count be right?", "Each customer shows the creator's coupon on their phone and your staff redeem it with your counter PIN, or type the code in counter mode. Nothing is guessed from views. You can download your daily counts and check them against your bill book."],
+  ["Does it work for barter deals?", "Yes. Track any creator post, paid or barter, whether you found the creator on Mitra or not. Seeing a free-meal post next to a paid one is usually the first useful thing an owner learns."],
   ["Do I have to connect Instagram or YouTube?", "No. Join with your handles and the numbers you see in your own insights; they're shown as self-reported. Connecting an account later, read-only, gets you a Verified badge and puts you first in matches."],
-  ["How does Mitra make money?", "Creators never pay: not to join, not to apply, not to get Verified. Mitra takes no cut of deals, so you keep every rupee of your fee and any customer bonus. Businesses pay a monthly plan for counting customers and finding creators. During the Bengaluru pilot it's all free."],
-  ["How do I know an offer is real?", "Forward it to your Mitra inbox, send it on WhatsApp, or upload a screenshot. Mitra checks what the offer says and who sent it: scam patterns like registration fees, when their website was registered, whether the brand's official site matches, and what other creators reported. It shows its sources, so you decide."],
-  ["Which platforms count?", "Any you post on: Instagram, YouTube, Facebook, ShareChat, Moj or Josh. Businesses care about whether your audience lives near them, not which app it's on."],
   ["Which languages and cities?", "Kannada and English, in Bengaluru first. One city done properly before we go wider."],
   ["Are paid posts labelled?", "Yes. Paid and gifted posts carry \"Paid partnership\" or #ad, as the ASCI rules require. It protects your audience's trust, and yours."],
-  ["I use Mitra's Video Doctor today. What happens to it?", "It stays. Connected creators keep Video Doctor and Title Studio as part of their growth plan, alongside their deals."],
 ] as const;
 
 function Tick() {
@@ -64,9 +64,9 @@ export default function Home() {
         <div className="lp-wrap lp-nav__in">
           <Logo />
           <nav className="lp-nav__links" aria-label="Main">
-            <a href="#how" className="lp-hide-sm">How it works</a>
             <a href="#offer" className="lp-hide-sm">Check an offer</a>
             <a href="#business" className="lp-hide-sm">For businesses</a>
+            <a href="#team" className="lp-hide-sm">Who we are</a>
             <Link href="/login">Sign in</Link>
             <ThemeToggle />
             <a href="#join" className="lp-btn" style={{ minHeight: 40, padding: "0 18px", fontSize: 15 }}>
@@ -99,16 +99,26 @@ export default function Home() {
         </div>
       </div>
 
-      {/* ---- No access needed ---- */}
-      <section className="lp-section">
+      {/* ---- Two front doors ---- */}
+      <section className="lp-section" aria-labelledby="doors-title">
         <div className="lp-wrap">
-          <p className="lp-statement" data-reveal>
-            Join without connecting a single account. <em>Add your handles and your own numbers. Connect later, read-only, to get Verified.</em>
-          </p>
-          <div className="lp-pills" data-reveal>
-            {["Instagram", "YouTube", "Facebook", "ShareChat", "Moj", "Josh"].map((p) => (
-              <span key={p} className="lp-chip">{p}</span>
-            ))}
+          <div data-reveal>
+            <p className="lp-kn-line kn" lang="kn">ಎರಡು ಬಾಗಿಲುಗಳು, ಒಂದೇ ಮಿತ್ರ</p>
+            <h2 id="doors-title" className="lp-h2">One for creators. One for the places they post about.</h2>
+          </div>
+          <div className="lp-doors">
+            <a href="#offer" className="lp-card lp-door" data-reveal>
+              <span className="lp-label">For creators · ಕ್ರಿಯೇಟರ್‌ಗಳಿಗೆ</span>
+              <h3>Offer inbox</h3>
+              <p>Forward any collab DM, email or screenshot. Mitra tells you if it&apos;s a scam, what&apos;s missing, and what to reply. Free forever.</p>
+              <span className="lp-door__go">Check an offer <Arrow /></span>
+            </a>
+            <a href="#business" className="lp-card lp-door" data-reveal style={{ ["--i" as string]: 1 }}>
+              <span className="lp-label">For businesses · ವ್ಯಾಪಾರಗಳಿಗೆ</span>
+              <h3>Customer counter</h3>
+              <p>A coupon for every creator post, paid or barter. Counted at your counter, so you see which creator brought how many customers.</p>
+              <span className="lp-door__go">See how it counts <Arrow /></span>
+            </a>
           </div>
         </div>
       </section>
@@ -117,8 +127,8 @@ export default function Home() {
       <section id="how" className="lp-section scroll-mt-16" style={{ paddingTop: 0 }} aria-labelledby="how-title">
         <div className="lp-wrap">
           <div data-reveal>
-            <h2 id="how-title" className="lp-h2">How a deal moves.</h2>
             <p className="lp-kn-line kn" lang="kn">ಒಂದು ಡೀಲ್ ಹೇಗೆ ನಡೆಯುತ್ತದೆ</p>
+            <h2 id="how-title" className="lp-h2">How a deal moves.</h2>
           </div>
           <div className="mt-8">
             <DealStory />
@@ -130,9 +140,12 @@ export default function Home() {
       <section id="offer" className="lp-section scroll-mt-16" style={{ background: "var(--tint)" }} aria-labelledby="offer-title">
         <div className="lp-wrap">
           <div data-reveal>
-            <h2 id="offer-title" className="lp-h2">Got an offer? Paste it.</h2>
             <p className="lp-kn-line kn" lang="kn">ಆಫರ್ ಅನ್ನು ಇಲ್ಲಿ ಹಾಕಿ, ಏನು ಕಾಣೆಯಾಗಿದೆ ನೋಡಿ</p>
-            <p className="lp-lead mt-6">Most offers reach creators on WhatsApp or in DMs, and most leave out the fee, the date or how your video will be used. Try one.</p>
+            <h2 id="offer-title" className="lp-h2">Got an offer? Try it here.</h2>
+            <p className="lp-lead mt-6">
+              Most offers reach creators on WhatsApp or in DMs, and many ask for a &quot;registration fee&quot; or leave out the fee, the date or how your video will be used. Paste one below. In the app you can
+              also forward it on WhatsApp or email, or upload a screenshot, and Mitra checks who sent it too.
+            </p>
           </div>
           <div data-reveal>
             <OfferChecker />
@@ -144,8 +157,8 @@ export default function Home() {
       <section className="lp-section" aria-labelledby="kit-title">
         <div className="lp-wrap lp-two">
           <div data-reveal>
-            <h2 id="kit-title" className="lp-h2">A media kit with honest numbers.</h2>
             <p className="lp-kn-line kn" lang="kn">ಪ್ರಾಮಾಣಿಕ ಸಂಖ್ಯೆಗಳ ಮೀಡಿಯಾ ಕಿಟ್</p>
+            <h2 id="kit-title" className="lp-h2">A media kit with honest numbers.</h2>
             <ul className="lp-ticks">
               {[
                 "One page for every platform you post on, ready to send to any brand.",
@@ -204,54 +217,49 @@ export default function Home() {
         <div className="lp-wrap">
           <div data-reveal className="lp-two" style={{ alignItems: "end" }}>
             <div>
-              <h2 id="biz-title" className="lp-h2">From a goal to customers at your door.</h2>
-              <p className="lp-kn-line kn" lang="kn">ಗುರಿಯಿಂದ ನಿಮ್ಮ ಅಂಗಡಿಗೆ ಬರುವ ಗ್ರಾಹಕರವರೆಗೆ</p>
+              <p className="lp-kn-line kn" lang="kn">ಪ್ರತಿ ಕ್ರಿಯೇಟರ್ ಪೋಸ್ಟ್‌ನಿಂದ ಎಷ್ಟು ಗ್ರಾಹಕರು ಬಂದರು</p>
+              <h2 id="biz-title" className="lp-h2">Count the customers, not the likes.</h2>
             </div>
             <p className="lp-lead">
-              For cafés, salons, gyms and shops. You don&apos;t need to know any influencers. Say what you want and what you can spend. Mitra suggests creators whose audience lives near you, and every post gets its own code
-              so you can count what it brought in.
+              For cafés, salons, gyms and shops that already work with creators, paid or for a free meal. Mitra gives every post a coupon your customers show at the counter, so you finally know which creator
+              brings people in, and what each one costs you.
             </p>
           </div>
           <div className="lp-flow">
             <div data-reveal>
-              <h3>Your brief</h3>
-              <p className="lp-sub3">Three answers, two minutes.</p>
+              <h3>1 · Track a post</h3>
+              <p className="lp-sub3">Any creator, paid or barter. Thirty seconds.</p>
               <div className="lp-flow__body">
-                <div className="lp-field"><span>Goal</span><b className="font-semibold">Weekday lunch orders</b></div>
-                <div className="lp-field"><span>Budget</span><b className="font-semibold">₹15,000</b></div>
-                <div className="lp-field"><span>Area</span><b className="font-semibold">Jayanagar · 3 km</b></div>
+                <div className="lp-field"><span>Creator</span><b className="font-semibold">Sita · @sita.eats</b></div>
+                <div className="lp-field"><span>Deal</span><b className="font-semibold">₹3,000 + ₹30 a customer</b></div>
+                <div className="lp-field"><span>Customers get</span><b className="font-semibold">10% off the bill</b></div>
               </div>
             </div>
             <div data-reveal style={{ ["--i" as string]: 1 }}>
-              <h3>Matched creators</h3>
-              <p className="lp-sub3">A few that fit, with the reason for each.</p>
+              <h3>2 · Customers show the coupon</h3>
+              <p className="lp-sub3">From the creator&apos;s link, on their phone.</p>
               <div className="lp-flow__body">
-                {[
-                  ["SR", "Food · Kannada · Verified"],
-                  ["AK", "Lifestyle · Kannada + English"],
-                  ["MN", "Food · Kannada · lives 1 km away"],
-                ].map(([i, t]) => (
-                  <div key={i} className="lp-match">
-                    <span className="lp-av">{i}</span>
-                    <span>{t}</span>
-                  </div>
-                ))}
+                <div className="lp-field" style={{ display: "block", padding: 18, textAlign: "center" }}>
+                  <span className="block text-[14px]" style={{ color: "var(--ink-2)" }}>10% off your bill</span>
+                  <span className="mt-1 block font-semibold" style={{ color: "var(--ink)", letterSpacing: "0.04em", fontSize: "clamp(28px, 3vw, 40px)", whiteSpace: "nowrap" }}>RUCHI-SR</span>
+                  <span className="mt-1 block text-[13px]" style={{ color: "var(--ink-2)" }}>Staff: enter PIN to redeem</span>
+                </div>
               </div>
             </div>
             <div data-reveal style={{ ["--i" as string]: 2 }}>
-              <h3>Results</h3>
-              <p className="lp-sub3">Counted at your counter, not guessed.</p>
+              <h3>3 · You see who brought whom</h3>
+              <p className="lp-sub3">Paid and barter side by side.</p>
               <div className="lp-flow__body">
                 <div className="lp-field" style={{ display: "block", padding: 18 }}>
-                  <span className="lp-big block" style={{ color: "var(--ink)" }}>38</span>
-                  <span className="mt-2 block" style={{ color: "var(--ink-2)" }}>customers used code DOSA10</span>
+                  <span className="lp-big block" style={{ color: "var(--ink)" }}>27</span>
+                  <span className="mt-2 block" style={{ color: "var(--ink-2)" }}>customers used RUCHI-SR</span>
                 </div>
-                <div className="lp-field"><span>Cost per customer</span><b className="font-semibold">₹158</b></div>
+                <div className="lp-field"><span>Cost per customer</span><b className="font-semibold">₹141</b></div>
               </div>
             </div>
           </div>
           <p className="mt-8 text-[14px]" style={{ color: "var(--ink-3)" }}>
-            Example campaign: ₹6,000 spent, 38 customers. Free for businesses during the Bengaluru pilot.
+            Example: ₹3,000 + ₹30 × 27 customers = ₹3,810, or ₹141 a customer. When you want new creators, Mitra suggests ones whose audience lives near you. Free during the Bengaluru pilot.
           </p>
         </div>
       </section>
@@ -260,14 +268,14 @@ export default function Home() {
       <section className="lp-section" aria-labelledby="rules-title">
         <div className="lp-wrap">
           <div data-reveal>
-            <h2 id="rules-title" className="lp-h2">Three promises.</h2>
             <p className="lp-kn-line kn" lang="kn">ನಮ್ಮ ಮೂರು ಭರವಸೆಗಳು</p>
+            <h2 id="rules-title" className="lp-h2">Three promises.</h2>
           </div>
           <div className="lp-rules">
             {[
               ["Free for creators.", "No joining fee, no yearly plan, and Mitra takes no cut: your fee and every customer bonus are yours."],
-              ["Your accounts stay yours.", "Join without connecting anything. If you connect later, it's read-only: Mitra can never post for you."],
-              ["Kannada and English, Bengaluru first.", "One city and two languages, done properly, before we go anywhere else."],
+              ["Counted, never guessed.", "A customer is counted only when they show the coupon at your counter. You can check every day against your bill book."],
+              ["ಕನ್ನಡ first, then English.", "Bengaluru first, one neighbourhood at a time, with support in Kannada from day one."],
             ].map(([t, b], i) => (
               <div key={t} data-reveal style={{ ["--i" as string]: i }}>
                 <h3>{t}</h3>
@@ -278,12 +286,54 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ---- Who we are ---- */}
+      <section id="team" className="lp-section scroll-mt-16" style={{ paddingTop: 0 }} aria-labelledby="team-title">
+        <div className="lp-wrap lp-two" style={{ alignItems: "start" }}>
+          <div data-reveal>
+            <p className="lp-kn-line kn" lang="kn">ಮಿತ್ರದ ಹಿಂದೆ ಯಾರು</p>
+            <h2 id="team-title" className="lp-h2">Who&apos;s behind Mitra.</h2>
+            <p className="lp-lead mt-6">
+              A small team building for Bengaluru&apos;s creators and the shops they post about. Write to us in Kannada or English; a person answers.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {SUPPORT_WHATSAPP && (
+                <a href={`https://wa.me/${SUPPORT_WHATSAPP}`} className="lp-btn" target="_blank" rel="noopener noreferrer">
+                  WhatsApp us
+                </a>
+              )}
+              <a href={`mailto:${COMPANY.supportEmail}`} className={SUPPORT_WHATSAPP ? "lp-btn lp-btn--ghost" : "lp-btn"}>
+                {COMPANY.supportEmail}
+              </a>
+            </div>
+          </div>
+          <div className="grid gap-3" data-reveal>
+            {TEAM.map((p) => (
+              <div key={p.name} className="lp-card flex items-start gap-4 p-5">
+                <span className="lp-av" style={{ width: 48, height: 48 }}>
+                  {p.name
+                    .split(/\s+/)
+                    .map((w) => w[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-[17px] font-semibold">{p.name}</span>
+                  <span className="lp-label block">{p.role}</span>
+                  <span className="mt-1 block text-[15px]" style={{ color: "var(--ink-2)" }}>{p.line}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ---- FAQ ---- */}
       <section className="lp-section" style={{ paddingTop: 0 }} aria-labelledby="faq-title">
         <div className="lp-wrap lp-faq">
           <div className="lp-faq__head">
-            <h2 id="faq-title" className="lp-h2">Questions.</h2>
             <p className="lp-kn-line kn" lang="kn">ಪ್ರಶ್ನೆಗಳು</p>
+            <h2 id="faq-title" className="lp-h2">Questions.</h2>
           </div>
           <div>
             {FAQ.map(([q, a]) => (
@@ -303,8 +353,8 @@ export default function Home() {
       <section id="join" className="lp-section scroll-mt-16" style={{ background: "var(--tint)" }} aria-labelledby="join-title">
         <div className="lp-wrap lp-join">
           <div data-reveal>
-            <h2 id="join-title" className="lp-h2">Be first in your area.</h2>
             <p className="lp-kn-line kn" lang="kn">ನಿಮ್ಮ ಏರಿಯಾದಲ್ಲಿ ಮೊದಲಿಗರಾಗಿ</p>
+            <h2 id="join-title" className="lp-h2">Be first in your area.</h2>
             <p className="lp-lead mt-6">
               The pilot starts with a small group of creators and local businesses in Bengaluru, so every deal gets real attention. Tell us who you are and where; we&apos;ll write when
               your area opens.

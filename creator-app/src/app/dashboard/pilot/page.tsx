@@ -13,7 +13,7 @@ function Num({ label, value, target, note, ok }: { label: string; value: string;
       <p className="text-xs uppercase tracking-wider text-muted">{label}</p>
       <p className="mt-2 font-display text-2xl tabular-nums">{value}</p>
       <p className="mt-1 text-sm text-muted">{note}</p>
-      <p className={`mt-3 text-xs ${ok ? "font-semibold text-ink" : "text-muted"}`}>
+      <p className={`mt-3 text-xs ${ok ? "font-semibold text-good" : "text-muted"}`}>
         {ok ? "✓ " : ""}Target by 16 Dec: {target}
       </p>
     </Card>
@@ -77,14 +77,14 @@ export default function PilotPage() {
             <Num
               label="3 · Businesses paying"
               value={String(n.paying.value)}
-              note={`${n.paying.onPlans} on a plan (MRR ${inr(n.paying.mrrInr)}), ${n.paying.paidDeals} paid Mitra deals · ${n.paying.wouldPay} said they'd pay (${inr(n.paying.wouldPayMrrInr)}/month)`}
+              note={`on a paid plan · MRR ${inr(n.paying.mrrInr)} · ${n.paying.wouldPay} said they'd pay (${inr(n.paying.wouldPayMrrInr)}/month) · ${n.paying.paidDeals} Mitra deals paid to creators`}
               target="5–10 paying, any price"
               ok={n.paying.value >= 5}
             />
             <Num
               label="4 · Repeat rate"
               value={n.repeat.rate == null ? "–" : `${n.repeat.rate}%`}
-              note={n.repeat.of ? `${n.repeat.repeated} of ${n.repeat.of} ran a 2nd post within 30 days` : "no business is 30 days in yet"}
+              note={n.repeat.of ? `${n.repeat.repeated} of ${n.repeat.of} ran a 2nd post 1–30 days after their first` : "no business is 30 days in yet"}
               target={`≥${n.repeat.target}%`}
               ok={n.repeat.rate != null && n.repeat.rate >= n.repeat.target}
             />
