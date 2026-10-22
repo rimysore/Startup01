@@ -87,6 +87,8 @@ html:has(.lp) { scroll-behavior: smooth; }
 .lp-nav__in { display: flex; align-items: center; gap: 28px; height: 72px; }
 .lp-nav__links { margin-left: auto; display: flex; align-items: center; gap: 26px; font-size: 15px; font-weight: 500; color: var(--ink-2); }
 .lp-nav__links a:hover { color: var(--ink); }
+.lp-nav__links a { white-space: nowrap; }
+@media (max-width: 480px) { .lp-nav__links { gap: 16px; } .lp-nav__beta { display: none; } }
 @media (max-width: 860px) { .lp-nav__links .lp-hide-sm { display: none; } }
 
 /* Audience switch */
@@ -302,3 +304,6 @@ html:has(.lp) { scroll-behavior: smooth; }
 .lp-door h3 { font-family: var(--font-display-face), sans-serif; font-size: clamp(26px, 3vw, 34px); font-weight: 600; letter-spacing: -0.03em; }
 .lp-door p { color: var(--ink-2); font-size: 17px; max-width: 46ch; }
 .lp-door__go { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; font-weight: 600; }
+
+/* The beta mark: neutral, the logo stays the only colour */
+.lp-beta { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border: 1px solid var(--rule); border-radius: 999px; font-size: 11.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--ink-2); vertical-align: middle; }

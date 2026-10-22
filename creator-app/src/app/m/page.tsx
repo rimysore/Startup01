@@ -310,7 +310,7 @@ export default async function MarketHome() {
             <section className="lp-card mk-panel">
               <h2 className="mk-h2">{s.home.verifyTitle}</h2>
               <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.home.verifySub}</p>
-              <Link href={yt ? "/m/kit#verify" : "/api/auth/youtube/start?next=/m/kit%23verify"} className="lp-btn lp-btn--ghost mt-5" style={{ minHeight: 44 }}>
+              <Link href={yt ? "/m/kit#verify" : "/api/auth/youtube/start?only=count&next=/m/kit%3Fverify%3D1%23verify"} className="lp-btn lp-btn--ghost mt-5" style={{ minHeight: 44 }}>
                 {yt ? s.kit.verifyYt : s.home.verifyGo}
               </Link>
             </section>

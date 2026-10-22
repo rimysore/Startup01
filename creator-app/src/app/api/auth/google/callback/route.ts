@@ -3,6 +3,7 @@ import { currentUser, startSession, upsertUser } from "@/lib/auth";
 import { BETA } from "@/lib/beta";
 import { recordEvent } from "@/lib/beta-events";
 import { claimFounderSpot } from "@/lib/founders";
+import { MARKETPLACE } from "@/lib/marketplace/flag";
 import { finishOAuth } from "@/lib/oauth-state";
 import { exchangeCode, fetchSummary, googleProfile, saveYouTubeConnection } from "@/lib/youtube";
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
   const fail = (path: string, error: string) => NextResponse.redirect(new URL(`${path}?error=${error}`, origin));
 
   if (!intent) return fail("/login", "state");
-  const failPath = intent.intent === "login" ? "/login" : intent.next.startsWith("/m") ? "/m/kit" : "/dashboard/connections";
+  const failPath = intent.intent === "login" ? "/login" : intent.next.startsWith("/m") || MARKETPLACE ? "/m/kit" : "/dashboard/connections";
   const code = searchParams.get("code");
   if (searchParams.get("error") || !code) return fail(failPath, "denied");
 

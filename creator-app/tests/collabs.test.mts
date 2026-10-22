@@ -58,4 +58,13 @@ const fits = await c.creatorsFor("cafe");
 assert(fits.length === 1 && fits[0].userId === "sita", "only opted-in creators who fit (area or niche) are suggested");
 assert((await c.creatorsFor("gym")).some((x) => x.userId === "far") === true, "same area counts on its own");
 assert((await c.creatorsFor("nobody")).length === 0, "no business profile, no list");
+// Admin members list.
+await c.setBusinessInterest("sita", "cafe", true);
+const { adminMembers } = await import("@/lib/marketplace/members-admin");
+const all = await adminMembers();
+const sitaRow = all.find((x) => x.userId === "sita")!;
+const cafeRow = all.find((x) => x.userId === "cafe")!;
+assert(all.length === 7 && sitaRow.role === "creator" && sitaRow.email === "sita@x.com" && sitaRow.area === "Jayanagar" && sitaRow.what === "food, lifestyle", "admins see every member with their profile");
+assert(sitaRow.handles.some((h) => h.platform === "instagram" && h.verified) && sitaRow.counts.businessInterests === 1, "with verified accounts and what they used");
+assert(cafeRow.listed === true && cafeRow.plan === "free" && cafeRow.counts.creatorsInterested === 1 && all.find((x) => x.userId === "brand")!.counts.briefs === 1, "businesses show listing, plan and usage");
 console.log("all collabs tests passed");

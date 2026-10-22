@@ -3,21 +3,20 @@
 import { useEffect } from "react";
 import { MARKETPLACE } from "@/lib/marketplace/flag";
 import { setAudience, useAudience, type Audience } from "./audience";
-import { OfferStack } from "./OfferStack";
 
 // Kannada lines are a first draft: a native speaker checks them before launch. Kannada leads, English follows.
 const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string; cta: string; href: string }> = {
   creator: {
-    title: ["Forward any offer.", "Know if it's real."],
-    kn: "ಯಾವುದೇ ಕೊಲಾಬ್ ಆಫರ್ ಬಂದರೆ ಮಿತ್ರಗೆ ಫಾರ್ವರ್ಡ್ ಮಾಡಿ. ಅದು ನಿಜವೋ ಮೋಸವೋ ನಾವು ಹೇಳುತ್ತೇವೆ.",
-    sub: "Send a DM screenshot, an email or a WhatsApp message to Mitra. It flags registration-fee scams, fake brands and missing terms, and drafts your reply. Free forever, and you keep 100% of what you earn.",
+    title: ["Find your collabs", "in one go."],
+    kn: "ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ಗೆ ಹೊಂದುವ ಕೊಲಾಬ್‌ಗಳು ಒಂದೇ ಕಡೆ. ಆಯ್ಕೆ ಮಾಡಿ, ಗಳಿಸಿ.",
+    sub: "Make one profile with your area, your content and your numbers. Mitra shows every brand, affiliate program and local business that fits you, with why it fits, and you say you're interested in one tap. Free for creators, and you keep 100% of what you earn.",
     cta: "Join the pilot, free",
     href: "#join",
   },
   business: {
-    title: ["See the customers", "each creator brings."],
-    kn: "ಪ್ರತಿ ಕ್ರಿಯೇಟರ್ ಪೋಸ್ಟ್‌ನಿಂದ ಎಷ್ಟು ಗ್ರಾಹಕರು ಬಂದರು ಅಂತ ನೋಡಿ.",
-    sub: "Every creator post gets a coupon. Customers show it at your counter, your staff tap redeem, and you see customers and cost per customer for each creator, paid or barter. Free.",
+    title: ["Creators who fit you.", "Customers you can count."],
+    kn: "ನಿಮ್ಮ ಬಿಸಿನೆಸ್‌ಗೆ ಹೊಂದುವ ಕ್ರಿಯೇಟರ್‌ಗಳನ್ನು ಹುಡುಕಿ. ಪ್ರತಿ ಪೋಸ್ಟ್‌ನಿಂದ ಎಷ್ಟು ಗ್ರಾಹಕರು ಬಂದರು ನೋಡಿ.",
+    sub: "Add your business once and local creators who fit your area and category find you, and you see the ones matched to you. Every post gets a coupon counted at your counter, so you know the customers and cost per customer for each creator, paid or barter.",
     cta: "Sign up your business, free",
     href: "/m/start?role=business",
   },
@@ -73,12 +72,13 @@ export function HeroCopy() {
         <a href={a === "business" && !MARKETPLACE ? "#join" : c.href} className="lp-btn">
           {c.cta} <Arrow />
         </a>
-        <a href={a === "creator" ? "#offer" : "#business"} className="lp-btn lp-btn--ghost">
-          {a === "creator" ? "Try the offer check" : "See how counting works"}
+        <a href={a === "creator" ? "#collabs" : "#business"} className="lp-btn lp-btn--ghost">
+          {a === "creator" ? "See how matching works" : "See how counting works"}
         </a>
       </div>
       <p className="lp-hero__note lp-fade-in" style={{ ["--l" as string]: 4 }}>
-        {a === "creator" ? "Free forever · No account access needed · ಕನ್ನಡ and English" : "Free during the Bengaluru pilot · Paid or barter · ಕನ್ನಡ and English"}
+        <span className="lp-beta">Beta</span>{" "}
+        {a === "creator" ? "Free for creators · Verify YouTube and Instagram, read-only · ಕನ್ನಡ and English" : "Free during the Bengaluru pilot · Paid or barter · ಕನ್ನಡ and English"}
       </p>
     </>
   );
@@ -134,7 +134,37 @@ export function HeroArt() {
     );
   return (
     <div className="lp-hero__art lp-fade-in" style={{ ["--l" as string]: 2 }}>
-      <OfferStack />
+      <div className="lp-card p-6">
+        <div className="flex items-center justify-between">
+          <p className="text-[15px] font-semibold">Collabs for you</p>
+          <span className="lp-label">Example</span>
+        </div>
+        <p className="mt-1 text-[13.5px]" style={{ color: "var(--ink-2)" }}>
+          Food creator · Jayanagar · 18K on Instagram, verified
+        </p>
+        <div className="mt-4 grid gap-2">
+          {[
+            ["DC", "Darshini Corner", "In Jayanagar, your area · Fits your food content", "Looking for creators now"],
+            ["FS", "FitStop Gym", "In Basavanagudi · 2 open briefs", "₹2,500 + ₹30 per customer"],
+            ["AP", "An affiliate program", "Commission on every sale", "Open to all creators"],
+          ].map(([i, who, why, tag]) => (
+            <div key={i} className="lp-match" style={{ background: "var(--tint)" }}>
+              <span className="lp-av" style={{ background: "var(--card)" }}>{i}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">{who}</span>
+                <span className="block text-[13.5px]" style={{ color: "var(--ink-2)" }}>{why}</span>
+                <span className="block text-[12.5px]" style={{ color: "var(--ink-3)" }}>{tag}</span>
+              </span>
+              <span className="lp-btn lp-btn--ghost" style={{ minHeight: 34, padding: "0 12px", fontSize: 13 }}>
+                Interested
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 text-[13px]" style={{ color: "var(--ink-3)" }}>
+          New businesses appear here as soon as they join.
+        </p>
+      </div>
     </div>
   );
 }

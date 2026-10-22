@@ -9,12 +9,13 @@ import { MARKETPLACE } from "@/lib/marketplace/flag";
 
 /** A same-site path to go to after sign-in; anything that could leave the site ("//x", "/\\x", tabs) goes to the dashboard. */
 function sameSite(next: string | null): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) return "/dashboard";
+  const home = MARKETPLACE ? "/m" : "/dashboard";
+  if (!next || !next.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) return home;
   try {
     const u = new URL(next, "https://mitra.invalid");
-    return u.origin === "https://mitra.invalid" ? `${u.pathname}${u.search}${u.hash}` : "/dashboard";
+    return u.origin === "https://mitra.invalid" ? `${u.pathname}${u.search}${u.hash}` : home;
   } catch {
-    return "/dashboard";
+    return home;
   }
 }
 
@@ -144,12 +145,14 @@ export default function LoginPage() {
           <p className="mt-8 text-xs text-muted">
             By continuing you agree to our{" "}
             <Link href="/terms" className="underline underline-offset-2">Terms</Link> and{" "}
-            <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>. Mitra only reads your YouTube data
-            when you connect it, and never posts for you.
+            <Link href="/privacy" className="underline underline-offset-2">Privacy Policy</Link>. Mitra only reads public numbers from
+            accounts you choose to connect, and never posts for you.
           </p>
-          <Link href="/dashboard" className="mt-4 text-sm font-semibold text-accent">
-            ← Keep exploring the demo
-          </Link>
+          {!MARKETPLACE && (
+            <Link href="/dashboard" className="mt-4 text-sm font-semibold text-accent">
+              ← Keep exploring the demo
+            </Link>
+          )}
         </div>
       </div>
       <div className="relative hidden overflow-hidden bg-ink text-bg lg:block">
