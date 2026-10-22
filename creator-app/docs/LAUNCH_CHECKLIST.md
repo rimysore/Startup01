@@ -59,8 +59,8 @@ YouTube analytics product is kept on the `analytics-dashboard` branch (a copy of
      ones are simply left out.
    - Only professional (creator or business) Instagram accounts can connect; personal accounts are told to switch
      (free, in Instagram settings).
-4. **Database:** migrations 0012-0018 run automatically on deploy (`npm run db:migrate` in the Vercel build). All are
-   additive. 0017 seeds the 10 open programs; 0018 adds verified stats, Instagram connections and business listing.
+4. **Database:** migrations 0012-0019 run automatically on deploy (`npm run db:migrate` in the Vercel build). All are
+   additive. 0017 seeds the open programs; 0018 adds verified stats, Instagram connections and business listing; 0019 hides the YouTube programme and adds Wishlink (Instagram).
 5. **Content**
    - Add the co-founder to `TEAM` in `src/lib/company.ts`.
    - A native Kannada speaker checks `src/lib/marketplace/i18n.ts`, the landing page and the coupon page.
