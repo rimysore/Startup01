@@ -43,3 +43,26 @@ The creators' top "flip" is the thing idea 1 creates. Businesses paying ₹999 o
 3. **Kannada quality:** a native-speaker review of the first weeks of AI captions. Several buyers said "if it looks generic, I'll STOP".
 4. **Sell where the yes is.** In this panel, barter veterans and businesses that had been burned by influencers said yes most; word-of-mouth-only owners passed. Target owners who already give creators free meals.
 5. **Payment reminders only after the creator approves each one,** never sent automatically from their account.
+
+## Competitors (competitors.md, sources read 22 Oct 2026)
+- **₹999 AI posting has no gap.**
+  - Manva.ai: ₹199–1,999/mo. Kannada captions start on its ₹999 plan, and owners approve posts on WhatsApp.
+  - ZocialOne: ₹1,999/mo for AI posts plus comment and DM replies.
+  - Meta's Business Agent on WhatsApp: free replies and lead capture in Indian languages. It is still rolling out.
+  - Bengaluru agencies: ₹3,999–12,000/mo, usually with a minimum of 2–3 months.
+- **The gap is creator campaigns done for the owner,** with results the owner can check. Under ₹20k, nobody does this over WhatsApp. Petpooja bundles influencers for ₹20–40k, and only for restaurants. The gap sits on Mitra's existing creator marketplace.
+- **The talent manager has a small gap.** Socialji's AI talent manager is free. Influish takes 0% commission and has a rate tool and invoices. Fees on closed deals are hard to collect because deals close outside the platform.
+- **No rule blocks either idea.**
+  - ASCI requires AI-generated influencers to be labelled and bans made-up testimonials. Barter posts still need #ad.
+  - Posting to a business's Instagram needs `instagram_business_content_publish` and Meta App Review.
+  - WhatsApp marketing messages cost about ₹1.09 each, so keep reports and approvals as utility or service messages.
+  - Meta's own agent excludes health businesses.
+
+## Revised recommendation
+- **Lead with the moat, not the commodity.** Sell "Bengaluru creators for your business, run for you, results on WhatsApp." The AI posting and replies are included, not the headline. Competing on ₹999 AI captions alone means competing with Meta for free.
+- **Price the campaign by results so the panel's "creators burned me" fear is covered.** The ₹2,499 bundle was refused, so drop it.
+  - The AI manager costs ₹999/mo, first month free.
+  - A creator campaign costs a flat fee per campaign, for example ₹999. The owner pays only once the creator's post is live and the report shows its enquiries.
+  - The creator is paid by the business. Mitra takes no cut from the creator.
+- **Talent manager:** free for creators, with paste-to-check (no Instagram connection needed). It is how creators find the paid campaigns.
+- **CFO before and after:** this keeps ₹999/mo as the base, so the +₹72k estimate for year 1 stands. Campaign fees are extra and not yet modelled.
