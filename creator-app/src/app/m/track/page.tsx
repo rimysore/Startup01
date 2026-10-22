@@ -27,6 +27,11 @@ export default async function TrackPage() {
             <p className="mk-sub">{s.track.sub}</p>
           </div>
           <div className="flex flex-wrap gap-2">
+            {posts.length > 0 && (
+              <a href="/api/m/track/export" className="lp-btn lp-btn--ghost" download>
+                {s.track.export}
+              </a>
+            )}
             <Link href="/m/track/counter" className="lp-btn lp-btn--ghost">
               {s.track.counter}
             </Link>

@@ -42,6 +42,7 @@ function Icon({ d }: { d: string }) {
 }
 
 const ADMIN_NAV = [
+  { href: "/dashboard/pilot", label: "Pilot numbers", hint: "The five numbers investors ask for, and the bill check", icon: "M4 19V9M10 19V5M16 19v-7M22 19H2" },
   { href: "/dashboard/beta", label: "Beta metrics", hint: "Sources, retention, repeat use, language, results", icon: "M3 3v18h18M7 14l3-3 3 3 5-6" },
   { href: "/dashboard/users", label: "Users", hint: "Who signed up and what they used", icon: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8" },
   { href: "/dashboard/admin", label: "AI costs", hint: "Spend, calls and errors by feature", icon: "M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" },
