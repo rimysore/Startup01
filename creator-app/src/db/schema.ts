@@ -401,10 +401,36 @@ export const creatorHandles = pgTable(
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     /** How it was verified, e.g. "youtube_connection". */
     verifiedBy: text("verified_by"),
+    /** Public profile numbers read when verifying: posts, total views, recent posts with their counts. */
+    stats: jsonb("stats").$type<HandleStats>(),
+    avatarUrl: text("avatar_url"),
+    profileUrl: text("profile_url"),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("creator_handles_user_platform").on(t.userId, t.platform)],
 );
+
+export type HandleStats = {
+  posts: number | null;
+  totalViews?: number | null;
+  following?: number | null;
+  /** Average engagement (likes + comments) per recent post. */
+  avgEngagement?: number | null;
+  recent: { id: string; title: string; url: string | null; at: string; views?: number | null; likes?: number | null; comments?: number | null; kind?: string | null }[];
+};
+
+/** A creator's Instagram professional account, connected read-only (Instagram API with Instagram Login). */
+export const instagramConnections = pgTable("instagram_connections", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  igUserId: text("ig_user_id").notNull(),
+  username: text("username").notNull(),
+  /** Long-lived token, AES-256-GCM encrypted with SESSION_SECRET. */
+  accessToken: text("access_token").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
 
 /** A local business (or brand/agency) profile: what it is, where, and what it can spend. */
 export const businessProfiles = pgTable("business_profiles", {
@@ -421,6 +447,8 @@ export const businessProfiles = pgTable("business_profiles", {
   instagram: text("instagram"),
   /** Shared with a creator only after they accept an invite. */
   whatsapp: text("whatsapp"),
+  /** Shown to creators on Mitra (name, category, area, website/Instagram; never the budget or contacts). */
+  listed: boolean("listed").notNull().default(true),
   /** Hash of the counter PIN staff type to redeem a customer's coupon (never stored in clear). */
   counterPinHash: text("counter_pin_hash"),
   /** free | local | growth (billing starts after the pilot; see docs/BUSINESS_MODEL.md). */
@@ -742,4 +770,19 @@ export const programInterests = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.programId] })],
+);
+
+/** A creator saying "I'm interested" in a listed business: the business sees it with the creator's public kit. */
+export const businessInterests = pgTable(
+  "business_interests",
+  {
+    creatorUserId: text("creator_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    businessUserId: text("business_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.creatorUserId, t.businessUserId] }), index("business_interests_business").on(t.businessUserId, t.createdAt)],
 );

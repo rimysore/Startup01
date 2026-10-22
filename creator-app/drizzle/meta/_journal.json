@@ -127,6 +127,13 @@
       "when": 1792634028206,
       "tag": "0017_programs",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792636003912,
+      "tag": "0018_social_listings",
+      "breakpoints": true
     }
   ]
 }

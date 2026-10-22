@@ -5,7 +5,8 @@ import { DELIVERABLES, NICHES, PLATFORM_LABEL, PLATFORMS, type Deliverable } fro
 import type { Strings } from "@/lib/marketplace/i18n";
 import { send } from "./client";
 
-type Handle = { platform: string; handle: string; followers: number | null; avgViews: number | null; verifiedAt: string | null };
+type Stats = { posts: number | null; totalViews?: number | null; avgEngagement?: number | null; recent: { id: string; title: string; url: string | null; at: string; views?: number | null; likes?: number | null; comments?: number | null }[] };
+type Handle = { platform: string; handle: string; followers: number | null; avgViews: number | null; verifiedAt: string | null; stats?: Stats | null; profileUrl?: string | null };
 type Initial = {
   displayName: string;
   bio: string;
@@ -25,7 +26,21 @@ type Range = { low: number; high: number; n: number } | null;
 const num = (v: string) => (v.trim() === "" ? null : Math.max(0, Math.round(Number(v.replace(/[^\d.]/g, "")) || 0)));
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
-export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings; initial: Initial; youtubeConnected: boolean; ranges: Record<string, Range> }) {
+const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$/, "")}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1).replace(/\.0$/, "")}K` : String(n));
+
+export function KitEditor({
+  s,
+  initial,
+  youtubeConnected,
+  instagram,
+  ranges,
+}: {
+  s: Strings;
+  initial: Initial;
+  youtubeConnected: boolean;
+  instagram: { configured: boolean; connected: boolean; message: string | null };
+  ranges: Record<string, Range>;
+}) {
   const [f, setF] = useState(initial);
   const [handles, setHandles] = useState<Record<string, Handle>>(() =>
     Object.fromEntries(PLATFORMS.map((p) => [p, initial.handles.find((h) => h.platform === p) ?? { platform: p, handle: "", followers: null, avgViews: null, verifiedAt: null }])),
@@ -72,6 +87,21 @@ export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings
     if (r.error) return setMsg({ ok: false, text: r.error });
     setHandle("youtube", { handle: String(r.json?.handle ?? ""), followers: Number(r.json?.followers ?? 0), verifiedAt: String(r.json?.verifiedAt ?? new Date().toISOString()) });
     setMsg({ ok: true, text: s.common.verified });
+  }
+
+  async function refreshInstagram() {
+    setVerifying(true);
+    setMsg(null);
+    const r = await send("/api/m/kit/instagram", "POST");
+    setVerifying(false);
+    if (r.error) return setMsg({ ok: false, text: r.error });
+    location.reload();
+  }
+
+  async function disconnectInstagram() {
+    setVerifying(true);
+    await send("/api/m/kit/instagram", "DELETE");
+    location.reload();
   }
 
   // Back from Google with ?verify=1: verify straight away, once.
@@ -149,16 +179,97 @@ export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings
             </div>
           );
         })}
-        <div className="mt-2 flex flex-wrap items-center gap-3">
-          {youtubeConnected ? (
-            <button type="button" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }} onClick={verify} disabled={verifying}>
-              {verifying ? s.common.saving : s.kit.verifyYt}
-            </button>
-          ) : (
-            <a href="/api/auth/youtube/start?only=count&next=/m/kit%3Fverify%3D1%23verify" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
-              {s.kit.connectYt}
-            </a>
+        <div className="mk-verify">
+          <h3 className="text-[16px] font-semibold">{s.kit.verifyTitle}</h3>
+          <p className="lp-label">{s.kit.verifySub}</p>
+          {instagram.message && (
+            <p className={instagram.message === "ok" ? "mk-ok" : "mk-err"} role="status">
+              {s.kit.igMsg[instagram.message] ?? s.kit.igMsg.failed}
+            </p>
           )}
+          <div className="flex flex-wrap items-center gap-2">
+            {youtubeConnected ? (
+              <button type="button" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }} onClick={verify} disabled={verifying}>
+                {verifying ? s.common.saving : handles.youtube.verifiedAt ? s.kit.refreshYt : s.kit.verifyYt}
+              </button>
+            ) : (
+              <a href="/api/auth/youtube/start?only=count&next=/m/kit%3Fverify%3D1%23verify" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
+                {s.kit.connectYt}
+              </a>
+            )}
+            {instagram.configured ? (
+              instagram.connected ? (
+                <>
+                  <button type="button" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }} onClick={refreshInstagram} disabled={verifying}>
+                    {s.kit.refreshIg}
+                  </button>
+                  <button type="button" className="lp-link text-[14px]" style={{ color: "var(--ink-2)" }} onClick={disconnectInstagram} disabled={verifying}>
+                    {s.kit.disconnectIg}
+                  </button>
+                </>
+              ) : (
+                <a href="/api/auth/instagram/start" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
+                  {s.kit.connectIg}
+                </a>
+              )
+            ) : (
+              <span className="lp-label">{s.kit.igSoon}</span>
+            )}
+          </div>
+          {instagram.configured && !instagram.connected && <p className="lp-label">{s.kit.igHint}</p>}
+          <p className="lp-label">{s.kit.otherSelf}</p>
+          {(["youtube", "instagram"] as const)
+            .filter((p) => handles[p].verifiedAt && handles[p].stats)
+            .map((p) => {
+              const h = handles[p];
+              const st = h.stats!;
+              return (
+                <div key={p} className="mk-stats">
+                  <p className="font-semibold">
+                    {PLATFORM_LABEL[p]} ·{" "}
+                    {h.profileUrl ? (
+                      <a href={h.profileUrl} target="_blank" rel="noopener noreferrer" className="lp-link underline">
+                        {h.handle}
+                      </a>
+                    ) : (
+                      h.handle
+                    )}{" "}
+                    <span className="lp-chip lp-chip--ok">{s.common.verified}</span>
+                  </p>
+                  <p className="mt-1 text-[14px] tabular-nums" style={{ color: "var(--ink-2)" }}>
+                    {[
+                      h.followers != null ? `${compact(h.followers)} ${s.kit.followers.toLowerCase()}` : null,
+                      st.posts != null ? `${compact(st.posts)} ${s.kit.statPosts}` : null,
+                      h.avgViews != null ? `${compact(h.avgViews)} ${s.kit.statAvgViews}` : null,
+                      st.avgEngagement != null ? `${compact(st.avgEngagement)} ${s.kit.statEngagement}` : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                  {st.recent.length > 0 && (
+                    <details className="mt-2">
+                      <summary className="cursor-pointer text-[14px] font-semibold">{s.kit.statRecent}</summary>
+                      <ul className="mt-2 grid gap-1.5 text-[14px]">
+                        {st.recent.map((r) => (
+                          <li key={r.id} className="flex justify-between gap-3">
+                            {r.url ? (
+                              <a href={r.url} target="_blank" rel="noopener noreferrer" className="lp-link truncate">
+                                {r.title}
+                              </a>
+                            ) : (
+                              <span className="truncate">{r.title}</span>
+                            )}
+                            <span className="shrink-0 tabular-nums" style={{ color: "var(--ink-2)" }}>
+                              {[r.views != null ? `${compact(r.views)} views` : null, r.likes != null ? `${compact(r.likes)} likes` : null].filter(Boolean).join(" · ")}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
+                </div>
+              );
+            })}
           <span className="lp-label">{s.kit.verifyYtHint}</span>
         </div>
       </section>
