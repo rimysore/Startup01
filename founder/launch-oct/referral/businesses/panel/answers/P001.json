@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free and the coupon-with-PIN thing is exactly what I never had when I paid that creator: I'd finally see real walk-ins, not likes. I'll get my nephew to list us, but I'm not paying anyone or bringing creators until I see it work.",
+  "objection": "Will good creators actually be on it? A small beta team in Bengaluru could mean a handful of wannabes chasing free collabs, and my staff won't bother with PINs if nobody walks in with a coupon.",
+  "would_change_my_mind": "If after a month no decent creator near me shows interest, or the coupons bring zero customers, I'd drop it.",
+  "price_too_cheap": 0,
+  "price_cheap": 500,
+  "price_expensive": 2000,
+  "price_too_expensive": 5000
+}

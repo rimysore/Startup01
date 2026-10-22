@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "I run everything on WhatsApp and UPI. A new login, an app, and teaching my staff to punch in a PIN for every coupon is more work than I want for creators who mostly just want free food anyway.",
+  "objection": "It's one more app and sign-in to manage, and my staff at the counter won't bother with the PIN step on a busy day, so the customer counter will be wrong and I'll stop using it.",
+  "would_change_my_mind": "If it worked fully over WhatsApp, no app or Google login, and the coupon check was just a UPI-style scan or a WhatsApp message my staff already know how to do.",
+  "price_too_cheap": 0,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2499
+}

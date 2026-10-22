@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I paid a creator once and got likes, not customers, so a coupon count and cost per customer for each creator is exactly what I was missing. It's free, so I'll list one offer at one outlet and see if real people walk in. The ₹200 a month and the ₹150 referral don't matter to me.",
+  "objection": "My staff won't remember to ask for the coupon and type a PIN at 9 am when the queue is out the door, so the numbers will undercount, and I'll be back to guessing whether the creator worked.",
+  "would_change_my_mind": "If after the first collab my staff skip redemptions or the counter shows zero customers, I'll drop it. What would keep me is redemption taking one tap at the counter with no extra step for staff.",
+  "price_too_cheap": 0,
+  "price_cheap": 500,
+  "price_expensive": 2500,
+  "price_too_expensive": 6000
+}

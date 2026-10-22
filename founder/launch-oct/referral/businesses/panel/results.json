@@ -1,0 +1,139 @@
+{
+ "business": "Mitra (beta), creators and a customer counter for Bengaluru local businesses",
+ "seed": 662944,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 11,
+ "passes": 9,
+ "buy_rate": 0.55,
+ "by_segment": [
+  [
+   "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+   4,
+   0.75
+  ],
+  [
+   "Salon, gym or boutique, owner plus 2-10 staff",
+   7,
+   0.5714285714285714
+  ],
+  [
+   "Single-outlet café or darshini, owner runs the counter",
+   9,
+   0.4444444444444444
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Burned by influencers",
+   4,
+   1.0
+  ],
+  [
+   "Numbers-minded",
+   3,
+   1.0
+  ],
+  [
+   "Barter veteran",
+   5,
+   0.8
+  ],
+  [
+   "Uses an agency",
+   2,
+   0.0
+  ],
+  [
+   "Tech-shy",
+   3,
+   0.0
+  ],
+  [
+   "Word-of-mouth only",
+   3,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "under $1,533,000",
+   6,
+   0.8333333333333334
+  ],
+  [
+   "$2,345,000 and up",
+   7,
+   0.5714285714285714
+  ],
+  [
+   "$1,533,000 to $2,345,000",
+   7,
+   0.2857142857142857
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   5,
+   [
+    "I already pay an agency to handle Instagram and creators, and I'm on the counter from 7 to 2, so I don't have time to train staff on PINs and coupons for a beta app. Free plus paying me ₹200 a month sounds like it'll change the moment I rely on it.",
+    "I give free meals to creators all the time and never know if anyone comes, so the coupon counter is the one part that interests me. But a beta startup that says it will pay me ₹200 a month for nothing sounds too good, and I'm not handing my Google login and my staff's time to people who could vanish next month."
+   ],
+   [
+    "P003",
+    "P010"
+   ]
+  ],
+  [
+   "convenience",
+   3,
+   [
+    "I'm at the counter from 7 to 2 and I don't want another app, another login, and my staff fumbling with PINs while customers wait. Creators already message me on WhatsApp, so I don't see why I need this.",
+    "I run the counter myself during the rush, I am not going to stop and punch PINs for coupons, and I don't sign up for new apps. If my nephew wants creators he can message them on WhatsApp like he does now."
+   ],
+   [
+    "P005",
+    "P006"
+   ]
+  ],
+  [
+   "habit",
+   1,
+   [
+    "I already pay my agency to handle Instagram, and my counter boy has no time to type PINs for coupons during the morning rush. Rs 200 a month doesn't cover the hassle, and I'd rather not start leaning on a beta app run by a small team."
+   ],
+   [
+    "P004"
+   ]
+  ]
+ ],
+ "why_yes": [
+  [
+   "need",
+   11,
+   [
+    "It's free and the coupon-with-PIN thing is exactly what I never had when I paid that creator: I'd finally see real walk-ins, not likes. I'll get my nephew to list us, but I'm not paying anyone or bringing creators until I see it work.",
+    "I paid a creator once and got likes, not customers, so a coupon count and cost per customer for each creator is exactly what I was missing. It's free, so I'll list one offer at one outlet and see if real people walk in. The ₹200 a month and the ₹150 referral don't matter to me."
+   ],
+   [
+    "P001",
+    "P002"
+   ]
+  ]
+ ],
+ "flip": [
+  "My agency running it for me, plus a written commitment on what it will cost after the pilot, and proof from a salon like mine that the coupons brought in real paying customers.",
+  "My agency running it for me, or a café owner I know showing me real walk-ins and cost per customer from it, plus it being written down that the business side stays free.",
+  "If it worked fully on WhatsApp with no new app or sign-in, and a salon owner I know showed me it actually brought paying customers.",
+  "If it worked over WhatsApp with no login, and someone I know in the area showed me real extra customers it brought them.",
+  "If it worked fully over WhatsApp, no app or Google login, and the coupon check was just a UPI-style scan or a WhatsApp message my staff already know how to do.",
+  "Another café or darshini owner I know in my area showing me that real customers walked in with Mitra coupons and the ₹200 actually got paid.",
+  "Seeing a salon or gym near me that I know get real, repeat customers from good local creators through it, with the coupon numbers to show for it.",
+  "Another café or darshini owner I know nearby telling me they got real new customers through it, with the coupon numbers to prove it.",
+  "Another café owner I know nearby telling me it actually brought them new paying customers, or my nephew setting it up and handling it for me."
+ ],
+ "purchases_first_month_per_buyer": 1.0,
+ "price_answers": 20
+}

@@ -1,0 +1,71 @@
+{
+  "business": "Mitra (B) referral model: A + ₹150 per pass to the referring business + ₹200/month per active business",
+  "unit": "Creator Pass (1 year)",
+  "price": 499,
+  "variable": [
+    {
+      "label": "Razorpay 2% platform fee + 18% GST on the fee (razorpay.com/pricing, May 2026)",
+      "cost": 12
+    },
+    {
+      "label": "Referral commission to the business (founder's idea, tested at ₹150)",
+      "cost": 150
+    }
+  ],
+  "fixed_monthly": [
+    {
+      "label": "Field rep, part-time (₹25,000; Bengaluru sales executive average ₹24,174/month per Indeed, Mar 2026; PF and other payroll costs not included)",
+      "cost": 25000
+    },
+    {
+      "label": "Rep travel in 2 neighbourhoods (estimate)",
+      "cost": 5000
+    },
+    {
+      "label": "Hosting, database, email, domain (estimate)",
+      "cost": 3000
+    },
+    {
+      "label": "₹200/month x 20 active businesses (assumed average)",
+      "cost": 4000
+    },
+    {
+      "label": "Accountant for TDS on commissions and payouts (estimate)",
+      "cost": 2000
+    },
+    {
+      "label": "Company annual compliance (ROC, ITR, audit; ₹15k-30k/yr per CorporateWalla, taken as ₹20k)",
+      "cost": 1667
+    },
+    {
+      "label": "RazorpayX payouts plan BB+ Core (₹2,476/quarter) + ₹4.72 per payout (₹4 + GST) x ~20 monthly payouts",
+      "cost": 920
+    }
+  ],
+  "startup": [
+    {
+      "label": "Company registration + first-year compliance (estimate)",
+      "cost": 15000
+    },
+    {
+      "label": "Standees and leaflets for first 20 shops (estimate)",
+      "cost": 5000
+    }
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 3,
+  "ramp_per_day": [
+    0.0,
+    0.15,
+    0.25,
+    0.35,
+    0.5,
+    0.6,
+    0.75,
+    0.85,
+    1.0,
+    1.1,
+    1.25,
+    1.4
+  ]
+}

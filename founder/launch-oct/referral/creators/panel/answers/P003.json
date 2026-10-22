@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've already paid a 'registration fee' to a fake agency once, so a beta app asking ₹499 upfront makes me nervous, even if a café I know sent the link. I might try the free first collab, but I'm not paying for the pass until I've actually been paid through it.",
+  "objection": "Auto-DM could get my account flagged or shadowbanned by Instagram, and my account is my whole income. Also, the café gets ₹150 if I pay, so their invite feels a bit like they're selling to me, and I'd have to make promo videos on top of that.",
+  "would_change_my_mind": "Finishing the free collab and actually getting paid on time, plus proof that Auto-DM uses Instagram's official API and won't get my account flagged.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

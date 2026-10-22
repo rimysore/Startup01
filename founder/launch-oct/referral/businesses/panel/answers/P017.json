@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "My regulars and Google reviews bring my customers, and I've never needed creators. Some beta app from a small team asking me to sign in with Google, teach my counter staff a PIN, and chase ₹200 a month is just more hassle, and I don't know who you are.",
+  "objection": "Who are you? A new startup could disappear in three months and leave my staff confused, and I don't want strangers making videos of my shop.",
+  "would_change_my_mind": "Another café owner I know nearby telling me it actually brought them new paying customers, or my nephew setting it up and handling it for me.",
+  "price_too_cheap": 0,
+  "price_cheap": 200,
+  "price_expensive": 800,
+  "price_too_expensive": 1500
+}

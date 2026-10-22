@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "I run the counter myself during the rush, I am not going to stop and punch PINs for coupons, and I don't sign up for new apps. If my nephew wants creators he can message them on WhatsApp like he does now.",
+  "objection": "Customers won't bother showing a coupon, and my staff won't bother redeeming it in the rush, so the counting will be wrong anyway. And a ₹200-a-month payment from a beta app I've never heard of feels like a catch somewhere.",
+  "would_change_my_mind": "If it worked over WhatsApp with no login, and someone I know in the area showed me real extra customers it brought them.",
+  "price_too_cheap": 0,
+  "price_cheap": 199,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Sam",
+  "age": 42,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 2822000,
+  "behaviour": "Burned by influencers",
+  "behaviour_how": "Paid a creator, saw likes but no customers; now skeptical.",
+  "objection": "Will good creators actually be on it?",
+  "habit": "your nephew handles your Instagram page"
+ },
+ {
+  "id": "P002",
+  "name": "Felix",
+  "age": 33,
+  "segment": "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+  "income": 3305000,
+  "behaviour": "Burned by influencers",
+  "behaviour_how": "Paid a creator, saw likes but no customers; now skeptical.",
+  "objection": "My staff won't remember to redeem coupons when it's busy",
+  "habit": "you are at the counter from 7 am to 2 pm"
+ },
+ {
+  "id": "P003",
+  "name": "Jade",
+  "age": 36,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 2345000,
+  "behaviour": "Uses an agency",
+  "behaviour_how": "Pays a local agency or freelancer to handle Instagram.",
+  "objection": "Free now, but you'll start charging once I depend on it",
+  "habit": "you are at the counter from 7 am to 2 pm"
+ },
+ {
+  "id": "P004",
+  "name": "Dev",
+  "age": 39,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 1536000,
+  "behaviour": "Uses an agency",
+  "behaviour_how": "Pays a local agency or freelancer to handle Instagram.",
+  "objection": "Free now, but you'll start charging once I depend on it",
+  "habit": "you check UPI settlements every evening"
+ },
+ {
+  "id": "P005",
+  "name": "Emil",
+  "age": 37,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 2851000,
+  "behaviour": "Tech-shy",
+  "behaviour_how": "Uses WhatsApp and UPI, avoids new apps and logins.",
+  "objection": "Free now, but you'll start charging once I depend on it",
+  "habit": "you are at the counter from 7 am to 2 pm"
+ },
+ {
+  "id": "P006",
+  "name": "Cole",
+  "age": 44,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 1533000,
+  "behaviour": "Tech-shy",
+  "behaviour_how": "Uses WhatsApp and UPI, avoids new apps and logins.",
+  "objection": "Customers won't bother showing a coupon",
+  "habit": "your nephew handles your Instagram page"
+ },
+ {
+  "id": "P007",
+  "name": "Olivia",
+  "age": 26,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 882000,
+  "behaviour": "Numbers-minded",
+  "behaviour_how": "Tracks daily sales in a book or Petpooja; wants proof before spending.",
+  "objection": "Customers won't bother showing a coupon",
+  "habit": "you check UPI settlements every evening"
+ },
+ {
+  "id": "P008",
+  "name": "Bilal",
+  "age": 53,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 1894000,
+  "behaviour": "Burned by influencers",
+  "behaviour_how": "Paid a creator, saw likes but no customers; now skeptical.",
+  "objection": "Will good creators actually be on it?",
+  "habit": "you are at the counter from 7 am to 2 pm"
+ },
+ {
+  "id": "P009",
+  "name": "Priya",
+  "age": 24,
+  "segment": "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+  "income": 11468000,
+  "behaviour": "Tech-shy",
+  "behaviour_how": "Uses WhatsApp and UPI, avoids new apps and logins.",
+  "objection": "I already get creators asking for free food every week",
+  "habit": "you post offers on a local WhatsApp group"
+ },
+ {
+  "id": "P010",
+  "name": "Adrian",
+  "age": 37,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 2175000,
+  "behaviour": "Barter veteran",
+  "behaviour_how": "Gives free meals to creators often; not sure it brings anyone.",
+  "objection": "Who are you? A new startup could disappear",
+  "habit": "you post offers on a local WhatsApp group"
+ },
+ {
+  "id": "P011",
+  "name": "Kai",
+  "age": 24,
+  "segment": "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+  "income": 5412000,
+  "behaviour": "Barter veteran",
+  "behaviour_how": "Gives free meals to creators often; not sure it brings anyone.",
+  "objection": "My staff won't remember to redeem coupons when it's busy",
+  "habit": "you check UPI settlements every evening"
+ },
+ {
+  "id": "P012",
+  "name": "Mateo",
+  "age": 36,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 842000,
+  "behaviour": "Barter veteran",
+  "behaviour_how": "Gives free meals to creators often; not sure it brings anyone.",
+  "objection": "My staff won't remember to redeem coupons when it's busy",
+  "habit": "your nephew handles your Instagram page"
+ },
+ {
+  "id": "P013",
+  "name": "Mason",
+  "age": 40,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 1350000,
+  "behaviour": "Word-of-mouth only",
+  "behaviour_how": "Relies on regulars and Google reviews; never tried creators.",
+  "objection": "Will good creators actually be on it?",
+  "habit": "you get 3 or 4 Instagram DMs a week from creators asking for a free meal"
+ },
+ {
+  "id": "P014",
+  "name": "Sol",
+  "age": 37,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 2171000,
+  "behaviour": "Word-of-mouth only",
+  "behaviour_how": "Relies on regulars and Google reviews; never tried creators.",
+  "objection": "Who are you? A new startup could disappear",
+  "habit": "you post offers on a local WhatsApp group"
+ },
+ {
+  "id": "P015",
+  "name": "Dana",
+  "age": 43,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 1033000,
+  "behaviour": "Barter veteran",
+  "behaviour_how": "Gives free meals to creators often; not sure it brings anyone.",
+  "objection": "I don't have time to learn another app",
+  "habit": "you get 3 or 4 Instagram DMs a week from creators asking for a free meal"
+ },
+ {
+  "id": "P016",
+  "name": "Owen",
+  "age": 37,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 873000,
+  "behaviour": "Barter veteran",
+  "behaviour_how": "Gives free meals to creators often; not sure it brings anyone.",
+  "objection": "Will good creators actually be on it?",
+  "habit": "you check UPI settlements every evening"
+ },
+ {
+  "id": "P017",
+  "name": "Kira",
+  "age": 55,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 1701000,
+  "behaviour": "Word-of-mouth only",
+  "behaviour_how": "Relies on regulars and Google reviews; never tried creators.",
+  "objection": "Who are you? A new startup could disappear",
+  "habit": "your nephew handles your Instagram page"
+ },
+ {
+  "id": "P018",
+  "name": "Fatima",
+  "age": 30,
+  "segment": "Salon, gym or boutique, owner plus 2-10 staff",
+  "income": 1313000,
+  "behaviour": "Numbers-minded",
+  "behaviour_how": "Tracks daily sales in a book or Petpooja; wants proof before spending.",
+  "objection": "Who are you? A new startup could disappear",
+  "habit": "you are at the counter from 7 am to 2 pm"
+ },
+ {
+  "id": "P019",
+  "name": "Sienna",
+  "age": 29,
+  "segment": "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+  "income": 3696000,
+  "behaviour": "Burned by influencers",
+  "behaviour_how": "Paid a creator, saw likes but no customers; now skeptical.",
+  "objection": "Will good creators actually be on it?",
+  "habit": "you post offers on a local WhatsApp group"
+ },
+ {
+  "id": "P020",
+  "name": "Nadia",
+  "age": 50,
+  "segment": "Single-outlet café or darshini, owner runs the counter",
+  "income": 1712000,
+  "behaviour": "Numbers-minded",
+  "behaviour_how": "Tracks daily sales in a book or Petpooja; wants proof before spending.",
+  "objection": "Will good creators actually be on it?",
+  "habit": "you check UPI settlements every evening"
+ }
+]

@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "It's free and takes two minutes, and the one thing I never get from creator collabs is a real number of customers per post, so I'll list one offer and see what the PIN count says against my UPI settlements. If after a month the counter shows nothing, I stop.",
+  "objection": "Customers won't bother showing a coupon, and my staff will forget to enter the PIN when it's busy, so the counter will undercount and I'll be judging creators on bad numbers.",
+  "would_change_my_mind": "If the first month shows almost no redemptions, or if 'free' turns into me having to give big discounts or free services to creators, I'd drop it.",
+  "price_too_cheap": 0,
+  "price_cheap": 299,
+  "price_expensive": 999,
+  "price_too_expensive": 2000
+}

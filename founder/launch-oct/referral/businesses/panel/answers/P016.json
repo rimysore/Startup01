@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already give away free meals to creators and have no idea if anyone walks in because of them. If it's free and the PIN coupon tells me who actually brings customers, I'll list one offer and see.",
+  "objection": "Will good creators actually be on it, or just small accounts hunting free food? It's a beta with a small team, so I doubt there are many real Bengaluru food creators there yet.",
+  "would_change_my_mind": "If after a month I only get low-view creators asking for free meals and the coupon counter shows almost no redemptions, I'll stop bothering.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 999,
+  "price_too_expensive": 2000
+}

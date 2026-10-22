@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already give away free meals to creators every week and have no idea if a single customer walks in because of it. If it's free and a coupon finally tells me who actually brings people, I'll try it, and I can just send the link to the ones who DM me anyway.",
+  "objection": "I don't have time to learn another app, and during the lunch rush my counter boy is not going to stop to punch in a PIN for every coupon. If the redeeming is fiddly it will die in two weeks.",
+  "would_change_my_mind": "If redeeming a coupon takes more than a few seconds at the counter, or if creators keep DMing me directly instead of going through it, I'll stop using it.",
+  "price_too_cheap": 0,
+  "price_cheap": 199,
+  "price_expensive": 799,
+  "price_too_expensive": 1500
+}

@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Ravi",
+  "age": 30,
+  "segment": "Established local creator (50K-100K followers), collabs are real income, may have a manager",
+  "income": 2800000,
+  "behaviour": "Already on an app",
+  "behaviour_how": "Has Influish or a similar app; applies to campaigns and waits.",
+  "objection": "Influish costs the same and already has lakhs of creators",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P002",
+  "name": "Ana",
+  "age": 30,
+  "segment": "Established local creator (50K-100K followers), collabs are real income, may have a manager",
+  "income": 1333000,
+  "behaviour": "Rate-card professional",
+  "behaviour_how": "Has a rate card, sends a media kit, invoices brands.",
+  "objection": "Local cafés pay in food, not money",
+  "habit": "you work a day job and edit reels at night"
+ },
+ {
+  "id": "P003",
+  "name": "Mira",
+  "age": 22,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 1044000,
+  "behaviour": "Burned before",
+  "behaviour_how": "Was ghosted on payment or paid a 'registration fee' to a fake agency; distrusts platforms.",
+  "objection": "Auto-DM might get my account flagged by Instagram",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P004",
+  "name": "Leila",
+  "age": 24,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 173000,
+  "behaviour": "Barter-first",
+  "behaviour_how": "Takes free meals and products for posts; rarely asks for money.",
+  "objection": "Giving an app access to my Instagram feels risky",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P005",
+  "name": "Ada",
+  "age": 18,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 1101000,
+  "behaviour": "Barter-first",
+  "behaviour_how": "Takes free meals and products for posts; rarely asks for money.",
+  "objection": "Local cafés pay in food, not money",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P006",
+  "name": "Aisha",
+  "age": 21,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 849000,
+  "behaviour": "Already on an app",
+  "behaviour_how": "Has Influish or a similar app; applies to campaigns and waits.",
+  "objection": "Giving an app access to my Instagram feels risky",
+  "habit": "you post 3 to 4 reels a week, mostly food and places in South Bengaluru"
+ },
+ {
+  "id": "P007",
+  "name": "Liam",
+  "age": 30,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 413000,
+  "behaviour": "Growth-hungry",
+  "behaviour_how": "Cares more about followers and reach than money right now.",
+  "objection": "Local cafés pay in food, not money",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P008",
+  "name": "Sam",
+  "age": 19,
+  "segment": "Established local creator (50K-100K followers), collabs are real income, may have a manager",
+  "income": 1440000,
+  "behaviour": "Burned before",
+  "behaviour_how": "Was ghosted on payment or paid a 'registration fee' to a fake agency; distrusts platforms.",
+  "objection": "Is this run by a real company? Who do I complain to if a business doesn't pay?",
+  "habit": "you work a day job and edit reels at night"
+ },
+ {
+  "id": "P009",
+  "name": "Emil",
+  "age": 19,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 432000,
+  "behaviour": "Growth-hungry",
+  "behaviour_how": "Cares more about followers and reach than money right now.",
+  "objection": "Will there actually be businesses on it, or is it empty like other apps?",
+  "habit": "you get 2 or 3 collab DMs a week, half of them sketchy"
+ },
+ {
+  "id": "P010",
+  "name": "Talia",
+  "age": 21,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 346000,
+  "behaviour": "Barter-first",
+  "behaviour_how": "Takes free meals and products for posts; rarely asks for money.",
+  "objection": "Local cafés pay in food, not money",
+  "habit": "you get 2 or 3 collab DMs a week, half of them sketchy"
+ },
+ {
+  "id": "P011",
+  "name": "Iris",
+  "age": 32,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 361000,
+  "behaviour": "Free-only",
+  "behaviour_how": "Never pays for creator tools; uses whatever is free.",
+  "objection": "Is this run by a real company? Who do I complain to if a business doesn't pay?",
+  "habit": "you work a day job and edit reels at night"
+ },
+ {
+  "id": "P012",
+  "name": "Lina",
+  "age": 34,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 338000,
+  "behaviour": "Kannada-first",
+  "behaviour_how": "Makes Kannada content; feels national brands ignore regional creators.",
+  "objection": "Is this run by a real company? Who do I complain to if a business doesn't pay?",
+  "habit": "you post 3 to 4 reels a week, mostly food and places in South Bengaluru"
+ },
+ {
+  "id": "P013",
+  "name": "Chloe",
+  "age": 32,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 214000,
+  "behaviour": "Growth-hungry",
+  "behaviour_how": "Cares more about followers and reach than money right now.",
+  "objection": "Why pay ₹499 a year when barter deals come to my DMs anyway?",
+  "habit": "you are in 4 creator WhatsApp groups that share collab leads"
+ },
+ {
+  "id": "P014",
+  "name": "Freya",
+  "age": 31,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 1131000,
+  "behaviour": "Kannada-first",
+  "behaviour_how": "Makes Kannada content; feels national brands ignore regional creators.",
+  "objection": "Will there actually be businesses on it, or is it empty like other apps?",
+  "habit": "you work a day job and edit reels at night"
+ },
+ {
+  "id": "P015",
+  "name": "Noor",
+  "age": 24,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 538000,
+  "behaviour": "Barter-first",
+  "behaviour_how": "Takes free meals and products for posts; rarely asks for money.",
+  "objection": "Auto-DM might get my account flagged by Instagram",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P016",
+  "name": "Celine",
+  "age": 33,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 346000,
+  "behaviour": "Burned before",
+  "behaviour_how": "Was ghosted on payment or paid a 'registration fee' to a fake agency; distrusts platforms.",
+  "objection": "Influish costs the same and already has lakhs of creators",
+  "habit": "you work a day job and edit reels at night"
+ },
+ {
+  "id": "P017",
+  "name": "Noah",
+  "age": 18,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 1193000,
+  "behaviour": "Already on an app",
+  "behaviour_how": "Has Influish or a similar app; applies to campaigns and waits.",
+  "objection": "Giving an app access to my Instagram feels risky",
+  "habit": "you check your Instagram insights every morning"
+ },
+ {
+  "id": "P018",
+  "name": "Felix",
+  "age": 23,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 1069000,
+  "behaviour": "Free-only",
+  "behaviour_how": "Never pays for creator tools; uses whatever is free.",
+  "objection": "Local cafés pay in food, not money",
+  "habit": "you post 3 to 4 reels a week, mostly food and places in South Bengaluru"
+ },
+ {
+  "id": "P019",
+  "name": "Bilal",
+  "age": 23,
+  "segment": "Micro creator (10K-50K followers), does a few paid collabs a month",
+  "income": 819000,
+  "behaviour": "Rate-card professional",
+  "behaviour_how": "Has a rate card, sends a media kit, invoices brands.",
+  "objection": "Influish costs the same and already has lakhs of creators",
+  "habit": "you are in 4 creator WhatsApp groups that share collab leads"
+ },
+ {
+  "id": "P020",
+  "name": "Callum",
+  "age": 34,
+  "segment": "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+  "income": 433000,
+  "behaviour": "Rate-card professional",
+  "behaviour_how": "Has a rate card, sends a media kit, invoices brands.",
+  "objection": "Auto-DM might get my account flagged by Instagram",
+  "habit": "you check your Instagram insights every morning"
+ }
+]

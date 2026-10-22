@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already give free meals to creators and have no idea if anyone walks in because of them, so a free tool that shows customers per creator is worth two minutes of sign-up. If it doesn't work I've lost nothing, and the ₹200 a month is just a bonus.",
+  "objection": "My staff won't remember to ask for the coupon or punch in a PIN at lunch rush, so the counter will show zero and I'll be no wiser than I am now.",
+  "would_change_my_mind": "",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 999,
+  "price_too_expensive": 2500
+}

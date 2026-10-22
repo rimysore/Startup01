@@ -1,0 +1,59 @@
+{
+  "business": "Mitra (C) board's alternative: A + in-person setup + results guarantee, no cash to businesses",
+  "unit": "Creator Pass (1 year)",
+  "price": 499,
+  "variable": [
+    {
+      "label": "Razorpay 2% platform fee + 18% GST on the fee (razorpay.com/pricing, May 2026)",
+      "cost": 12
+    }
+  ],
+  "fixed_monthly": [
+    {
+      "label": "Field rep, part-time (₹25,000; Bengaluru sales executive average ₹24,174/month per Indeed, Mar 2026; PF and other payroll costs not included)",
+      "cost": 25000
+    },
+    {
+      "label": "Rep travel in 2 neighbourhoods (estimate)",
+      "cost": 5000
+    },
+    {
+      "label": "Hosting, database, email, domain (estimate)",
+      "cost": 3000
+    },
+    {
+      "label": "Results guarantee: extra rep time / covering a second creator's barter for shops under target (estimate)",
+      "cost": 5000
+    },
+    {
+      "label": "Company annual compliance (ROC, ITR, audit; ₹15k-30k/yr per CorporateWalla, taken as ₹20k)",
+      "cost": 1667
+    }
+  ],
+  "startup": [
+    {
+      "label": "Company registration + first-year compliance (estimate)",
+      "cost": 15000
+    },
+    {
+      "label": "Standees and leaflets for first 20 shops (estimate)",
+      "cost": 5000
+    }
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 3,
+  "ramp_per_day": [
+    0.0,
+    0.36,
+    0.6,
+    0.84,
+    1.2,
+    1.44,
+    1.8,
+    2.04,
+    2.4,
+    2.64,
+    3.0,
+    3.36
+  ]
+}

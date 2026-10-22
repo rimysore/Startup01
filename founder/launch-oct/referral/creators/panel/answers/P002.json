@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "values",
+  "reason": "I'd use the free first collab since the café asked, but I'm not paying to make promo videos for businesses that aren't paying me. I have a rate card and brands already come to me or my manager, so ₹499 isn't the issue; giving away content is.",
+  "objection": "As a pass holder I have to make short promotional videos for participating businesses. That's unpaid work, and it cheapens my rates. And most local cafés on a platform like this will want to pay in food, not money.",
+  "would_change_my_mind": "If the promo videos were optional, or paid at my rate, and Mitra showed me real paid briefs from brands that pay what my rate card says.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 1499,
+  "price_too_expensive": 3000
+}

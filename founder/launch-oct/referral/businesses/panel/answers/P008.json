@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "Last time I paid a creator I got likes and not one customer I could count, so a coupon my staff redeem with a PIN is exactly what I was missing. It's free and two minutes, so I'll list the business, but I won't pay any creator until the counter shows real people walking in.",
+  "objection": "Will good creators actually be on it, or just small accounts chasing a free collab and a ₹499 pass? It's a beta with a small team, and I don't have time to chase coupons at the counter between 7 and 2.",
+  "would_change_my_mind": "If after the first month the creators interested in me have tiny or fake-looking audiences and the coupon count stays near zero, I stop using it.",
+  "price_too_cheap": 99,
+  "price_cheap": 499,
+  "price_expensive": 2500,
+  "price_too_expensive": 5000
+}

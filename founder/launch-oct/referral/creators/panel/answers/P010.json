@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'd sign up with the café's link and do the free collab, sure, but my collabs are free food and products, so paying for a pass to get more barter deals doesn't add up for me yet. I already get 2-3 DMs a week without paying anyone.",
+  "objection": "Local cafés pay in food, not money, so where does the ₹499 come back to me? And the café getting ₹150 when I buy, plus me owing them promo videos, makes it feel like I'm paying to work for them.",
+  "would_change_my_mind": "If my free collab through Mitra turned into an actual paid collab, or the pass came with at least one guaranteed paid gig that covers the ₹499.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 399,
+  "price_too_expensive": 699
+}
