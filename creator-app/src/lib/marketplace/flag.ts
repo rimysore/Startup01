@@ -50,6 +50,16 @@ export const PLANS = {
 export type PlanId = keyof typeof PLANS;
 export const isPlanId = (v: unknown): v is PlanId => typeof v === "string" && v in PLANS;
 export const PLANS_ENFORCED = false;
+/** Businesses and brands pay nothing for now: no plans shown, no upgrade prompts. The plans above stay for later. */
+export const BUSINESSES_FREE = true;
+
+/**
+ * The Creator Pass: ₹499 a year for collabs and Auto-DM. Everyone is free until FREE_UNTIL (the launch month,
+ * an ISO date set in the environment; unset means free with no end date yet). After that each creator's first
+ * collab is still free. Nothing is blocked unless CREATOR_PASS_ENFORCED=1, and nothing is charged in the app yet:
+ * an admin switches a pass on once the creator has paid.
+ */
+export const CREATOR_PASS = { priceInr: 499, months: 12 } as const;
 /** Customers counted in a month on the free plan before Mitra suggests upgrading (results first, then the ask). */
 export const UPGRADE_NUDGE_CUSTOMERS = 10;
 

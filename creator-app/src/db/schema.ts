@@ -436,6 +436,75 @@ export const instagramConnections = pgTable("instagram_connections", {
   /** Long-lived token, AES-256-GCM encrypted with SESSION_SECRET. */
   accessToken: text("access_token").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  /** Permissions asked for at the last connect (comma-separated); Auto-DM needs the comments and messages ones. */
+  scopes: text("scopes"),
+  /** When Mitra subscribed to this account's comment webhooks (Auto-DM). */
+  subscribedAt: timestamp("subscribed_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/**
+ * Auto-DM: when someone comments a keyword on a creator's post (or any post), Mitra sends them a private reply
+ * through Instagram's API, with a link (often a business's coupon link, so the customer is counted).
+ */
+export const dmAutomations = pgTable(
+  "dm_automations",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    /** The Instagram post or reel it watches; null means every post. */
+    mediaId: text("media_id"),
+    mediaCaption: text("media_caption"),
+    mediaUrl: text("media_url"),
+    mediaThumb: text("media_thumb"),
+    keywords: jsonb("keywords").$type<string[]>().notNull().default([]),
+    /** Reply to every comment, not only ones with a keyword. */
+    anyComment: boolean("any_comment").notNull().default(false),
+    message: text("message").notNull(),
+    linkUrl: text("link_url"),
+    /** Optional public reply under the comment, e.g. "Sent you a DM!" */
+    publicReply: text("public_reply"),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("dm_automations_user").on(t.userId)],
+);
+
+/** Every comment an automation acted on (one row per comment, so nobody gets two DMs). */
+export const dmEvents = pgTable(
+  "dm_events",
+  {
+    commentId: text("comment_id").primaryKey(),
+    automationId: text("automation_id")
+      .notNull()
+      .references(() => dmAutomations.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    commenterUsername: text("commenter_username"),
+    text: text("text"),
+    /** sent | failed | skipped */
+    status: text("status").notNull(),
+    error: text("error"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("dm_events_automation_time").on(t.automationId, t.createdAt), index("dm_events_user_time").on(t.userId, t.createdAt)],
+);
+
+/** The Creator Pass (₹499 a year): who has it until when, and who said they want it. */
+export const creatorPasses = pgTable("creator_passes", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  paidUntil: timestamp("paid_until", { withTimezone: true }),
+  /** How it was given: admin (manual, e.g. paid by UPI) or payment. */
+  source: text("source"),
+  note: text("note"),
+  /** When the creator tapped "I want the Creator Pass". */
+  interestAt: timestamp("interest_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

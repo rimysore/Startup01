@@ -120,6 +120,8 @@ async function cleanUp(now: number): Promise<void> {
     .update(schema.creatorHandles)
     .set({ verifiedAt: null, verifiedBy: null, followers: null, avgViews: null, stats: null, avatarUrl: null })
     .where(and(inArray(schema.creatorHandles.verifiedBy, ["youtube_connection", "instagram_connection"]), lt(schema.creatorHandles.verifiedAt, monthAgo)));
+  // Auto-DM activity (commenters' usernames and comments) is kept 90 days (privacy policy).
+  await d.delete(schema.dmEvents).where(lt(schema.dmEvents.createdAt, new Date(now - 90 * 86_400_000)));
   await d.delete(schema.whatsappLinkCodes).where(lt(schema.whatsappLinkCodes.expiresAt, new Date(now)));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wa:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 7 * 86_400_000))));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wajoin:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 86_400_000))));

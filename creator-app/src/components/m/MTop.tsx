@@ -3,7 +3,7 @@ import { Logo, ThemeToggle } from "@/components/ui";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { LangSwitch, SignOut } from "./client";
 
-type Tab = "home" | "kit" | "inbox" | "offers" | "deals" | "business" | "briefs" | "track";
+type Tab = "home" | "kit" | "autodm" | "inbox" | "offers" | "deals" | "business" | "briefs" | "track";
 
 /** The marketplace top bar: the logo, this side's pages, the language switch and the account links. */
 export function MTop({ s, role, lang, active }: { s: Strings; role: string | null; lang: string; active?: Tab }) {
@@ -11,8 +11,9 @@ export function MTop({ s, role, lang, active }: { s: Strings; role: string | nul
     role === "creator"
       ? [
           { id: "home", href: "/m", label: s.nav.home },
-          { id: "inbox", href: "/m/inbox", label: s.nav.inbox },
           { id: "kit", href: "/m/kit", label: s.nav.kit },
+          { id: "autodm", href: "/m/autodm", label: s.nav.autodm },
+          { id: "inbox", href: "/m/inbox", label: s.nav.inbox },
           { id: "deals", href: "/m/deals", label: s.nav.deals },
         ]
       : role

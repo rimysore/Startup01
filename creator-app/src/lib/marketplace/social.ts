@@ -74,9 +74,11 @@ export function youtubeVerified(snap: ChannelSnapshotLike) {
 
 /* ---- Instagram (Instagram API with Instagram Login) ---- */
 
-const IG_VERSION = process.env.INSTAGRAM_GRAPH_VERSION || "v23.0";
-const IG_GRAPH = "https://graph.instagram.com";
-export const IG_SCOPES = ["instagram_business_basic", "instagram_business_manage_insights"];
+export const IG_VERSION = process.env.INSTAGRAM_GRAPH_VERSION || "v23.0";
+export const IG_GRAPH = "https://graph.instagram.com";
+export const IG_SCOPES = ["instagram_business_basic", "instagram_business_manage_insights", "instagram_business_manage_comments", "instagram_business_manage_messages"];
+/** What Auto-DM needs on top of reading the profile: reading comments and sending private replies. */
+export const DM_SCOPES = ["instagram_business_manage_comments", "instagram_business_manage_messages"];
 
 export function instagramConfigured(): boolean {
   return Boolean(process.env.INSTAGRAM_APP_ID && process.env.INSTAGRAM_APP_SECRET);
@@ -89,7 +91,7 @@ export function instagramAuthUrl(origin: string, state: string): string {
   return `https://www.instagram.com/oauth/authorize?${p}`;
 }
 
-async function igJson<T>(res: Response): Promise<T> {
+export async function igJson<T>(res: Response): Promise<T> {
   const body = (await res.json().catch(() => null)) as (T & { error?: { message?: string; type?: string } | string; error_message?: string }) | null;
   if (!res.ok || !body) {
     const msg = typeof body?.error === "object" ? body.error.message : (body?.error_message ?? String(body?.error ?? res.status));
@@ -269,8 +271,8 @@ export async function syncInstagram(userId: string, snap: IgSnapshot, fallbackNa
   return { handle, filled };
 }
 
-export async function saveInstagramConnection(userId: string, c: { igUserId: string; username: string; token: string; expiresAt: Date }) {
-  const values = { igUserId: c.igUserId, username: c.username, accessToken: encrypt(c.token), expiresAt: c.expiresAt, updatedAt: new Date() };
+export async function saveInstagramConnection(userId: string, c: { igUserId: string; username: string; token: string; expiresAt: Date; scopes?: string[] }) {
+  const values = { igUserId: c.igUserId, username: c.username, accessToken: encrypt(c.token), expiresAt: c.expiresAt, scopes: (c.scopes ?? IG_SCOPES).join(","), updatedAt: new Date() };
   await (await db()).insert(schema.instagramConnections).values({ userId, ...values }).onConflictDoUpdate({ target: schema.instagramConnections.userId, set: values });
 }
 
@@ -293,10 +295,12 @@ export async function instagramToken(userId: string, f: Fetcher = fetch, now = D
   return r.access_token;
 }
 
-/** Disconnect Instagram: drop the token and the verified numbers (typed numbers can be entered again). */
+/** Disconnect Instagram: drop the token, the verified numbers and Auto-DM activity (typed numbers can be entered again). */
 export async function removeInstagram(userId: string) {
   const d = await db();
   await d.delete(schema.instagramConnections).where(eq(schema.instagramConnections.userId, userId));
+  // Auto-DM activity goes with the connection; the creator's Auto-DM settings stay for when they reconnect.
+  await d.delete(schema.dmEvents).where(eq(schema.dmEvents.userId, userId));
   await d
     .update(schema.creatorHandles)
     .set({ verifiedAt: null, verifiedBy: null, stats: null, avatarUrl: null, followers: null, updatedAt: new Date() })
