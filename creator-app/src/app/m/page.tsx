@@ -4,6 +4,7 @@ import { MTop } from "@/components/m/MTop";
 import { marketPage } from "@/lib/marketplace/page";
 import { invitesForCreator, listBriefs } from "@/lib/marketplace/business";
 import { customersThisMonth, planState, shouldNudge } from "@/lib/marketplace/plans";
+import { type PassState, passState } from "@/lib/marketplace/pass";
 import { listTracked, trackTotals } from "@/lib/marketplace/track";
 import { programsFor } from "@/lib/marketplace/programs";
 import { businessesFor, creatorsFor, interestedCreators, type CreatorCard } from "@/lib/marketplace/collabs";
@@ -126,7 +127,7 @@ export default async function MarketHome() {
     );
   }
 
-  const [{ profile, handles }, deals, invites, programs, businesses] = await Promise.all([getKit(user.id), listDeals(user.id), invitesForCreator(user.id), programsFor(user.id), businessesFor(user.id)]);
+  const [{ profile, handles }, deals, invites, programs, businesses, pass] = await Promise.all([getKit(user.id), listDeals(user.id), invitesForCreator(user.id), programsFor(user.id), businessesFor(user.id), passState(user.id)]);
   const pending = invites.filter((i) => i.invite.status === "pending");
   const pct = kitCompleteness(profile, handles);
   const totals = dealTotals(deals);
@@ -140,7 +141,7 @@ export default async function MarketHome() {
           {first ? `, ${first}` : ""}.
         </h1>
         <p className="mk-sub">{s.home.creatorSub}</p>
-        <LaunchNotice s={s} side="creator" />
+        <LaunchNotice s={s} side="creator" pass={pass} />
         {!igVerified && (
           <section className="lp-card mk-panel mt-6 flex flex-wrap items-center justify-between gap-4">
             <div className="grid min-w-0 max-w-[60ch] gap-1">
@@ -261,6 +262,14 @@ export default async function MarketHome() {
         )}
         <div className="mk-grid">
           <section className="lp-card mk-panel">
+            <h2 className="mk-h2">{s.autodm.title}</h2>
+            <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.autodm.sub}</p>
+            <Link href="/m/autodm" className="lp-btn mt-5" style={{ minHeight: 44 }}>
+              {s.autodm.title}
+            </Link>
+          </section>
+
+          <section className="lp-card mk-panel">
             <h2 className="mk-h2">{s.home.offerTitle}</h2>
             <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.home.offerSub}</p>
             <Link href="/m/inbox" className="lp-btn mt-5" style={{ minHeight: 44 }}>
@@ -322,28 +331,38 @@ export default async function MarketHome() {
   );
 }
 
-/** The launch notice: what's free now, and what's coming (Creator Pro, Agency, business plans). */
-function LaunchNotice({ s, side }: { s: Strings; side: "creator" | "business" }) {
+/** The launch notice: free launch month, then the first collab free and the Creator Pass; businesses always free. */
+function LaunchNotice({ s, side, pass }: { s: Strings; side: "creator" | "business"; pass?: PassState }) {
+  const day = (d: Date) => d.toLocaleDateString("en-IN", { day: "numeric", month: "long" });
+  const t = s.pass;
+  const line =
+    side === "business" || !pass
+      ? t.businessFree
+      : pass.status === "active" && pass.paidUntil
+        ? `${t.active} ${day(pass.paidUntil)}.`
+        : pass.status === "launch_free"
+          ? `${pass.freeUntil ? `${t.launchFreeUntil} ${day(pass.freeUntil)}` : t.launchFree}. ${t.afterLaunch}`
+          : pass.status === "first_collab_free"
+            ? t.firstFree
+            : t.needs;
   return (
     <section className="mk-nudge mt-6" aria-label={s.launch.title}>
       <div className="grid min-w-0 gap-2">
-        <p className="text-[17px] font-semibold">{s.launch.title}</p>
+        <p className="text-[17px] font-semibold">
+          {side === "business" || !pass ? t.titleBusiness : pass.status === "launch_free" ? t.titleLaunch : pass.status === "first_collab_free" ? t.titleFirst : t.title}
+        </p>
         <p className="text-[15px]" style={{ color: "var(--ink-2)" }}>
-          {side === "creator" ? s.launch.creator : s.launch.business}
+          {line}{" "}
+          {side === "creator" && (
+            <Link href="/m/pass" className="lp-link underline">
+              {t.more}
+            </Link>
+          )}
         </p>
         <details>
           <summary className="cursor-pointer text-[14px] font-semibold">{s.launch.comingTitle}</summary>
           <ul className="mt-2 grid gap-1.5 text-[14px]" style={{ color: "var(--ink-2)" }}>
-            <li>• {s.launch.pro}</li>
             <li>• {s.launch.agency}</li>
-            {side === "business" && (
-              <li>
-                • {s.launch.plans}: {s.launch.plansLine}{" "}
-                <Link href="/m/plans" className="lp-link underline">
-                  {s.nav.plans}
-                </Link>
-              </li>
-            )}
           </ul>
         </details>
       </div>

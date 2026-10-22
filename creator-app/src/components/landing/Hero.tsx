@@ -9,7 +9,7 @@ const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string;
   creator: {
     title: ["Find your collabs", "in one go."],
     kn: "ನಿಮ್ಮ ಪ್ರೊಫೈಲ್‌ಗೆ ಹೊಂದುವ ಕೊಲಾಬ್‌ಗಳು ಒಂದೇ ಕಡೆ. ಆಯ್ಕೆ ಮಾಡಿ, ಗಳಿಸಿ.",
-    sub: "Connect Instagram and your profile fills itself: followers, average views, what you make. Mitra shows every brand, affiliate program and local business that fits you, with why it fits, and you say you're interested in one tap. Free for creators, and you keep 100% of what you earn.",
+    sub: "Connect Instagram and your profile fills itself: followers, average views, what you make. Mitra shows every brand, affiliate program and local business that fits you, with why it fits, and you say you're interested in one tap. Auto-DM sends your link to everyone who comments. Your first collab is free, and you keep 100% of what you earn.",
     cta: "Join the pilot, free",
     href: "#join",
   },
@@ -78,7 +78,7 @@ export function HeroCopy() {
       </div>
       <p className="lp-hero__note lp-fade-in" style={{ ["--l" as string]: 4 }}>
         <span className="lp-beta">Beta</span>{" "}
-        {a === "creator" ? "Free for creators · Connect Instagram, read-only · ಕನ್ನಡ and English" : "Free during the Bengaluru pilot · Paid or barter · ಕನ್ನಡ and English"}
+        {a === "creator" ? "Free in the launch month · First collab always free · ಕನ್ನಡ and English" : "Free for businesses and brands · Paid or barter · ಕನ್ನಡ and English"}
       </p>
     </>
   );

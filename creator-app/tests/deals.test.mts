@@ -80,7 +80,7 @@ assert(PLANS.local.priceInr === 499 && PLANS.growth.priceInr === 1499 && PLANS.f
 assert(plans.withinLimit(null, 1000) && plans.withinLimit(3, 2) && !plans.withinLimit(3, 3), "limits: null is unlimited");
 assert((await plans.customersThisMonth("biz")) === 12, "customers counted this month");
 assert((await plans.matchesThisMonth("biz")) === 2, "matched invites this month");
-assert(plans.shouldNudge("free", 12, null) && !plans.shouldNudge("free", 9, null), "nudge to upgrade only after 10+ customers on free");
+assert(!plans.shouldNudge("free", 12, null) && !plans.shouldNudge("free", 9, null), "no upgrade nudges while businesses are free");
 assert(!plans.shouldNudge("local", 50, null) && !plans.shouldNudge("free", 50, "local"), "no nudge on a paid plan or once they've said which plan");
 assert(await plans.setPlanInterest("biz", "local"), "record 'I'd pay for Local'");
 const st = await plans.planState("biz");

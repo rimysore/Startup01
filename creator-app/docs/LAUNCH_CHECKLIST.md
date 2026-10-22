@@ -59,14 +59,24 @@ YouTube analytics product is kept on the `analytics-dashboard` branch (a copy of
      ones are simply left out.
    - Only professional (creator or business) Instagram accounts can connect; personal accounts are told to switch
      (free, in Instagram settings).
-4. **Database:** migrations 0012-0019 run automatically on deploy (`npm run db:migrate` in the Vercel build). All are
-   additive. 0017 seeds the open programs; 0018 adds verified stats, Instagram connections and business listing; 0019 hides the YouTube programme and adds Wishlink (Instagram).
-5. **Content**
+4. **Auto-DM (Instagram webhooks).** In the Meta app → Instagram → Webhooks: callback URL
+   `https://trymitraapp.com/api/webhooks/instagram`, verify token = the value of `INSTAGRAM_WEBHOOK_VERIFY_TOKEN`
+   (any long random string you set in Vercel), subscribe to the **comments** field. Add
+   `instagram_business_manage_comments` and `instagram_business_manage_messages` to App Review (screencast:
+   create an Auto-DM, comment the keyword from another account, the DM arrives). Mitra subscribes each creator's
+   account to comment events when they connect. Limits: one DM per comment, at most 180 an hour per account.
+   **Pricing switches** (Vercel env): `FREE_UNTIL=2026-11-30` (end of the free launch month; unset = free with
+   no end date shown), `CREATOR_PASS_ENFORCED=1` to actually block a second collab and Auto-DM without a pass
+   (leave unset until payment is ready). Admins switch a pass on in `/dashboard/members` after the creator pays.
+   Businesses and brands are free (`BUSINESSES_FREE` in `flag.ts`).
+5. **Database:** migrations 0012-0020 run automatically on deploy (`npm run db:migrate` in the Vercel build). All are
+   additive. 0017 seeds the open programs; 0018 adds verified stats, Instagram connections and business listing; 0019 hides the YouTube programme and adds Wishlink (Instagram); 0020 adds Auto-DM and the Creator Pass.
+6. **Content**
    - Add the co-founder to `TEAM` in `src/lib/company.ts`.
    - A native Kannada speaker checks `src/lib/marketplace/i18n.ts`, the landing page and the coupon page.
    - Review the 10 seeded programs at `/dashboard/programs` (links, eligibility) and hide any you don't want shown.
    - Add local businesses there **only with the owner's permission**.
-6. **Smoke test on the production URL** (15 minutes): join the waitlist as a creator; sign up as a creator and see
+7. **Smoke test on the production URL** (15 minutes): join the waitlist as a creator; sign up as a creator and see
    10+ open programs; mark one "I'm interested"; connect Instagram (as a tester until App Review approves) and check the profile filled itself; sign up as a business
    in the same area and check it appears in the creator's "Collabs for you"; mark it interested and check the
    business sees the creator; track a post, set a PIN, open the link on a phone, redeem; check `/dashboard/members`

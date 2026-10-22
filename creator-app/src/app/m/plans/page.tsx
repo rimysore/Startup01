@@ -1,6 +1,6 @@
 import { MTop } from "@/components/m/MTop";
 import { PlanInterest } from "@/components/m/TrackParts";
-import { PLANS, type PlanId } from "@/lib/marketplace/flag";
+import { BUSINESSES_FREE, PLANS, type PlanId } from "@/lib/marketplace/flag";
 import { marketPageFor } from "@/lib/marketplace/page";
 import { planState } from "@/lib/marketplace/plans";
 
@@ -12,6 +12,17 @@ export default async function PlansPage() {
   const { user, member, s } = await marketPageFor("/m/plans", "business");
   const state = await planState(user.id);
   const ids = Object.keys(PLANS) as PlanId[];
+  // For now Mitra is free for businesses and brands: no plans to choose from.
+  if (BUSINESSES_FREE)
+    return (
+      <>
+        <MTop s={s} role={member.role} lang={member.uiLanguage} active="track" />
+        <main className="lp-wrap mk-main">
+          <h1 className="mk-h1">{s.plans.title}</h1>
+          <p className="mk-nudge mt-6 text-[16px]">{s.pass.businessFree}</p>
+        </main>
+      </>
+    );
   return (
     <>
       <MTop s={s} role={member.role} lang={member.uiLanguage} active="track" />

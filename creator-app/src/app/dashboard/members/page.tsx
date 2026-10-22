@@ -9,6 +9,28 @@ const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1)}M` : n >= 1e3
 const day = (d: string | Date | null) => (d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "–");
 const ROLES = ["all", "creator", "business", "brand", "agency"] as const;
 
+/** The Creator Pass for one creator: its state, and a switch for after they've paid (e.g. by UPI). */
+function PassCell({ m, onChange }: { m: AdminMember; onChange: (paidUntil: Date | null) => void }) {
+  const [busy, setBusy] = useState(false);
+  const active = m.pass.paidUntil && new Date(m.pass.paidUntil) > new Date();
+  const set = async (on: boolean) => {
+    if (!confirm(on ? `Switch the Creator Pass on for ${m.name || m.email} for a year?` : `Switch off ${m.name || m.email}'s Creator Pass?`)) return;
+    setBusy(true);
+    const r = await fetch(`/api/admin/members/${m.userId}/pass`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ on }) });
+    const j = (await r.json().catch(() => null)) as { paidUntil?: string | null } | null;
+    setBusy(false);
+    if (r.ok) onChange(j?.paidUntil ? new Date(j.paidUntil) : null);
+  };
+  return (
+    <p className="mt-1">
+      {active ? <span className="font-semibold text-good">Pass until {day(m.pass.paidUntil)}</span> : m.pass.wantsAt ? <span className="font-semibold">Wants the pass</span> : "No pass"}{" "}
+      <button type="button" className="underline" disabled={busy} onClick={() => set(!active)}>
+        {active ? "switch off" : "switch on"}
+      </button>
+    </p>
+  );
+}
+
 /** Admins only: everyone on the marketplace, their profile and what they've used. */
 export default function MembersPage() {
   const { me } = useDashboard();
@@ -112,6 +134,7 @@ export default function MembersPage() {
                         <>
                           <p>{m.openToOffers ? "Open to offers" : "Not open"}</p>
                           <p>{m.publicKit ? <a href={m.publicKit} className="underline">Public kit</a> : "Kit private"}</p>
+                          <PassCell m={m} onChange={(paidUntil) => setRows((r) => r?.map((x) => (x.userId === m.userId ? { ...x, pass: { ...x.pass, paidUntil } } : x)) ?? null)} />
                         </>
                       ) : (
                         <>
@@ -126,7 +149,7 @@ export default function MembersPage() {
                     <td className="py-2.5 pr-3 text-xs text-ink-2">
                       {m.role === "creator" ? (
                         <p>
-                          {m.counts.businessInterests} interested · {m.counts.programInterests} programs · {m.counts.inboxOffers} offers checked · {m.counts.deals} deals
+                          {m.counts.businessInterests} interested · {m.counts.programInterests} programs · {m.counts.inboxOffers} offers checked · {m.counts.deals} deals · {m.counts.autoDms} Auto-DMs, {m.counts.dmsSent} DMs sent
                         </p>
                       ) : (
                         <p>

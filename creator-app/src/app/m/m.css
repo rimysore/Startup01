@@ -120,3 +120,20 @@
 .mk-verify { display: grid; gap: 10px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--rule); }
 .mk-stats { padding: 14px 16px; border-radius: 14px; background: var(--tint); }
 .mk-statgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px 16px; }
+
+/* Auto-DM */
+.mk-dm { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 14px; align-items: start; }
+.mk-dm__thumb { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 12px; object-fit: cover; background: var(--tint); font-size: 12px; font-weight: 700; color: var(--ink-3); }
+.mk-dm__end { display: grid; justify-items: end; gap: 8px; }
+@media (max-width: 560px) { .mk-dm { grid-template-columns: 48px minmax(0, 1fr); } .mk-dm__thumb { width: 48px; height: 48px; } .mk-dm__end { grid-column: 1 / -1; display: flex; justify-content: flex-start; align-items: center; gap: 16px; } }
+.mk-switch { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.mk-switch input { appearance: none; width: 40px; height: 24px; border-radius: 99px; background: var(--rule); position: relative; transition: background-color 180ms ease; cursor: pointer; }
+.mk-switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink-3); transition: transform 180ms ease, background-color 180ms ease; }
+.mk-switch input:checked::after { background: var(--paper); }
+.mk-switch input:checked { background: var(--ink); }
+.mk-switch input:checked::after { transform: translateX(16px); }
+.mk-posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; max-height: 340px; overflow-y: auto; }
+.mk-post { display: grid; gap: 6px; padding: 6px; border-radius: 12px; background: var(--tint); text-align: left; font-size: 12.5px; color: var(--ink-2); border: 2px solid transparent; }
+.mk-post .mk-dm__thumb { width: 100%; height: auto; aspect-ratio: 1; }
+.mk-post[aria-pressed="true"] { border-color: var(--ink); }
+.mk-bubble { white-space: pre-wrap; max-width: 420px; padding: 12px 14px; border-radius: 18px 18px 18px 6px; background: var(--tint); font-size: 14.5px; word-break: break-word; }

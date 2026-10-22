@@ -7,7 +7,7 @@ export async function adminMembers() {
   const d = await db();
   const toMap = async (q: Promise<{ id: string; n: number }[]>) => new Map((await q).map((r) => [r.id, r.n]));
   const n = sql<number>`count(*)::int`;
-  const [rows, creators, businesses, handles, lastSeen, tracked, inbox, programs, interestsGiven, interestsGot, briefs, deals] = await Promise.all([
+  const [rows, creators, businesses, handles, lastSeen, tracked, inbox, programs, interestsGiven, interestsGot, briefs, deals, passes, autos, dmsSent] = await Promise.all([
     d.select({ m: schema.members, email: schema.users.email, name: schema.users.name, joined: schema.users.createdAt }).from(schema.members).innerJoin(schema.users, eq(schema.users.id, schema.members.userId)).orderBy(desc(schema.users.createdAt)),
     d.select().from(schema.creatorProfiles),
     d.select().from(schema.businessProfiles),
@@ -20,7 +20,11 @@ export async function adminMembers() {
     toMap(d.select({ id: schema.businessInterests.businessUserId, n }).from(schema.businessInterests).groupBy(schema.businessInterests.businessUserId)),
     toMap(d.select({ id: schema.opportunities.businessUserId, n }).from(schema.opportunities).groupBy(schema.opportunities.businessUserId)),
     toMap(d.select({ id: schema.deals.creatorUserId, n }).from(schema.deals).groupBy(schema.deals.creatorUserId)),
+    d.select().from(schema.creatorPasses),
+    toMap(d.select({ id: schema.dmAutomations.userId, n }).from(schema.dmAutomations).groupBy(schema.dmAutomations.userId)),
+    toMap(d.select({ id: schema.dmEvents.userId, n }).from(schema.dmEvents).where(eq(schema.dmEvents.status, "sent")).groupBy(schema.dmEvents.userId)),
   ]);
+  const pass = new Map(passes.map((p) => [p.userId, p]));
   const cp = new Map(creators.map((c) => [c.userId, c]));
   const bp = new Map(businesses.map((b) => [b.userId, b]));
   const seen = new Map(lastSeen.map((r) => [r.id, r.at]));
@@ -44,6 +48,7 @@ export async function adminMembers() {
       planInterest: b?.planInterest ?? null,
       joined,
       lastSeen: seen.get(m.userId) ?? null,
+      pass: { paidUntil: pass.get(m.userId)?.paidUntil ?? null, wantsAt: pass.get(m.userId)?.interestAt ?? null },
       counts: {
         trackedPosts: tracked.get(m.userId) ?? 0,
         briefs: briefs.get(m.userId) ?? 0,
@@ -52,6 +57,8 @@ export async function adminMembers() {
         programInterests: programs.get(m.userId) ?? 0,
         businessInterests: interestsGiven.get(m.userId) ?? 0,
         creatorsInterested: interestsGot.get(m.userId) ?? 0,
+        autoDms: autos.get(m.userId) ?? 0,
+        dmsSent: dmsSent.get(m.userId) ?? 0,
       },
     };
   });

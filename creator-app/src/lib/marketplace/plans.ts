@@ -1,6 +1,6 @@
 import { and, eq, gt, isNotNull, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
-import { isPlanId, PLANS, UPGRADE_NUDGE_CUSTOMERS, type PlanId } from "./flag";
+import { BUSINESSES_FREE, isPlanId, PLANS, UPGRADE_NUDGE_CUSTOMERS, type PlanId } from "./flag";
 
 /*
  * Business plans. During the pilot nothing is charged or enforced; owners can say which plan they'd pay for, which
@@ -57,5 +57,6 @@ export const limitsOf = (plan: PlanId) => PLANS[plan];
 
 /** Results first, then the ask: suggest upgrading only on the free plan, after enough customers were counted. */
 export function shouldNudge(plan: PlanId, customers: number, interest: PlanId | null): boolean {
+  if (BUSINESSES_FREE) return false;
   return plan === "free" && !interest && customers >= UPGRADE_NUDGE_CUSTOMERS;
 }

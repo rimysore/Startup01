@@ -37,8 +37,9 @@ const AREAS = [
 
 const FAQ = [
   ["How does Mitra find collabs for me?", "You make one profile: your area, the kind of content you make, your languages and your numbers. Every brand, affiliate program and local business on Mitra shows up for you, best fit first, with the reasons (same area, matches your content, looking for creators now). Tap \"Interested\" and the business sees your profile. New businesses appear as soon as they join."],
-  ["Is this the finished app?", "No, it's a beta. We're running a pilot in Bengaluru and changing things every week from what creators and owners tell us. Everything is free during the pilot."],
-  ["How does Mitra make money?", "Creators never pay: not to join, not to check offers, not to get Verified. Mitra takes no cut of deals, so creators keep every rupee of their fee and any customer bonus. Businesses pay a monthly plan for counting customers and finding creators. During the Bengaluru pilot it's all free."],
+  ["What is Auto-DM?", "When someone comments a word like DOSA on your reel, Mitra sends them a DM from your Instagram straight away, with your link or a business's coupon. It uses Instagram's official API: one DM per comment, never to your own comments, and nothing else is posted. Coupon links count every customer at the business's counter."],
+  ["Is this the finished app?", "No, it's a beta. We're running a pilot in Bengaluru and changing things every week from what creators and owners tell us. Everything is free in the launch month."],
+  ["How does Mitra make money?", "Creators pay for the Creator Pass, ₹499 a year, after the launch month, and your first collab is always free. Businesses and brands pay nothing for now. Mitra takes no cut of deals, so you keep every rupee of your fee and any customer bonus. Checking offers and your media kit stay free."],
   ["How do I know an offer is real?", "Forward it to Mitra on WhatsApp or email, or upload a screenshot. Mitra checks what the offer says and who sent it: scam patterns like registration fees, when their website was registered, whether the brand's official site matches, and what other creators reported. It shows its sources, so you decide."],
   ["Will the customer count be right?", "Each customer shows the creator's coupon on their phone and your staff redeem it with your counter PIN, or type the code in counter mode. Nothing is guessed from views. You can download your daily counts and check them against your bill book."],
   ["Does it work for barter deals?", "Yes. Track any creator post, paid or barter, whether you found the creator on Mitra or not. Seeing a free-meal post next to a paid one is usually the first useful thing an owner learns."],
@@ -267,7 +268,7 @@ export default function Home() {
             </div>
           </div>
           <p className="mt-8 text-[14px]" style={{ color: "var(--ink-3)" }}>
-            Example: ₹3,000 + ₹30 × 27 customers = ₹3,810, or ₹141 a customer. When you want new creators, Mitra suggests ones whose audience lives near you. Free during the Bengaluru pilot.
+            Example: ₹3,000 + ₹30 × 27 customers = ₹3,810, or ₹141 a customer. When you want new creators, Mitra suggests ones whose audience lives near you. Free for businesses.
           </p>
         </div>
       </section>
@@ -281,7 +282,7 @@ export default function Home() {
           </div>
           <div className="lp-rules">
             {[
-              ["Free for creators.", "No joining fee, no yearly plan, and Mitra takes no cut: your fee and every customer bonus are yours."],
+              ["Your first collab is free.", "Free in the launch month, then your first collab is still free. After that ₹499 a year, and Mitra never takes a cut: your fee and every customer bonus are yours."],
               ["Counted, never guessed.", "A customer is counted only when they show the coupon at your counter. You can check every day against your bill book."],
               ["ಕನ್ನಡ first, then English.", "Bengaluru first, one neighbourhood at a time, with support in Kannada from day one."],
             ].map(([t, b], i) => (
