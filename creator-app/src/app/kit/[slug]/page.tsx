@@ -84,9 +84,26 @@ async function PublicKit({ params }: { params: PageProps<"/kit/[slug]">["params"
                   </div>
                   <p className="mk-stat mt-4">{h.followers != null ? compact(h.followers) : "–"}</p>
                   <p className="lp-label mt-1">
-                    @{h.handle}
+                    {v && h.profileUrl ? (
+                      <a href={h.profileUrl} target="_blank" rel="noopener noreferrer nofollow" className="underline">
+                        @{h.handle.replace(/^@/, "")}
+                      </a>
+                    ) : (
+                      `@${h.handle.replace(/^@/, "")}`
+                    )}
                     {h.avgViews != null ? ` · ${compact(h.avgViews)} avg views` : ""}
+                    {v && h.stats?.posts != null ? ` · ${compact(h.stats.posts)} posts` : ""}
+                    {v && h.stats?.engagementRate != null ? ` · ${h.stats.engagementRate}% engagement` : v && h.stats?.avgEngagement != null ? ` · ${compact(h.stats.avgEngagement)} likes + comments a post` : ""}
+                    {v && h.stats?.postsPerWeek != null ? ` · ${h.stats.postsPerWeek} posts a week` : ""}
                   </p>
+                  {v && h.stats?.audience && (h.stats.audience.cities.length > 0 || h.stats.audience.ages.length > 0) && (
+                    <p className="lp-label mt-1">
+                      Audience:{" "}
+                      {[...h.stats.audience.cities.map((c) => `${c.name} ${c.pct}%`), ...h.stats.audience.ages.map((a) => `${a.name} ${a.pct}%`), h.stats.audience.women != null ? `${h.stats.audience.women}% women` : null]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  )}
                 </div>
               );
             })}

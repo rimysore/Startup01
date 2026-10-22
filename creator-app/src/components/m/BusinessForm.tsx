@@ -4,13 +4,13 @@ import { useState } from "react";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { send } from "./client";
 
-type F = { name: string; category: string; area: string; budgetMinInr: string; budgetMaxInr: string; website: string; instagram: string; whatsapp: string };
+type F = { name: string; category: string; area: string; budgetMinInr: string; budgetMaxInr: string; website: string; instagram: string; whatsapp: string; listed: boolean };
 
 export function BusinessForm({ s, initial }: { s: Strings; initial: F }) {
   const [f, setF] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  const field = (k: keyof F) => ({ value: f[k], onChange: (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value }) });
+  const field = (k: Exclude<keyof F, "listed">) => ({ value: f[k], onChange: (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value }) });
   const digits = (k: "budgetMinInr" | "budgetMaxInr") => ({ value: f[k], inputMode: "numeric" as const, onChange: (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value.replace(/[^\d]/g, "") }) });
 
   async function save(e: React.FormEvent) {
@@ -70,6 +70,14 @@ export function BusinessForm({ s, initial }: { s: Strings; initial: F }) {
           {s.business.whatsapp} <small>({s.common.optional})</small>
           <input {...field("whatsapp")} type="tel" inputMode="tel" maxLength={20} placeholder="+91" />
           <small>{s.business.whatsappHint}</small>
+        </label>
+        <label className="mk-check">
+          <input type="checkbox" checked={f.listed} onChange={(e) => setF({ ...f, listed: e.target.checked })} />
+          <span>
+            <b style={{ color: "var(--ink)" }}>{s.business.listed}</b>
+            <br />
+            {s.business.listedHint}
+          </span>
         </label>
       </section>
       <div className="mk-bar">

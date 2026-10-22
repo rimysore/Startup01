@@ -55,6 +55,27 @@ export default function PilotPage() {
 
       {n && (
         <div className="space-y-6">
+          <Card>
+            <h2 className="mb-3 font-semibold">Launch interest</h2>
+            <div className="grid gap-4 text-sm sm:grid-cols-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted">Pilot waitlist</p>
+                <p className="mt-1 font-display text-2xl tabular-nums">{n.launch.waitlistTotal}</p>
+                <p className="mt-1 text-muted">{Object.entries(n.launch.waitlistByRole).map(([k, v]) => `${v} ${k}`).join(" · ") || "none yet"}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted">Accounts</p>
+                <p className="mt-1 font-display text-2xl tabular-nums">{Object.values(n.launch.accountsByRole).reduce((a, b) => a + b, 0)}</p>
+                <p className="mt-1 text-muted">{Object.entries(n.launch.accountsByRole).map(([k, v]) => `${v} ${k}`).join(" · ") || "none yet"}</p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted">Creators interested in programs</p>
+                <p className="mt-1 font-display text-2xl tabular-nums">{n.launch.creatorsInterested}</p>
+                <p className="mt-1 text-muted">{n.launch.topPrograms.map((p) => `${p.name} (${p.n})`).join(" · ") || "none yet"}</p>
+              </div>
+            </div>
+          </Card>
+
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Num
               label="1 · Businesses counting"
@@ -114,7 +135,8 @@ export default function PilotPage() {
                     <th className="py-2 pr-3 text-right">Businesses counting</th>
                     <th className="py-2 pr-3 text-right">Customers counted</th>
                     <th className="py-2 pr-3 text-right">New tracked posts</th>
-                    <th className="py-2 text-right">Inbox offers</th>
+                    <th className="py-2 pr-3 text-right">Inbox offers</th>
+                    <th className="py-2 text-right">Waitlist</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
@@ -124,7 +146,8 @@ export default function PilotPage() {
                       <td className="py-2.5 pr-3 text-right tabular-nums">{w.activeBusinesses}</td>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{w.customers}</td>
                       <td className="py-2.5 pr-3 text-right tabular-nums">{w.newPosts}</td>
-                      <td className="py-2.5 text-right tabular-nums">{w.inboxOffers}</td>
+                      <td className="py-2.5 pr-3 text-right tabular-nums">{w.inboxOffers}</td>
+                      <td className="py-2.5 text-right tabular-nums">{w.waitlist}</td>
                     </tr>
                   ))}
                 </tbody>

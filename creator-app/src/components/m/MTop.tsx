@@ -26,7 +26,10 @@ export function MTop({ s, role, lang, active }: { s: Strings; role: string | nul
   return (
     <header className="mk-top">
       <div className="lp-wrap mk-top__in">
-        <Logo />
+        <span className="flex items-center gap-2">
+          <Logo />
+          <span className="lp-beta">Beta</span>
+        </span>
         {tabs.length > 0 && (
           <nav className="mk-tabs" aria-label="Marketplace">
             {tabs.map((t) => (

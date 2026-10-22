@@ -19,9 +19,9 @@ import { COMPANY, SUPPORT_WHATSAPP, TEAM } from "@/lib/company";
  */
 
 export const metadata: Metadata = {
-  title: "Mitra: check every collab offer, and count the customers each creator post brings",
+  title: "Mitra (beta): find collabs that fit you, and creators who bring customers",
   description:
-    "For Bengaluru's Kannada and English creators: forward any collab offer and know if it's real, free forever. For cafés, salons and gyms: a coupon for every creator post, counted at your counter.",
+    "For Bengaluru's Kannada and English creators: every brand, affiliate program and local business that fits your profile, in one place. For cafés, salons and gyms: creators matched to you, and the customers each post brings, counted at your counter.",
 };
 
 const AREAS = [
@@ -36,11 +36,13 @@ const AREAS = [
 ];
 
 const FAQ = [
+  ["How does Mitra find collabs for me?", "You make one profile: your area, the kind of content you make, your languages and your numbers. Every brand, affiliate program and local business on Mitra shows up for you, best fit first, with the reasons (same area, matches your content, looking for creators now). Tap \"Interested\" and the business sees your profile. New businesses appear as soon as they join."],
+  ["Is this the finished app?", "No, it's a beta. We're running a pilot in Bengaluru and changing things every week from what creators and owners tell us. Everything is free during the pilot."],
   ["How does Mitra make money?", "Creators never pay: not to join, not to check offers, not to get Verified. Mitra takes no cut of deals, so creators keep every rupee of their fee and any customer bonus. Businesses pay a monthly plan for counting customers and finding creators. During the Bengaluru pilot it's all free."],
   ["How do I know an offer is real?", "Forward it to Mitra on WhatsApp or email, or upload a screenshot. Mitra checks what the offer says and who sent it: scam patterns like registration fees, when their website was registered, whether the brand's official site matches, and what other creators reported. It shows its sources, so you decide."],
   ["Will the customer count be right?", "Each customer shows the creator's coupon on their phone and your staff redeem it with your counter PIN, or type the code in counter mode. Nothing is guessed from views. You can download your daily counts and check them against your bill book."],
   ["Does it work for barter deals?", "Yes. Track any creator post, paid or barter, whether you found the creator on Mitra or not. Seeing a free-meal post next to a paid one is usually the first useful thing an owner learns."],
-  ["Do I have to connect Instagram or YouTube?", "No. Join with your handles and the numbers you see in your own insights; they're shown as self-reported. Connecting an account later, read-only, gets you a Verified badge and puts you first in matches."],
+  ["Do I have to connect Instagram?", "No, but it's the quickest way in. Connecting an Instagram creator or business account, read-only, fetches your followers, average views, engagement and where your followers are, fills in your profile and gives you a Verified badge that puts you higher in matches. Mitra never posts for you. You can also type your numbers; they're shown as self-reported."],
   ["Which languages and cities?", "Kannada and English, in Bengaluru first. One city done properly before we go wider."],
   ["Are paid posts labelled?", "Yes. Paid and gifted posts carry \"Paid partnership\" or #ad, as the ASCI rules require. It protects your audience's trust, and yours."],
 ] as const;
@@ -62,9 +64,12 @@ export default function Home() {
 
       <StickyNav>
         <div className="lp-wrap lp-nav__in">
-          <Logo />
+          <span className="flex items-center gap-2">
+            <Logo />
+            <span className="lp-beta lp-nav__beta">Beta</span>
+          </span>
           <nav className="lp-nav__links" aria-label="Main">
-            <a href="#offer" className="lp-hide-sm">Check an offer</a>
+            <a href="#collabs" className="lp-hide-sm">For creators</a>
             <a href="#business" className="lp-hide-sm">For businesses</a>
             <a href="#team" className="lp-hide-sm">Who we are</a>
             <Link href="/login">Sign in</Link>
@@ -100,24 +105,27 @@ export default function Home() {
       </div>
 
       {/* ---- Two front doors ---- */}
-      <section className="lp-section" aria-labelledby="doors-title">
+      <section id="collabs" className="lp-section scroll-mt-16" aria-labelledby="doors-title">
         <div className="lp-wrap">
           <div data-reveal>
             <p className="lp-kn-line kn" lang="kn">ಎರಡು ಬಾಗಿಲುಗಳು, ಒಂದೇ ಮಿತ್ರ</p>
             <h2 id="doors-title" className="lp-h2">One for creators. One for the places they post about.</h2>
           </div>
           <div className="lp-doors">
-            <a href="#offer" className="lp-card lp-door" data-reveal>
+            <a href="#join" className="lp-card lp-door" data-reveal>
               <span className="lp-label">For creators · ಕ್ರಿಯೇಟರ್‌ಗಳಿಗೆ</span>
-              <h3>Offer inbox</h3>
-              <p>Forward any collab DM, email or screenshot. Mitra tells you if it&apos;s a scam, what&apos;s missing, and what to reply. Free forever.</p>
-              <span className="lp-door__go">Check an offer <Arrow /></span>
+              <h3>Collabs matched to you</h3>
+              <p>
+                One profile: your area, your content, your verified numbers. See every brand, affiliate program and local business that fits you, with why, and tap &quot;Interested&quot;. Got an offer
+                elsewhere? Mitra checks it for scams too.
+              </p>
+              <span className="lp-door__go">Join the pilot <Arrow /></span>
             </a>
             <a href="#business" className="lp-card lp-door" data-reveal style={{ ["--i" as string]: 1 }}>
               <span className="lp-label">For businesses · ವ್ಯಾಪಾರಗಳಿಗೆ</span>
-              <h3>Customer counter</h3>
-              <p>A coupon for every creator post, paid or barter. Counted at your counter, so you see which creator brought how many customers.</p>
-              <span className="lp-door__go">See how it counts <Arrow /></span>
+              <h3>Creators who fit you</h3>
+              <p>Add your business and creators near you see it straight away. See who&apos;s interested and who fits your area, then give each post a coupon and count the customers it brings.</p>
+              <span className="lp-door__go">See how it works <Arrow /></span>
             </a>
           </div>
         </div>
@@ -158,12 +166,12 @@ export default function Home() {
         <div className="lp-wrap lp-two">
           <div data-reveal>
             <p className="lp-kn-line kn" lang="kn">ಪ್ರಾಮಾಣಿಕ ಸಂಖ್ಯೆಗಳ ಮೀಡಿಯಾ ಕಿಟ್</p>
-            <h2 id="kit-title" className="lp-h2">A media kit with honest numbers.</h2>
+            <h2 id="kit-title" className="lp-h2">Connect Instagram. Your profile fills itself.</h2>
             <ul className="lp-ticks">
               {[
-                "One page for every platform you post on, ready to send to any brand.",
-                "Numbers you enter are labelled self-reported. Nobody is fooled, so nobody is let down.",
-                "Connect an account and those numbers turn Verified. Verified creators are matched first.",
+                "One tap, read-only: followers, average views on your reels, engagement and where your followers are.",
+                "Mitra fills in your profile from your bio and posts: what you make, your languages and your area. You can change anything.",
+                "Verified numbers are matched first. Numbers you type yourself are labelled self-reported.",
                 "You set your own rates. Mitra shows what similar creators nearby charge.",
               ].map((t) => (
                 <li key={t}>
@@ -185,9 +193,9 @@ export default function Home() {
             <div className="mt-4">
               {(
                 [
-                  ["Instagram", "18.4K", "followers", false],
-                  ["YouTube", "6.2K", "subscribers", true],
-                  ["ShareChat", "3.1K", "followers", false],
+                  ["Followers", "18.4K", "Instagram", true],
+                  ["Average views", "9.6K", "recent reels", true],
+                  ["Engagement", "4.8%", "likes + comments", true],
                 ] as const
               ).map(([p, n, unit, v]) => (
                 <div key={p} className="lp-kit__row">

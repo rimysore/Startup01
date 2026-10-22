@@ -4,7 +4,7 @@ import { decrypt, encrypt, randomToken, safeEqual } from "./crypto";
 const COOKIE = "mitra_oauth";
 
 export interface OAuthIntent {
-  intent: "login" | "youtube";
+  intent: "login" | "youtube" | "instagram";
   next: string;
 }
 

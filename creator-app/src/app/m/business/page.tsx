@@ -26,6 +26,7 @@ export default async function BusinessPage() {
             website: b?.website ?? "",
             instagram: b?.instagram ?? "",
             whatsapp: b?.whatsapp ?? "",
+            listed: b?.listed ?? true,
           }}
         />
       </main>

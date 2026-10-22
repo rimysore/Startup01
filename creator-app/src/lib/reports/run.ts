@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, isNull, like, lt, or } from "drizzle-orm";
+import { and, asc, eq, gt, inArray, isNull, like, lt, or } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { User } from "../auth";
 import { t } from "../whatsapp/strings";
@@ -114,11 +114,12 @@ async function cleanUp(now: number): Promise<void> {
     .update(schema.prospects)
     .set({ subscribers: 0, views: "0", videoCount: 0 })
     .where(and(lt(schema.prospects.updatedAt, monthAgo), gt(schema.prospects.subscribers, 0)));
-  // Marketplace: a YouTube-verified subscriber count is API data too, so it lapses after 30 days unless re-verified.
+  // Marketplace: verified numbers are API data (YouTube's and Meta's rules), so they lapse after 30 days unless
+  // re-verified: followers, stats, views and avatar are cleared; the handle the creator typed stays.
   await d
     .update(schema.creatorHandles)
-    .set({ verifiedAt: null, verifiedBy: null, followers: null })
-    .where(and(eq(schema.creatorHandles.verifiedBy, "youtube_connection"), lt(schema.creatorHandles.verifiedAt, monthAgo)));
+    .set({ verifiedAt: null, verifiedBy: null, followers: null, avgViews: null, stats: null, avatarUrl: null })
+    .where(and(inArray(schema.creatorHandles.verifiedBy, ["youtube_connection", "instagram_connection"]), lt(schema.creatorHandles.verifiedAt, monthAgo)));
   await d.delete(schema.whatsappLinkCodes).where(lt(schema.whatsappLinkCodes.expiresAt, new Date(now)));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wa:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 7 * 86_400_000))));
   await d.delete(schema.webhookEvents).where(and(like(schema.webhookEvents.id, "wajoin:%"), lt(schema.webhookEvents.receivedAt, new Date(now - 86_400_000))));

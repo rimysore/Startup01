@@ -109,7 +109,7 @@ export function slugify(name: string): string {
   return s.length >= 3 ? s : `creator-${s || "kit"}`;
 }
 
-async function uniqueSlug(base: string, userId: string): Promise<string> {
+export async function uniqueSlug(base: string, userId: string): Promise<string> {
   const d = await db();
   for (let i = 0; i < 50; i++) {
     const slug = i ? `${base}-${i + 1}` : base;
@@ -248,6 +248,8 @@ export const BusinessInput = z
     budgetMaxInr: rupees,
     website: optText(200),
     instagram: optText(80),
+    /** Listed for creators on Mitra (name, category, area, website, Instagram; never budget or contacts). */
+    listed: z.boolean().optional(),
     whatsapp: z
       .string()
       .trim()
@@ -266,7 +268,7 @@ export async function getBusiness(userId: string): Promise<BusinessProfile | nul
 }
 
 export async function saveBusiness(userId: string, input: z.infer<typeof BusinessInput>): Promise<BusinessProfile> {
-  const values = { ...input, budgetMinInr: input.budgetMinInr ?? null, budgetMaxInr: input.budgetMaxInr ?? null, whatsapp: input.whatsapp ?? null, updatedAt: new Date() };
+  const values = { ...input, listed: input.listed ?? true, budgetMinInr: input.budgetMinInr ?? null, budgetMaxInr: input.budgetMaxInr ?? null, whatsapp: input.whatsapp ?? null, updatedAt: new Date() };
   const [b] = await (await db())
     .insert(schema.businessProfiles)
     .values({ userId, ...values })
