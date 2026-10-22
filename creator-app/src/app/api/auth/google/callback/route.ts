@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const fail = (path: string, error: string) => NextResponse.redirect(new URL(`${path}?error=${error}`, origin));
 
   if (!intent) return fail("/login", "state");
-  const failPath = intent.intent === "login" ? "/login" : "/dashboard/connections";
+  const failPath = intent.intent === "login" ? "/login" : intent.next.startsWith("/m") ? "/m/kit" : "/dashboard/connections";
   const code = searchParams.get("code");
   if (searchParams.get("error") || !code) return fail(failPath, "denied");
 

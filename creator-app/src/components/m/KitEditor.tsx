@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DELIVERABLES, NICHES, PLATFORM_LABEL, PLATFORMS, type Deliverable } from "@/lib/marketplace/flag";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { send } from "./client";
@@ -74,6 +74,16 @@ export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings
     setMsg({ ok: true, text: s.common.verified });
   }
 
+  // Back from Google with ?verify=1: verify straight away, once.
+  const autoVerified = useRef(false);
+  useEffect(() => {
+    if (autoVerified.current || !youtubeConnected || new URLSearchParams(location.search).get("verify") !== "1") return;
+    autoVerified.current = true;
+    history.replaceState(null, "", `${location.pathname}#verify`);
+    void verify();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on arrival
+  }, [youtubeConnected]);
+
   return (
     <form className="mk-form" onSubmit={save}>
       <section className="lp-card mk-fieldset">
@@ -145,7 +155,7 @@ export function KitEditor({ s, initial, youtubeConnected, ranges }: { s: Strings
               {verifying ? s.common.saving : s.kit.verifyYt}
             </button>
           ) : (
-            <a href="/api/auth/youtube/start?next=/m/kit%23verify" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
+            <a href="/api/auth/youtube/start?only=count&next=/m/kit%3Fverify%3D1%23verify" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
               {s.kit.connectYt}
             </a>
           )}

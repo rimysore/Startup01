@@ -10,6 +10,9 @@ export interface GoogleTokens {
 }
 
 export const LOGIN_SCOPES = ["openid", "email", "profile"];
+/** Read-only access to the channel's public details (name, subscriber count): all the media kit's Verify needs. */
+export const YOUTUBE_READONLY = "https://www.googleapis.com/auth/youtube.readonly";
+
 export const YOUTUBE_SCOPES = [
   "https://www.googleapis.com/auth/youtube.readonly",
   "https://www.googleapis.com/auth/yt-analytics.readonly",

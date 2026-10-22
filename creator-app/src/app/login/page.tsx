@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useQueryParam } from "@/components/hooks";
 import { Button, ErrorNote, Logo, ThemeToggle } from "@/components/ui";
 import { INVITE_ONLY } from "@/lib/company";
+import { MARKETPLACE } from "@/lib/marketplace/flag";
 
 /** A same-site path to go to after sign-in; anything that could leave the site ("//x", "/\\x", tabs) goes to the dashboard. */
 function sameSite(next: string | null): string {
@@ -78,7 +79,9 @@ export default function LoginPage() {
         </div>
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-12">
           <h1 className="font-display text-5xl leading-tight">Namaste 🙏</h1>
-          <p className="mt-2 text-ink-2">Sign in to connect your channel and get real answers from Mitra.</p>
+          <p className="mt-2 text-ink-2">
+            {MARKETPLACE ? "Sign in with Google. No channel access needed: creators check offers and see open programs; businesses count the customers each creator brings." : "Sign in to connect your channel and get real answers from Mitra."}
+          </p>
 
           {error && ERRORS[error] && <div className="mt-6"><ErrorNote>{ERRORS[error]}</ErrorNote></div>}
 

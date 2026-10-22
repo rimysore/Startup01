@@ -162,6 +162,46 @@ export default async function MarketHome() {
             </div>
           </section>
         )}
+        {programs.length > 0 && (
+          <section className="mt-8">
+            <h2 className="mk-h2">{s.programs.title}</h2>
+            <p className="mt-2 max-w-[70ch] text-[15px]" style={{ color: "var(--ink-2)" }}>
+              {s.programs.sub}
+            </p>
+            <div className="mk-programs mt-5">
+              {programs.map((p) => (
+                <article key={p.id} className="lp-card mk-panel grid content-start gap-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="lp-chip">{s.programs.kinds[p.kind] ?? p.kind}</span>
+                    {p.area && <span className="lp-label">{p.area}</span>}
+                  </div>
+                  <h3 className="text-[18px] font-semibold">{p.name}</h3>
+                  <p className="text-[15px]" style={{ color: "var(--ink-2)" }}>
+                    {p.summary}
+                  </p>
+                  {p.eligibility && (
+                    <p className="lp-label">
+                      {s.programs.who}: {p.eligibility}
+                    </p>
+                  )}
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <ProgramInterest s={s} id={p.id} interested={p.interested} />
+                    {p.link ? (
+                      <a href={p.link} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }}>
+                        {s.programs.visit} ↗
+                      </a>
+                    ) : p.kind === "local" ? (
+                      <Link href="/m/kit" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }}>
+                        {s.home.kitEdit}
+                      </Link>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="lp-label mt-4">{s.programs.note}</p>
+          </section>
+        )}
         <div className="mk-grid">
           <section className="lp-card mk-panel">
             <h2 className="mk-h2">{s.home.offerTitle}</h2>
@@ -229,46 +269,6 @@ export default async function MarketHome() {
             </section>
           )}
         </div>
-        {programs.length > 0 && (
-          <section className="mt-10">
-            <h2 className="mk-h2">{s.programs.title}</h2>
-            <p className="mt-2 max-w-[70ch] text-[15px]" style={{ color: "var(--ink-2)" }}>
-              {s.programs.sub}
-            </p>
-            <div className="mk-programs mt-5">
-              {programs.map((p) => (
-                <article key={p.id} className="lp-card mk-panel grid content-start gap-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="lp-chip">{s.programs.kinds[p.kind] ?? p.kind}</span>
-                    {p.area && <span className="lp-label">{p.area}</span>}
-                  </div>
-                  <h3 className="text-[18px] font-semibold">{p.name}</h3>
-                  <p className="text-[15px]" style={{ color: "var(--ink-2)" }}>
-                    {p.summary}
-                  </p>
-                  {p.eligibility && (
-                    <p className="lp-label">
-                      {s.programs.who}: {p.eligibility}
-                    </p>
-                  )}
-                  <div className="mt-1 flex flex-wrap gap-2">
-                    <ProgramInterest s={s} id={p.id} interested={p.interested} />
-                    {p.link ? (
-                      <a href={p.link} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }}>
-                        {s.programs.visit} ↗
-                      </a>
-                    ) : p.kind === "local" ? (
-                      <Link href="/m/kit" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }}>
-                        {s.home.kitEdit}
-                      </Link>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className="lp-label mt-4">{s.programs.note}</p>
-          </section>
-        )}
       </main>
     </>
   );
