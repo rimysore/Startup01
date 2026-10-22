@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already track sales every day and I have no idea which creator posts actually bring people in, so a free trial that I can check against my bill book costs me nothing to test. If it counts 10+ customers, ₹299 is nothing next to what I pay creators.",
+  "objection": "It only works if the creator sends me the link, and the creators I'd hire may not bother. My staff also have to remember to type the PIN or note the code when the salon is busy, otherwise the count is wrong and useless to me.",
+  "would_change_my_mind": "If after the free month the WhatsApp counts don't match my bill book, or none of the creators I work with will use it, I'd drop it.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2500
+}

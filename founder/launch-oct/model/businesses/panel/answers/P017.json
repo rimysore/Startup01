@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "Creators keep asking me for free services and none of them can show me a single paying customer, so a free count I can check against my own bill book is worth trying. If it shows ten real customers I don't mind ₹299; if it shows nothing, I've got my answer to give the next creator.",
+  "objection": "My staff are busy with clients, they will forget to type the PIN or note the code, and then the count is wrong and I am paying for numbers I can't trust. Also the creator sends the link, so the creator controls it, not me.",
+  "would_change_my_mind": "If after the free month the evening counts don't match my bill book, or my staff keep missing codes, I stop and won't pay.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

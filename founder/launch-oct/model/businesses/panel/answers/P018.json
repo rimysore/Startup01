@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "I stand at the counter myself and in the morning rush nobody has time to take a customer's phone and type a PIN. I already know roughly who came from a reel because they say so, so I don't need another WhatsApp message to tell me.",
+  "objection": "Customers won't bother showing a coupon, so the count will come out low and the report will say the creator did nothing when people actually came.",
+  "would_change_my_mind": "If the creator I already work with set it up for me and I saw a week of counts that matched my bill book without my staff doing anything extra at the counter.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 399,
+  "price_too_expensive": 699
+}

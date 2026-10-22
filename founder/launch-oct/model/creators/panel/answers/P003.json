@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd use the free counted collab, since a 'customers I brought' record could help me land cash deals. But the main thing the pass sells is Auto-DM, and I'm not risking my account's reach on a bot sending DMs, so I'd skip the ₹499.",
+  "objection": "Auto-DM could get my account flagged or shadowbanned by Instagram. My reach is everything to me right now, and a small beta team can't promise that won't happen.",
+  "would_change_my_mind": "Proof Auto-DM runs through Instagram's official API, plus a few Bengaluru creators my size using it for months with no drop in reach.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2499
+}

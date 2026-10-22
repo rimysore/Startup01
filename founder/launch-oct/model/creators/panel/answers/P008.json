@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I'd maybe try the free first counted collab, but I'm not paying for a pass from a small beta team I've never heard of. I mostly do food-for-posts anyway, so I don't need Auto-DM or unlimited counted posts yet.",
+  "objection": "Is this a real company? If the café doesn't scan the coupons or doesn't pay me later, who do I complain to? Small team, beta, all it says is that I get a counter.",
+  "would_change_my_mind": "If my free collab actually showed real counted customers and a café paid me cash because of that record, then I'd pay the ₹499.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

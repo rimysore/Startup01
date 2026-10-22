@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I don't know who Mitra is, and a link some creator forwards me on WhatsApp asking for a PIN looks like the kind of thing I tell my staff not to tap. My nephew does the Instagram, I count customers from the bill book, and I won't have my staff typing PINs on customers' phones when the shop is busy.",
+  "objection": "Who are you? A new startup with a small team could vanish in three months, and I'm not handing my customer counts to someone I've never met just because a creator sent the link.",
+  "would_change_my_mind": "Another salon or gym owner I know in my area telling me they've used it for a few months and the numbers matched their bill book, or someone from Mitra coming to the shop and setting it up in person.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 699,
+  "price_too_expensive": 1500
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already invoice brands off my rate card and insights, so I'd try the one free counted collab first, but I'm not paying for a beta tool from a small team I can't verify yet. ₹499 isn't the issue; putting my name on a link I send to a café owner is.",
+  "objection": "Who actually runs Mitra and is there a registered company behind it? If a café disputes the counts or doesn't pay me, who do I complain to, and will brands outside Bengaluru even trust a 'customers I brought' record from a beta app?",
+  "would_change_my_mind": "A free counted collab that shows real redemption numbers a brand actually accepts in a rate negotiation, plus a visible company name, GST/registration and a support contact.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 999,
+  "price_too_expensive": 2499
+}

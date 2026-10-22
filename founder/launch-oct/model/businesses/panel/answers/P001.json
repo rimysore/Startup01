@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "My agency handles Instagram and the creators, and I'm at the counter till 2 so I won't be chasing WhatsApp links. ₹299 is nothing, but getting my staff in every outlet to type PINs on customers' phones during the morning rush isn't going to happen.",
+  "objection": "My staff won't do the coupon step when it's busy, so the count will be wrong, and then the number is useless. Also it depends on creators sending me the link, and most of them just want free food.",
+  "would_change_my_mind": "If my agency set it up and ran it across all my outlets and gave me the report, with no extra work for counter staff.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 1500,
+  "price_too_expensive": 3000
+}

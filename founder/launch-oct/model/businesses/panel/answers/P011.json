@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I don't work with any creators, my regulars and Google reviews bring my customers, so there is nothing for this to count. And even if I tried one, my customers won't bother showing a coupon at a busy counter.",
+  "objection": "Customers won't bother showing a coupon, and I don't have time to type PINs on their phones during the morning rush, so the count would be wrong anyway.",
+  "would_change_my_mind": "If I actually started paying a creator and a café owner I know showed me it counted real customers without slowing the counter.",
+  "price_too_cheap": 49,
+  "price_cheap": 99,
+  "price_expensive": 299,
+  "price_too_expensive": 499
+}

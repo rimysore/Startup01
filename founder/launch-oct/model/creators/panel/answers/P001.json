@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've been ghosted and I've paid a fake agency's 'registration fee' before, so I'm not paying any platform, even ₹499, until I've seen it work. I might try the free counted collab, but the pass waits until a café actually uses the coupon and the count holds up.",
+  "objection": "Café owners here can barely be bothered to reply on WhatsApp. Will they really make customers show a coupon at the counter? And will a brand asking for cash ever trust a 'customers I brought' number from some beta app nobody has heard of?",
+  "would_change_my_mind": "My first free collab gets a real count that a café owner backs up, and someone in my WhatsApp groups says a business paid them cash after seeing their Mitra record.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 799,
+  "price_too_expensive": 1499
+}

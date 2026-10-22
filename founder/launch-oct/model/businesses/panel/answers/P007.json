@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I paid a creator once, got likes and no customers, so a number per creator is exactly what I'm missing. It's free to try, there's no app, and ₹299 is nothing next to what one bad creator cost me, so I'd try it at one outlet next time a creator comes asking.",
+  "objection": "My counter staff at rush hour won't remember to type a PIN or note a code, so the count will come out low and I won't know if the creator flopped or my staff just skipped it. And the creator has to send me the link, so the ones who are only after a free meal will never bother.",
+  "would_change_my_mind": "If I could send the Mitra link to the creator myself as a condition of the deal, and staff just had to scan or tap once, I'd roll it out to all my outlets, not just one.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2499
+}

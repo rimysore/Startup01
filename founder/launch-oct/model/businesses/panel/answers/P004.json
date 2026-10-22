@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I already hand out free services to creators every week and have no idea if any of it brings people in, so a free trial that just counts it is worth a shot. ₹299 is nothing next to what I give away in freebies.",
+  "objection": "It only works if the creator sends me the link, and the good creators won't bother with some beta tool; plus my staff are busy and will forget to type the PIN or note the code, so the count will look low and I won't trust it.",
+  "would_change_my_mind": "If in the first couple of weeks the creators who DM me won't use the link or my staff can't keep up with the codes, I'd drop it.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2500
+}

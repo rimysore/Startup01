@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I don't work with creators at all; my regulars, Google reviews and the WhatsApp group already fill my slots. This only does anything once a creator sends me a link, and the ones who message me just want free stuff.",
+  "objection": "It's a tool for measuring something I don't do. Why would I start paying creators just so I can count them?",
+  "would_change_my_mind": "Another salon or gym owner I know nearby showing me real numbers, like creators bringing in paying customers who came back, at a cost per customer below what a Google review push or a WhatsApp offer costs me.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

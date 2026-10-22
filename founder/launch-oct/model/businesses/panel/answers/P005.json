@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "₹299 is nothing for us, but I'm at the counter till 2 and my agency handles the creators, so I'm not going to add one more step for my staff at peak hours. If the counts come out wrong because nobody typed the PIN, the numbers are useless to me anyway.",
+  "objection": "When it's busy my staff won't remember to ask for the coupon or type a PIN on someone's phone, and they definitely won't send codes from the bill book later. Then the report undercounts and I end up blaming the wrong creator.",
+  "would_change_my_mind": "If my agency set it up across all my outlets and ran it for me, and I saw a week where the WhatsApp count actually matched my bill book without my staff doing extra work.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 1500,
+  "price_too_expensive": 4000
+}

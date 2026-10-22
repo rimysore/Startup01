@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "₹499 is nothing to me, but the first counted collab is free, so I'd run that before paying for anything. If the café owner won't bother with the link, or customers don't show the coupon, the count is useless and so is the pass.",
+  "objection": "Local cafés pay in food, not money. A few coupon counts from one café won't make the next owner pay my rate card, and I don't know whether owners will take a beta link from a small team seriously.",
+  "would_change_my_mind": "My free collab actually logging real coupon redemptions, and one café paying me cash after seeing that 'customers I brought' number.",
+  "price_too_cheap": 99,
+  "price_cheap": 299,
+  "price_expensive": 1499,
+  "price_too_expensive": 3000
+}

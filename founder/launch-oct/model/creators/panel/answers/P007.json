@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I never pay for creator tools. I'd use the free first counted collab and send the link to a café, but I'm not paying ₹499 for Auto-DM when I can reply to DMs myself at night.",
+  "objection": "It's a small beta team. Who is actually behind this, and if a café ghosts me on payment, does Mitra do anything, or is it just a counter?",
+  "would_change_my_mind": "Getting the pass free by bringing a café in, and then the counts actually getting me a cash collab instead of free food. Then I might pay to keep it, but only after it has paid me first.",
+  "price_too_cheap": 0,
+  "price_cheap": 99,
+  "price_expensive": 299,
+  "price_too_expensive": 499
+}

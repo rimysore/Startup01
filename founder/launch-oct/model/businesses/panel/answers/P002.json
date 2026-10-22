@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I'm already giving free meals to creators with no idea if anyone walks in because of them, so a free trial that sends me a daily count I can check against my bill book is worth a try. ₹299 only when it counts 10 or more is small money if the numbers hold up.",
+  "objection": "At lunch rush my counter boy won't stop to type a PIN on someone's phone or write codes on bills, so half the creator customers will never get counted and the numbers will be useless.",
+  "would_change_my_mind": "If after two weeks the evening counts don't match what I see in my bill book, or my staff skip it when it's busy, I'll drop it.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 599,
+  "price_too_expensive": 1000
+}

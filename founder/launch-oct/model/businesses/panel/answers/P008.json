@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already stopped paying creators after getting likes and no customers, so I'm not going to start again just to try a counting tool. And I won't let some beta startup I've never heard of get between my staff, my bill book and my customers' phones.",
+  "objection": "Who are you? A small new team could disappear in three months, and I don't want my counter staff doing PIN entry for a coupon system that might not be there next month.",
+  "would_change_my_mind": "Another café or darshini owner nearby that I know telling me it actually showed which creator brought real people, and a creator offering to work with me only if they use it.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

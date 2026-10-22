@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I've never paid for a creator tool and I'm not starting now. Collab DMs already come in every week, and a free first counted collab is enough for me to test it. I'd use the free part and skip the pass.",
+  "objection": "Why pay ₹499 a year when barter deals come to my DMs anyway? And I'm not sure a café owner will bother counting coupons at the counter. If they don't, the 'customers I brought' record is empty and the pass does nothing for me.",
+  "would_change_my_mind": "Proof that a brand actually paid a creator cash because of their Mitra count record. Or earning the pass free by bringing cafés, so I never pay.",
+  "price_too_cheap": 49,
+  "price_cheap": 99,
+  "price_expensive": 299,
+  "price_too_expensive": 499
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "need",
+  "reason": "I give away free meals every week and honestly have no idea if any of them bring a single customer. If it's free to try and I only pay in a month it actually counts 10 people, I'll try it, because ₹299 is less than two free meals.",
+  "objection": "It only works if the creators bother to send me the link, and the ones DMing me for free food are mostly not the good ones. My counter staff also won't remember to type a PIN in the lunch rush, so the count could come out lower than what really happened.",
+  "would_change_my_mind": "If after the free month the evening message shows nobody came, or the creators won't use the link, I'll stop. If it's simple enough to just write the code on the bill, I'll keep it.",
+  "price_too_cheap": 49,
+  "price_cheap": 149,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}
