@@ -42,7 +42,7 @@ const FAQ = [
   ["How do I know an offer is real?", "Forward it to Mitra on WhatsApp or email, or upload a screenshot. Mitra checks what the offer says and who sent it: scam patterns like registration fees, when their website was registered, whether the brand's official site matches, and what other creators reported. It shows its sources, so you decide."],
   ["Will the customer count be right?", "Each customer shows the creator's coupon on their phone and your staff redeem it with your counter PIN, or type the code in counter mode. Nothing is guessed from views. You can download your daily counts and check them against your bill book."],
   ["Does it work for barter deals?", "Yes. Track any creator post, paid or barter, whether you found the creator on Mitra or not. Seeing a free-meal post next to a paid one is usually the first useful thing an owner learns."],
-  ["Do I have to connect Instagram or YouTube?", "No. Join with your handles and the numbers you see in your own insights; they're shown as self-reported. Connecting YouTube or an Instagram professional account, read-only, fetches your public numbers (followers, posts, views, likes on recent posts), gives you a Verified badge and puts you higher in matches. Mitra never posts for you. Other apps stay self-reported."],
+  ["Do I have to connect Instagram?", "No, but it's the quickest way in. Connecting an Instagram creator or business account, read-only, fetches your followers, average views, engagement and where your followers are, fills in your profile and gives you a Verified badge that puts you higher in matches. Mitra never posts for you. You can also type your numbers; they're shown as self-reported."],
   ["Which languages and cities?", "Kannada and English, in Bengaluru first. One city done properly before we go wider."],
   ["Are paid posts labelled?", "Yes. Paid and gifted posts carry \"Paid partnership\" or #ad, as the ASCI rules require. It protects your audience's trust, and yours."],
 ] as const;
@@ -166,12 +166,12 @@ export default function Home() {
         <div className="lp-wrap lp-two">
           <div data-reveal>
             <p className="lp-kn-line kn" lang="kn">ಪ್ರಾಮಾಣಿಕ ಸಂಖ್ಯೆಗಳ ಮೀಡಿಯಾ ಕಿಟ್</p>
-            <h2 id="kit-title" className="lp-h2">A media kit with honest numbers.</h2>
+            <h2 id="kit-title" className="lp-h2">Connect Instagram. Your profile fills itself.</h2>
             <ul className="lp-ticks">
               {[
-                "One page for every platform you post on, ready to send to any brand.",
-                "Numbers you enter are labelled self-reported. Nobody is fooled, so nobody is let down.",
-                "Connect an account and those numbers turn Verified. Verified creators are matched first.",
+                "One tap, read-only: followers, average views on your reels, engagement and where your followers are.",
+                "Mitra fills in your profile from your bio and posts: what you make, your languages and your area. You can change anything.",
+                "Verified numbers are matched first. Numbers you type yourself are labelled self-reported.",
                 "You set your own rates. Mitra shows what similar creators nearby charge.",
               ].map((t) => (
                 <li key={t}>
@@ -193,9 +193,9 @@ export default function Home() {
             <div className="mt-4">
               {(
                 [
-                  ["Instagram", "18.4K", "followers", false],
-                  ["YouTube", "6.2K", "subscribers", true],
-                  ["ShareChat", "3.1K", "followers", false],
+                  ["Followers", "18.4K", "Instagram", true],
+                  ["Average views", "9.6K", "recent reels", true],
+                  ["Engagement", "4.8%", "likes + comments", true],
                 ] as const
               ).map(([p, n, unit, v]) => (
                 <div key={p} className="lp-kit__row">

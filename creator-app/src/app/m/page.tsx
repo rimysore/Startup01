@@ -9,7 +9,6 @@ import { programsFor } from "@/lib/marketplace/programs";
 import { businessesFor, creatorsFor, interestedCreators, type CreatorCard } from "@/lib/marketplace/collabs";
 import { BusinessInterest, ProgramInterest } from "@/components/m/TrackParts";
 import { dealTotals, getBusiness, getKit, isVerified, kitCompleteness, listDeals } from "@/lib/marketplace/store";
-import { youtubeConnection } from "@/lib/youtube";
 
 // Reads the session and may redirect: renders per request (see the /m layout).
 export const instant = false;
@@ -127,11 +126,11 @@ export default async function MarketHome() {
     );
   }
 
-  const [{ profile, handles }, deals, yt, invites, programs, businesses] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id), invitesForCreator(user.id), programsFor(user.id), businessesFor(user.id)]);
+  const [{ profile, handles }, deals, invites, programs, businesses] = await Promise.all([getKit(user.id), listDeals(user.id), invitesForCreator(user.id), programsFor(user.id), businessesFor(user.id)]);
   const pending = invites.filter((i) => i.invite.status === "pending");
   const pct = kitCompleteness(profile, handles);
   const totals = dealTotals(deals);
-  const ytVerified = handles.some((h) => h.platform === "youtube" && isVerified(h));
+  const igVerified = handles.some((h) => h.platform === "instagram" && isVerified(h));
   return (
     <>
       {top}
@@ -142,6 +141,17 @@ export default async function MarketHome() {
         </h1>
         <p className="mk-sub">{s.home.creatorSub}</p>
         <LaunchNotice s={s} side="creator" />
+        {!igVerified && (
+          <section className="lp-card mk-panel mt-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="grid min-w-0 max-w-[60ch] gap-1">
+              <h2 className="mk-h2">{s.home.verifyTitle}</h2>
+              <p style={{ color: "var(--ink-2)" }}>{s.home.verifySub}</p>
+            </div>
+            <a href="/api/auth/instagram/start" className="lp-btn" style={{ minHeight: 46 }}>
+              {s.home.verifyGo}
+            </a>
+          </section>
+        )}
         <section className="mt-8">
           <h2 className="mk-h2">{s.collabs.title}</h2>
           <p className="mt-2 max-w-[70ch] text-[15px]" style={{ color: "var(--ink-2)" }}>
@@ -306,15 +316,6 @@ export default async function MarketHome() {
             )}
           </section>
 
-          {!ytVerified && (
-            <section className="lp-card mk-panel">
-              <h2 className="mk-h2">{s.home.verifyTitle}</h2>
-              <p className="mt-2" style={{ color: "var(--ink-2)" }}>{s.home.verifySub}</p>
-              <Link href={yt ? "/m/kit#verify" : "/api/auth/youtube/start?only=count&next=/m/kit%3Fverify%3D1%23verify"} className="lp-btn lp-btn--ghost mt-5" style={{ minHeight: 44 }}>
-                {yt ? s.kit.verifyYt : s.home.verifyGo}
-              </Link>
-            </section>
-          )}
         </div>
       </main>
     </>

@@ -4,14 +4,13 @@ import { DELIVERABLES } from "@/lib/marketplace/flag";
 import { marketPageFor } from "@/lib/marketplace/page";
 import { getKit, isVerified, rateRange } from "@/lib/marketplace/store";
 import { instagramConfigured, instagramConnection } from "@/lib/marketplace/social";
-import { youtubeConnection } from "@/lib/youtube";
 
 // Reads the session and may redirect: renders per request (see the /m layout).
 export const instant = false;
 
 export default async function KitPage({ searchParams }: PageProps<"/m/kit">) {
   const { user, member, s } = await marketPageFor("/m/kit", "creator");
-  const [{ profile, handles }, yt, ig] = await Promise.all([getKit(user.id), youtubeConnection(user.id), instagramConnection(user.id)]);
+  const [{ profile, handles }, ig] = await Promise.all([getKit(user.id), instagramConnection(user.id)]);
   const igMsg = (await searchParams).ig;
   const niches = profile?.niches ?? [];
   const ranges = Object.fromEntries(await Promise.all(DELIVERABLES.map(async (d) => [d, await rateRange(user.id, d, niches)] as const)));
@@ -45,7 +44,6 @@ export default async function KitPage({ searchParams }: PageProps<"/m/kit">) {
               profileUrl: h.profileUrl,
             })),
           }}
-          youtubeConnected={Boolean(yt && !yt.needsReconnectAt)}
           instagram={{ configured: instagramConfigured(), connected: Boolean(ig), message: typeof igMsg === "string" ? igMsg : null }}
           ranges={ranges}
         />

@@ -9,7 +9,7 @@ const ROLES = [
   {
     id: "creator",
     label: "Creator",
-    handle: "Your Instagram or YouTube handle",
+    handle: "Your Instagram handle",
     ph: "@yourhandle",
   },
   {

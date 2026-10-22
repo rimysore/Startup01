@@ -36,20 +36,56 @@ const fake: typeof fetch = async (input) => {
   if (url.includes("/access_token?") && url.includes("ig_exchange_token")) return json({ access_token: "long-token", expires_in: 60 * 86400 });
   if (url.includes("/refresh_access_token")) return json({ access_token: "refreshed", expires_in: 60 * 86400 });
   if (url.includes("/me/media")) return json({ data: [
-    { id: "m1", caption: "Best benne dosa in Basavanagudi\n#food", media_product_type: "REELS", permalink: "https://instagram.com/reel/m1", timestamp: "2026-10-10T00:00:00Z", like_count: 1200, comments_count: 80 },
+    { id: "m1", caption: "Best benne dosa in Basavanagudi\n#food #bangalorefood", media_product_type: "REELS", permalink: "https://instagram.com/reel/m1", timestamp: "2026-10-10T00:00:00Z", like_count: 1200, comments_count: 80 },
     { id: "m2", caption: "", media_type: "IMAGE", permalink: "https://instagram.com/p/m2", timestamp: "2026-10-05T00:00:00Z", like_count: 400, comments_count: 20 },
+    { id: "m3", caption: "ಬೆಂಗಳೂರಿನ ಅತ್ಯುತ್ತಮ ದೋಸೆ ಹುಡುಕಾಟ, ಜಯನಗರದ ರುಚಿ", media_product_type: "REELS", permalink: "https://instagram.com/reel/m3", timestamp: "2026-09-26T00:00:00Z", like_count: 900, comments_count: 40 },
   ] });
-  if (url.includes("/me?")) return json({ user_id: "1789", username: "sita.eats", account_type: "MEDIA_CREATOR", profile_picture_url: "https://ig/p.jpg", followers_count: 18400, follows_count: 310, media_count: 356 });
+  if (url.includes("/m1/insights")) return json({ data: [{ name: "views", period: "lifetime", values: [{ value: 22000 }] }] });
+  if (url.includes("/m2/insights")) return json({ error: { message: "not supported" } }, 400);
+  if (url.includes("/m3/insights")) return json({ data: [{ name: "views", total_value: { value: 9000 } }] });
+  if (url.includes("/me/insights")) {
+    const b = new URL(url).searchParams.get("breakdown");
+    const results = b === "city" ? [["Bengaluru, Karnataka", 600], ["Mysuru, Karnataka", 150], ["Chennai, Tamil Nadu", 50], ["Mumbai, Maharashtra", 200]]
+      : b === "age" ? [["18-24", 300], ["25-34", 500], ["35-44", 200]]
+      : [["F", 550], ["M", 430], ["U", 20]];
+    return json({ data: [{ name: "follower_demographics", total_value: { breakdowns: [{ dimension_keys: [b], results: results.map(([k, v]) => ({ dimension_values: [k], value: v })) }] } }] });
+  }
+  if (url.includes("/me?") && url.includes("fields=biography")) return json({ biography: "Kannada food videos | Jayanagar, Bengaluru 🍛 Collabs: DM" });
+  if (url.includes("/me?")) return json({ user_id: "1789", username: "sita.eats", name: "Sita Rao", account_type: "MEDIA_CREATOR", profile_picture_url: "https://ig/p.jpg", followers_count: 18400, follows_count: 310, media_count: 356 });
   return json({ error: { message: "unexpected" } }, 400);
 };
 const ex = await so.instagramExchange("code", "http://localhost:3000", fake);
 assert(ex.token === "long-token" && ex.userId === "1789" && ex.expiresAt.getTime() > Date.now() + 59 * 86400_000, "Instagram: code → long-lived token");
 const snap = await so.instagramSnapshot(ex.token, fake);
-const ig = so.instagramVerified(snap);
-assert(ig.followers === 18400 && ig.stats.posts === 356 && ig.stats.following === 310 && ig.avgViews === null, "Instagram: followers, posts, following; no views on this API");
-assert(ig.stats.avgEngagement === 850 && ig.stats.recent[0].title === "Best benne dosa in Basavanagudi" && ig.stats.recent[1].title === "Post", "Instagram: engagement per post, first caption line as the title");
+const ig = so.instagramVerified(snap, new Date("2026-10-12T00:00:00Z").getTime());
+assert(ig.followers === 18400 && ig.stats.posts === 356 && ig.stats.following === 310, "Instagram: followers, posts, following");
+assert(ig.avgViews === 15500, "Instagram: average views = median views of recent reels, from insights");
+assert(ig.stats.recent[0].views === 22000 && ig.stats.recent[1].views === null, "a post without views just shows none");
+assert(ig.stats.avgEngagement === 880 && ig.stats.engagementRate === 4.8 && ig.stats.reelsShare === 67 && ig.stats.postsPerWeek === 1.3, "engagement per post, engagement rate, share of reels, posts a week");
+assert(ig.stats.audience?.cities[0].name === "Bengaluru" && ig.stats.audience.cities[0].pct === 60 && ig.stats.audience.cities.length === 3 && ig.stats.audience.ages[0].name === "25-34" && ig.stats.audience.women === 55, "audience: top cities, ages and share of women");
+assert(ig.stats.recent[0].title === "Best benne dosa in Basavanagudi" && ig.stats.recent[1].title === "Post", "first caption line as the title");
 assert(ig.profileUrl === "https://www.instagram.com/sita.eats/" && ig.verifiedBy === "instagram_connection", "Instagram: profile link");
-assert(!calls.some((c) => c.includes("insights")), "only public profile fields are read, no insights");
+assert(so.IG_SCOPES.includes("instagram_business_manage_insights") && !calls.some((c) => c.includes("publish") || c.includes("comments")), "reads only: profile, posts and insights");
+
+const fill = so.instagramProfileFill(snap);
+assert(fill.displayName === "Sita Rao" && fill.bio?.startsWith("Kannada food videos") && fill.niches[0] === "food" && fill.area === "Jayanagar", "profile fill: name, bio, niche from captions, area from the bio");
+assert(fill.languages.includes("kn") && fill.languages.includes("en"), "profile fill: Kannada and English from bio and captions");
+
+// No profile yet: connecting creates it. A profile with typed fields keeps them.
+await d.insert(schema.users).values({ id: "new", email: "new@x.com", name: "New Person" });
+await m.joinMarketplace("new", { role: "creator", uiLanguage: "en", terms: true, contact: false });
+const r1 = await so.syncInstagram("new", snap, "New Person");
+const np = (await m.getKit("new")).profile!;
+assert(np.displayName === "Sita Rao" && np.area === "Jayanagar" && np.niches[0] === "food" && np.slug && r1.filled.includes("bio") && r1.handle.avgViews === 15500, "a new creator's profile is made from Instagram");
+await m.saveKit("cr", m.KitInput.parse({ displayName: "Sita", bio: "My own line", area: "Malleshwaram", niches: ["travel"], languages: ["en"] }));
+const r2 = await so.syncInstagram("cr", snap, "Sita");
+const cp = (await m.getKit("cr")).profile!;
+assert(cp.bio === "My own line" && cp.area === "Malleshwaram" && cp.niches.join() === "travel" && cp.languages.includes("kn") && r2.filled.join() === "languages", "typed fields are never overwritten; languages are added");
+
+// Only the profile is required: a failing insights call leaves views and audience empty.
+const noInsights: typeof fetch = async (input, init) => (String(input).includes("insights") ? new Response("{}", { status: 403 }) : fake(input, init));
+const plain = so.instagramVerified(await so.instagramSnapshot("t", noInsights));
+assert(plain.followers === 18400 && plain.avgViews === null && plain.stats.audience === null, "without insights: followers still verified, no views or audience");
 await so.saveInstagramConnection("cr", { igUserId: ex.userId, username: "sita.eats", token: ex.token, expiresAt: ex.expiresAt });
 const [row] = await d.select().from(schema.instagramConnections).where(eq(schema.instagramConnections.userId, "cr"));
 assert(row.accessToken !== "long-token", "the token is stored encrypted");

@@ -127,6 +127,10 @@ async function creatorCards(userIds: string[] | null, business: { area: string |
         score += 3;
       }
       if (best) reasons.push(`${compact(best.followers!)} on ${best.platform === "youtube" ? "YouTube" : best.platform === "instagram" ? "Instagram" : best.platform}${verified ? " (verified)" : " (self-reported)"}`);
+      if (best?.avgViews) reasons.push(`${compact(best.avgViews)} average views`);
+      if (verified && best?.stats?.engagementRate != null) reasons.push(`${best.stats.engagementRate}% engagement`);
+      const topCity = verified ? best?.stats?.audience?.cities[0] : undefined;
+      if (topCity) reasons.push(`${topCity.pct}% of followers in ${topCity.name}`);
       if (verified) score += 2;
       if (p.languages.includes("kn")) reasons.push("Posts in Kannada");
       return { userId: p.userId, name: p.displayName, area: p.area, niches: p.niches, kit: p.isPublic ? `/kit/${p.slug}` : null, reach: best ? compact(best.followers!) : null, verified, reasons, score };

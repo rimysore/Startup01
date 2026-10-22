@@ -416,6 +416,13 @@ export type HandleStats = {
   following?: number | null;
   /** Average engagement (likes + comments) per recent post. */
   avgEngagement?: number | null;
+  /** Average likes + comments per post as a % of followers. */
+  engagementRate?: number | null;
+  postsPerWeek?: number | null;
+  /** % of recent posts that are reels. */
+  reelsShare?: number | null;
+  /** Where followers are, from Instagram insights (accounts with 100+ followers): top entries with their share in %. */
+  audience?: { cities: { name: string; pct: number }[]; ages: { name: string; pct: number }[]; women: number | null } | null;
   recent: { id: string; title: string; url: string | null; at: string; views?: number | null; likes?: number | null; comments?: number | null; kind?: string | null }[];
 };
 

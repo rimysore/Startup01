@@ -109,7 +109,7 @@ export function slugify(name: string): string {
   return s.length >= 3 ? s : `creator-${s || "kit"}`;
 }
 
-async function uniqueSlug(base: string, userId: string): Promise<string> {
+export async function uniqueSlug(base: string, userId: string): Promise<string> {
   const d = await db();
   for (let i = 0; i < 50; i++) {
     const slug = i ? `${base}-${i + 1}` : base;

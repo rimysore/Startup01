@@ -1,11 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { DELIVERABLES, NICHES, PLATFORM_LABEL, PLATFORMS, type Deliverable } from "@/lib/marketplace/flag";
+import { useState } from "react";
+import { DELIVERABLES, NICHES, PLATFORMS, type Deliverable } from "@/lib/marketplace/flag";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { send } from "./client";
 
-type Stats = { posts: number | null; totalViews?: number | null; avgEngagement?: number | null; recent: { id: string; title: string; url: string | null; at: string; views?: number | null; likes?: number | null; comments?: number | null }[] };
+type Share = { name: string; pct: number };
+type Stats = {
+  posts: number | null;
+  avgEngagement?: number | null;
+  engagementRate?: number | null;
+  postsPerWeek?: number | null;
+  reelsShare?: number | null;
+  audience?: { cities: Share[]; ages: Share[]; women: number | null } | null;
+  recent: { id: string; title: string; url: string | null; at: string; views?: number | null; likes?: number | null; comments?: number | null }[] };
 type Handle = { platform: string; handle: string; followers: number | null; avgViews: number | null; verifiedAt: string | null; stats?: Stats | null; profileUrl?: string | null };
 type Initial = {
   displayName: string;
@@ -31,13 +39,11 @@ const compact = (n: number) => (n >= 1e6 ? `${(n / 1e6).toFixed(1).replace(/\.0$
 export function KitEditor({
   s,
   initial,
-  youtubeConnected,
   instagram,
   ranges,
 }: {
   s: Strings;
   initial: Initial;
-  youtubeConnected: boolean;
   instagram: { configured: boolean; connected: boolean; message: string | null };
   ranges: Record<string, Range>;
 }) {
@@ -53,6 +59,8 @@ export function KitEditor({
   const toggle = (key: "niches" | "languages", v: string, max: number) =>
     setF((x) => ({ ...x, [key]: x[key].includes(v) ? x[key].filter((y) => y !== v) : x[key].length < max ? [...x[key], v] : x[key] }));
   const setHandle = (p: string, patch: Partial<Handle>) => setHandles((h) => ({ ...h, [p]: { ...h[p], ...patch } }));
+  // Instagram only for now; other accounts already saved are kept as they are.
+  const ig = handles.instagram;
 
   async function save(e?: React.FormEvent) {
     e?.preventDefault();
@@ -79,16 +87,6 @@ export function KitEditor({
     setMsg({ ok: true, text: s.common.saved });
   }
 
-  async function verify() {
-    setVerifying(true);
-    setMsg(null);
-    const r = await send("/api/m/kit/verify", "POST");
-    setVerifying(false);
-    if (r.error) return setMsg({ ok: false, text: r.error });
-    setHandle("youtube", { handle: String(r.json?.handle ?? ""), followers: Number(r.json?.followers ?? 0), verifiedAt: String(r.json?.verifiedAt ?? new Date().toISOString()) });
-    setMsg({ ok: true, text: s.common.verified });
-  }
-
   async function refreshInstagram() {
     setVerifying(true);
     setMsg(null);
@@ -104,18 +102,33 @@ export function KitEditor({
     location.reload();
   }
 
-  // Back from Google with ?verify=1: verify straight away, once.
-  const autoVerified = useRef(false);
-  useEffect(() => {
-    if (autoVerified.current || !youtubeConnected || new URLSearchParams(location.search).get("verify") !== "1") return;
-    autoVerified.current = true;
-    history.replaceState(null, "", `${location.pathname}#verify`);
-    void verify();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- runs once on arrival
-  }, [youtubeConnected]);
-
   return (
     <form className="mk-form" onSubmit={save}>
+      <section className="lp-card mk-fieldset" id="verify">
+        <InstagramCard s={s} h={ig} instagram={instagram} busy={verifying} onRefresh={refreshInstagram} onDisconnect={disconnectInstagram} />
+        {!ig.verifiedAt && (
+          <details open={!instagram.configured || Boolean(ig.handle)}>
+            <summary className="cursor-pointer text-[14px] font-semibold">{s.kit.typeOwn}</summary>
+            <div className="mk-handle mk-handle--head lp-label mt-3" aria-hidden>
+              <span />
+              <span>{s.kit.handle}</span>
+              <span>{s.kit.followers}</span>
+              <span>{s.kit.avgViews}</span>
+              <span />
+            </div>
+            <div className="mk-handle">
+              <span>Instagram</span>
+              <input aria-label={`Instagram ${s.kit.handle}`} value={ig.handle} onChange={(e) => setHandle("instagram", { handle: e.target.value })} placeholder="@" maxLength={80} />
+              <input aria-label={`Instagram ${s.kit.followers}`} inputMode="numeric" value={ig.followers ?? ""} placeholder={s.kit.followers} onChange={(e) => setHandle("instagram", { followers: num(e.target.value) })} />
+              <input aria-label={`Instagram ${s.kit.avgViews}`} inputMode="numeric" value={ig.avgViews ?? ""} placeholder={s.kit.avgViews} onChange={(e) => setHandle("instagram", { avgViews: num(e.target.value) })} />
+              <span className="lp-chip" style={{ visibility: ig.handle ? "visible" : "hidden" }}>
+                {s.common.selfReported}
+              </span>
+            </div>
+          </details>
+        )}
+      </section>
+
       <section className="lp-card mk-fieldset">
         <div className="mk-row">
           <label className="mk-label">
@@ -152,125 +165,6 @@ export function KitEditor({
               </button>
             ))}
           </div>
-        </div>
-      </section>
-
-      <section className="lp-card mk-fieldset" id="verify">
-        <h2 className="mk-h2">{s.kit.handles}</h2>
-        <div className="mk-handle mk-handle--head lp-label" aria-hidden>
-          <span />
-          <span>{s.kit.handle}</span>
-          <span>{s.kit.followers}</span>
-          <span>{s.kit.avgViews}</span>
-          <span />
-        </div>
-        {PLATFORMS.map((p) => {
-          const h = handles[p];
-          const verified = Boolean(h.verifiedAt);
-          return (
-            <div key={p} className="mk-handle">
-              <span>{PLATFORM_LABEL[p]}</span>
-              <input aria-label={`${PLATFORM_LABEL[p]} ${s.kit.handle}`} value={h.handle} onChange={(e) => setHandle(p, { handle: e.target.value, ...(verified ? { verifiedAt: null } : {}) })} placeholder="@" maxLength={80} />
-              <input aria-label={`${PLATFORM_LABEL[p]} ${s.kit.followers}`} inputMode="numeric" value={h.followers ?? ""} placeholder={s.kit.followers} disabled={verified} onChange={(e) => setHandle(p, { followers: num(e.target.value) })} />
-              <input aria-label={`${PLATFORM_LABEL[p]} ${s.kit.avgViews}`} inputMode="numeric" value={h.avgViews ?? ""} placeholder={s.kit.avgViews} onChange={(e) => setHandle(p, { avgViews: num(e.target.value) })} />
-              <span className={`lp-chip ${verified ? "lp-chip--ok" : ""}`} style={{ visibility: h.handle ? "visible" : "hidden" }}>
-                {verified ? s.common.verified : s.common.selfReported}
-              </span>
-            </div>
-          );
-        })}
-        <div className="mk-verify">
-          <h3 className="text-[16px] font-semibold">{s.kit.verifyTitle}</h3>
-          <p className="lp-label">{s.kit.verifySub}</p>
-          {instagram.message && (
-            <p className={instagram.message === "ok" ? "mk-ok" : "mk-err"} role="status">
-              {s.kit.igMsg[instagram.message] ?? s.kit.igMsg.failed}
-            </p>
-          )}
-          <div className="flex flex-wrap items-center gap-2">
-            {youtubeConnected ? (
-              <button type="button" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }} onClick={verify} disabled={verifying}>
-                {verifying ? s.common.saving : handles.youtube.verifiedAt ? s.kit.refreshYt : s.kit.verifyYt}
-              </button>
-            ) : (
-              <a href="/api/auth/youtube/start?only=count&next=/m/kit%3Fverify%3D1%23verify" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
-                {s.kit.connectYt}
-              </a>
-            )}
-            {instagram.configured ? (
-              instagram.connected ? (
-                <>
-                  <button type="button" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }} onClick={refreshInstagram} disabled={verifying}>
-                    {s.kit.refreshIg}
-                  </button>
-                  <button type="button" className="lp-link text-[14px]" style={{ color: "var(--ink-2)" }} onClick={disconnectInstagram} disabled={verifying}>
-                    {s.kit.disconnectIg}
-                  </button>
-                </>
-              ) : (
-                <a href="/api/auth/instagram/start" className="lp-btn lp-btn--ghost" style={{ minHeight: 42 }}>
-                  {s.kit.connectIg}
-                </a>
-              )
-            ) : (
-              <span className="lp-label">{s.kit.igSoon}</span>
-            )}
-          </div>
-          {instagram.configured && !instagram.connected && <p className="lp-label">{s.kit.igHint}</p>}
-          <p className="lp-label">{s.kit.otherSelf}</p>
-          {(["youtube", "instagram"] as const)
-            .filter((p) => handles[p].verifiedAt && handles[p].stats)
-            .map((p) => {
-              const h = handles[p];
-              const st = h.stats!;
-              return (
-                <div key={p} className="mk-stats">
-                  <p className="font-semibold">
-                    {PLATFORM_LABEL[p]} ·{" "}
-                    {h.profileUrl ? (
-                      <a href={h.profileUrl} target="_blank" rel="noopener noreferrer" className="lp-link underline">
-                        {h.handle}
-                      </a>
-                    ) : (
-                      h.handle
-                    )}{" "}
-                    <span className="lp-chip lp-chip--ok">{s.common.verified}</span>
-                  </p>
-                  <p className="mt-1 text-[14px] tabular-nums" style={{ color: "var(--ink-2)" }}>
-                    {[
-                      h.followers != null ? `${compact(h.followers)} ${s.kit.followers.toLowerCase()}` : null,
-                      st.posts != null ? `${compact(st.posts)} ${s.kit.statPosts}` : null,
-                      h.avgViews != null ? `${compact(h.avgViews)} ${s.kit.statAvgViews}` : null,
-                      st.avgEngagement != null ? `${compact(st.avgEngagement)} ${s.kit.statEngagement}` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </p>
-                  {st.recent.length > 0 && (
-                    <details className="mt-2">
-                      <summary className="cursor-pointer text-[14px] font-semibold">{s.kit.statRecent}</summary>
-                      <ul className="mt-2 grid gap-1.5 text-[14px]">
-                        {st.recent.map((r) => (
-                          <li key={r.id} className="flex justify-between gap-3">
-                            {r.url ? (
-                              <a href={r.url} target="_blank" rel="noopener noreferrer" className="lp-link truncate">
-                                {r.title}
-                              </a>
-                            ) : (
-                              <span className="truncate">{r.title}</span>
-                            )}
-                            <span className="shrink-0 tabular-nums" style={{ color: "var(--ink-2)" }}>
-                              {[r.views != null ? `${compact(r.views)} views` : null, r.likes != null ? `${compact(r.likes)} likes` : null].filter(Boolean).join(" · ")}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
-                  )}
-                </div>
-              );
-            })}
-          <span className="lp-label">{s.kit.verifyYtHint}</span>
         </div>
       </section>
 
@@ -345,5 +239,124 @@ export function KitEditor({
         )}
       </div>
     </form>
+  );
+}
+
+/** Connect Instagram, or what it verified: followers, views, engagement, rhythm, audience and recent posts. */
+function InstagramCard({
+  s,
+  h,
+  instagram,
+  busy,
+  onRefresh,
+  onDisconnect,
+}: {
+  s: Strings;
+  h: Handle;
+  instagram: { configured: boolean; connected: boolean; message: string | null };
+  busy: boolean;
+  onRefresh: () => void;
+  onDisconnect: () => void;
+}) {
+  const st = h.verifiedAt ? h.stats : null;
+  const aud = st?.audience;
+  return (
+    <div className="mk-verify" style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>
+      <h2 className="mk-h2">{s.kit.verifyTitle}</h2>
+      <p className="lp-label">{s.kit.verifySub}</p>
+      {instagram.message && (
+        <p className={["ok", "filled"].includes(instagram.message) ? "mk-ok" : "mk-err"} role="status">
+          {s.kit.igMsg[instagram.message] ?? s.kit.igMsg.failed}
+        </p>
+      )}
+      {st ? (
+        <div className="mk-stats">
+          <p className="font-semibold">
+            Instagram ·{" "}
+            {h.profileUrl ? (
+              <a href={h.profileUrl} target="_blank" rel="noopener noreferrer" className="lp-link underline">
+                @{h.handle}
+              </a>
+            ) : (
+              `@${h.handle}`
+            )}{" "}
+            <span className="lp-chip lp-chip--ok">{s.common.verified}</span>
+          </p>
+          <div className="mk-statgrid mt-3">
+            {[
+              [h.followers, s.kit.followers],
+              [h.avgViews, s.kit.statAvgViews],
+              [st.engagementRate != null ? `${st.engagementRate}%` : null, s.kit.statER],
+              [st.postsPerWeek, s.kit.statPerWeek],
+              [st.reelsShare != null ? `${st.reelsShare}%` : null, s.kit.statReels],
+              [st.posts, s.kit.statPosts],
+            ]
+              .filter(([v]) => v != null)
+              .map(([v, label]) => (
+                <div key={String(label)}>
+                  <p className="text-[22px] font-semibold tabular-nums">{typeof v === "number" ? compact(v) : v}</p>
+                  <p className="lp-label">{label}</p>
+                </div>
+              ))}
+          </div>
+          {aud && (aud.cities.length > 0 || aud.ages.length > 0) && (
+            <p className="mt-3 text-[14px]" style={{ color: "var(--ink-2)" }}>
+              <b className="font-semibold" style={{ color: "var(--ink)" }}>
+                {s.kit.statAudience}:
+              </b>{" "}
+              {[...aud.cities.map((c) => `${c.name} ${c.pct}%`), ...aud.ages.map((a) => `${a.name} ${a.pct}%`), aud.women != null ? `${aud.women}% ${s.kit.statWomen}` : null].filter(Boolean).join(" · ")}
+            </p>
+          )}
+          {st.recent.length > 0 && (
+            <details className="mt-2">
+              <summary className="cursor-pointer text-[14px] font-semibold">{s.kit.statRecent}</summary>
+              <ul className="mt-2 grid gap-1.5 text-[14px]">
+                {st.recent.map((r) => (
+                  <li key={r.id} className="flex justify-between gap-3">
+                    {r.url ? (
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="lp-link truncate">
+                        {r.title}
+                      </a>
+                    ) : (
+                      <span className="truncate">{r.title}</span>
+                    )}
+                    <span className="shrink-0 tabular-nums" style={{ color: "var(--ink-2)" }}>
+                      {[r.views != null ? `${compact(r.views)} ${s.kit.statViews}` : null, r.likes != null ? `${compact(r.likes)} ♥` : null].filter(Boolean).join(" · ")}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {instagram.connected && (
+              <button type="button" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }} onClick={onRefresh} disabled={busy}>
+                {busy ? s.common.saving : s.kit.refreshIg}
+              </button>
+            )}
+            {instagram.connected && (
+              <button type="button" className="lp-link text-[14px]" style={{ color: "var(--ink-2)" }} onClick={onDisconnect} disabled={busy}>
+                {s.kit.disconnectIg}
+              </button>
+            )}
+          </div>
+        </div>
+      ) : instagram.configured ? (
+        <div className="grid justify-items-start gap-2">
+          {instagram.connected ? (
+            <button type="button" className="lp-btn" style={{ minHeight: 46 }} onClick={onRefresh} disabled={busy}>
+              {busy ? s.common.saving : s.kit.refreshIg}
+            </button>
+          ) : (
+            <a href="/api/auth/instagram/start" className="lp-btn" style={{ minHeight: 46 }}>
+              {s.kit.connectIg}
+            </a>
+          )}
+          <p className="lp-label">{s.kit.igHint}</p>
+        </div>
+      ) : (
+        <p className="lp-label">{s.kit.igSoon}</p>
+      )}
+    </div>
   );
 }
