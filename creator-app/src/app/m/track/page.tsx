@@ -3,6 +3,7 @@ import { MTop } from "@/components/m/MTop";
 import { PinForm } from "@/components/m/TrackParts";
 import { marketPageFor } from "@/lib/marketplace/page";
 import { getBusiness } from "@/lib/marketplace/store";
+import { customersThisMonth, planState, shouldNudge } from "@/lib/marketplace/plans";
 import { hasCounterPin, listTracked, trackTotals } from "@/lib/marketplace/track";
 
 // Reads the session and may redirect: renders per request (see the /m layout).
@@ -13,8 +14,9 @@ const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 /** Every tracked creator post with its customers, paid and barter side by side, the counter PIN and counter mode. */
 export default async function TrackPage() {
   const { user, member, s } = await marketPageFor("/m/track", "business");
-  const [biz, posts, pinSet] = await Promise.all([getBusiness(user.id), listTracked(user.id), hasCounterPin(user.id)]);
+  const [biz, posts, pinSet, plan, monthCustomers] = await Promise.all([getBusiness(user.id), listTracked(user.id), hasCounterPin(user.id), planState(user.id), customersThisMonth(user.id)]);
   const tot = trackTotals(posts);
+  const nudge = shouldNudge(plan.plan, monthCustomers, plan.interest);
   return (
     <>
       <MTop s={s} role={member.role} lang={member.uiLanguage} active="track" />
@@ -33,6 +35,22 @@ export default async function TrackPage() {
             </Link>
           </div>
         </div>
+
+        {nudge && (
+          <section className="mk-nudge mt-8">
+            <div className="min-w-0">
+              <p className="text-[18px] font-semibold">
+                {s.plans.nudgeA} {monthCustomers} {s.plans.nudgeB}
+              </p>
+              <p className="mt-1 text-[15px]" style={{ color: "var(--ink-2)" }}>
+                {s.plans.nudgeSub}
+              </p>
+            </div>
+            <Link href="/m/plans" className="lp-btn">
+              {s.plans.nudgeGo}
+            </Link>
+          </section>
+        )}
 
         {posts.length > 0 && (
           <section className="mk-grid">
@@ -101,7 +119,12 @@ export default async function TrackPage() {
                 <li key={step}>{step}</li>
               ))}
             </ol>
-            <p className="lp-label mt-4">{s.track.freePlan}</p>
+            <p className="lp-label mt-4">
+              {s.track.freePlan}{" "}
+              <Link href="/m/plans" className="lp-link">
+                {s.nav.plans} →
+              </Link>
+            </p>
           </section>
         </div>
       </main>

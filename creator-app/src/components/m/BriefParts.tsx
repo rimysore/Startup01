@@ -2,7 +2,6 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FEE_WAIVED_IN_PILOT, MITRA_FEE_PCT } from "@/lib/marketplace/flag";
 import type { Strings } from "@/lib/marketplace/i18n";
 import { send } from "./client";
 
@@ -11,17 +10,32 @@ type MatchView = { userId: string; name: string; initials: string; area: string 
 /** A matched creator with the reasons, Mitra's suggested fee and the invite. */
 export function InviteCard({ s, briefId, match, fee, inPlan, suggested }: { s: Strings; briefId: string; match: MatchView; fee: number | null; inPlan: boolean; suggested: boolean }) {
   const router = useRouter();
+  const [kind, setKind] = useState<"paid" | "barter">("paid");
   const [amount, setAmount] = useState(fee != null ? String(fee) : "");
+  const [barterNote, setBarterNote] = useState("");
+  const [bonus, setBonus] = useState("");
+  const [cap, setCap] = useState("");
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ text: string; upgrade: boolean } | null>(null);
+  const digits = (set: (v: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => set(e.target.value.replace(/[^\d]/g, ""));
+  const most = kind === "paid" && Number(bonus) > 0 && Number(cap) > 0 ? Number(amount || 0) + Number(cap) : null;
+  const ready = kind === "barter" ? barterNote.trim().length > 0 : Number(amount) > 0 || Number(bonus) > 0;
 
   async function invite() {
     setBusy(true);
     setError(null);
-    const r = await send(`/api/m/briefs/${briefId}/invites`, "POST", { creatorUserId: match.userId, feeInr: amount || 0, message: note });
+    const r = await send(`/api/m/briefs/${briefId}/invites`, "POST", {
+      creatorUserId: match.userId,
+      kind,
+      feeInr: kind === "paid" ? amount || null : null,
+      barterNote: kind === "barter" ? barterNote : null,
+      bonusPerCustomerInr: bonus || null,
+      bonusCapInr: cap || null,
+      message: note,
+    });
     setBusy(false);
-    if (r.error) return setError(r.error);
+    if (r.error) return setError({ text: r.error, upgrade: Boolean(r.json?.upgrade) });
     router.refresh();
   }
 
@@ -47,24 +61,55 @@ export function InviteCard({ s, briefId, match, fee, inPlan, suggested }: { s: S
           </li>
         ))}
       </ul>
-      <label className="mk-label">
-        {s.brief.fee}
-        <input inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, ""))} placeholder="₹" />
-        {suggested && <small>{s.brief.planSuggested}</small>}
-        {Number(amount) > 0 && (
-          <small>
-            {s.brief.feeOnTop} ({MITRA_FEE_PCT}%): ₹{Math.round((Number(amount) * MITRA_FEE_PCT) / 100).toLocaleString("en-IN")}
-            {FEE_WAIVED_IN_PILOT ? ` · ${s.invite.waived}` : ""}
-          </small>
-        )}
-      </label>
+      <div className="mk-chips" role="group" aria-label={s.terms.kind}>
+        {(["paid", "barter"] as const).map((k) => (
+          <button key={k} type="button" aria-pressed={kind === k} onClick={() => setKind(k)}>
+            {k === "paid" ? s.terms.paid : s.terms.barter}
+          </button>
+        ))}
+      </div>
+      {kind === "paid" ? (
+        <label className="mk-label">
+          {s.terms.base}
+          <input inputMode="numeric" value={amount} onChange={digits(setAmount)} placeholder="₹" />
+          {suggested && <small>{s.brief.planSuggested}</small>}
+        </label>
+      ) : (
+        <label className="mk-label">
+          {s.terms.barterNote}
+          <input value={barterNote} onChange={(e) => setBarterNote(e.target.value)} maxLength={160} placeholder={s.terms.barterPh} />
+        </label>
+      )}
+      <div className="mk-row">
+        <label className="mk-label">
+          {s.terms.bonus} <small>({s.common.optional})</small>
+          <input inputMode="numeric" value={bonus} onChange={digits(setBonus)} placeholder="₹30" />
+        </label>
+        <label className="mk-label">
+          {s.terms.cap} <small>({s.common.optional})</small>
+          <input inputMode="numeric" value={cap} onChange={digits(setCap)} placeholder="₹1,500" disabled={!bonus} />
+        </label>
+      </div>
+      <small className="lp-label">
+        {most != null ? `${s.terms.most}: ₹${most.toLocaleString("en-IN")}. ` : ""}
+        {s.terms.noCutBiz}
+      </small>
       <label className="mk-label">
         {s.brief.message} <small>({s.common.optional})</small>
         <input value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
       </label>
-      {error && <p className="mk-err">{error}</p>}
+      {error && (
+        <p className="mk-err">
+          {error.text}{" "}
+          {error.upgrade && (
+            <a href="/m/plans" className="lp-link">
+              {s.plans.nudgeGo}
+            </a>
+          )}
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" className="lp-btn" style={{ minHeight: 44 }} onClick={invite} disabled={busy || !amount}>
+        <button type="button" className="lp-btn" style={{ minHeight: 44 }} onClick={invite} disabled={busy || !ready}>
           {busy ? s.common.saving : s.brief.invite}
         </button>
         {match.kit && (

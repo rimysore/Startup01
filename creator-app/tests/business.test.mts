@@ -52,7 +52,6 @@ assert(matches.find((x) => x.userId === "sr")!.reasons.includes("Based in Jayana
 const plan = b.planBudget(10000, matches);
 assert(plan.total <= 10000 && plan.picks.filter((p) => !p.suggested).reduce((s, p) => s + p.fee, 0) === 7000, "plan takes priced matches that fit (4,000 + 3,000)");
 assert(plan.picks.some((p) => p.userId === "noprice" && p.suggested), "creators without a price get a suggested share, marked as such");
-assert(b.mitraFee(6000) === 600, "Mitra's fee is 10%");
 
 // Invites.
 assert((await b.inviteCreator("biz", brief.id, { creatorUserId: "shy", feeInr: 4000, message: null })) === "not_matched", "can't invite someone who didn't opt in");

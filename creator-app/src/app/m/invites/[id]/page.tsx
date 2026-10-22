@@ -2,8 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MTop } from "@/components/m/MTop";
 import { InviteAnswer } from "@/components/m/RoomParts";
-import { briefAsOffer, inviteForCreator, mitraFee } from "@/lib/marketplace/business";
-import { FEE_WAIVED_IN_PILOT, MITRA_FEE_PCT } from "@/lib/marketplace/flag";
+import { briefAsOffer, inviteForCreator } from "@/lib/marketplace/business";
+import { maxEarn, termsOf } from "@/lib/marketplace/money";
 import { marketPageFor } from "@/lib/marketplace/page";
 import { checkOffer } from "@/lib/offer-check";
 
@@ -25,8 +25,9 @@ export default async function InvitePage({ params }: PageProps<"/m/invites/[id]"
   if (!row) notFound();
   const { invite, brief, business } = row;
   const name = business?.name ?? "A local business";
-  const checks = checkOffer(briefAsOffer(brief, invite.feeInr, name));
-  const fee = mitraFee(invite.feeInr);
+  const t = termsOf(invite);
+  const checks = checkOffer(briefAsOffer(brief, t, name));
+  const most = maxEarn(t);
   return (
     <>
       <MTop s={s} role="creator" lang={member.uiLanguage} active="home" />
@@ -44,15 +45,29 @@ export default async function InvitePage({ params }: PageProps<"/m/invites/[id]"
           {invite.message && <p className="lp-reply mt-4">“{invite.message}”</p>}
           <div className="lp-deal__rows">
             <div className="lp-deal__row"><span>{s.invite.want}</span><b>{brief.deliverables.map((d) => s.deliverable[d as keyof typeof s.deliverable] ?? d).join(" + ")}</b></div>
-            <div className="lp-deal__row"><span>{s.invite.youGet}</span><b>{invite.feeInr != null ? `${inr(invite.feeInr)} ${s.invite.inFull}` : "–"}</b></div>
+            <div className="lp-deal__row">
+              <span>{t.kind === "barter" ? s.invite.youGet : s.terms.forPost}</span>
+              <b>{t.kind === "barter" ? (t.barterNote ?? s.terms.barter) : t.feeInr != null ? `${inr(t.feeInr)} ${s.invite.inFull}` : "–"}</b>
+            </div>
+            {t.bonusPerCustomerInr != null && (
+              <div className="lp-deal__row">
+                <span>{s.terms.bonusLine}</span>
+                <b>
+                  {inr(t.bonusPerCustomerInr)} {s.terms.perCustomer}
+                  {t.bonusCapInr != null ? `, ${s.terms.upTo} ${inr(t.bonusCapInr)}` : ` (${s.terms.noCap})`}
+                </b>
+              </div>
+            )}
+            {t.bonusPerCustomerInr != null && most != null && (
+              <div className="lp-deal__row">
+                <span>{s.terms.most}</span>
+                <b>{inr(most)}</b>
+              </div>
+            )}
             {brief.postBy && <div className="lp-deal__row"><span>{s.invite.postBy}</span><b>{brief.postBy}</b></div>}
             <div className="lp-deal__row">
-              <span>
-                {s.invite.feeLine} ({MITRA_FEE_PCT}%)
-              </span>
-              <b>{FEE_WAIVED_IN_PILOT ? <>
-                    <s style={{ color: "var(--ink-3)" }}>{inr(fee)}</s> {s.invite.waived}
-                  </> : inr(fee)}</b>
+              <span>{s.terms.noCut}</span>
+              <b>{s.terms.noCutValue}</b>
             </div>
           </div>
         </section>

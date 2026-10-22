@@ -5,6 +5,7 @@ import { CustomerCounter } from "@/components/m/BriefParts";
 import { HereLink, MessageBox, RoomActions } from "@/components/m/RoomParts";
 import { getRoom } from "@/lib/marketplace/business";
 import { SITE_URL } from "@/lib/company";
+import { amountDue, bonusDue, termsOf } from "@/lib/marketplace/money";
 import { marketPage } from "@/lib/marketplace/page";
 
 // Reads the session and may redirect: renders per request (see the /m layout).
@@ -25,6 +26,9 @@ export default async function RoomPage({ params }: PageProps<"/m/room/[id]">) {
       ? { name: room.business.name, email: room.business.email, whatsapp: room.business.whatsapp, extra: room.business.website ?? room.business.instagram }
       : { name: room.creator.name, email: room.creator.email, whatsapp: room.creator.whatsapp, extra: room.creator.isPublic && room.creator.slug ? `${SITE_URL}/kit/${room.creator.slug}` : null };
   const link = outcome?.linkCode ? `/r/${outcome.linkCode}` : null;
+  const t = termsOf(deal);
+  const customers = outcome?.redemptions ?? 0;
+  const due = amountDue(t, customers);
   return (
     <>
       <MTop s={s} role={member!.role} lang={member!.uiLanguage} />
@@ -49,7 +53,21 @@ export default async function RoomPage({ params }: PageProps<"/m/room/[id]">) {
               <div className="lp-deal__rows">
                 {room.brief && <div className="lp-deal__row"><span>{s.room.goal}</span><b>{room.brief.goal}</b></div>}
                 <div className="lp-deal__row"><span>{s.invite.want}</span><b>{room.brief ? room.brief.deliverables.map((d) => s.deliverable[d as keyof typeof s.deliverable] ?? d).join(" + ") : (deal.deliverables ?? "–")}</b></div>
-                <div className="lp-deal__row"><span>{s.invite.fee}</span><b>{deal.feeInr != null ? inr(deal.feeInr) : "–"}</b></div>
+                <div className="lp-deal__row"><span>{t.kind === "barter" ? s.invite.youGet : s.terms.forPost}</span><b>{t.kind === "barter" ? (t.barterNote ?? s.terms.barter) : t.feeInr != null ? inr(t.feeInr) : "–"}</b></div>
+                {t.bonusPerCustomerInr != null && (
+                  <>
+                    <div className="lp-deal__row">
+                      <span>{s.terms.bonusLine}</span>
+                      <b>
+                        {inr(t.bonusPerCustomerInr)} {s.terms.perCustomer}
+                        {t.bonusCapInr != null ? `, ${s.terms.upTo} ${inr(t.bonusCapInr)}` : ""}
+                      </b>
+                    </div>
+                    <div className="lp-deal__row"><span>{s.terms.bonusEarned}</span><b>{inr(bonusDue(t, customers))}</b></div>
+                  </>
+                )}
+                {due > 0 && <div className="lp-deal__row"><span>{s.terms.due}</span><b>{inr(due)}</b></div>}
+                <div className="lp-deal__row"><span>{s.terms.noCut}</span><b>{side === "creator" ? s.terms.noCutValue : "–"}</b></div>
                 {deal.postBy && <div className="lp-deal__row"><span>{s.invite.postBy}</span><b>{deal.postBy}</b></div>}
               </div>
             </section>
@@ -78,7 +96,7 @@ export default async function RoomPage({ params }: PageProps<"/m/room/[id]">) {
                 {side === "business" && <CustomerCounter s={s} dealId={deal.id} count={outcome?.redemptions ?? 0} />}
               </div>
             </section>
-            <RoomActions s={s} dealId={deal.id} side={side} status={deal.status} paidInr={outcome?.paidInr ?? null} fee={deal.feeInr} rating={side === "creator" ? outcome?.creatorRating ?? null : outcome?.businessRating ?? null} />
+            <RoomActions s={s} dealId={deal.id} side={side} status={deal.status} paidInr={outcome?.paidInr ?? null} fee={due || null} rating={side === "creator" ? outcome?.creatorRating ?? null : outcome?.businessRating ?? null} />
           </div>
 
           <div className="grid content-start gap-4">

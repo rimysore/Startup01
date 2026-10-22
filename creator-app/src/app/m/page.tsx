@@ -2,6 +2,7 @@ import Link from "next/link";
 import { MTop } from "@/components/m/MTop";
 import { marketPage } from "@/lib/marketplace/page";
 import { invitesForCreator, listBriefs } from "@/lib/marketplace/business";
+import { customersThisMonth, planState, shouldNudge } from "@/lib/marketplace/plans";
 import { listTracked, trackTotals } from "@/lib/marketplace/track";
 import { dealTotals, getBusiness, getKit, isVerified, kitCompleteness, listDeals } from "@/lib/marketplace/store";
 import { youtubeConnection } from "@/lib/youtube";
@@ -18,8 +19,9 @@ export default async function MarketHome() {
   const top = <MTop s={s} role={member!.role} lang={member!.uiLanguage} active="home" />;
 
   if (member!.role !== "creator") {
-    const [biz, briefs, tracked] = await Promise.all([getBusiness(user.id), listBriefs(user.id), listTracked(user.id)]);
+    const [biz, briefs, tracked, plan, monthCustomers] = await Promise.all([getBusiness(user.id), listBriefs(user.id), listTracked(user.id), planState(user.id), customersThisMonth(user.id)]);
     const tot = trackTotals(tracked);
+    const nudge = shouldNudge(plan.plan, monthCustomers, plan.interest);
     return (
       <>
         {top}
@@ -29,6 +31,21 @@ export default async function MarketHome() {
             {first ? `, ${first}` : ""}.
           </h1>
           <p className="mk-sub">{s.home.businessSub}</p>
+          {nudge && (
+            <section className="mk-nudge mt-8">
+              <div className="min-w-0">
+                <p className="text-[18px] font-semibold">
+                  {s.plans.nudgeA} {monthCustomers} {s.plans.nudgeB}
+                </p>
+                <p className="mt-1 text-[15px]" style={{ color: "var(--ink-2)" }}>
+                  {s.plans.nudgeSub}
+                </p>
+              </div>
+              <Link href="/m/plans" className="lp-btn">
+                {s.plans.nudgeGo}
+              </Link>
+            </section>
+          )}
           <section className="lp-card mk-panel mt-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="min-w-0">

@@ -3,7 +3,9 @@ import { and, desc, eq, gt, inArray, isNotNull, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { promoCodeFor, uniqueLinkCode } from "./business";
-import { FREE_TRACKED_PER_MONTH, PLANS_ENFORCED } from "./flag";
+import { PLANS, PLANS_ENFORCED } from "./flag";
+import { amountDue, bonusDue, costPerCustomer, terms, termsOf, TermsInput, type Terms } from "./money";
+import { planOf, withinLimit } from "./plans";
 
 /*
  * Track: a business counts the customers any creator post brings, paid or barter, found through Mitra or not.
@@ -21,16 +23,17 @@ const httpsUrl = z
   .refine((u) => /^https:\/\/[^\s]+$/i.test(u), "Use a link starting with https://");
 const optional = <T extends z.ZodTypeAny>(t: T) => z.union([t, z.literal("").transform(() => null), z.null()]).optional();
 
-export const TrackInput = z.object({
-  creatorName: z.string().trim().min(1).max(80),
-  creatorHandle: optional(z.string().trim().max(80)),
-  kind: z.enum(["paid", "barter"]),
-  baseFeeInr: optional(z.coerce.number().int().min(0).max(10_000_000)),
-  barterNote: optional(z.string().trim().max(160)),
-  offerText: z.string().trim().min(2).max(120),
-  destinationUrl: optional(httpsUrl),
-  postUrl: optional(httpsUrl),
-});
+/** Who the creator is, the deal (base fee or barter, plus an optional bonus per customer) and the customer's offer. */
+export const TrackInput = z.intersection(
+  z.object({
+    creatorName: z.string().trim().min(1).max(80),
+    creatorHandle: optional(z.string().trim().max(80)),
+    offerText: z.string().trim().min(2).max(120),
+    destinationUrl: optional(httpsUrl),
+    postUrl: optional(httpsUrl),
+  }),
+  TermsInput,
+);
 
 export const TrackUpdate = z.object({
   status: z.enum(["active", "ended"]).optional(),
@@ -99,11 +102,13 @@ export async function trackedThisMonth(businessUserId: string, now = new Date())
   return row?.n ?? 0;
 }
 
-export async function createTrackedPost(businessUserId: string, input: z.infer<typeof TrackInput>): Promise<TrackedPost | "no_business" | "limit"> {
+export async function createTrackedPost(businessUserId: string, raw: z.input<typeof TrackInput>): Promise<TrackedPost | "no_business" | "limit"> {
+  const input = TrackInput.parse(raw);
   const d = await db();
   const [biz] = await d.select({ name: schema.businessProfiles.name }).from(schema.businessProfiles).where(eq(schema.businessProfiles.userId, businessUserId));
   if (!biz) return "no_business";
-  if (PLANS_ENFORCED && (await trackedThisMonth(businessUserId)) >= FREE_TRACKED_PER_MONTH) return "limit";
+  if (PLANS_ENFORCED && !withinLimit(PLANS[await planOf(businessUserId)].trackedPerMonth, await trackedThisMonth(businessUserId))) return "limit";
+  const t = terms(input);
   const [row] = await d
     .insert(schema.trackedPosts)
     .values({
@@ -111,9 +116,11 @@ export async function createTrackedPost(businessUserId: string, input: z.infer<t
       businessUserId,
       creatorName: input.creatorName,
       creatorHandle: input.creatorHandle?.replace(/^@/, "") ?? null,
-      kind: input.kind,
-      baseFeeInr: input.kind === "paid" ? (input.baseFeeInr ?? null) : null,
-      barterNote: input.kind === "barter" ? (input.barterNote ?? null) : null,
+      kind: t.kind,
+      baseFeeInr: t.feeInr,
+      barterNote: t.barterNote,
+      bonusPerCustomerInr: t.bonusPerCustomerInr,
+      bonusCapInr: t.bonusCapInr,
       offerText: input.offerText,
       promoCode: await freePromoCode(businessUserId, biz.name, input.creatorName),
       linkCode: await uniqueLinkCode(),
@@ -125,15 +132,18 @@ export async function createTrackedPost(businessUserId: string, input: z.infer<t
 }
 
 /** A Mitra deal's tracked post, sharing the deal's promo code and link. */
-export async function startTrackedForDeal(p: { businessUserId: string; creatorUserId: string; creatorName: string; dealId: string; baseFeeInr: number | null; promoCode: string; linkCode: string; destinationUrl: string | null }) {
+export async function startTrackedForDeal(p: { businessUserId: string; creatorUserId: string; creatorName: string; dealId: string; terms: Terms; promoCode: string; linkCode: string; destinationUrl: string | null }) {
   await (await db()).insert(schema.trackedPosts).values({
     id: crypto.randomUUID(),
     businessUserId: p.businessUserId,
     creatorName: p.creatorName,
     creatorUserId: p.creatorUserId,
     dealId: p.dealId,
-    kind: "paid",
-    baseFeeInr: p.baseFeeInr,
+    kind: p.terms.kind,
+    baseFeeInr: p.terms.feeInr,
+    barterNote: p.terms.barterNote,
+    bonusPerCustomerInr: p.terms.bonusPerCustomerInr,
+    bonusCapInr: p.terms.bonusCapInr,
     offerText: "Show this at the counter",
     promoCode: p.promoCode,
     linkCode: p.linkCode,
@@ -141,13 +151,14 @@ export async function startTrackedForDeal(p: { businessUserId: string; creatorUs
   });
 }
 
-export type TrackedStats = { opened: number; customers: number; perCustomer: number | null };
+export type TrackedStats = { opened: number; customers: number; bonus: number; due: number; perCustomer: number | null };
 
-/** Opened coupons, redeemed customers, and cost per customer for paid posts (none for barter or before any customer). */
+/** Opened coupons, redeemed customers, bonus earned, what's owed so far, and money per customer (none before a customer, or when nothing is paid). */
 function statsFor(post: TrackedPost, counts: { opened: number; customers: number } | undefined): TrackedStats {
   const opened = counts?.opened ?? 0;
   const customers = counts?.customers ?? 0;
-  return { opened, customers, perCustomer: post.kind === "paid" && post.baseFeeInr && customers ? Math.round(post.baseFeeInr / customers) : null };
+  const t = termsOf(post);
+  return { opened, customers, bonus: bonusDue(t, customers), due: amountDue(t, customers), perCustomer: costPerCustomer(t, customers) };
 }
 
 async function countsFor(ids: string[]) {
@@ -201,8 +212,9 @@ export function trackTotals(posts: (TrackedPost & { stats: TrackedStats })[]) {
   const sum = (kind: "paid" | "barter") => {
     const ps = posts.filter((p) => p.kind === kind);
     const customers = ps.reduce((s, p) => s + p.stats.customers, 0);
-    const spent = ps.reduce((s, p) => s + (p.stats.customers ? (p.baseFeeInr ?? 0) : 0), 0);
-    return { posts: ps.length, customers, perCustomer: kind === "paid" && customers && spent ? Math.round(spent / customers) : null };
+    // Money counts once a post has brought someone in (a fee for a post that brought nobody isn't a cost per customer).
+    const spent = ps.reduce((s, p) => s + (p.stats.customers ? p.stats.due : 0), 0);
+    return { posts: ps.length, customers, perCustomer: customers && spent ? Math.round(spent / customers) : null };
   };
   return { paid: sum("paid"), barter: sum("barter"), customers: posts.reduce((s, p) => s + p.stats.customers, 0) };
 }
