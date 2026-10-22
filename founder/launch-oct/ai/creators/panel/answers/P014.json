@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already have a manager and four WhatsApp groups for leads, so the scam check is nice but not something I'd pay for. And letting a tiny beta app send DMs and payment reminders from my account is exactly the kind of thing that got me burned before.",
+  "objection": "Auto-DM and messages sent from my account could get my Instagram flagged, and a small unknown team holding my brand deals and payment details feels risky. At ₹199 a year it honestly looks too cheap to be a real business that will still be around.",
+  "would_change_my_mind": "Proof it uses Instagram's official API with no ban risk, plus a few established Bengaluru creators I know vouching that it actually got them paid on time.",
+  "price_too_cheap": 99,
+  "price_cheap": 999,
+  "price_expensive": 4999,
+  "price_too_expensive": 12000
+}

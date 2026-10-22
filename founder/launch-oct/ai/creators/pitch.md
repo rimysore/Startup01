@@ -1,0 +1,4 @@
+Mitra AI Talent Manager (beta): a manager for your Instagram collabs, in Kannada and English.
+Forward or paste any brand offer (DM, email, WhatsApp). Mitra's AI checks it for scams (fake brands, upfront-fee asks, dodgy links), tells you a fair rate for your views and audience, and drafts your reply and counter-offer. You send it, or edit it first.
+It keeps track of every deal: what was agreed, deadlines, and when payment is due, and sends the brand polite payment reminders from your account if they're late. Your media kit fills itself from your Instagram (followers, views, audience by city) so you can share one link.
+Free to use. Mitra Pro (auto-DM to commenters, unlimited deals and reminders) is ₹199 a year. Or, if you prefer, pay nothing up front and Mitra takes 5% only of deals you close using its counter-offer. You never pay to get or accept a collab. Beta: small team, Bengaluru only.

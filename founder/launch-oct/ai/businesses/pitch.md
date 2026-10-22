@@ -1,0 +1,5 @@
+Mitra AI Marketing Manager (beta): your Instagram run for you, in Kannada and English, approved on WhatsApp.
+Connect your business Instagram once on your phone. Every Monday Mitra's AI sends you on WhatsApp a plan for the week: 3 posts or reels with captions in Kannada and English, the best times to post, and what to shoot (a 20-second clip of today's special is enough). Reply 1 to approve each one; nothing is posted without your OK.
+When someone comments "price", "menu" or "booking", Mitra replies in their DM and sends them to your WhatsApp with a ready first message, so new enquiries land in your chat. When you want more reach, Mitra picks Bengaluru creators who match your area and runs the collab for you.
+Every Sunday one WhatsApp report: views, new followers, enquiries, and what to post next. No coupons, no staff steps at the counter.
+₹999 a month, or ₹2,499 a month including one creator campaign. First month free, cancel any time by replying STOP. Beta: small team, Bengaluru only.

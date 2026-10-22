@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've been burned by a fake agency already, so a beta app from a small team I've never heard of that wants my Instagram and sends messages from my account is a hard no for now. My WhatsApp groups already flag the obvious scams, and most of the café offers are food not cash, so there's not much to take 5% of or chase payment on.",
+  "objection": "Who are these people? Giving an unknown app access to my Instagram and letting it DM brands as me feels like the exact kind of risk I swore off, and I don't believe an AI knows a fair rate for Bengaluru better than the creators in my groups.",
+  "would_change_my_mind": "Two or three creators I actually know from my WhatsApp groups vouching that it caught a real scam or got them paid on a late deal, and a way to use the scam check by just pasting an offer without connecting my account.",
+  "price_too_cheap": 0,
+  "price_cheap": 99,
+  "price_expensive": 499,
+  "price_too_expensive": 1200
+}

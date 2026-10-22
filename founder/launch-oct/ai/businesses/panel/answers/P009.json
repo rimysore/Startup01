@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "convenience",
+  "reason": "It runs on WhatsApp so I don't have to learn another app, the first month is free and I can stop by replying STOP, so I'll try the ₹999 plan. I'm not paying for the creator campaign though, I've already wasted money on likes that never turned into customers.",
+  "objection": "AI captions and creator collabs sound like the same vanity metrics again: views and followers in a Sunday report don't pay my staff, I want to see actual bookings walking in.",
+  "would_change_my_mind": "If after the free month the report can't show me real enquiries that turned into bookings, I cancel. Proof from another salon or gym in my area with actual bookings would get me onto the ₹2,499 plan.",
+  "price_too_cheap": 299,
+  "price_cheap": 799,
+  "price_expensive": 2499,
+  "price_too_expensive": 5000
+}

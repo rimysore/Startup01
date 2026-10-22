@@ -1,0 +1,144 @@
+{
+ "business": "Mitra (beta), a collab marketplace for Bengaluru Instagram creators",
+ "seed": 527407,
+ "dealt": 20,
+ "answered": 20,
+ "skipped": [],
+ "buys": 0,
+ "passes": 20,
+ "buy_rate": 0.0,
+ "by_segment": [
+  [
+   "Micro creator (10K-50K followers), does a few paid collabs a month",
+   8,
+   0.0
+  ],
+  [
+   "Nano creator (2K-10K followers), student or day job, mostly barter so far",
+   9,
+   0.0
+  ],
+  [
+   "Established local creator (50K-100K followers), collabs are real income, may have a manager",
+   3,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Burned before",
+   3,
+   0.0
+  ],
+  [
+   "Kannada-first",
+   2,
+   0.0
+  ],
+  [
+   "Growth-hungry",
+   3,
+   0.0
+  ],
+  [
+   "Free-only",
+   2,
+   0.0
+  ],
+  [
+   "Barter-first",
+   4,
+   0.0
+  ],
+  [
+   "Rate-card professional",
+   3,
+   0.0
+  ],
+  [
+   "Already on an app",
+   3,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$795,000 and up",
+   7,
+   0.0
+  ],
+  [
+   "under $374,000",
+   6,
+   0.0
+  ],
+  [
+   "$374,000 to $795,000",
+   7,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "trust",
+   10,
+   [
+    "I've been burned by a fake agency already, so a beta app from a small team I've never heard of that wants my Instagram and sends messages from my account is a hard no for now. My WhatsApp groups already flag the obvious scams, and most of the café offers are food not cash, so there's not much to take 5% of or chase payment on.",
+    "I'd maybe try the free scam check on a couple of leads from my WhatsApp groups, but Pro's main thing is auto-DM, and that's exactly what could get my account flagged. My reach is everything right now, so I'm not paying to put it at risk, even if it's only 199."
+   ],
+   [
+    "P001",
+    "P003"
+   ]
+  ],
+  [
+   "need",
+   8,
+   [
+    "Most of what I get is barter from small cafes and salons, maybe one paid offer in a month, so I'd try the free version for the scam check but I don't see why I'd pay for Pro yet. It also doesn't bring me any new brands, it only manages the ones I already find through my WhatsApp groups.",
+    "Most of my collabs are barter, so a fair-rate check, payment reminders and a 5% cut don't do much for me yet. What I want is more followers and reach, and the only growth bit here, auto-DM to commenters, is locked behind Pro. I might try the free version once, but I wouldn't pay for it."
+   ],
+   [
+    "P002",
+    "P004"
+   ]
+  ],
+  [
+   "habit",
+   2,
+   [
+    "I never pay for creator tools, so Pro at ₹199 is a no even if it's cheap. I might try the free scam check on one of those sketchy DMs, but I'm not handing over 5% of a deal I could have negotiated myself or with my manager.",
+    "I already apply to campaigns on Influish, and the barter offers come straight to my DMs, so I don't see a reason to pay for another app. I might try the free version to check a dodgy offer, but I won't pay for Pro or give up 5% in the first month."
+   ],
+   [
+    "P005",
+    "P012"
+   ]
+  ]
+ ],
+ "why_yes": [],
+ "flip": [
+  "Two or three creators I actually know from my WhatsApp groups vouching that it caught a real scam or got them paid on a late deal, and a way to use the scam check by just pasting an offer without connecting my account.",
+  "If it actually sent me paid offers from Bengaluru businesses looking for Kannada creators, I'd pay the ₹199 without thinking.",
+  "Proof that the auto-DM uses Instagram's official API and stays inside its limits, like a few Bengaluru creators my size using it for months with no flags or reach drop.",
+  "If it actually brought me collab leads or helped me grow followers, for example by matching me with Bengaluru brands, instead of only managing deals I find myself.",
+  "If the free version caught a real scam or got me a noticeably higher rate on a real deal, I'd think about the 5% option. I still wouldn't pay up front.",
+  "Proof from other Bengaluru creators my size that the Pro auto-DM to commenters actually grew their followers and reach, without any risk to their account.",
+  "Seeing a real registered company with named founders and a support contact, plus a creator I know in Bengaluru saying it actually got them paid on a late collab.",
+  "If it actually turned one of my barter offers into a paid deal, and I could see the real company behind it with a support number in Bengaluru, I'd pay the ₹199.",
+  "If Mitra actually brought me paid brand offers, or proof that its counter-offers turned barter deals into paid ones for nano creators like me in Bengaluru.",
+  "If people in my creator WhatsApp groups said Mitra got them a paid deal or got a late payment out of a brand, and the site showed a real registered company with a named founder and a support contact.",
+  "If a creator I know from my WhatsApp groups said they'd used it for a few months and it actually got them paid on a late deal, and I could use the scam check by just pasting an offer without connecting my Instagram at all.",
+  "If its counter-offer actually turned one of my barter DMs into a paid deal, I'd happily pay the 5% or ₹199.",
+  "A registered company with named founders and a real support contact, plus reminders that wait for my approval before sending, and maybe a creator I know vouching for it.",
+  "Proof it uses Instagram's official API with no ban risk, plus a few established Bengaluru creators I know vouching that it actually got them paid on time.",
+  "If Mitra actually brought me paid brand deals, not just helped me negotiate the barter offers I already get.",
+  "If it actually got me paid deals, showed me that brands sending barter offers would pay cash for my numbers and helped me turn a few of those into real money, then ₹199 a year would be nothing.",
+  "If Mitra brought me actual paid collabs from local Bengaluru food places or brands that want Kannada creators, or a creator I know in South Bengaluru showed me it got her a better rate on a real deal.",
+  "If Mitra actually brought me paid collabs from Bengaluru brands, or showed me that barter-only cafés switched to cash after I sent its counter-offer.",
+  "A creator from one of my WhatsApp groups using it and saying it got them paid instead of just bartered, plus a way to use the scam check and rate advice without connecting my Instagram at all.",
+  "If Mitra actually brought me paid collabs, or showed proof that creators my size in South Bengaluru turned barter offers into cash using it."
+ ],
+ "purchases_first_month_per_buyer": null,
+ "price_answers": 20
+}

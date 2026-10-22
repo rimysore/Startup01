@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I already pay an agency to run Instagram for my outlets, and my marketing person handles them. I'm not going to switch to an AI beta from a small team and approve posts on WhatsApp between orders at the counter.",
+  "objection": "AI captions and a stranger picking creators for my brand across several outlets. If a bad post or a freeloading creator goes out under my name, my agency answers for it. Here, who answers?",
+  "would_change_my_mind": "Proof from another Bengaluru chain my size that the comment-to-WhatsApp enquiries actually brought in more bookings than our agency gets, so I could hand it to my marketing person as an add-on, not a replacement.",
+  "price_too_cheap": 499,
+  "price_cheap": 1999,
+  "price_expensive": 7999,
+  "price_too_expensive": 15000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already have a rate card, a media kit and my own invoicing, so I don't need help pricing or drafting replies. Letting an unknown beta app send payment reminders to brands from my account is a big risk to relationships I've built.",
+  "objection": "Who is actually behind this? It's a small beta team with no company name I can check, and if a reminder goes out wrong or a brand still doesn't pay, there's nobody I can hold responsible.",
+  "would_change_my_mind": "A registered company with named founders and a real support contact, plus reminders that wait for my approval before sending, and maybe a creator I know vouching for it.",
+  "price_too_cheap": 99,
+  "price_cheap": 499,
+  "price_expensive": 2500,
+  "price_too_expensive": 6000
+}

@@ -1,0 +1,89 @@
+{
+ "n": 20,
+ "seed": 571712,
+ "customer": {
+  "business": "Mitra (beta), creators and a customer counter for Bengaluru local businesses",
+  "target": "Owners or managers of independent cafés, darshinis, salons, gyms and boutiques in South and Central Bengaluru that have tried or considered Instagram creators",
+  "where": "Bengaluru (Jayanagar, Basavanagudi, Malleshwaram, Koramangala, HSR, Indiranagar)",
+  "age": [
+   24,
+   55
+  ],
+  "currency": "INR",
+  "segments": [
+   {
+    "name": "Single-outlet café or darshini, owner runs the counter",
+    "share": 0.45,
+    "income": [
+     600000,
+     2400000
+    ]
+   },
+   {
+    "name": "Salon, gym or boutique, owner plus 2-10 staff",
+    "share": 0.35,
+    "income": [
+     800000,
+     3000000
+    ]
+   },
+   {
+    "name": "Small chain (2-5 outlets) or new D2C brand with a marketing person",
+    "share": 0.2,
+    "income": [
+     3000000,
+     12000000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Barter veteran",
+    "share": 0.25,
+    "how": "Gives free meals to creators often; not sure it brings anyone."
+   },
+   {
+    "name": "Burned by influencers",
+    "share": 0.2,
+    "how": "Paid a creator, saw likes but no customers; now skeptical."
+   },
+   {
+    "name": "Word-of-mouth only",
+    "share": 0.15,
+    "how": "Relies on regulars and Google reviews; never tried creators."
+   },
+   {
+    "name": "Uses an agency",
+    "share": 0.1,
+    "how": "Pays a local agency or freelancer to handle Instagram."
+   },
+   {
+    "name": "Tech-shy",
+    "share": 0.15,
+    "how": "Uses WhatsApp and UPI, avoids new apps and logins."
+   },
+   {
+    "name": "Numbers-minded",
+    "share": 0.15,
+    "how": "Tracks daily sales in a book or Petpooja; wants proof before spending."
+   }
+  ],
+  "objections": [
+   "My staff won't remember to redeem coupons when it's busy",
+   "Customers won't bother showing a coupon",
+   "Free now, but you'll start charging once I depend on it",
+   "I already get creators asking for free food every week",
+   "I don't have time to learn another app",
+   "Will good creators actually be on it?",
+   "Who are you? A new startup could disappear"
+  ],
+  "habits": [
+   "you are at the counter from 7 am to 2 pm",
+   "you get 3 or 4 Instagram DMs a week from creators asking for a free meal",
+   "you check UPI settlements every evening",
+   "your nephew handles your Instagram page",
+   "you post offers on a local WhatsApp group"
+  ]
+ },
+ "pitch": "Mitra AI Marketing Manager (beta): your Instagram run for you, in Kannada and English, approved on WhatsApp.\nConnect your business Instagram once on your phone. Every Monday Mitra's AI sends you on WhatsApp a plan for the week: 3 posts or reels with captions in Kannada and English, the best times to post, and what to shoot (a 20-second clip of today's special is enough). Reply 1 to approve each one; nothing is posted without your OK.\nWhen someone comments \"price\", \"menu\" or \"booking\", Mitra replies in their DM and sends them to your WhatsApp with a ready first message, so new enquiries land in your chat. When you want more reach, Mitra picks Bengaluru creators who match your area and runs the collab for you.\nEvery Sunday one WhatsApp report: views, new followers, enquiries, and what to post next. No coupons, no staff steps at the counter.\n₹999 a month, or ₹2,499 a month including one creator campaign. First month free, cancel any time by replying STOP. Beta: small team, Bengaluru only."
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I already have a manager and a feel for which DMs are sketchy, and what I want right now is reach, not a rate calculator. I'm not handing a small beta team access to my Instagram so it can message brands from my account.",
+  "objection": "Letting an unknown beta app send payment reminders and DMs from my account could make me look bad with brands I've built relationships with, and most local cafés will still just pay in food whatever 'fair rate' it tells me.",
+  "would_change_my_mind": "Proof from other Bengaluru creators my size that the Pro auto-DM to commenters actually grew their followers and reach, without any risk to their account.",
+  "price_too_cheap": 49,
+  "price_cheap": 199,
+  "price_expensive": 999,
+  "price_too_expensive": 2500
+}

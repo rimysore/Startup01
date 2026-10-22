@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I've already been burned by a fake agency and a brand that ghosted me on payment, so a new beta app from a small team asking to connect my Instagram and send messages from my account is exactly the kind of thing I'd skip. My WhatsApp groups already flag dodgy leads for free, and most of my collabs are barter anyway.",
+  "objection": "Giving an unknown app access to my Instagram and letting it message brands from my account feels risky. If it gets hacked or spams someone, it's my name and my account on the line, and I can't even tell who is behind it.",
+  "would_change_my_mind": "If a creator I know from my WhatsApp groups said they'd used it for a few months and it actually got them paid on a late deal, and I could use the scam check by just pasting an offer without connecting my Instagram at all.",
+  "price_too_cheap": 0,
+  "price_cheap": 99,
+  "price_expensive": 499,
+  "price_too_expensive": 999
+}

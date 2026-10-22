@@ -1,0 +1,63 @@
+{
+  "business": "Mitra AI Marketing Manager: ₹999/month per business, first month free; creators free; no paid rep",
+  "unit": "paying business-month",
+  "price": 999,
+  "variable": [
+    {
+      "label": "Razorpay 2% + 18% GST on the fee",
+      "cost": 24
+    },
+    {
+      "label": "AI text: weekly plans, captions EN+KN, comment/DM replies, weekly report (estimate; check Claude API pricing)",
+      "cost": 150
+    },
+    {
+      "label": "AI images, ~12 a month (estimate; fal FLUX schnell-class pricing)",
+      "cost": 10
+    },
+    {
+      "label": "WhatsApp messages: weekly plan, approvals, report, ~20 a month (estimate; Meta India rate card)",
+      "cost": 20
+    }
+  ],
+  "fixed_monthly": [
+    {
+      "label": "Hosting, database, email, domain (estimate)",
+      "cost": 3000
+    },
+    {
+      "label": "Company annual compliance (₹20k/yr)",
+      "cost": 1667
+    },
+    {
+      "label": "Business outreach: boosted posts, WhatsApp/LinkedIn promos (estimate)",
+      "cost": 5000
+    },
+    {
+      "label": "Phone + WhatsApp Business number (estimate)",
+      "cost": 500
+    }
+  ],
+  "startup": [
+    {
+      "label": "Company registration",
+      "cost": 15000
+    }
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 1.333,
+  "ramp_per_day": [
+    0.0,
+    0.1,
+    0.223,
+    0.333,
+    0.467,
+    0.587,
+    0.73,
+    0.857,
+    1.003,
+    1.137,
+    1.29,
+    1.427
+  ]
+}

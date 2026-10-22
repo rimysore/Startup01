@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "price",
+  "reason": "I already pay an agency a lot more than this every month, and the first month is free with no coupons or counter work, so I'd have my marketing person run it on one outlet alongside the agency and compare. If the enquiries on WhatsApp actually show up, I'd question what the agency is doing for its fee.",
+  "objection": "AI captions in Kannada can come out generic or sound off, and with several outlets I don't want our brand posting things that look cheap next to what the agency makes. I also doubt a small beta team can handle multiple accounts properly.",
+  "would_change_my_mind": "If the first two weeks of plans look generic or the creator picks don't fit our area, I'd stop after the free month and stick with the agency.",
+  "price_too_cheap": 299,
+  "price_cheap": 999,
+  "price_expensive": 4999,
+  "price_too_expensive": 9999
+}

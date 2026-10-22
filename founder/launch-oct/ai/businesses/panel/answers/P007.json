@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already pay a marketing person to plan our posts, so an AI sending me three captions a week doesn't take anything off my plate. And the creator-collab part is exactly what burned me before: likes, no customers.",
+  "objection": "I've seen views and followers go up before with nothing at the till. A Sunday report of views and 'enquiries' doesn't prove anyone walked in or ordered, and I don't trust a creator campaign picked by an AI any more than one I picked myself.",
+  "would_change_my_mind": "Proof from another Bengaluru outlet like mine that the DM-to-WhatsApp enquiries turned into actual orders or bookings, with numbers, not just reach.",
+  "price_too_cheap": 299,
+  "price_cheap": 999,
+  "price_expensive": 2499,
+  "price_too_expensive": 5000
+}

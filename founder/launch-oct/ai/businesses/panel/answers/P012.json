@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": true,
+  "purchases_first_month": 1,
+  "reason_code": "convenience",
+  "reason": "If it really is only WhatsApp and I just reply 1, that is not another app to learn, and the first month is free, so I will let my manager connect the Instagram and see what comes. The money is nothing for me; my time and my salon's look are what matter.",
+  "objection": "I don't trust a machine to post for my salon. If the captions sound cheap or the Kannada is wrong, my clients will see it, and connecting Instagram might turn into passwords and logins I can't handle.",
+  "would_change_my_mind": "If the first two weeks of posts look generic or I have to sit and fix things, I will reply STOP and not pay.",
+  "price_too_cheap": 299,
+  "price_cheap": 999,
+  "price_expensive": 3500,
+  "price_too_expensive": 7000
+}
