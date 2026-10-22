@@ -5,19 +5,21 @@ import { MARKETPLACE } from "@/lib/marketplace/flag";
 import { setAudience, useAudience, type Audience } from "./audience";
 import { OfferStack } from "./OfferStack";
 
-// Kannada lines are a first draft: a native speaker checks them before launch.
-const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string; cta: string }> = {
+// Kannada lines are a first draft: a native speaker checks them before launch. Kannada leads, English follows.
+const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string; cta: string; href: string }> = {
   creator: {
-    title: ["Get paid by brands", "and shops near you."],
-    kn: "ನಿಮ್ಮ ಹತ್ತಿರದ ಬ್ರ್ಯಾಂಡ್‌ಗಳು ಮತ್ತು ಅಂಗಡಿಗಳಿಂದ ಹಣ ಪಡೆಯಿರಿ.",
-    sub: "Mitra finds paid deals for Kannada and English creators in Bengaluru, checks every offer before you say yes, and keeps your deals in one place. Free for creators, and you keep your whole fee.",
-    cta: "Join as a creator",
+    title: ["Forward any offer.", "Know if it's real."],
+    kn: "ಯಾವುದೇ ಕೊಲಾಬ್ ಆಫರ್ ಬಂದರೆ ಮಿತ್ರಗೆ ಫಾರ್ವರ್ಡ್ ಮಾಡಿ. ಅದು ನಿಜವೋ ಮೋಸವೋ ನಾವು ಹೇಳುತ್ತೇವೆ.",
+    sub: "Send a DM screenshot, an email or a WhatsApp message to Mitra. It flags registration-fee scams, fake brands and missing terms, and drafts your reply. Free forever, and you keep 100% of what you earn.",
+    cta: "Check an offer, free",
+    href: "#offer",
   },
   business: {
-    title: ["Local creators who", "bring real customers."],
-    kn: "ನಿಜವಾದ ಗ್ರಾಹಕರನ್ನು ಕರೆತರುವ ಸ್ಥಳೀಯ ಕ್ರಿಯೇಟರ್‌ಗಳು.",
-    sub: "Tell Mitra your goal, budget and area. Get a short list of Kannada and English creators whose audience lives near you, and a promo code that shows what each post brought in.",
-    cta: "Join as a business",
+    title: ["See the customers", "each creator brings."],
+    kn: "ಪ್ರತಿ ಕ್ರಿಯೇಟರ್ ಪೋಸ್ಟ್‌ನಿಂದ ಎಷ್ಟು ಗ್ರಾಹಕರು ಬಂದರು ಅಂತ ನೋಡಿ.",
+    sub: "Every creator post gets a coupon. Customers show it at your counter, your staff tap redeem, and you see customers and cost per customer for each creator, paid or barter. Free.",
+    cta: "Count your next post, free",
+    href: "#join",
   },
 };
 
@@ -53,6 +55,9 @@ export function HeroCopy() {
   }, []);
   return (
     <>
+      <p className="lp-hero__kn lp-kn-line kn lp-fade-in" lang="kn" style={{ ["--l" as string]: 0 }}>
+        {c.kn}
+      </p>
       <h1 className="lp-display" key={a}>
         {c.title.map((line, i) => (
           <span key={line} className="lp-line">
@@ -60,33 +65,22 @@ export function HeroCopy() {
           </span>
         ))}
       </h1>
-      <p className="lp-hero__kn lp-kn-line kn lp-fade-in" lang="kn" style={{ ["--l" as string]: 1 }}>
-        {c.kn}
-      </p>
       <p className="lp-hero__sub lp-lead lp-fade-in" style={{ ["--l" as string]: 2 }}>
         {c.sub}
       </p>
       <div className="lp-hero__act lp-fade-in" style={{ ["--l" as string]: 3 }}>
         {/* With the marketplace on, sign up straight away; otherwise join the pilot waitlist below. */}
-        <a href={MARKETPLACE ? `/m/start?role=${a}` : "#join"} className="lp-btn">
+        <a href={MARKETPLACE ? `/m/start?role=${a}` : c.href} className="lp-btn">
           {c.cta} <Arrow />
         </a>
-        <a href="#how" className="lp-btn lp-btn--ghost">
-          See how a deal works
+        <a href={a === "creator" ? "#offer" : "#business"} className="lp-btn lp-btn--ghost">
+          {a === "creator" ? "Try it on this page" : "See how counting works"}
         </a>
       </div>
       <p className="lp-hero__note lp-fade-in" style={{ ["--l" as string]: 4 }}>
-        {a === "creator" ? "Free for creators · No account access needed · ಕನ್ನಡ and English" : "Free during the Bengaluru pilot · Creators within your area · ಕನ್ನಡ and English"}
+        {a === "creator" ? "Free forever · No account access needed · ಕನ್ನಡ and English" : "Free during the Bengaluru pilot · Paid or barter · ಕನ್ನಡ and English"}
       </p>
     </>
-  );
-}
-
-function Check() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M4 10.5 8 14.5 16 5.5" />
-    </svg>
   );
 }
 
@@ -98,41 +92,43 @@ export function HeroArt() {
       <div className="lp-hero__art lp-fade-in" style={{ ["--l" as string]: 2 }}>
         <div className="lp-card p-6">
           <div className="flex items-center justify-between">
-            <p className="text-[15px] font-semibold">Your brief</p>
+            <p className="text-[15px] font-semibold">Creator posts this month</p>
             <span className="lp-label">Example</span>
           </div>
-          <div className="mt-4 grid gap-2">
+          <div className="mt-4 grid grid-cols-2 gap-2">
             {[
-              ["Goal", "More weekday lunch orders"],
-              ["Budget", "₹15,000"],
-              ["Area", "Jayanagar, within 3 km"],
-            ].map(([k, v]) => (
-              <div key={k} className="lp-field" style={{ background: "var(--tint)" }}>
+              ["Paid posts", "41", "₹154 per customer"],
+              ["Barter posts", "9", "for one lunch for two"],
+            ].map(([k, n, sub]) => (
+              <div key={k} className="lp-field grid gap-1" style={{ background: "var(--tint)", display: "grid" }}>
                 <span>{k}</span>
-                <b className="font-semibold">{v}</b>
+                <b className="lp-big" style={{ color: "var(--ink)", fontSize: 40 }}>{n}</b>
+                <span className="text-[13.5px]" style={{ color: "var(--ink-2)" }}>customers · {sub}</span>
               </div>
             ))}
           </div>
-          <p className="mt-6 text-[15px] font-semibold">3 creators matched</p>
-          <div className="mt-3 grid gap-2">
+          <div className="mt-4 grid gap-2">
             {[
-              ["SR", "Food · Kannada · 24K", "Verified", "Most of her viewers live in South Bengaluru"],
-              ["AK", "Lifestyle · Kannada + English · 61K", "Verified", "Posts weekday food finds"],
-              ["MN", "Food · Kannada · 9K", "Self-reported", "Lives 1 km from you"],
-            ].map(([i, who, tag, why]) => (
+              ["SR", "Sita · RUCHI-SR", "₹3,000 + ₹30 per customer", "27"],
+              ["AK", "Arun · RUCHI-AK", "₹2,500", "14"],
+              ["MN", "Meena · RUCHI-MN", "Barter: lunch for two", "9"],
+            ].map(([i, who, deal, n]) => (
               <div key={i} className="lp-match" style={{ background: "var(--tint)" }}>
                 <span className="lp-av" style={{ background: "var(--card)" }}>{i}</span>
                 <span className="min-w-0 flex-1">
                   <span className="block font-semibold">{who}</span>
-                  <span className="block text-[13.5px]" style={{ color: "var(--ink-2)" }}>{why}</span>
+                  <span className="block text-[13.5px]" style={{ color: "var(--ink-2)" }}>{deal}</span>
                 </span>
-                <span className={`lp-chip ${tag === "Verified" ? "lp-chip--ok" : ""}`} style={{ background: "var(--card)" }}>
-                  {tag === "Verified" && <Check />}
-                  {tag}
+                <span className="text-right">
+                  <span className="block text-[18px] font-semibold tabular-nums">{n}</span>
+                  <span className="block text-[12px]" style={{ color: "var(--ink-2)" }}>customers</span>
                 </span>
               </div>
             ))}
           </div>
+          <p className="mt-4 text-[13px]" style={{ color: "var(--ink-3)" }}>
+            Counted when customers show the coupon at your counter.
+          </p>
         </div>
       </div>
     );

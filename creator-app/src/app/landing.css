@@ -294,3 +294,11 @@ html:has(.lp) { scroll-behavior: smooth; }
 .lp-stack__dots span { width: 6px; height: 6px; border-radius: 6px; background: var(--rule); transition: width 400ms var(--ease), background-color 400ms ease; }
 .lp-stack__dots span[data-on="true"] { width: 20px; background: var(--ink); }
 @media (prefers-reduced-motion: reduce) { .lp-stack__card, .lp-stack__card > * { transition: none; animation: none !important; } }
+
+/* Two front doors */
+.lp-doors { margin-top: 32px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); }
+.lp-door { display: grid; gap: 10px; padding: 28px; transition: transform 220ms var(--ease, ease), box-shadow 220ms ease; }
+.lp-door:hover { transform: translateY(-3px); }
+.lp-door h3 { font-family: var(--font-display-face), sans-serif; font-size: clamp(26px, 3vw, 34px); font-weight: 600; letter-spacing: -0.03em; }
+.lp-door p { color: var(--ink-2); font-size: 17px; max-width: 46ch; }
+.lp-door__go { display: inline-flex; align-items: center; gap: 8px; margin-top: 8px; font-weight: 600; }
