@@ -1,0 +1,55 @@
+{
+  "business": "Mitra (E) per counted customer: ₹20 each, first 3 a month free, capped at ₹399/month; creators free; no paid rep",
+  "unit": "active café-month (average bill ₹222 under the assumed count spread)",
+  "price": 222,
+  "variable": [
+    {
+      "label": "Razorpay 2% + 18% GST on the fee (razorpay.com/pricing)",
+      "cost": 5
+    },
+    {
+      "label": "WhatsApp evening summary, ~30 utility messages × ~₹0.12 (estimate)",
+      "cost": 4
+    }
+  ],
+  "fixed_monthly": [
+    {
+      "label": "Hosting, database, email, domain (estimate)",
+      "cost": 3000
+    },
+    {
+      "label": "Company annual compliance (₹20k/yr, CorporateWalla)",
+      "cost": 1667
+    },
+    {
+      "label": "Creator outreach: boosted posts, creator-group promos (estimate)",
+      "cost": 5000
+    },
+    {
+      "label": "Phone + WhatsApp Business number for remote setup (estimate)",
+      "cost": 500
+    }
+  ],
+  "startup": [
+    {
+      "label": "Company registration (₹13.5–17.5k, eAuditor)",
+      "cost": 15000
+    }
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 2.667,
+  "ramp_per_day": [
+    0.0,
+    0.0,
+    0.233,
+    0.467,
+    0.7,
+    0.967,
+    1.233,
+    1.533,
+    1.8,
+    2.1,
+    2.367,
+    2.667
+  ]
+}
