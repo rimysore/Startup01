@@ -11,15 +11,15 @@ const COPY: Record<Audience, { title: [string, string]; kn: string; sub: string;
     title: ["Forward any offer.", "Know if it's real."],
     kn: "ಯಾವುದೇ ಕೊಲಾಬ್ ಆಫರ್ ಬಂದರೆ ಮಿತ್ರಗೆ ಫಾರ್ವರ್ಡ್ ಮಾಡಿ. ಅದು ನಿಜವೋ ಮೋಸವೋ ನಾವು ಹೇಳುತ್ತೇವೆ.",
     sub: "Send a DM screenshot, an email or a WhatsApp message to Mitra. It flags registration-fee scams, fake brands and missing terms, and drafts your reply. Free forever, and you keep 100% of what you earn.",
-    cta: "Check an offer, free",
-    href: "#offer",
+    cta: "Join the pilot, free",
+    href: "#join",
   },
   business: {
     title: ["See the customers", "each creator brings."],
     kn: "ಪ್ರತಿ ಕ್ರಿಯೇಟರ್ ಪೋಸ್ಟ್‌ನಿಂದ ಎಷ್ಟು ಗ್ರಾಹಕರು ಬಂದರು ಅಂತ ನೋಡಿ.",
     sub: "Every creator post gets a coupon. Customers show it at your counter, your staff tap redeem, and you see customers and cost per customer for each creator, paid or barter. Free.",
-    cta: "Count your next post, free",
-    href: "#join",
+    cta: "Sign up your business, free",
+    href: "/m/start?role=business",
   },
 };
 
@@ -69,12 +69,12 @@ export function HeroCopy() {
         {c.sub}
       </p>
       <div className="lp-hero__act lp-fade-in" style={{ ["--l" as string]: 3 }}>
-        {/* With the marketplace on, sign up straight away; otherwise join the pilot waitlist below. */}
-        <a href={MARKETPLACE ? `/m/start?role=${a}` : c.href} className="lp-btn">
+        {/* Launch: creators join the pilot waitlist; businesses sign up (the waitlist when the marketplace is off). */}
+        <a href={a === "business" && !MARKETPLACE ? "#join" : c.href} className="lp-btn">
           {c.cta} <Arrow />
         </a>
         <a href={a === "creator" ? "#offer" : "#business"} className="lp-btn lp-btn--ghost">
-          {a === "creator" ? "Try it on this page" : "See how counting works"}
+          {a === "creator" ? "Try the offer check" : "See how counting works"}
         </a>
       </div>
       <p className="lp-hero__note lp-fade-in" style={{ ["--l" as string]: 4 }}>

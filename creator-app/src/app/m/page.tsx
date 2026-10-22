@@ -1,9 +1,12 @@
 import Link from "next/link";
+import type { Strings } from "@/lib/marketplace/i18n";
 import { MTop } from "@/components/m/MTop";
 import { marketPage } from "@/lib/marketplace/page";
 import { invitesForCreator, listBriefs } from "@/lib/marketplace/business";
 import { customersThisMonth, planState, shouldNudge } from "@/lib/marketplace/plans";
 import { listTracked, trackTotals } from "@/lib/marketplace/track";
+import { programsFor } from "@/lib/marketplace/programs";
+import { ProgramInterest } from "@/components/m/TrackParts";
 import { dealTotals, getBusiness, getKit, isVerified, kitCompleteness, listDeals } from "@/lib/marketplace/store";
 import { youtubeConnection } from "@/lib/youtube";
 
@@ -31,6 +34,7 @@ export default async function MarketHome() {
             {first ? `, ${first}` : ""}.
           </h1>
           <p className="mk-sub">{s.home.businessSub}</p>
+          <LaunchNotice s={s} side="business" />
           {nudge && (
             <section className="mk-nudge mt-8">
               <div className="min-w-0">
@@ -118,7 +122,7 @@ export default async function MarketHome() {
     );
   }
 
-  const [{ profile, handles }, deals, yt, invites] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id), invitesForCreator(user.id)]);
+  const [{ profile, handles }, deals, yt, invites, programs] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id), invitesForCreator(user.id), programsFor(user.id)]);
   const pending = invites.filter((i) => i.invite.status === "pending");
   const pct = kitCompleteness(profile, handles);
   const totals = dealTotals(deals);
@@ -132,6 +136,7 @@ export default async function MarketHome() {
           {first ? `, ${first}` : ""}.
         </h1>
         <p className="mk-sub">{s.home.creatorSub}</p>
+        <LaunchNotice s={s} side="creator" />
         {(pending.length > 0 || profile?.openToOffers) && (
           <section className="mt-8">
             <h2 className="mk-h2">{s.invite.list}</h2>
@@ -224,7 +229,76 @@ export default async function MarketHome() {
             </section>
           )}
         </div>
+        {programs.length > 0 && (
+          <section className="mt-10">
+            <h2 className="mk-h2">{s.programs.title}</h2>
+            <p className="mt-2 max-w-[70ch] text-[15px]" style={{ color: "var(--ink-2)" }}>
+              {s.programs.sub}
+            </p>
+            <div className="mk-programs mt-5">
+              {programs.map((p) => (
+                <article key={p.id} className="lp-card mk-panel grid content-start gap-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="lp-chip">{s.programs.kinds[p.kind] ?? p.kind}</span>
+                    {p.area && <span className="lp-label">{p.area}</span>}
+                  </div>
+                  <h3 className="text-[18px] font-semibold">{p.name}</h3>
+                  <p className="text-[15px]" style={{ color: "var(--ink-2)" }}>
+                    {p.summary}
+                  </p>
+                  {p.eligibility && (
+                    <p className="lp-label">
+                      {s.programs.who}: {p.eligibility}
+                    </p>
+                  )}
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <ProgramInterest s={s} id={p.id} interested={p.interested} />
+                    {p.link ? (
+                      <a href={p.link} target="_blank" rel="noopener noreferrer" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }}>
+                        {s.programs.visit} ↗
+                      </a>
+                    ) : p.kind === "local" ? (
+                      <Link href="/m/kit" className="lp-btn lp-btn--ghost" style={{ minHeight: 40 }}>
+                        {s.home.kitEdit}
+                      </Link>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="lp-label mt-4">{s.programs.note}</p>
+          </section>
+        )}
       </main>
     </>
+  );
+}
+
+/** The launch notice: what's free now, and what's coming (Creator Pro, Agency, business plans). */
+function LaunchNotice({ s, side }: { s: Strings; side: "creator" | "business" }) {
+  return (
+    <section className="mk-nudge mt-6" aria-label={s.launch.title}>
+      <div className="grid min-w-0 gap-2">
+        <p className="text-[17px] font-semibold">{s.launch.title}</p>
+        <p className="text-[15px]" style={{ color: "var(--ink-2)" }}>
+          {side === "creator" ? s.launch.creator : s.launch.business}
+        </p>
+        <details>
+          <summary className="cursor-pointer text-[14px] font-semibold">{s.launch.comingTitle}</summary>
+          <ul className="mt-2 grid gap-1.5 text-[14px]" style={{ color: "var(--ink-2)" }}>
+            <li>• {s.launch.pro}</li>
+            <li>• {s.launch.agency}</li>
+            {side === "business" && (
+              <li>
+                • {s.launch.plans}: {s.launch.plansLine}{" "}
+                <Link href="/m/plans" className="lp-link underline">
+                  {s.nav.plans}
+                </Link>
+              </li>
+            )}
+          </ul>
+        </details>
+      </div>
+    </section>
   );
 }

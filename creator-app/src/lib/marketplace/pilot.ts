@@ -74,6 +74,21 @@ export async function pilotNumbers(opts: { now?: Date; exclude?: string[] } = {}
   const scams = inbox.filter((r) => (r.verdict as { verdict?: string } | null)?.verdict === "likely_scam").length;
   const reports = (await d.select({ userId: schema.senderReports.userId, kind: schema.senderReports.kind }).from(schema.senderReports)).filter((r) => !skip.has(r.userId));
 
+  // Launch interest: pilot waitlist sign-ups by role, accounts by role, and which open programs creators want.
+  const wl = await d.select({ source: schema.waitlist.source, at: schema.waitlist.createdAt }).from(schema.waitlist);
+  const waitlistByRole: Record<string, number> = {};
+  for (const w of wl) if (w.source?.startsWith("mkt-")) waitlistByRole[w.source.slice(4)] = (waitlistByRole[w.source.slice(4)] ?? 0) + 1;
+  const members = (await d.select({ userId: schema.members.userId, role: schema.members.role }).from(schema.members)).filter((m) => !skip.has(m.userId));
+  const accountsByRole: Record<string, number> = {};
+  for (const mb of members) if (mb.role) accountsByRole[mb.role] = (accountsByRole[mb.role] ?? 0) + 1;
+  const interestRows = (await d
+    .select({ userId: schema.programInterests.userId, name: schema.programs.name })
+    .from(schema.programInterests)
+    .innerJoin(schema.programs, eq(schema.programs.id, schema.programInterests.programId))).filter((r) => !skip.has(r.userId));
+  const byProgram: Record<string, number> = {};
+  for (const r of interestRows) byProgram[r.name] = (byProgram[r.name] ?? 0) + 1;
+  const topPrograms = Object.entries(byProgram).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, n]) => ({ name, n }));
+
   // Weekly trend, last 8 weeks (weeks end today).
   const weeks = Array.from({ length: 8 }, (_, i) => {
     const end = now.getTime() - i * 7 * DAY;
@@ -84,6 +99,7 @@ export async function pilotNumbers(opts: { now?: Date; exclude?: string[] } = {}
       newPosts: posts.filter((p) => inWeek(p.createdAt)).length,
       customers: redeemed.filter((c) => inWeek(c.redeemedAt)).length,
       inboxOffers: inbox.filter((r) => inWeek(r.at)).length,
+      waitlist: wl.filter((w) => w.source?.startsWith("mkt-") && inWeek(w.at)).length,
       activeBusinesses: new Set(redeemed.filter((c) => inWeek(c.redeemedAt)).map((c) => postOf.get(c.trackedPostId)!.businessUserId)).size,
     };
   }).reverse();
@@ -96,6 +112,7 @@ export async function pilotNumbers(opts: { now?: Date; exclude?: string[] } = {}
     paying: { value: paying.length, mrrInr: mrr, paidDeals: paidDeals.length, wouldPay: willing.length, wouldPayMrrInr: willingMrr, target: "5-10" },
     repeat: { rate: repeatBase ? Math.round((repeated / repeatBase) * 100) : null, repeated, of: repeatBase, target: 50 },
     inbox: { creators: new Set(inbox.map((r) => r.userId)).size, offers: inbox.length, bySource, scamsFlagged: scams, scamReports: reports.filter((r) => r.kind === "scam").length, target: 100 },
+    launch: { waitlistByRole, waitlistTotal: Object.values(waitlistByRole).reduce((a, b) => a + b, 0), accountsByRole, creatorsInterested: new Set(interestRows.map((r) => r.userId)).size, topPrograms },
     weeks,
   };
 }

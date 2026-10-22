@@ -701,3 +701,45 @@ export const coupons = pgTable(
   },
   (t) => [index("coupons_post").on(t.trackedPostId, t.redeemedAt)],
 );
+
+/**
+ * Open programs creators can join: brand creator programs, affiliate networks, platform programs, and local
+ * businesses the founders sign up by hand (with the owner's permission). Shown on the creator's home; founders
+ * edit them in the admin. Mitra doesn't run these and takes nothing from them.
+ */
+export const programs = pgTable(
+  "programs",
+  {
+    id: text("id").primaryKey(),
+    /** local | brand | affiliate | platform */
+    kind: text("kind").notNull(),
+    name: text("name").notNull(),
+    summary: text("summary").notNull(),
+    /** Who can join, in plain words (e.g. "10K+ YouTube subscribers"). */
+    eligibility: text("eligibility"),
+    area: text("area"),
+    /** Where to apply or read the terms (https). */
+    link: text("link"),
+    /** published | hidden */
+    status: text("status").notNull().default("published"),
+    sortOrder: integer("sort_order").notNull().default(100),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("programs_status_sort").on(t.status, t.sortOrder)],
+);
+
+/** A creator saying "I'm interested" in a program: tells the founders which deals to chase. */
+export const programInterests = pgTable(
+  "program_interests",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    programId: text("program_id")
+      .notNull()
+      .references(() => programs.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.programId] })],
+);
