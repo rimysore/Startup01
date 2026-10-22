@@ -1,0 +1,55 @@
+{
+  "business": "Mitra (D) businesses pay after proof: ₹299/month in months with 10+ counted customers; creators free; no paid rep",
+  "unit": "paying business-month",
+  "price": 299,
+  "variable": [
+    {
+      "label": "Razorpay 2% + 18% GST on the fee (razorpay.com/pricing)",
+      "cost": 7
+    },
+    {
+      "label": "WhatsApp evening summary, ~30 utility messages × ~₹0.12 (estimate; check Meta's India rate card)",
+      "cost": 4
+    }
+  ],
+  "fixed_monthly": [
+    {
+      "label": "Hosting, database, email, domain (estimate)",
+      "cost": 3000
+    },
+    {
+      "label": "Company annual compliance (₹20k/yr, CorporateWalla)",
+      "cost": 1667
+    },
+    {
+      "label": "Creator outreach: boosted posts, creator-group promos (estimate)",
+      "cost": 5000
+    },
+    {
+      "label": "Phone + WhatsApp Business number for remote setup (estimate)",
+      "cost": 500
+    }
+  ],
+  "startup": [
+    {
+      "label": "Company registration (₹13.5–17.5k, eAuditor)",
+      "cost": 15000
+    }
+  ],
+  "days_per_month": 30,
+  "plan_per_day": 2.0,
+  "ramp_per_day": [
+    0.0,
+    0.0,
+    0.167,
+    0.333,
+    0.5,
+    0.667,
+    0.867,
+    1.067,
+    1.267,
+    1.467,
+    1.667,
+    1.867
+  ]
+}
