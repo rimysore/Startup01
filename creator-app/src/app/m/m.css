@@ -112,3 +112,7 @@
 .mk-coupon__staff { width: 100%; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--rule); display: grid; justify-items: center; }
 .mk-coupon__note { max-width: 440px; text-align: center; font-size: 13px; color: var(--ink-3); }
 .mk-coupon__brand { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-3); }
+
+/* Plans */
+.mk-plans { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.mk-nudge { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; border-radius: 20px; background: var(--tint); }

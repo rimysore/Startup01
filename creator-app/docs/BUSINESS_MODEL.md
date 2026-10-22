@@ -88,6 +88,6 @@ What we will **not** sell: creators' contact details, access to creators, verifi
 ## Product changes that follow from this
 
 - Built: Track (free customer counting for any creator post, barter included), coupons with counter-PIN redeem,
-  counter mode, paid vs barter results. Next: base fee + bonus deals, the plans and the upgrade prompt, then payments.
-- The 10% matched-deal fee shown on invites (`MITRA_FEE_PCT`, waived in the pilot) is replaced by the plans once they
-  ship; until then it stays waived.
+  counter mode, paid vs barter results; deals as base fee or barter + bonus per customer; the plans page with
+  "I'd pay for this" and the upgrade suggestion after 10+ counted customers. Next: payments, then billing for plans.
+- The old 10% matched-deal fee is gone from the product; invites tell both sides Mitra takes no cut.

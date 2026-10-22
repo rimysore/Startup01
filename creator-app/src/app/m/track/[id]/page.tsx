@@ -43,6 +43,17 @@ export default async function TrackedPostPage({ params }: PageProps<"/m/track/[i
               {post.stats.opened} {s.track.opened}
               {post.stats.perCustomer != null ? ` · ${inr(post.stats.perCustomer)} ${s.track.perCustomer}` : ""}
             </p>
+            {post.bonusPerCustomerInr != null && (
+              <p className="mt-2 text-[14px]" style={{ color: "var(--ink-2)" }}>
+                {s.terms.bonusLine}: {inr(post.bonusPerCustomerInr)} {s.terms.perCustomer}
+                {post.bonusCapInr != null ? `, ${s.terms.upTo} ${inr(post.bonusCapInr)}` : ""} · {s.terms.bonusEarned} {inr(post.stats.bonus)}
+              </p>
+            )}
+            {post.stats.due > 0 && (
+              <p className="mt-1 text-[14px] font-semibold">
+                {s.terms.due}: {inr(post.stats.due)}
+              </p>
+            )}
           </div>
           <div className="lp-card mk-panel">
             <p className="lp-label">{s.track.code}</p>

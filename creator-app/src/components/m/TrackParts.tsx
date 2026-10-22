@@ -63,7 +63,7 @@ export function RedeemBox({ id, pinReady, locked, en, kn }: { id: string; pinRea
 /** Start tracking a creator post: who, paid or barter, and what customers get. */
 export function TrackForm({ s }: { s: Strings }) {
   const router = useRouter();
-  const [f, setF] = useState({ creatorName: "", creatorHandle: "", kind: "paid" as "paid" | "barter", baseFeeInr: "", barterNote: "", offerText: "", destinationUrl: "", postUrl: "" });
+  const [f, setF] = useState({ creatorName: "", creatorHandle: "", kind: "paid" as "paid" | "barter", feeInr: "", barterNote: "", bonusPerCustomerInr: "", bonusCapInr: "", offerText: "", destinationUrl: "", postUrl: "" });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const set = (k: keyof typeof f) => (e: React.ChangeEvent<HTMLInputElement>) => setF({ ...f, [k]: e.target.value });
@@ -72,7 +72,12 @@ export function TrackForm({ s }: { s: Strings }) {
     e.preventDefault();
     setBusy(true);
     setError(null);
-    const r = await send("/api/m/track", "POST", { ...f, baseFeeInr: f.kind === "paid" && f.baseFeeInr ? Number(f.baseFeeInr) : null });
+    const r = await send("/api/m/track", "POST", {
+      ...f,
+      feeInr: f.kind === "paid" && f.feeInr ? Number(f.feeInr) : null,
+      bonusPerCustomerInr: f.bonusPerCustomerInr ? Number(f.bonusPerCustomerInr) : null,
+      bonusCapInr: f.bonusCapInr ? Number(f.bonusCapInr) : null,
+    });
     setBusy(false);
     if (r.error) return setError(r.json?.field ? `${r.error} (${String(r.json.field)})` : r.error);
     router.push(`/m/track/${r.json?.id}`);
@@ -104,7 +109,7 @@ export function TrackForm({ s }: { s: Strings }) {
         {f.kind === "paid" ? (
           <label className="mk-label">
             {s.track.baseFee}
-            <input inputMode="numeric" value={f.baseFeeInr} onChange={(e) => setF({ ...f, baseFeeInr: e.target.value.replace(/\D/g, "") })} maxLength={8} placeholder="3000" />
+            <input inputMode="numeric" value={f.feeInr} onChange={(e) => setF({ ...f, feeInr: e.target.value.replace(/\D/g, "") })} maxLength={8} placeholder="3000" />
           </label>
         ) : (
           <label className="mk-label">
@@ -112,6 +117,17 @@ export function TrackForm({ s }: { s: Strings }) {
             <input value={f.barterNote} onChange={set("barterNote")} maxLength={160} placeholder={s.track.barterPh} />
           </label>
         )}
+        <div className="mk-row">
+          <label className="mk-label">
+            {s.terms.bonus} <small>({s.common.optional})</small>
+            <input inputMode="numeric" value={f.bonusPerCustomerInr} onChange={(e) => setF({ ...f, bonusPerCustomerInr: e.target.value.replace(/\D/g, "") })} maxLength={6} placeholder="30" />
+            <span className="lp-label">{s.terms.bonusHint}</span>
+          </label>
+          <label className="mk-label">
+            {s.terms.cap} <small>({s.common.optional})</small>
+            <input inputMode="numeric" value={f.bonusCapInr} onChange={(e) => setF({ ...f, bonusCapInr: e.target.value.replace(/\D/g, "") })} maxLength={8} placeholder="1500" disabled={!f.bonusPerCustomerInr} />
+          </label>
+        </div>
         <label className="mk-label">
           {s.track.offer}
           <input value={f.offerText} onChange={set("offerText")} maxLength={120} placeholder={s.track.offerPh} required />
@@ -128,7 +144,7 @@ export function TrackForm({ s }: { s: Strings }) {
         </label>
       </section>
       <div className="mk-bar">
-        <button type="submit" className="lp-btn" disabled={busy || !f.creatorName.trim() || f.offerText.trim().length < 2}>
+        <button type="submit" className="lp-btn" disabled={busy || !f.creatorName.trim() || f.offerText.trim().length < 2 || (f.kind === "barter" ? !f.barterNote.trim() : !f.feeInr && !f.bonusPerCustomerInr)}>
           {busy ? s.common.saving : s.track.create}
         </button>
         {error && (
@@ -300,5 +316,31 @@ export function CounterBox({ s }: { s: Strings }) {
         </p>
       )}
     </div>
+  );
+}
+
+/** "I'd pay for this" on a plan during the pilot: recorded, never charged. */
+export function PlanInterest({ s, plan, chosen }: { s: Strings; plan: string; chosen: boolean }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  async function set(next: string | null) {
+    setBusy(true);
+    await send("/api/m/plans", "PUT", { plan: next });
+    setBusy(false);
+    router.refresh();
+  }
+  if (chosen)
+    return (
+      <div className="grid gap-2">
+        <p className="mk-ok">{s.plans.wanted}</p>
+        <button type="button" className="lp-link justify-self-start text-[14px]" onClick={() => set(null)} disabled={busy}>
+          {s.plans.undo}
+        </button>
+      </div>
+    );
+  return (
+    <button type="button" className="lp-btn" onClick={() => set(plan)} disabled={busy} style={{ minHeight: 44 }}>
+      {s.plans.want}
+    </button>
   );
 }

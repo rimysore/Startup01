@@ -33,7 +33,7 @@ Studio) is untouched either way.
 | Brief: goal (presets or own words), details, what to post, kind of creators, language, total budget, area, date, an https link for viewers | `/m/briefs/new`, `POST /api/m/briefs` |
 | Matching with a reason for every suggestion: shared niche or same area required; language, verified reach and a rate inside the budget rank higher; creators priced above the whole budget are left out. Only creators who switched on "Let local businesses find me" (logged as a `matching` consent) are ever suggested | `matchCreators()` in `src/lib/marketplace/business.ts` |
 | Mitra's plan: the best matches whose fees fit the budget, then a suggested share for creators who haven't set a price, and what's left over | `planBudget()` |
-| Invites with the fee and a note; creators get an email, see the brief, Mitra's fee (10%, shown as waived during the pilot) and the offer checker's reading, then accept or decline. Contact details are shared only on accept | `/m/briefs/<id>`, `/m/invites/<id>`, `/api/m/invites/<id>` |
+| Invites with the fee and a note; creators get an email, see the brief, the terms (base fee or barter, plus any bonus per customer; Mitra takes no cut) and the offer checker's reading, then accept or decline. Contact details are shared only on accept | `/m/briefs/<id>`, `/m/invites/<id>`, `/api/m/invites/<id>` |
 | On accept: the deal opens in the creator's log as a Mitra deal, with a promo code (business name + creator initials, e.g. RUCHI-SR) and a tracked link `/r/<code>` that counts visits and redirects to the brief's https link | `respondToInvite()`, `src/app/r/[code]/route.ts` |
 | Deal room for both sides: terms, code, link, WhatsApp/email hand-off, messages; the creator marks it posted, the business counts customers at the counter (+1/−1) and records payment; both rate | `/m/room/<id>` |
 | Results per brief: customers, paid to creators, cost per customer (once something is paid), link visits | `briefResults()` |
@@ -67,13 +67,19 @@ subject, text }` works too), route `offers+*@<domain>` to it, and set `INBOUND_E
 
 Free plan allowance (`FREE_TRACKED_PER_MONTH = 2`) applies only once `PLANS_ENFORCED` is switched on; the pilot is unlimited.
 
+### Deals and plans (weeks 3-4)
+
+| Piece | Where |
+| --- | --- |
+| Migration `0016_deals_bonus_plans.sql` (additive): invite kind / barter / bonus, deal bonus, tracked-post bonus, business plan and plan interest | `src/db/schema.ts` |
+| Deal terms: a base fee for the post or barter, plus an optional bonus per counted customer up to a cap, all to the creator. Validation, bonus earned, amount owed, most a creator can earn, cost per customer | `src/lib/marketplace/money.ts` |
+| Invite card (paid/barter, bonus, cap, "most they can earn"), the creator's invite page, the deal room (bonus earned, owed so far; payment pre-filled with it), Track form and post page | `BriefParts.tsx`, `/m/invites/<id>`, `/m/room/<id>`, `TrackParts.tsx`, `/m/track/<id>` |
+| Plans: Free / Mitra Local ₹499 / Mitra Growth ₹1,499 (`PLANS` in `flag.ts`); limits apply only when `PLANS_ENFORCED`; owners can say "I'd pay for this" (recorded, never charged); after 10+ counted customers in a month on Free, Track and home suggest upgrading | `src/lib/marketplace/plans.ts`, `/m/plans`, `PUT /api/m/plans` |
+
 ### Who pays
 
-Creators keep 100% of the agreed fee; on deals Mitra brought, the business pays Mitra's fee (`MITRA_FEE_PCT`) on top
-(`FEE_PAID_BY`), shown on the invite to both sides. See `docs/BUSINESS_MODEL.md`.
-
-Mitra's fee is mentioned wherever a deal is logged: only on deals Mitra brought (`source = "mitra"`), never on
-deals the creator found. No fee is charged in code yet.
+Creators never pay, and Mitra takes no cut of deals: the creator gets the whole base fee and every bonus. Businesses
+pay for the platform (the plans above); everything is free during the pilot. See `docs/BUSINESS_MODEL.md`.
 
 ## Before launch
 
@@ -81,7 +87,7 @@ deals the creator found. No fee is charged in code yet.
 - Instagram verification (Meta's API) is not built; Instagram numbers stay self-reported.
 - Payments go between the two sides directly (UPI, cash); Mitra records them. Split payouts through a payment
   provider come after a CA confirms the setup (weeks 5-6).
-- `FEE_WAIVED_IN_PILOT` in `flag.ts` shows the 10% fee as waived; turn it off only once billing for it exists.
+- `PLANS_ENFORCED` in `flag.ts` stays off until billing exists (Razorpay subscriptions, after a CA confirms GST invoicing).
 - Check the Terms cover the marketplace (roles, deals made between users, Mitra not being a party to deals it
   didn't bring, the disclosed fee) with whoever reviews the legal pages.
 
@@ -91,5 +97,5 @@ deals the creator found. No fee is charged in code yet.
 deletion), `tests/business.test.mts` (opt-in, matching and its reasons, the plan, invites, contact hand-off only
 after accepting, deal room access, counters, payments, tracked links, deletion) and `tests/offer.test.mts` run in
 `npm test`, with `tests/inbox.test.mts` (scam patterns, sender checks against a fake network, caching, reports,
-privacy, forwarding webhook) and `tests/track.test.mts` (codes, coupons, PIN limits, counter mode, totals, deal link-up,
-deletion) alongside.
+privacy, forwarding webhook) `tests/track.test.mts` (codes, coupons, PIN limits, counter mode, totals, deal link-up,
+deletion) and `tests/deals.test.mts` (terms, bonus maths, invites to deals to tracked posts, plans, nudge) alongside.

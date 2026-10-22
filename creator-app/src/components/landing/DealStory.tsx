@@ -7,7 +7,7 @@ const STEPS = [
   { title: "Checked", body: "Before you reply, the offer checker flags what's missing: the fee, the date, when you're paid, how they'll use your video.", status: "Offer checked", foot: "One question to ask: can they run your reel as an ad, and for how long?" },
   { title: "Agreed", body: "The terms you both said yes to are saved in your deal log. No more scrolling WhatsApp to remember what was promised.", status: "Terms saved", foot: "Half in advance, half on posting. Usage: 30 days on their page." },
   { title: "Posted", body: "Your post carries its own promo code. The business sees the customers it brought; you get proof for your next deal.", status: "Live", foot: "Customers show code DOSA10 at the counter." },
-  { title: "Paid", body: "The business pays you your full fee. On deals Mitra brought, the business pays Mitra's fee on top, shown to both of you before anyone agrees.", status: "Paid", foot: "You received ₹6,000 in full. The café paid Mitra ₹600 (10%) on top." },
+  { title: "Paid", body: "The business pays you your fee for the post, plus a bonus for every customer who used your code. Mitra takes no cut.", status: "Paid", foot: "You received ₹6,000 + ₹420 bonus (14 customers). All yours." },
 ];
 
 /** Steps scroll past a pinned deal card that moves through its stages with them. The numbers are an example. */

@@ -37,7 +37,7 @@ const AREAS = [
 
 const FAQ = [
   ["Do I have to connect Instagram or YouTube?", "No. Join with your handles and the numbers you see in your own insights; they're shown as self-reported. Connecting an account later, read-only, gets you a Verified badge and puts you first in matches."],
-  ["How does Mitra make money?", "Creators never pay: not to join, not to apply, not to get Verified, and you keep 100% of the fee you agree to. On deals Mitra brings, the business pays Mitra a small fee on top, shown to both sides before anyone says yes. Offers you find yourself are never charged. During the Bengaluru pilot it's all free."],
+  ["How does Mitra make money?", "Creators never pay: not to join, not to apply, not to get Verified. Mitra takes no cut of deals, so you keep every rupee of your fee and any customer bonus. Businesses pay a monthly plan for counting customers and finding creators. During the Bengaluru pilot it's all free."],
   ["How do I know an offer is real?", "Forward it to your Mitra inbox, send it on WhatsApp, or upload a screenshot. Mitra checks what the offer says and who sent it: scam patterns like registration fees, when their website was registered, whether the brand's official site matches, and what other creators reported. It shows its sources, so you decide."],
   ["Which platforms count?", "Any you post on: Instagram, YouTube, Facebook, ShareChat, Moj or Josh. Businesses care about whether your audience lives near them, not which app it's on."],
   ["Which languages and cities?", "Kannada and English, in Bengaluru first. One city done properly before we go wider."],
@@ -265,7 +265,7 @@ export default function Home() {
           </div>
           <div className="lp-rules">
             {[
-              ["Free for creators.", "No joining fee, no yearly plan, and you keep your whole fee. On deals Mitra brings, the business pays Mitra's small fee on top."],
+              ["Free for creators.", "No joining fee, no yearly plan, and Mitra takes no cut: your fee and every customer bonus are yours."],
               ["Your accounts stay yours.", "Join without connecting anything. If you connect later, it's read-only: Mitra can never post for you."],
               ["Kannada and English, Bengaluru first.", "One city and two languages, done properly, before we go anywhere else."],
             ].map(([t, b], i) => (
