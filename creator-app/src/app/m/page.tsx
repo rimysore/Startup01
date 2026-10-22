@@ -6,7 +6,8 @@ import { invitesForCreator, listBriefs } from "@/lib/marketplace/business";
 import { customersThisMonth, planState, shouldNudge } from "@/lib/marketplace/plans";
 import { listTracked, trackTotals } from "@/lib/marketplace/track";
 import { programsFor } from "@/lib/marketplace/programs";
-import { ProgramInterest } from "@/components/m/TrackParts";
+import { businessesFor, creatorsFor, interestedCreators, type CreatorCard } from "@/lib/marketplace/collabs";
+import { BusinessInterest, ProgramInterest } from "@/components/m/TrackParts";
 import { dealTotals, getBusiness, getKit, isVerified, kitCompleteness, listDeals } from "@/lib/marketplace/store";
 import { youtubeConnection } from "@/lib/youtube";
 
@@ -22,7 +23,7 @@ export default async function MarketHome() {
   const top = <MTop s={s} role={member!.role} lang={member!.uiLanguage} active="home" />;
 
   if (member!.role !== "creator") {
-    const [biz, briefs, tracked, plan, monthCustomers] = await Promise.all([getBusiness(user.id), listBriefs(user.id), listTracked(user.id), planState(user.id), customersThisMonth(user.id)]);
+    const [biz, briefs, tracked, plan, monthCustomers, fits, fans] = await Promise.all([getBusiness(user.id), listBriefs(user.id), listTracked(user.id), planState(user.id), customersThisMonth(user.id), creatorsFor(user.id), interestedCreators(user.id)]);
     const tot = trackTotals(tracked);
     const nudge = shouldNudge(plan.plan, monthCustomers, plan.interest);
     return (
@@ -35,6 +36,10 @@ export default async function MarketHome() {
           </h1>
           <p className="mk-sub">{s.home.businessSub}</p>
           <LaunchNotice s={s} side="business" />
+          <div className="mk-grid">
+            <CreatorList s={s} title={s.fit.interestedTitle} sub={s.fit.interestedSub} empty={s.fit.noneInterested} creators={fans} invite={biz ? "/m/briefs/new" : "/m/business"} />
+            <CreatorList s={s} title={s.fit.title} sub={s.fit.sub} empty={s.fit.none} creators={fits} invite={biz ? "/m/briefs/new" : "/m/business"} />
+          </div>
           {nudge && (
             <section className="mk-nudge mt-8">
               <div className="min-w-0">
@@ -122,7 +127,7 @@ export default async function MarketHome() {
     );
   }
 
-  const [{ profile, handles }, deals, yt, invites, programs] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id), invitesForCreator(user.id), programsFor(user.id)]);
+  const [{ profile, handles }, deals, yt, invites, programs, businesses] = await Promise.all([getKit(user.id), listDeals(user.id), youtubeConnection(user.id), invitesForCreator(user.id), programsFor(user.id), businessesFor(user.id)]);
   const pending = invites.filter((i) => i.invite.status === "pending");
   const pct = kitCompleteness(profile, handles);
   const totals = dealTotals(deals);
@@ -137,6 +142,48 @@ export default async function MarketHome() {
         </h1>
         <p className="mk-sub">{s.home.creatorSub}</p>
         <LaunchNotice s={s} side="creator" />
+        <section className="mt-8">
+          <h2 className="mk-h2">{s.collabs.title}</h2>
+          <p className="mt-2 max-w-[70ch] text-[15px]" style={{ color: "var(--ink-2)" }}>
+            {s.collabs.sub}
+          </p>
+          {businesses.length ? (
+            <div className="mk-programs mt-5">
+              {businesses.map((b) => (
+                <article key={b.userId} className="lp-card mk-panel grid content-start gap-3">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="lp-chip">{b.category ?? s.programs.kinds.local}</span>
+                    {b.isNew && <span className="lp-chip lp-chip--ink">{s.collabs.newChip}</span>}
+                  </div>
+                  <h3 className="text-[18px] font-semibold">{b.name}</h3>
+                  <ul className="grid gap-1 text-[14.5px]" style={{ color: "var(--ink-2)" }}>
+                    {b.reasons.map((r) => (
+                      <li key={r}>• {r}</li>
+                    ))}
+                  </ul>
+                  <div className="mt-1 flex flex-wrap items-center gap-2">
+                    <BusinessInterest s={s} id={b.userId} interested={b.interested} />
+                    {b.website?.startsWith("https://") && (
+                      <a href={b.website} target="_blank" rel="noopener noreferrer nofollow" className="lp-link text-[14px]" style={{ color: "var(--ink-2)" }}>
+                        {s.collabs.website} ↗
+                      </a>
+                    )}
+                    {b.instagram && (
+                      <a href={`https://www.instagram.com/${b.instagram.replace(/^@/, "")}/`} target="_blank" rel="noopener noreferrer nofollow" className="lp-link text-[14px]" style={{ color: "var(--ink-2)" }}>
+                        {s.collabs.instagram} ↗
+                      </a>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="lp-card mk-panel mt-4" style={{ color: "var(--ink-2)" }}>
+              {s.collabs.none}
+            </p>
+          )}
+          <p className="lp-label mt-3">{s.collabs.sharedNote}</p>
+        </section>
         {(pending.length > 0 || profile?.openToOffers) && (
           <section className="mt-8">
             <h2 className="mk-h2">{s.invite.list}</h2>
@@ -299,6 +346,47 @@ function LaunchNotice({ s, side }: { s: Strings; side: "creator" | "business" })
           </ul>
         </details>
       </div>
+    </section>
+  );
+}
+
+/** A short list of creators for a business: who they are, why they fit, their kit, and a way to invite. */
+function CreatorList({ s, title, sub, empty, creators, invite }: { s: Strings; title: string; sub: string; empty: string; creators: CreatorCard[]; invite: string }) {
+  return (
+    <section className="lp-card mk-panel grid content-start gap-3">
+      <h2 className="mk-h2">{title}</h2>
+      <p className="text-[15px]" style={{ color: "var(--ink-2)" }}>
+        {sub}
+      </p>
+      {creators.length ? (
+        <ul className="grid gap-3">
+          {creators.map((c) => (
+            <li key={c.userId} className="flex items-start justify-between gap-3">
+              <span className="min-w-0">
+                <span className="block font-semibold">
+                  {c.name}
+                  {c.area ? <span style={{ color: "var(--ink-2)", fontWeight: 400 }}> · {c.area}</span> : null}
+                </span>
+                <span className="block text-[13.5px]" style={{ color: "var(--ink-2)" }}>
+                  {c.reasons.join(" · ")}
+                </span>
+              </span>
+              {c.kit && (
+                <a href={c.kit} target="_blank" className="lp-link shrink-0 text-[14px]">
+                  {s.fit.viewKit} ↗
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="lp-label">{empty}</p>
+      )}
+      {creators.length > 0 && (
+        <Link href={invite} className="lp-btn lp-btn--ghost justify-self-start" style={{ minHeight: 42 }}>
+          {s.fit.invite}
+        </Link>
+      )}
     </section>
   );
 }

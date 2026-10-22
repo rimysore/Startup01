@@ -365,3 +365,24 @@ export function ProgramInterest({ s, id, interested }: { s: Strings; id: string;
     </button>
   );
 }
+
+/** "I'm interested" on a business listed on Mitra; the business sees the creator. */
+export function BusinessInterest({ s, id, interested }: { s: Strings; id: string; interested: boolean }) {
+  const router = useRouter();
+  const [on, setOn] = useState(interested);
+  const [busy, setBusy] = useState(false);
+  async function toggle() {
+    setBusy(true);
+    const r = await send(`/api/m/businesses/${id}`, "PUT", { interested: !on });
+    setBusy(false);
+    if (!r.error) {
+      setOn(!on);
+      router.refresh();
+    }
+  }
+  return (
+    <button type="button" className={on ? "lp-btn" : "lp-btn lp-btn--ghost"} aria-pressed={on} onClick={toggle} disabled={busy} style={{ minHeight: 40 }}>
+      {on ? `✓ ${s.collabs.noted}` : s.collabs.interested}
+    </button>
+  );
+}
